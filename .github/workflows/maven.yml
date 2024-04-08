@@ -1,0 +1,30 @@
+name: Java CI with Maven
+
+on:
+  push:
+    branches:
+      - Release*
+      - main
+      - IGDD-1429_create_pipeline
+
+  pull_request:
+    branches:
+      - Release*
+      - main
+
+# Ensure only one build changes dev environment at the same time
+concurrency: dev
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout the software
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{secrets.ACTIONS_KEY}}
+
+# More to come...
