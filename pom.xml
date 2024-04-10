@@ -90,18 +90,10 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>1.4.6</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.github.jnr</groupId>
-                        <artifactId>jnr-unixsocket</artifactId>
-                        <version>0.38.14</version>
-                    </dependency>
-                </dependencies>
+                <version>1.4.13</version>
                 <executions>
                     <execution>
                         <id>build-image</id>
@@ -129,11 +121,9 @@
                     <repository>izgw-transform</repository>
                     <buildArgs>
                         <JAR_FILENAME>${project.build.finalName}.jar</JAR_FILENAME>
-                        <IZGW_VERSION>${project.version}</IZGW_VERSION>
                     </buildArgs>
                 </configuration>
             </plugin>
-            -->
         </plugins>
 	</build>
 
