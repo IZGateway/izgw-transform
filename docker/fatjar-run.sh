@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /usr/share/izg-transform
+cd /usr/share/izg-transform || exit
 
 jarfilename=$1
 
@@ -25,7 +25,6 @@ cat /tmp/newresolv.conf > /etc/resolv.conf
 dnsmasq  --use-stale-cache=0 --log-queries=extra --user=root --log-facility=/var/log/dnsmasq.log
 
 java $JAVA_OPTS $JAVA_TOOL_OPTS \
-   -XX:+CreateCoredumpOnCrash -cp ./bc-fips-1.0.2.4.jar:./bcpkix-fips-1.0.7.jar:./bctls-fips-1.0.16.jar \
    -Xms4g \
    -Xmx8g \
    -Djava.library.path=lib \

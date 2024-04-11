@@ -1,12 +1,11 @@
 FROM ghcr.io/izgateway/alpine-node-openssl-fips:latest
 
-RUN apk update
-RUN apk add --no-cache openjdk17-jre
+RUN apk update && apk add --no-cache openjdk17-jre
 
 # Define arguments (set in izgw-transform pom.xml)
 ARG JAR_FILENAME
 
-# Ports - TODO update to proper ports as application takes shape
+# Ports
 EXPOSE 8080
 # Remote debugging
 EXPOSE 8000
@@ -31,13 +30,7 @@ RUN rm run1.sh
 # Add izgw-transform jar file
 ADD target/$JAR_FILENAME app.jar
 
-# Ensure we only use NIST certified publicly available BC-FIPS packages
-ADD docker/data/fips/bc-fips-1.0.2.4.jar bc-fips-1.0.2.4.jar
-ADD docker/data/fips/bcpkix-fips-1.0.7.jar bcpkix-fips-1.0.7.jar
-ADD docker/data/fips/bctls-fips-1.0.16.jar bctls-fips-1.0.16.jar
-
 # Make scripts executable
 RUN ["chmod", "u+r+x", "run.sh"]
-
 
 ENTRYPOINT ["sh","-c","bash run.sh app.jar"]
