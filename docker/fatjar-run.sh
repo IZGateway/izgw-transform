@@ -12,7 +12,7 @@ then
     # NOTE: The * below is important.  It enables your debugger to attach through whatever IP Address Docker is using
     # to recieve connections on port 8000.  If not used, then only connections from 127.0.0.1 are accepted, and while
     # you may think your IP Address of the host is 127.0.0.1, it's not inside the container.
-    JAVA_TOOL_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:8000
+    JAVA_TOOL_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address="*:8000"
 fi
 
 #Save original nameserver in temp file and empty contents
