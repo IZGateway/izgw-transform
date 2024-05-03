@@ -17,14 +17,11 @@ concurrency: dev
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout the software
         uses: actions/checkout@v4
         with:
           ssh-key: ${{secrets.ACTIONS_KEY}}
-
-# More to come...
+# More to come....
