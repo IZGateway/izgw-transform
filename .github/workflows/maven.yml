@@ -5,7 +5,7 @@ on:
     branches:
       - Release*
       - main
-      - IGDD-1429_create_pipeline
+      - IGDD-1429_initial_pipeline
 
   pull_request:
     branches:
