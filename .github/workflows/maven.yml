@@ -80,4 +80,16 @@ jobs:
 
       - name: Print all environment variables
         run: printenv
+
+      - name: Maven Install
+        env:
+          COMMON_PASS: ${{ secrets.COMMON_PASS }}
+          ELASTIC_API_KEY: ${{ secrets.ELASTIC_API_KEY }}
+
+        run: |
+          env && mvn -B clean package install -Dbuildno=${{github.run_number}} \
+              -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
+              -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
+              -Dimage.tag=$IMAGE_BRANCH_TAG
+
 # More to come....
