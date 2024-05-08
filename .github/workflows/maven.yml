@@ -113,4 +113,18 @@ jobs:
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
 
+      - name: Login to GitHub Repository
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag, push and deploy image to Github Repository
+        run: |
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
+          docker image push --all-tags ghcr.io/izgateway/izgw-transform
+
 # More to come...
