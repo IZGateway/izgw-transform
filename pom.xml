@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
 	<artifactId>transformation</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0-IZGWTS-SNAPSHOT</version>
 	<name>transformation</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -22,7 +22,8 @@
         <project.build.finalName>${project.artifactId}-${project.version}-${timestamp}</project.build.finalName>
         <image.tag>${project.build.finalName}</image.tag>
         <buildno>${timestamp}</buildno>
-    </properties>	<dependencies>
+    </properties>
+    <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
