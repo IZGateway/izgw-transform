@@ -9,7 +9,7 @@ import java.util.List;
 @Component
 @Getter
 @Setter
-public class Pipe {
+public class PipeConfig {
     private List<OperationConfig> preconditions;
     // TODO - solutions may end up w/ unique id's instead of names?
     private String solution;

@@ -10,7 +10,7 @@ import java.util.UUID;
 @Component
 @Getter
 @Setter
-public class Solution {
+public class SolutionConfig {
     private UUID id;
     private String name;
     private String description;

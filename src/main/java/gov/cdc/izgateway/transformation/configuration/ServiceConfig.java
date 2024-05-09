@@ -11,5 +11,5 @@ import java.util.List;
 @Setter
 public class ServiceConfig {
     private List<OrganizationConfig> organizations;
-    private List<Solution> solutions;
+    private List<SolutionConfig> solutions;
 }
