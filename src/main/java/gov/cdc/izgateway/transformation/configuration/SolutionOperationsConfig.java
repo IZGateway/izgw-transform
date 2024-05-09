@@ -9,7 +9,7 @@ import java.util.List;
 @Component
 @Getter
 @Setter
-public class ServiceConfig {
-    private List<OrganizationConfig> organizations;
-    private List<Solution> solutions;
+public class SolutionOperationsConfig {
+    private List<OperationConfig> preconditions;
+    private List<OperationConfig> operationList;
 }

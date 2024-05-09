@@ -9,7 +9,9 @@ import java.util.List;
 @Component
 @Getter
 @Setter
-public class ServiceConfig {
-    private List<OrganizationConfig> organizations;
-    private List<Solution> solutions;
+public class Pipe {
+    private List<OperationConfig> preconditions;
+    // TODO - solutions may end up w/ unique id's instead of names?
+    private String solution;
+    private String version;
 }

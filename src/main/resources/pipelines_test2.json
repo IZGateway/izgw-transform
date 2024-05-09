@@ -1,0 +1,226 @@
+{
+  "organizations": [
+    {
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
+      "organizationName": "Audacious Test Organziation",
+      "pipelines": [
+        {
+          "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
+          "name": "HL7v2 to IZ Gateway hub",
+          "inboundEndpoint": "TS IZGHub WSDL Listener",
+          "outboundEndpoint": "IZG Hub",
+          "description": "A pipeline for ORG1, receiving from TS IZGHub WSDL Listener and sending to IZG Hub",
+          "pipes": [
+            {
+              "preconditions": [
+                {
+                  "method": "equals",
+                  "fieldName": "MSH-4-1",
+                  "fieldValue": "FLHOSP1"
+                },
+                {
+                  "method": "equals",
+                  "fieldName": "MSH-6-1",
+                  "fieldValue": "FLSHOTS"
+                }
+              ],
+              "solution": "babyname",
+              "version": "1.0"
+            },
+            {
+              "preconditions": [],
+              "solution": "fixzip",
+              "version": "1.1"
+            },
+            {
+              "preconditions": [],
+              "solution": "racecode_mapping",
+              "version": "1.0"
+            }
+          ]
+        },
+        {
+          "id": "018f5ec3-992d-795d-8b32-e1d16e5afd4f",
+          "name": "FHIR to IZ Gateway hub",
+          "inboundEndpoint": "TS FHIR Listener",
+          "outboundEndpoint": "IZG Hub",
+          "description": "A pipeline for ORG1, receiving via FHIR listener.  Converting to HL7/SOAP to send to IZG Hub",
+          "pipes": [
+            {
+              "preconditions": [],
+              "solution": "fhirconvert",
+              "version": "1.0"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "solutions": [
+    {
+      "id": "018f5ecd-4df2-770d-baa7-d0b8369f2803",
+      "name": "fixzip",
+      "description": "Showing example where we have precondition to apply a set of operations on VXU.  So if user picked fixzip but QBP's were flowing through the fixzip would do nothing.  Only VXU's they sent would be changed.  These preconditions would only be seen by solutioners, user would not see this.  This would allow expansion - solutioner could add another 'request operation' for ADTs that operated on different HL7 fields.  Happy to explore other options.",
+      "version": "1.1",
+      "requestOperations": [
+        {
+          "preconditions": [
+            {
+              "method": "equals",
+              "fieldName": "MSH-9-1",
+              "fieldValue": "VXU"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "regex_replace",
+              "field": "PID-11-5",
+              "regex": "s/\\b(\\d{5})(\\d{4})?\\b/$1-$2/g"
+            },
+            {
+              "method": "regex_replace",
+              "field": "NK1-4-5",
+              "regex": "s/\\b(\\d{5})(\\d{4})?\\b/$1-$2/g"
+            },
+            {
+              "method": "regex_replace",
+              "field": "NK1-32-5",
+              "regex": "s/\\b(\\d{5})(\\d{4})?\\b/$1-$2/g"
+            },
+            {
+              "method": "regex_replace",
+              "field": "GT1-5-5",
+              "regex": "s/\\b(\\d{5})(\\d{4})?\\b/$1-$2/g"
+            },
+            {
+              "method": "regex_replace",
+              "field": "GT1-17-5",
+              "regex": "s/\\b(\\d{5})(\\d{4})?\\b/$1-$2/g"
+            },
+            {
+              "method": "regex_replace",
+              "field": "IN1-5-5",
+              "regex": "s/\\b(\\d{5})(\\d{4})?\\b/$1-$2/g"
+            },
+            {
+              "method": "regex_replace",
+              "field": "IN1-44-5",
+              "regex": "s/\\b(\\d{5})(\\d{4})?\\b/$1-$2/g"
+            },
+            {
+              "method": "regex_replace",
+              "field": "ORC-22-5",
+              "regex": "s/\\b(\\d{5})(\\d{4})?\\b/$1-$2/g"
+            },
+            {
+              "method": "regex_replace",
+              "field": "OBX-24-5",
+              "regex": "s/\\b(\\d{5})(\\d{4})?\\b/$1-$2/g"
+            }
+          ]
+        }
+      ],
+      "responseOperations": []
+    },
+    {
+      "id": "018f5ecd-a421-78a1-9e31-2b10122c47eb",
+      "name": "babyname",
+      "description": "I admittedly don't know the details of this use case yet just adding some example stuff here to flesh it out. Request looks to see if name fields just equals BABY and then does some sets.  Response has 2 entries.  One looks for MSA-1 of AR and changes to AE via set.  The other looks for MSA-1 of CR and changes to CE via set.",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [
+            {
+              "method": "equals",
+              "fieldName": "PID-5-1",
+              "fieldValue": "BABY"
+            },
+            {
+              "method": "equals",
+              "fieldName": "PID-5-2",
+              "fieldValue": "BABY"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "PID-5-1",
+              "setValue": "BABYLASTNAME"
+            },
+            {
+              "method": "set",
+              "destinationField": "PID-5-2",
+              "setValue": "BABYFIRSTNAME"
+            }
+          ]
+        }
+      ],
+      "responseOperations": [
+        {
+          "preconditions": [
+            {
+              "method": "equals",
+              "fieldName": "MSA-1-1",
+              "fieldValue": "AR"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "MSA-1-1",
+              "setValue": "AE"
+            }
+          ]
+        },
+        {
+          "preconditions": [
+            {
+              "method": "equals",
+              "fieldName": "MSA-1-1",
+              "fieldValue": "CR"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "MSA-1-1",
+              "setValue": "CE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "018f5ece-04bc-7374-9397-28c955746911",
+      "name": "racecode_mapping",
+      "description": "Example of using mapper operation to convert codes in PID-10-1 from whatever is sent to a standard codeset. Question is... how does mapping table get set?",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [
+            {
+              "method": "notempty",
+              "fieldName": "PID-10-1"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "mapper",
+              "fieldName": "PID-10-1",
+              "mappingTable": ""
+            }
+          ]
+        }
+      ],
+      "responseOperations": []
+    },
+    {
+      "id": "018f5ece-656b-7561-a24e-2eee221ebfbb",
+      "name": "fhirconvert",
+      "description": "",
+      "version": "1.0",
+      "requestOperations": [],
+      "responseOperations": []
+    }
+  ]
+}

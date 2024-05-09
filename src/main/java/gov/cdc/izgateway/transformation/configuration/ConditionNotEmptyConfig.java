@@ -4,12 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @Getter
 @Setter
-public class ServiceConfig {
-    private List<OrganizationConfig> organizations;
-    private List<Solution> solutions;
+public class ConditionNotEmptyConfig extends OperationConfig {
+    private String fieldName;
 }

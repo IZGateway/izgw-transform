@@ -37,7 +37,7 @@ public class Hl7Pipeline extends BasePipeline implements Pipeline {
 
     @Override
     public void executeThisPipeline(Message message, String direction) throws HL7Exception {
-        log.log(Level.WARNING, String.format("Executing %s Pipeline: %s", direction, this.configuration.getPipelineName()));
+        log.log(Level.WARNING, String.format("Executing %s Pipeline: %s", direction, this.configuration.getName()));
         // TODO - finish
         // TODO - also gross w/ the direction thing definitely needs to be handled differently
 

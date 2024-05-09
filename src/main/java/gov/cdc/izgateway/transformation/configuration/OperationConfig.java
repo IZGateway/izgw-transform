@@ -13,7 +13,10 @@ import org.springframework.stereotype.Component;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = OperationCopyConfig.class, name = "copy"),
         @JsonSubTypes.Type(value = OperationSetConfig.class, name = "set"),
-        @JsonSubTypes.Type(value = OperationEqualsConfig.class, name = "equals")
+        @JsonSubTypes.Type(value = OperationEqualsConfig.class, name = "equals"),
+        @JsonSubTypes.Type(value = OperationRegexReplaceConfig.class, name = "regex_replace"),
+        @JsonSubTypes.Type(value = ConditionNotEmptyConfig.class, name = "notempty"),
+        @JsonSubTypes.Type(value = OperationMapperConfig.class, name = "mapper")
 })
 public class OperationConfig {
     private int order;
