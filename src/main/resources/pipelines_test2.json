@@ -24,17 +24,20 @@
                   "fieldValue": "FLSHOTS"
                 }
               ],
-              "solution": "babyname",
+              "solutionName": "babyname",
+              "solutionId": "018f5ecd-a421-78a1-9e31-2b10122c47eb",
               "version": "1.0"
             },
             {
               "preconditions": [],
-              "solution": "fixzip",
+              "solutionName": "fixzip",
+              "solutionId": "018f5ecd-4df2-770d-baa7-d0b8369f2803",
               "version": "1.1"
             },
             {
               "preconditions": [],
-              "solution": "racecode_mapping",
+              "solutionName": "racecode_mapping",
+              "solutionId": "018f5ece-04bc-7374-9397-28c955746911",
               "version": "1.0"
             }
           ],
@@ -50,7 +53,8 @@
           "pipes": [
             {
               "preconditions": [],
-              "solution": "fhirconvert",
+              "solutionName": "fhirconvert",
+              "solutionId": "018f5ece-656b-7561-a24e-2eee221ebfbb",
               "version": "1.0"
             }
           ],

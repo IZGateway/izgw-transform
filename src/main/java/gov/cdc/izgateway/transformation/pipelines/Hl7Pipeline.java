@@ -22,7 +22,7 @@ public class Hl7Pipeline extends BasePipeline implements Pipeline {
     List<Hl7v2Pipe> pipes;
 
 
-    public Hl7Pipeline(PipelineConfig pipelineConfig) {
+    public Hl7Pipeline(PipelineConfig pipelineConfig) throws Exception {
         super(pipelineConfig);
 
         // A pipeline will have "pipes"

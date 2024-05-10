@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @Getter
@@ -12,6 +13,7 @@ import java.util.List;
 public class PipeConfig {
     private List<OperationConfig> preconditions;
     // TODO - solutions may end up w/ unique id's instead of names?
-    private String solution;
+    private UUID solutionId;
+    private String solutionName;
     private String version;
 }

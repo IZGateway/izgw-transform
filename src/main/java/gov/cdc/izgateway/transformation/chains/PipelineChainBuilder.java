@@ -18,7 +18,7 @@ public class PipelineChainBuilder {
     @Autowired
     ServiceConfig serviceConfig;
 
-    public PipelineChain build(ServiceContext context) {
+    public PipelineChain build(ServiceContext context) throws Exception {
         PipelineChain chain = new PipelineChain();
 
         // TODO - clean this up, quick/dirty obviously can be better
