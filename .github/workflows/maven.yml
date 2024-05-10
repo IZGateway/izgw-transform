@@ -103,7 +103,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Tag, push and deploy image to Amazon ECR
+      - name: Tag and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: transformation-service
@@ -112,6 +112,12 @@ jobs:
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_BRANCH_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
+
+      - name: Update ECS service to force new deployment of latest image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: transformation-service
+        run: |
           aws ecs update-service --cluster izgateway-dev-izgateway-services --service izgateway-transformation-service --force-new-deployment --enable-execute-command --desired-count 1 | jq ".service.deployments[].id"
 
       - name: Login to GitHub Repository
