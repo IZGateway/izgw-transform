@@ -3,6 +3,7 @@ name: Java CI with Maven
 on:
   push:
     branches:
+      - Release*
       - IGDD-1429_initial_pipeline2
 
   pull_request:
