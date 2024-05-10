@@ -4,6 +4,9 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.configuration.PipelineConfig;
 
+// TODO - Need to make generic, meaning not using HAPI at this level because
+//        classes that extend this will not all be HL7 related
+
 abstract class BasePipeline implements Pipeline {
 
     Pipeline nextPipeline;

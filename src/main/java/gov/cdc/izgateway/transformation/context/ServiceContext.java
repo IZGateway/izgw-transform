@@ -8,17 +8,18 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
 import lombok.Data;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @Data
 public class ServiceContext {
-    private String organizationName;
+    private UUID organizationId;
     private String inboundEndpoint;
     private String outboundEndpoint;
     private Message requestMessage;
     private Message responseMessage;
 
-    public ServiceContext(String organizationName, String inboundEndpoint, String outboundEndpoint, String rawHl7Message) throws HL7Exception {
-        this.organizationName = organizationName;
+    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, String rawHl7Message) throws HL7Exception {
+        this.organizationId = organizationId;
         this.inboundEndpoint = inboundEndpoint;
         this.outboundEndpoint = outboundEndpoint;
 

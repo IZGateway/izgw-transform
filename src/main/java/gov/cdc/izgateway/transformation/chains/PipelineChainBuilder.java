@@ -28,7 +28,7 @@ public class PipelineChainBuilder {
                 .getOrganizations()
                 .stream()
                 .filter(
-                        org -> org.getOrganizationName().equals(context.getOrganizationName())
+                        org -> org.getOrganizationId().equals(context.getOrganizationId())
                 )
                 .toList();
 
@@ -42,8 +42,12 @@ public class PipelineChainBuilder {
                     .toList();
         }
 
+        // TODO - I think there should only be 1 Pipeline per Org / IB / OB
+        //        need to verify and potentially fail here?  or something?
+
         // build chain
         for (PipelineConfig pipelineConfig : pipelineConfigs) {
+            // TODO - make generic isn't necessarily always going to be an Hl7Pipeline we are building here.
             chain.addPipeline(new Hl7Pipeline(pipelineConfig));
         }
 

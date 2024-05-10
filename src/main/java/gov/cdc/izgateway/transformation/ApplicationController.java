@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
 import java.util.logging.Level;
 
 @Log
@@ -34,7 +35,7 @@ public class ApplicationController {
 
             // TODO - need to figure out how to determine Org, IB & OB
             // TODO - this is all just for DEMO
-            String organization = headers.getFirst("X-izgw-organization");
+            UUID organization = UUID.fromString(headers.getFirst("X-izgw-organization"));
             String inboundEndpoint = headers.getFirst("X-izgw-ib");
             String outboundEndpoint = headers.getFirst("X-izgw-ob");
 

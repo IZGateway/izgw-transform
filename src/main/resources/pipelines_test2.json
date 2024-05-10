@@ -9,7 +9,7 @@
           "name": "HL7v2 to IZ Gateway hub",
           "inboundEndpoint": "TS IZGHub WSDL Listener",
           "outboundEndpoint": "IZG Hub",
-          "description": "A pipeline for ORG1, receiving from TS IZGHub WSDL Listener and sending to IZG Hub",
+          "description": "REMOTE REQUEST/RESPONSE TRANSFORMATIONS A pipeline for ORG1, receiving from TS IZGHub WSDL Listener and sending to IZG Hub",
           "pipes": [
             {
               "preconditions": [
@@ -37,21 +37,25 @@
               "solution": "racecode_mapping",
               "version": "1.0"
             }
-          ]
+          ],
+          "requestTransformations": [],
+          "responseTransformations": []
         },
         {
           "id": "018f5ec3-992d-795d-8b32-e1d16e5afd4f",
           "name": "FHIR to IZ Gateway hub",
           "inboundEndpoint": "TS FHIR Listener",
           "outboundEndpoint": "IZG Hub",
-          "description": "A pipeline for ORG1, receiving via FHIR listener.  Converting to HL7/SOAP to send to IZG Hub",
+          "description": "REMOTE REQUEST/RESPONSE TRANSFORMATIONS A pipeline for ORG1, receiving via FHIR listener.  Converting to HL7/SOAP to send to IZG Hub",
           "pipes": [
             {
               "preconditions": [],
               "solution": "fhirconvert",
               "version": "1.0"
             }
-          ]
+          ],
+          "requestTransformations": [],
+          "responseTransformations": []
         }
       ]
     }
