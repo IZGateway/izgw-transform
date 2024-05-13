@@ -3,6 +3,7 @@ package gov.cdc.izgateway.transformation.pipes;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.configuration.PipeConfig;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 
 abstract class BasePipe implements Pipe {
     private Pipe next;
@@ -14,9 +15,9 @@ abstract class BasePipe implements Pipe {
 
 
     @Override
-    public void execute(Message message) throws HL7Exception {
-        executeThisPipe(message);
-        executeNextPipe(message);
+    public void execute(ServiceContext context) throws HL7Exception {
+        executeThisPipe(context);
+        executeNextPipe(context);
     }
 
     @Override
@@ -29,11 +30,11 @@ abstract class BasePipe implements Pipe {
         return next;
     }
 
-    public abstract void executeThisPipe(Message message) throws HL7Exception;
+    public abstract void executeThisPipe(ServiceContext context) throws HL7Exception;
 
-    private void executeNextPipe(Message message) throws HL7Exception {
+    private void executeNextPipe(ServiceContext context) throws HL7Exception {
         if (next != null) {
-            next.execute(message);
+            next.execute(context);
         }
     }
 }

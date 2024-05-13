@@ -1,8 +1,8 @@
 package gov.cdc.izgateway.transformation.solutions;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.configuration.SolutionConfig;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 import lombok.extern.java.Log;
 
 @Log
@@ -15,15 +15,12 @@ public class Solution {
         responseOperations = new SolutionOperations(configuration.getResponseOperations());
     }
 
-    // TODO - make generic not HL7 specfic
-    // TODO - pass state or context around and determine from that to run request or response
-    public void executeRequest(Message message) throws HL7Exception {
-        requestOperations.execute(message);
-    }
-
-    // TODO - make generic not HL7 specfic
-    // TODO - pass state or context around and determine from that to run request or response
-    public void executeResponse(Message message) throws HL7Exception {
-        responseOperations.execute(message);
+    // TODO - make generic not HL7 specific
+    public void execute(ServiceContext context) throws HL7Exception {
+        if (context.getCurrentDirection().equals("REQUEST")) {
+            requestOperations.execute(context.getRequestMessage());
+        } else if (context.getCurrentDirection().equals("RESPONSE")) {
+            responseOperations.execute(context.getResponseMessage());
+        }
     }
 }

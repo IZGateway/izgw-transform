@@ -20,6 +20,8 @@ public class ServiceContext {
     private Message requestMessage;
     private Message responseMessage;
     private ServiceConfig configuration;
+    // TODO - solidify this, temp setup to test theory of tracking direction
+    private String currentDirection;
 
     public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, ServiceConfig configuration, String rawHl7Message) throws HL7Exception {
         this.organizationId = organizationId;
@@ -30,6 +32,7 @@ public class ServiceContext {
         rawHl7Message = rawHl7Message.replace("\n", "\r");
 
         this.requestMessage = parseMessage(rawHl7Message);
+        this.currentDirection = "REQUEST";
     }
 
     private Message parseMessage(String rawHl7Message) throws HL7Exception {

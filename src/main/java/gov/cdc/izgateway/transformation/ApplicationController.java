@@ -51,12 +51,14 @@ public class ApplicationController {
                     incomingMessage);
 
             PipelineChain pipeline = pipelineBuilder.build(context);
-            pipeline.execute(context.getRequestMessage(), "request");
+            pipeline.execute(context);
 
             // At this point request message has been transformed, we need to send it and deal with the response
             Message responseMessage = MllpSender.send("localhost", 6661, context.getRequestMessage());
+            context.setCurrentDirection("RESPONSE");
+            context.setResponseMessage(responseMessage);
 
-            pipeline.execute(responseMessage, "response");
+            pipeline.execute(context);
 
             assert responseMessage != null;
             return responseMessage.encode();

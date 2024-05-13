@@ -28,9 +28,7 @@
               "solutionId": "018f5ecd-a421-78a1-9e31-2b10122c47eb",
               "version": "1.0"
             }
-          ],
-          "requestTransformations": [],
-          "responseTransformations": []
+          ]
         },
         {
           "id": "018f5ec3-992d-795d-8b32-e1d16e5afd4f",
@@ -87,7 +85,38 @@
         }
       ],
       "responseOperations": [
-
+        {
+          "preconditions": [
+            {
+              "method": "equals",
+              "fieldName": "MSA-1-1",
+              "fieldValue": "AE"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "MSA-1-1",
+              "setValue": "AR"
+            }
+          ]
+        },
+        {
+          "preconditions": [
+            {
+              "method": "equals",
+              "fieldName": "MSA-1-1",
+              "fieldValue": "CE"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "MSA-1-1",
+              "setValue": "CR"
+            }
+          ]
+        }
       ]
     }
   ]

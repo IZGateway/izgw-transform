@@ -3,6 +3,7 @@ package gov.cdc.izgateway.transformation.pipes;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.configuration.*;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.operations.ConditionalOperation;
 import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.AccessLevel;
@@ -21,20 +22,39 @@ public class Hl7v2Pipe extends BasePipe implements Pipe {
     private List<ConditionalOperation> preconditions;
     private Solution solution;
 
+    // TODO - Solution level in the pipeline do we give the end user ability to
+    //        set precondition on Request/Response?  Or just request.  Or at all?
+    @Setter(AccessLevel.NONE)
+    private boolean preconditionChecked;
+    @Setter(AccessLevel.NONE)
+    private boolean preconditionPassed;
+
     public Hl7v2Pipe(PipeConfig configuration) {
         super(configuration);
         preconditions = new ArrayList<>();
+        preconditionChecked = false;
+        preconditionPassed = false;
     }
 
     @Override
-    public void executeThisPipe(Message message) throws HL7Exception {
+    public void executeThisPipe(ServiceContext context) throws HL7Exception {
+
+        if (!preconditionChecked) {
+            preconditionPassed = preconditionPass(context.getRequestMessage());
+
+            // TODO - remove or make only log on DEBUG
+            if (preconditionPassed) {
+                log.log(Level.WARNING, "Precondition Passed");
+            } else {
+                log.log(Level.WARNING, "Precondition Failed");
+            }
+
+            preconditionChecked = true;
+        }
+
         // TODO - determine if we are working w/ request or response
-        if (preconditionPass(message)) {
-            log.log(Level.WARNING, "Precondition Passed");
-            solution.executeRequest(message);
-            solution.executeResponse(message);
-        } else {
-            log.log(Level.WARNING, "Precondition Failed");
+        if (preconditionPassed) {
+            solution.execute(context);
         }
     }
 

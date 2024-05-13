@@ -16,6 +16,7 @@ import java.util.logging.Level;
 
 @Log
 public class SolutionOperations {
+    // TODO fix this... we are passing in ALL preconditions and operations at once and its getting lumped together
     private final Hl7v2OperationChain operations;
     private final List<ConditionalOperation> preconditions;
 
@@ -23,7 +24,7 @@ public class SolutionOperations {
         operations = new Hl7v2OperationChain();
 
         // TODO add preconditions
-        preconditions = new ArrayList<ConditionalOperation>();
+        preconditions = new ArrayList<>();
 
         for (SolutionOperationsConfig solutionOperationsConfig : configuration) {
 
@@ -46,17 +47,6 @@ public class SolutionOperations {
 
     }
 
-    // TODO - make generic not HL7 specific
-    // TODO - pass a context or state around to determine if we are running request or response
-    public void execute(Message message) throws HL7Exception {
-        if (preconditionPass(message)) {
-            log.log(Level.WARNING, "Precondition Passed");
-            operations.execute(message);
-        } else {
-            log.log(Level.WARNING, "Precondition Failed");
-        }
-    }
-
     private boolean preconditionPass(Message message) throws HL7Exception {
         boolean pass = true;
 
@@ -65,5 +55,17 @@ public class SolutionOperations {
         }
 
         return pass;
+    }
+
+    // TODO - make generic not HL7 specific
+    public void execute(Message message) throws HL7Exception {
+
+        if (preconditionPass(message)) {
+            log.log(Level.WARNING, "Precondition Passed");
+            operations.execute(message);
+        } else {
+            log.log(Level.WARNING, "Precondition Failed");
+        }
+
     }
 }
