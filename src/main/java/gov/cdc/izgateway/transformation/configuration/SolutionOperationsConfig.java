@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.transformation.configuration;
 
+import gov.cdc.izgateway.transformation.operations.ConditionalOperation;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;

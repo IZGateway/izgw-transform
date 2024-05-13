@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.transformation.pipes;
 
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.configuration.PipeConfig;
 
@@ -13,7 +14,8 @@ abstract class BasePipe implements Pipe {
 
 
     @Override
-    public void execute(Message message) {
+    public void execute(Message message) throws HL7Exception {
+        executeThisPipe(message);
         executeNextPipe(message);
     }
 
@@ -27,9 +29,9 @@ abstract class BasePipe implements Pipe {
         return next;
     }
 
-    public abstract void executeThisPipe(Message message);
+    public abstract void executeThisPipe(Message message) throws HL7Exception;
 
-    private void executeNextPipe(Message message) {
+    private void executeNextPipe(Message message) throws HL7Exception {
         if (next != null) {
             next.execute(message);
         }

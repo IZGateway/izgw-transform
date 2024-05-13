@@ -26,6 +26,9 @@ public class ServiceContext {
         this.inboundEndpoint = inboundEndpoint;
         this.outboundEndpoint = outboundEndpoint;
         this.configuration = configuration;
+
+        rawHl7Message = rawHl7Message.replace("\n", "\r");
+
         this.requestMessage = parseMessage(rawHl7Message);
     }
 

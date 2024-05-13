@@ -23,6 +23,7 @@ public class PipelineChain {
     }
 
     public void execute(Message message, String direction) throws HL7Exception {
+        // TODO - pipeline is singular now, remove first/next from this level
         if (firstPipeline != null) {
             firstPipeline.execute(message, direction);
         }

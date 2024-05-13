@@ -2,17 +2,16 @@ package gov.cdc.izgateway.transformation.chains;
 
 import gov.cdc.izgateway.transformation.configuration.*;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.operations.Hl7v2EqualsOperation;
 import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import gov.cdc.izgateway.transformation.pipes.Hl7v2Pipe;
-import gov.cdc.izgateway.transformation.transformers.Hl7DataTransformation;
+import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
-// TODO - move building the WHOLE chain here since we have the context here.
+import java.util.Optional;
 
 @Service
 @Log
@@ -50,31 +49,30 @@ public class PipelineChainBuilder {
             // TODO - make generic isn't necessarily always going to be an Hl7Pipeline we are building here.
             Hl7Pipeline pipeline = new Hl7Pipeline(pipelineConfig);
 
-            List<Hl7DataTransformation> requestTransformations;
-            List<Hl7DataTransformation> responseTransformation;
-            List<Hl7v2Pipe> pipes;
-
-//            // A pipeline will have "pipes"
-            pipes = new ArrayList<>();
+            // A pipeline will have "pipes"
             for (PipeConfig pipeConfig : pipelineConfig.getPipes()) {
                 Hl7v2Pipe pipe = new Hl7v2Pipe(pipeConfig);
 
-            }
-            pipeline.setPipes(pipes);
+                for (OperationConfig co : pipeConfig.getPreconditions()) {
+                    // Precondition
+                    if (co instanceof OperationEqualsConfig operationEqualsConfig) {
+                        pipe.addPrecondition(new Hl7v2EqualsOperation(operationEqualsConfig));
+                    }
+                }
 
-            // So under single pipeline we will have Request & Response Transformations
-            // Loop those in the pipeline config and build the objects
-            requestTransformations = new ArrayList<>();
-            for (DataTransformationConfig dtConfig : pipelineConfig.getRequestTransformations()) {
-                requestTransformations.add(new Hl7DataTransformation(dtConfig));
-            }
-            pipeline.setRequestTransformations(requestTransformations);
+                // Get Solution configuration from full system configuration
+                Optional<SolutionConfig> solutionConfig = context.getConfiguration().getSolutions().stream()
+                        .filter(sc -> sc.getId().equals(pipeConfig.getSolutionId()))
+                        .findFirst();
 
-            responseTransformation = new ArrayList<>();
-            for (DataTransformationConfig dtConfig : pipelineConfig.getResponseTransformations()) {
-                responseTransformation.add(new Hl7DataTransformation(dtConfig));
+                if (solutionConfig.isPresent()) {
+                    pipe.setSolution(new Solution(solutionConfig.get()));
+                } else {
+                    throw new Exception(String.format("Solution not found in system with ID %s", pipeConfig.getSolutionId()));
+                }
+
+                pipeline.addPipe(pipe);
             }
-            pipeline.setResponseTransformation(responseTransformation);
 
             chain.addPipeline(pipeline);
         }
