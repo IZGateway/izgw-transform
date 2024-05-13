@@ -5,7 +5,9 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -17,12 +19,13 @@ public class ServiceContext {
     private String outboundEndpoint;
     private Message requestMessage;
     private Message responseMessage;
+    private ServiceConfig configuration;
 
-    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, String rawHl7Message) throws HL7Exception {
+    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, ServiceConfig configuration, String rawHl7Message) throws HL7Exception {
         this.organizationId = organizationId;
         this.inboundEndpoint = inboundEndpoint;
         this.outboundEndpoint = outboundEndpoint;
-
+        this.configuration = configuration;
         this.requestMessage = parseMessage(rawHl7Message);
     }
 

@@ -39,7 +39,16 @@ public class ApplicationController {
             String inboundEndpoint = headers.getFirst("X-izgw-ib");
             String outboundEndpoint = headers.getFirst("X-izgw-ob");
 
-            ServiceContext context = new ServiceContext(organization, inboundEndpoint, outboundEndpoint, incomingMessage);
+            // TODO - passing config to context, mainly because when we get to the point of
+            //        building the pipes we need to be able to lookup details of the Solutions
+            //        from the solutions section in the configuration.  But that was not there.
+            //        Has to be a better way to do this Spring-y Boot-y.  Going old school
+            //        for now.
+            ServiceContext context = new ServiceContext(organization,
+                    inboundEndpoint,
+                    outboundEndpoint,
+                    serviceConfig,
+                    incomingMessage);
 
             PipelineChain pipeline = pipelineBuilder.build(context);
             pipeline.execute(context.getRequestMessage(), "request");

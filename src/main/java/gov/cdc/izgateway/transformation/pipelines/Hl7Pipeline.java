@@ -7,6 +7,7 @@ import gov.cdc.izgateway.transformation.configuration.PipeConfig;
 import gov.cdc.izgateway.transformation.configuration.PipelineConfig;
 import gov.cdc.izgateway.transformation.pipes.Hl7v2Pipe;
 import gov.cdc.izgateway.transformation.transformers.Hl7DataTransformation;
+import lombok.Setter;
 import lombok.extern.java.Log;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 @Log
+@Setter
 public class Hl7Pipeline extends BasePipeline implements Pipeline {
 
     // TODO - remember to remove request/response transformations once refactor is complete
@@ -25,23 +27,24 @@ public class Hl7Pipeline extends BasePipeline implements Pipeline {
     public Hl7Pipeline(PipelineConfig pipelineConfig) throws Exception {
         super(pipelineConfig);
 
-        // A pipeline will have "pipes"
-        pipes = new ArrayList<>();
-        for (PipeConfig pipeConfig : pipelineConfig.getPipes()) {
-            pipes.add(new Hl7v2Pipe(pipeConfig));
-        }
-
-        // So under single pipeline we will have Request & Response Transformations
-        // Loop those in the pipeline config and build the objects
-        requestTransformations = new ArrayList<>();
-        for (DataTransformationConfig dtConfig : configuration.getRequestTransformations()) {
-            requestTransformations.add(new Hl7DataTransformation(dtConfig));
-        }
-
-        responseTransformation = new ArrayList<>();
-        for (DataTransformationConfig dtConfig : configuration.getResponseTransformations()) {
-            responseTransformation.add(new Hl7DataTransformation(dtConfig));
-        }
+        // TODO - trying to move this into the pipeline builder
+//        // A pipeline will have "pipes"
+//        pipes = new ArrayList<>();
+//        for (PipeConfig pipeConfig : pipelineConfig.getPipes()) {
+//            pipes.add(new Hl7v2Pipe(pipeConfig));
+//        }
+//
+//        // So under single pipeline we will have Request & Response Transformations
+//        // Loop those in the pipeline config and build the objects
+//        requestTransformations = new ArrayList<>();
+//        for (DataTransformationConfig dtConfig : configuration.getRequestTransformations()) {
+//            requestTransformations.add(new Hl7DataTransformation(dtConfig));
+//        }
+//
+//        responseTransformation = new ArrayList<>();
+//        for (DataTransformationConfig dtConfig : configuration.getResponseTransformations()) {
+//            responseTransformation.add(new Hl7DataTransformation(dtConfig));
+//        }
 
     }
 
