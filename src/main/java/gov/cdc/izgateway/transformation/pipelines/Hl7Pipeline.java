@@ -16,7 +16,7 @@ public class Hl7Pipeline extends BasePipeline implements Pipeline {
     List<Hl7v2Pipe> pipes;
 
 
-    public Hl7Pipeline(PipelineConfig pipelineConfig) throws Exception {
+    public Hl7Pipeline(PipelineConfig pipelineConfig) {
         super(pipelineConfig);
         pipes = new ArrayList<>();
     }

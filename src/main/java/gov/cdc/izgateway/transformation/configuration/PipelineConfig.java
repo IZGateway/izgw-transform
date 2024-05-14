@@ -16,8 +16,5 @@ public class PipelineConfig {
     private String description;
     private String inboundEndpoint;
     private String outboundEndpoint;
-    // TODO - remove request/response Transformations once "pipes" gets built out
-    private List<DataTransformationConfig> requestTransformations;
-    private List<DataTransformationConfig> responseTransformations;
     private List<PipeConfig> pipes;
 }

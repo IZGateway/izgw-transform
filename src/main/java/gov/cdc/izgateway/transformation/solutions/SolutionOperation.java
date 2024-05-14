@@ -23,7 +23,6 @@ public class SolutionOperation {
     public SolutionOperation(SolutionOperationsConfig configuration) {
         operations = new Hl7v2OperationChain();
 
-        // TODO add preconditions
         preconditions = new ArrayList<>();
 
         for (OperationConfig conditionalConfig : configuration.getPreconditions()) {

@@ -17,8 +17,7 @@ public class Hl7v2EqualsOperation extends BaseConditionalOperation<OperationEqua
 
     @Override
     public boolean evaluate(Message message) throws HL7Exception {
-        // TODO - finish implementation
-
+        
         log.log(Level.WARNING, String.format("Precondition Evaluation: %s / Does %s EQUAL %s",
                 this.getClass().getSimpleName(),
                 this.operationConfig.getFieldName(),

@@ -7,7 +7,6 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.UUID;

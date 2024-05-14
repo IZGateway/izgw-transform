@@ -52,7 +52,6 @@ public class Hl7v2Pipe extends BasePipe implements Pipe {
             preconditionChecked = true;
         }
 
-        // TODO - determine if we are working w/ request or response
         if (preconditionPassed) {
             solution.execute(context);
         }

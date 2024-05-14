@@ -12,7 +12,6 @@ import java.util.UUID;
 @Setter
 public class PipeConfig {
     private List<OperationConfig> preconditions;
-    // TODO - solutions may end up w/ unique id's instead of names?
     private UUID solutionId;
     private String solutionName;
     private String version;
