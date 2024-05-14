@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 @Setter
-public class OperationEqualsConfig extends OperationConfig {
+public class ConditionEqualsConfig extends OperationConfig {
     private String fieldName;
     private String fieldValue;
 }

@@ -2,7 +2,10 @@ package gov.cdc.izgateway.transformation.chains;
 
 import gov.cdc.izgateway.transformation.configuration.*;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.operations.Hl7v2EmptyOperation;
 import gov.cdc.izgateway.transformation.operations.Hl7v2EqualsOperation;
+import gov.cdc.izgateway.transformation.operations.Hl7v2NotEmptyOperation;
+import gov.cdc.izgateway.transformation.operations.Hl7v2NotEqualsOperation;
 import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import gov.cdc.izgateway.transformation.pipes.Hl7v2Pipe;
 import gov.cdc.izgateway.transformation.solutions.Solution;
@@ -51,12 +54,19 @@ public class PipelineChainBuilder {
 
             // A pipeline will have "pipes"
             for (PipeConfig pipeConfig : pipelineConfig.getPipes()) {
-                Hl7v2Pipe pipe = new Hl7v2Pipe(pipeConfig);
+                Hl7v2Pipe pipe = new Hl7v2Pipe();
 
                 for (OperationConfig co : pipeConfig.getPreconditions()) {
                     // Precondition
-                    if (co instanceof OperationEqualsConfig operationEqualsConfig) {
-                        pipe.addPrecondition(new Hl7v2EqualsOperation(operationEqualsConfig));
+                    // TODO - this is repeated in SolutionOperation.java fix this
+                    if (co instanceof ConditionEqualsConfig conditionEqualsConfig) {
+                        pipe.addPrecondition(new Hl7v2EqualsOperation(conditionEqualsConfig));
+                    } else if (co instanceof ConditionNotEqualsConfig conditionNotEqualsConfig) {
+                        pipe.addPrecondition(new Hl7v2NotEqualsOperation(conditionNotEqualsConfig));
+                    } else if (co instanceof ConditionNotEmptyConfig conditionNotEmptyConfig) {
+                        pipe.addPrecondition(new Hl7v2NotEmptyOperation(conditionNotEmptyConfig));
+                    } else if (co instanceof ConditionEmptyConfig conditionEmptyConfig) {
+                        pipe.addPrecondition(new Hl7v2EmptyOperation(conditionEmptyConfig));
                     }
                 }
 

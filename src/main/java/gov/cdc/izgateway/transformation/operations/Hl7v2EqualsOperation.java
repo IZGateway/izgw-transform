@@ -3,15 +3,15 @@ package gov.cdc.izgateway.transformation.operations;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
-import gov.cdc.izgateway.transformation.configuration.OperationEqualsConfig;
+import gov.cdc.izgateway.transformation.configuration.ConditionEqualsConfig;
 import lombok.extern.java.Log;
 
 import java.util.logging.Level;
 
 @Log
-public class Hl7v2EqualsOperation extends BaseConditionalOperation<OperationEqualsConfig> implements ConditionalOperation {
+public class Hl7v2EqualsOperation extends BaseConditionalOperation<ConditionEqualsConfig> implements ConditionalOperation {
 
-    public Hl7v2EqualsOperation(OperationEqualsConfig configuration) {
+    public Hl7v2EqualsOperation(ConditionEqualsConfig configuration) {
         super(configuration);
     }
 

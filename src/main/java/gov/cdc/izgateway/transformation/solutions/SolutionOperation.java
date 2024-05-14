@@ -4,10 +4,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.chains.Hl7v2OperationChain;
 import gov.cdc.izgateway.transformation.configuration.*;
-import gov.cdc.izgateway.transformation.operations.ConditionalOperation;
-import gov.cdc.izgateway.transformation.operations.Hl7v2CopyOperation;
-import gov.cdc.izgateway.transformation.operations.Hl7v2EqualsOperation;
-import gov.cdc.izgateway.transformation.operations.Hl7v2SetOperation;
+import gov.cdc.izgateway.transformation.operations.*;
 import lombok.extern.java.Log;
 
 import java.util.ArrayList;
@@ -26,8 +23,21 @@ public class SolutionOperation {
         preconditions = new ArrayList<>();
 
         for (OperationConfig conditionalConfig : configuration.getPreconditions()) {
-            if (conditionalConfig instanceof OperationEqualsConfig operationsEqualsConfig) {
+
+            if (conditionalConfig instanceof ConditionEqualsConfig operationsEqualsConfig) {
                 preconditions.add(new Hl7v2EqualsOperation(operationsEqualsConfig));
+            }
+
+            else if (conditionalConfig instanceof ConditionNotEqualsConfig operationsNotEqualsConfig) {
+                preconditions.add(new Hl7v2NotEqualsOperation(operationsNotEqualsConfig));
+            }
+
+            else if (conditionalConfig instanceof ConditionNotEmptyConfig conditionNotEmptyConfig) {
+                preconditions.add(new Hl7v2NotEmptyOperation(conditionNotEmptyConfig));
+            }
+
+            else if (conditionalConfig instanceof ConditionEmptyConfig conditionEmptyConfig) {
+                preconditions.add(new Hl7v2EmptyOperation(conditionEmptyConfig));
             }
         }
 
@@ -46,7 +56,8 @@ public class SolutionOperation {
         boolean pass = true;
 
         for (ConditionalOperation op : preconditions) {
-            pass = pass && op.evaluate(message);
+            // TODO - short-circut w/ &&?
+            pass = pass & op.evaluate(message);
         }
 
         return pass;

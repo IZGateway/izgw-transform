@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 @Setter
-public class ConditionNotEmptyConfig extends OperationConfig {
+public class ConditionEmptyConfig extends OperationConfig {
     private String dataPath;
 }
