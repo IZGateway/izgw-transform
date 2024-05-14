@@ -56,8 +56,7 @@ public class SolutionOperation {
         boolean pass = true;
 
         for (ConditionalOperation op : preconditions) {
-            // TODO - short-circut w/ &&?
-            pass = pass & op.evaluate(message);
+            pass = pass && op.evaluate(message);
         }
 
         return pass;

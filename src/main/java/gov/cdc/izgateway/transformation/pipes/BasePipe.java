@@ -69,8 +69,7 @@ abstract class BasePipe implements Pipe {
         boolean pass = true;
 
         for (ConditionalOperation op : preconditions) {
-            // TODO - short circuit w/ &&
-            pass = pass & op.evaluate(message);
+            pass = pass && op.evaluate(message);
         }
 
         return pass;
