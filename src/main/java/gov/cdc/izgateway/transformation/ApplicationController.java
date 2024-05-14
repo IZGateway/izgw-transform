@@ -54,7 +54,7 @@ public class ApplicationController {
             pipeline.execute(context);
 
             // At this point request message has been transformed, we need to send it and deal with the response
-            Message responseMessage = MllpSender.send("localhost", 6661, context.getRequestMessage());
+            Message responseMessage = MllpSender.send("localhost", 21110, context.getRequestMessage());
             context.setCurrentDirection("RESPONSE");
             context.setResponseMessage(responseMessage);
 
