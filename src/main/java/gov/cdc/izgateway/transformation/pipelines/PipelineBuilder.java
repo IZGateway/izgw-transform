@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.transformation.chains;
+package gov.cdc.izgateway.transformation.pipelines;
 
 import gov.cdc.izgateway.transformation.configuration.*;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
@@ -6,7 +6,6 @@ import gov.cdc.izgateway.transformation.operations.Hl7v2EmptyOperation;
 import gov.cdc.izgateway.transformation.operations.Hl7v2EqualsOperation;
 import gov.cdc.izgateway.transformation.operations.Hl7v2NotEmptyOperation;
 import gov.cdc.izgateway.transformation.operations.Hl7v2NotEqualsOperation;
-import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import gov.cdc.izgateway.transformation.pipes.Hl7v2Pipe;
 import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.extern.java.Log;
@@ -18,10 +17,11 @@ import java.util.Optional;
 
 @Service
 @Log
-public class PipelineChainBuilder {
+public class PipelineBuilder {
 
-    public PipelineChain build(ServiceContext context) throws Exception {
-        PipelineChain chain = new PipelineChain();
+    public Hl7Pipeline build(ServiceContext context) throws Exception {
+
+        Hl7Pipeline pipeline = new Hl7Pipeline();
 
         // TODO - clean this up, quick/dirty obviously can be better
 
@@ -39,18 +39,23 @@ public class PipelineChainBuilder {
         for (OrganizationConfig organizationConfig : organizations) {
             pipelineConfigs = organizationConfig.getPipelines().stream()
                     .filter(
-                            pipeline -> pipeline.getInboundEndpoint().equals(context.getInboundEndpoint()) && pipeline.getOutboundEndpoint().equals(context.getOutboundEndpoint())
+                            pl -> pl.getInboundEndpoint().equals(context.getInboundEndpoint()) && pl.getOutboundEndpoint().equals(context.getOutboundEndpoint())
                     )
                     .toList();
         }
 
-        // TODO - I think there should only be 1 Pipeline per Org / IB / OB
-        //        need to verify and potentially fail here?  or something?
+        if (pipelineConfigs.size() > 1) {
+            throw new Exception(String.format("More than one pipeline configured for Organization: '%s', Inbound Endpoint: '%s' and Outbound Endpoint: '%s'",
+                    context.getOrganizationId(),
+                    context.getInboundEndpoint(),
+                    context.getOutboundEndpoint()));
+        }
 
         // build chain
-        for (PipelineConfig pipelineConfig : pipelineConfigs) {
+        if (!pipelineConfigs.isEmpty()) {
+            PipelineConfig pipelineConfig = pipelineConfigs.get(0);
             // TODO - make generic isn't necessarily always going to be an Hl7Pipeline we are building here.
-            Hl7Pipeline pipeline = new Hl7Pipeline(pipelineConfig);
+            pipeline = new Hl7Pipeline(pipelineConfig);
 
             // A pipeline will have "pipes"
             for (PipeConfig pipeConfig : pipelineConfig.getPipes()) {
@@ -83,10 +88,8 @@ public class PipelineChainBuilder {
 
                 pipeline.addPipe(pipe);
             }
-
-            chain.addPipeline(pipeline);
         }
 
-        return chain;
+        return pipeline;
     }
 }

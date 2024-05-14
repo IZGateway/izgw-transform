@@ -19,7 +19,7 @@ public class ServiceContext {
     private Message requestMessage;
     private Message responseMessage;
     private ServiceConfig configuration;
-    // TODO - solidify this, temp setup to test theory of tracking direction
+    // TODO - Setup ENUM or some way to lock down potential directions (REQUEST/RESPONSE)
     private String currentDirection;
 
     public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, ServiceConfig configuration, String rawHl7Message) throws HL7Exception {

@@ -12,6 +12,10 @@ abstract class BasePipeline implements Pipeline {
     Pipeline nextPipeline;
     PipelineConfig configuration;
 
+    protected BasePipeline() {
+
+    }
+
     protected BasePipeline(PipelineConfig pipelineConfig) {
         this.configuration = pipelineConfig;
 
@@ -19,7 +23,10 @@ abstract class BasePipeline implements Pipeline {
 
     @Override
     public void execute(ServiceContext context) throws HL7Exception {
-        executeThisPipeline(context);
+        if (configuration != null) {
+            executeThisPipeline(context);
+        }
+
         executeNextPipeline(context);
     }
 

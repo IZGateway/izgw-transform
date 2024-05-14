@@ -15,6 +15,7 @@ public class Hl7Pipeline extends BasePipeline implements Pipeline {
 
     List<Hl7v2Pipe> pipes;
 
+    public Hl7Pipeline() {}
 
     public Hl7Pipeline(PipelineConfig pipelineConfig) {
         super(pipelineConfig);
