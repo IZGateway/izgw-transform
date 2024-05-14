@@ -76,6 +76,7 @@ public class PipelineBuilder {
                 }
 
                 // Get Solution configuration from full system configuration
+                // TODO - take version into account!
                 Optional<SolutionConfig> solutionConfig = context.getConfiguration().getSolutions().stream()
                         .filter(sc -> sc.getId().equals(pipeConfig.getSolutionId()))
                         .findFirst();

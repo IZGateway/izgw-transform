@@ -26,6 +26,10 @@ public class Hl7v2EqualsOperation extends BaseConditionalOperation<ConditionEqua
         Terser terser = new Terser(message);
         String sourceValue = terser.get(operationConfig.getFieldName());
 
+        if (sourceValue == null) {
+            return false;
+        }
+
         return (sourceValue.equals(operationConfig.getFieldValue()));
     }
 }

@@ -14,9 +14,9 @@
             {
               "preconditions": [
                 {
-                  "method": "not_equals",
+                  "method": "equals",
                   "fieldName": "MSH-4-1",
-                  "fieldValue": "FLHOSP2"
+                  "fieldValue": "FLHOSP1"
                 },
                 {
                   "method": "equals",
@@ -27,6 +27,12 @@
               "solutionName": "babyname",
               "solutionId": "018f5ecd-a421-78a1-9e31-2b10122c47eb",
               "version": "1.0"
+            },
+            {
+              "solutionId": "018f7881-7607-7220-a94b-fe0c7e81cbec",
+              "solutionName": "AustinCustom1",
+              "version": "1.0",
+              "preconditions": []
             },
             {
               "preconditions": [],
@@ -61,6 +67,77 @@
     }
   ],
   "solutions": [
+    {
+      "id": "018f7881-7607-7220-a94b-fe0c7e81cbec",
+      "name": "AustinCustom1",
+      "description": "Just implements the example from original demo.  MSH-4-1 to MSH-22-1 (if MSH-22-1 is empty).  MSH-6-1 to MSH-23-1 (is MSH-23-1 is empty). Hardcode MSH-21-1 and MSH-21-2 if they don't already match specified precondition values",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [
+            {
+              "method": "empty",
+              "dataPath": "/MSH-22-1"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "copy",
+              "sourceField": "/MSH-4-1",
+              "destinationField": "/MSH-22-1"
+            }
+          ]
+        },
+        {
+          "preconditions": [
+            {
+              "method": "empty",
+              "dataPath": "/MSH-23-1"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "copy",
+              "sourceField": "/MSH-6-1",
+              "destinationField": "/MSH-23-1"
+            }
+          ]
+        },
+        {
+          "preconditions": [
+            {
+              "method": "not_equals",
+              "fieldName": "/MSH-21-1",
+              "fieldValue": "CDCPHINVS"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-21-1",
+              "setValue": "CDCPHINVS"
+            }
+          ]
+        },
+        {
+          "preconditions": [
+            {
+              "method": "not_equals",
+              "fieldName": "/MSH-21-2",
+              "fieldValue": "Z22"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-21-2",
+              "setValue": "Z22"
+            }
+          ]
+        }
+      ],
+      "responseOperations": []
+    },
     {
       "id": "018f5ecd-4df2-770d-baa7-d0b8369f2803",
       "name": "fixzip",
