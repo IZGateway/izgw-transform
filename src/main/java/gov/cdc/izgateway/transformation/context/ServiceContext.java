@@ -5,10 +5,13 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import gov.cdc.izgateway.transformation.configuration.OrganizationConfig;
+import gov.cdc.izgateway.transformation.configuration.PipelineConfig;
 import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import lombok.Data;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Data
@@ -44,5 +47,27 @@ public class ServiceContext {
         }
 
         return parser.parse(rawHl7Message);
+    }
+
+    public OrganizationConfig getOrganization() {
+        return configuration
+                .getOrganizations()
+                .stream()
+                .filter(org -> org.getOrganizationId().equals(organizationId))
+                .reduce((a, b) -> {
+                    throw new IllegalStateException("More than one OrganizationConfig found for id " + organizationId);
+                }).orElse(null);
+    }
+
+    public PipelineConfig getPipeline() {
+        return getOrganization().getPipelines()
+                .stream()
+                .filter(pl -> pl.getInboundEndpoint().equals(inboundEndpoint) && pl.getOutboundEndpoint().equals(outboundEndpoint))
+                .reduce((a, b) -> {
+                    throw new IllegalStateException(String.format("More than one PipelineConfig found for Organization ID '%s', Inbound Endpoint '%s', and Outbound Endpoint '%s'",
+                            outboundEndpoint,
+                            inboundEndpoint,
+                            outboundEndpoint));
+                }).orElse(null);
     }
 }

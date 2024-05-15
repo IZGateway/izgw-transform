@@ -11,8 +11,6 @@ import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,35 +23,13 @@ public class PipelineBuilder {
 
         // TODO - clean this up, quick/dirty obviously can be better
 
-        // get Organization objects for the context org
-        List<OrganizationConfig> organizations = context.getConfiguration()
-                .getOrganizations()
-                .stream()
-                .filter(
-                        org -> org.getOrganizationId().equals(context.getOrganizationId())
-                )
-                .toList();
-
-        // get pipelines for the context ib and ob endpoints
-        List<PipelineConfig> pipelineConfigs = new ArrayList<>();
-        for (OrganizationConfig organizationConfig : organizations) {
-            pipelineConfigs = organizationConfig.getPipelines().stream()
-                    .filter(
-                            pl -> pl.getInboundEndpoint().equals(context.getInboundEndpoint()) && pl.getOutboundEndpoint().equals(context.getOutboundEndpoint())
-                    )
-                    .toList();
-        }
-
-        if (pipelineConfigs.size() > 1) {
-            throw new Exception(String.format("More than one pipeline configured for Organization: '%s', Inbound Endpoint: '%s' and Outbound Endpoint: '%s'",
-                    context.getOrganizationId(),
-                    context.getInboundEndpoint(),
-                    context.getOutboundEndpoint()));
-        }
+        // Get pipeline from the context
+        // Context has Organzation, Inbound Endpoint & Outbound Endpoint
+        // Should only be 1 Pipeline for that combination of information
+        PipelineConfig pipelineConfig = context.getPipeline();
 
         // build chain
-        if (!pipelineConfigs.isEmpty()) {
-            PipelineConfig pipelineConfig = pipelineConfigs.get(0);
+        if (pipelineConfig != null) {
             // TODO - make generic isn't necessarily always going to be an Hl7Pipeline we are building here.
             pipeline = new Hl7Pipeline(pipelineConfig);
 
