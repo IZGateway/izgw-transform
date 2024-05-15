@@ -26,25 +26,7 @@ abstract class BasePipeline implements Pipeline {
         if (configuration != null) {
             executeThisPipeline(context);
         }
-
-        executeNextPipeline(context);
-    }
-
-    @Override
-    public void setNextPipeline(Pipeline nextPipeline) {
-        this.nextPipeline = nextPipeline;
-    }
-
-    @Override
-    public Pipeline getNextPipeline() {
-        return nextPipeline;
     }
 
     public abstract void executeThisPipeline(ServiceContext context) throws HL7Exception;
-
-    public void executeNextPipeline(ServiceContext context) throws HL7Exception {
-        if (nextPipeline != null) {
-            nextPipeline.execute(context);
-        }
-    }
 }

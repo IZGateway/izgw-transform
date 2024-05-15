@@ -8,10 +8,4 @@ public interface Pipeline {
     // TODO - if throw stays needs to be generic, not everything will be HL7
     void execute(ServiceContext context) throws HL7Exception;
 
-    // TODO - remove once refactor finishes "Next" will exist on Pipes in Pipeline
-    void setNextPipeline(Pipeline nextPipeline);
-
-    // TODO - remove once refactor finishes "Next" will exist on Pipes in Pipeline
-    Pipeline getNextPipeline();
-
 }
