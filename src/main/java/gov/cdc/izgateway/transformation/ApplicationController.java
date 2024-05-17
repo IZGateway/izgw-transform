@@ -18,11 +18,14 @@ import java.util.logging.Level;
 @RestController
 public class ApplicationController {
 
-    @Autowired
-    ServiceConfig serviceConfig;
+    private final ServiceConfig serviceConfig;
+    private final PipelineBuilder pipelineBuilder;
 
     @Autowired
-    PipelineBuilder pipelineBuilder;
+    public ApplicationController(ServiceConfig serviceConfig, PipelineBuilder pipelineBuilder) {
+        this.serviceConfig = serviceConfig;
+        this.pipelineBuilder = pipelineBuilder;
+    }
 
     @GetMapping("/hello")
     public String transform() {
