@@ -10,11 +10,9 @@ import java.util.UUID;
 @Component
 @Getter
 @Setter
-public class PipelineConfig {
-    private String name;
-    private UUID id;
-    private String description;
-    private String inboundEndpoint;
-    private String outboundEndpoint;
-    private List<PipeConfig> pipes;
+public class PipeConfig {
+    private List<OperationConfig> preconditions;
+    private UUID solutionId;
+    private String solutionName;
+    private String version;
 }
