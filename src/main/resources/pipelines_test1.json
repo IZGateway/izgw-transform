@@ -2,8 +2,10 @@
   "organizations": [
     {
       "organizationName": "org1",
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
       "pipelines": [
         {
+          "pipelineId": "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
           "pipelineName": "org1_p1",
           "inboundEndpoint": "izghubwsdl",
           "outboundEndpoint": "izghub://dev.phiz-project.org",
@@ -89,6 +91,7 @@
           ]
         },
         {
+          "pipelineId": "018f5ec0-73b7-7d8a-8938-85fb657f463d",
           "pipelineName": "org1_p2",
           "inboundEndpoint": "rest/transform",
           "outboundEndpoint": null,

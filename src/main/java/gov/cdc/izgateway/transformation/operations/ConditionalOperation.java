@@ -5,6 +5,4 @@ import ca.uhn.hl7v2.model.Message;
 
 public interface ConditionalOperation {
     boolean evaluate(Message message) throws HL7Exception;
-
-    // TODO - we may need set/next if > 1 single condition on a pipeline
 }

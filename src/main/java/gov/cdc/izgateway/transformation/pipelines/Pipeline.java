@@ -1,14 +1,11 @@
 package gov.cdc.izgateway.transformation.pipelines;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Message;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 
 public interface Pipeline {
 
-    void execute(Message message, String direction) throws HL7Exception;
-
-    void setNextPipeline(Pipeline nextPipeline);
-
-    Pipeline getNextPipeline();
+    // TODO - if throw stays needs to be generic, not everything will be HL7
+    void execute(ServiceContext context) throws HL7Exception;
 
 }
