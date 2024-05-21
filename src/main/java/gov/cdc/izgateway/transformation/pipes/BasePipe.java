@@ -4,6 +4,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.operations.ConditionalOperation;
+import gov.cdc.izgateway.transformation.preconditions.Precondition;
 import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.AccessLevel;
 import lombok.Setter;
@@ -29,7 +30,7 @@ abstract class BasePipe implements Pipe {
     protected boolean preconditionPassed;
 
     protected Solution solution;
-    protected List<ConditionalOperation> preconditions;
+    protected List<Precondition> preconditions;
 
     protected BasePipe() {
         preconditions = new ArrayList<>();
@@ -68,7 +69,7 @@ abstract class BasePipe implements Pipe {
     private boolean preconditionPass(Message message) throws HL7Exception {
         boolean pass = true;
 
-        for (ConditionalOperation op : preconditions) {
+        for (Precondition op : preconditions) {
             pass = pass && op.evaluate(message);
         }
 
@@ -86,7 +87,7 @@ abstract class BasePipe implements Pipe {
     }
 
     @Override
-    public void addPrecondition(ConditionalOperation op) {
+    public void addPrecondition(Precondition op) {
         preconditions.add(op);
     }
 
