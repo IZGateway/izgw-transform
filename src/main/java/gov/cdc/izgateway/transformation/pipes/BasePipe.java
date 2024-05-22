@@ -20,12 +20,9 @@ abstract class BasePipe implements Pipe {
     @Setter(AccessLevel.NONE)
     private Pipe next;
 
-    // TODO - Solution level in the pipeline do we give the end user ability to
-    //        set precondition on both Request and Response?  Here is setup to
-    //        execute on Request only and save status so that actions will also
-    //        execute on the Response
     @Setter(AccessLevel.NONE)
     protected boolean preconditionChecked;
+
     @Setter(AccessLevel.NONE)
     protected boolean preconditionPassed;
 

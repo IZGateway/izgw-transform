@@ -33,7 +33,7 @@ public class PipelineBuilder {
         // Get pipeline from the context
         // Context has Organzation, Inbound Endpoint & Outbound Endpoint
         // Should only be 1 Pipeline for that combination of information
-        PipelineConfig pipelineConfig = context.getPipeline();
+        PipelineConfig pipelineConfig = serviceConfig.getPipelineConfig(context);
 
         // build chain
         if (pipelineConfig != null) {
@@ -50,10 +50,11 @@ public class PipelineBuilder {
                     }
                 }
 
+                // TODO - Hl7v2Pipe gets created with pipeConfig.  Then setSolution pulls solutionConfig
+                // basically does everything internally.  Not here?
+
                 // Get Solution configuration from full system configuration
-                Optional<SolutionConfig> solutionConfig = context.getConfiguration().getSolutions().stream()
-                        .filter(sc -> sc.getId().equals(pipeConfig.getSolutionId()))
-                        .findFirst();
+                Optional<SolutionConfig> solutionConfig = serviceConfig.getSolutionConfigById(pipeConfig.getSolutionId());
 
                 if (solutionConfig.isPresent()) {
                     // TODO - need to pass context here to get DataType

@@ -54,25 +54,25 @@ public class ServiceContext {
         return parser.parse(rawHl7Message);
     }
 
-    public OrganizationConfig getOrganization() {
-        return configuration
-                .getOrganizations()
-                .stream()
-                .filter(org -> org.getOrganizationId().equals(organizationId))
-                .reduce((a, b) -> {
-                    throw new IllegalStateException("More than one OrganizationConfig found for id " + organizationId);
-                }).orElse(null);
-    }
+//    public OrganizationConfig getOrganization() {
+//        return configuration
+//                .getOrganizations()
+//                .stream()
+//                .filter(org -> org.getOrganizationId().equals(organizationId))
+//                .reduce((a, b) -> {
+//                    throw new IllegalStateException("More than one OrganizationConfig found for id " + organizationId);
+//                }).orElse(null);
+//    }
 
-    public PipelineConfig getPipeline() {
-        return getOrganization().getPipelines()
-                .stream()
-                .filter(pl -> pl.getInboundEndpoint().equals(inboundEndpoint) && pl.getOutboundEndpoint().equals(outboundEndpoint))
-                .reduce((a, b) -> {
-                    throw new IllegalStateException(String.format("More than one PipelineConfig found for Organization ID '%s', Inbound Endpoint '%s', and Outbound Endpoint '%s'",
-                            outboundEndpoint,
-                            inboundEndpoint,
-                            outboundEndpoint));
-                }).orElse(null);
-    }
+//    public PipelineConfig getPipeline() {
+//        return getOrganization().getPipelines()
+//                .stream()
+//                .filter(pl -> pl.getInboundEndpoint().equals(inboundEndpoint) && pl.getOutboundEndpoint().equals(outboundEndpoint))
+//                .reduce((a, b) -> {
+//                    throw new IllegalStateException(String.format("More than one PipelineConfig found for Organization ID '%s', Inbound Endpoint '%s', and Outbound Endpoint '%s'",
+//                            outboundEndpoint,
+//                            inboundEndpoint,
+//                            outboundEndpoint));
+//                }).orElse(null);
+//    }
 }
