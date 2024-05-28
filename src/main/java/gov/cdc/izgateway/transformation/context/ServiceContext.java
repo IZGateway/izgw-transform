@@ -20,16 +20,13 @@ public class ServiceContext {
     private String outboundEndpoint;
     private Message requestMessage;
     private Message responseMessage;
-    // TODO - remove configuration from context, will be pulled in other classes as needed
-    private ServiceConfig configuration;
     private DataFlowDirection currentDirection;
     private DataType dataType;
 
-    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, ServiceConfig configuration, DataType dataType, String rawMessage) throws HL7Exception {
+    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, DataType dataType, String rawMessage) throws HL7Exception {
         this.organizationId = organizationId;
         this.inboundEndpoint = inboundEndpoint;
         this.outboundEndpoint = outboundEndpoint;
-        this.configuration = configuration;
         this.dataType = dataType;
 
         if (dataType.equals(DataType.HL7V2)) {

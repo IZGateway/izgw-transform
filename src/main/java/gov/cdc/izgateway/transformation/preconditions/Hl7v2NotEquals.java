@@ -11,7 +11,7 @@ public class Hl7v2NotEquals extends NotEquals implements Precondition {
 
     @Override
     public boolean evaluate(Message message) {
-        Hl7v2Equals hl7v2Equals = new Hl7v2Equals(new Equals(this.getDataPath(), this.getComparisonValue()));
+        Hl7v2Equals hl7v2Equals = new Hl7v2Equals(this.getDataPath(), this.getComparisonValue());
         return !hl7v2Equals.evaluate(message);
     }
 }

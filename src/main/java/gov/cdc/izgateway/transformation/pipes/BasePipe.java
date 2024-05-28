@@ -8,13 +8,14 @@ import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
 @Setter
-@Log
+@Slf4j
 abstract class BasePipe implements Pipe {
     @Setter(AccessLevel.NONE)
     private Pipe next;
@@ -47,22 +48,20 @@ abstract class BasePipe implements Pipe {
 
     @Override
     public void executeCondition(ServiceContext context) throws HL7Exception {
-        // TODO - change to protected?
         if (!preconditionChecked) {
             preconditionPassed = preconditionPass(context.getRequestMessage());
 
-            // TODO - remove or make only log on DEBUG
             if (preconditionPassed) {
-                log.log(Level.WARNING, "Precondition Passed");
+                log.trace("Pipe Precondition Passed");
             } else {
-                log.log(Level.WARNING, "Precondition Failed");
+                log.trace("Pipe Precondition Failed");
             }
 
             preconditionChecked = true;
         }
     }
 
-    private boolean preconditionPass(Message message) throws HL7Exception {
+    private boolean preconditionPass(Message message) {
         boolean pass = true;
 
         for (Precondition op : preconditions) {

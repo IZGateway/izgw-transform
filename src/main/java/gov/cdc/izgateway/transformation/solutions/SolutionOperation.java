@@ -7,13 +7,13 @@ import gov.cdc.izgateway.transformation.configuration.*;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.operations.*;
 import gov.cdc.izgateway.transformation.preconditions.*;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-@Log
+@Slf4j
 public class SolutionOperation {
 
     private final Hl7v2OperationChain operations;
@@ -57,10 +57,10 @@ public class SolutionOperation {
     public void execute(Message message) throws HL7Exception {
 
         if (preconditionPass(message)) {
-            log.log(Level.WARNING, "Precondition Passed");
+            log.trace("Solution Operation Precondition Passed");
             operations.execute(message);
         } else {
-            log.log(Level.WARNING, "Precondition Failed");
+            log.trace("Solution Operation Precondition Failed");
         }
 
     }

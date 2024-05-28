@@ -8,6 +8,10 @@ public class Hl7v2Equals extends Equals implements Precondition {
 
     public Hl7v2Equals() {}
 
+    public Hl7v2Equals(String dataPath, String comparisonValue) {
+        super(dataPath, comparisonValue);
+    }
+
     public Hl7v2Equals(Equals equals) {
         super(equals);
     }

@@ -7,8 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class NotEquals extends Equals implements Precondition {
-    private String dataPath;
-    private String comparisonValue;
 
     protected NotEquals() {
         super();

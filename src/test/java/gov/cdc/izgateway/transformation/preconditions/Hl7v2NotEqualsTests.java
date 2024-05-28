@@ -23,7 +23,7 @@ class Hl7v2NotEqualsTests {
     })
     void testNonMatchingValues(String dataPath, String comparisonValue) throws HL7Exception {
         // Testing fields against values they DO NOT contain so Hl7v2NotEquals.evaluate() should return true.
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","",null, DataType.HL7V2, TestMessage1());
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
 
         Hl7v2NotEquals ne = new Hl7v2NotEquals();
         ne.setDataPath(dataPath);
@@ -44,7 +44,7 @@ class Hl7v2NotEqualsTests {
     })
     void testMatchingValues(String dataPath, String comparisonValue) throws HL7Exception {
         // Testing fields against values they actually contain so Hl7v2NotEquals.evaluate() should return false.
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","",null, DataType.HL7V2, TestMessage1());
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
 
         Hl7v2NotEquals ne = new Hl7v2NotEquals();
         ne.setDataPath(dataPath);
@@ -64,7 +64,7 @@ class Hl7v2NotEqualsTests {
     })
     void testFieldDoesNotExist(String dataPath, String comparisonValue) throws HL7Exception {
         // Testing fields that are not in the message so Hl7v2NotEquals.evaluate() should return true.
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","",null, DataType.HL7V2, TestMessage1());
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
 
         Hl7v2NotEquals ne = new Hl7v2NotEquals();
         ne.setDataPath(dataPath);

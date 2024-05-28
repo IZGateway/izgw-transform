@@ -46,7 +46,6 @@ public class ApplicationController {
             ServiceContext context = new ServiceContext(organization,
                     inboundEndpoint,
                     outboundEndpoint,
-                    serviceConfig,
                     DataType.HL7V2,
                     incomingMessage);
 

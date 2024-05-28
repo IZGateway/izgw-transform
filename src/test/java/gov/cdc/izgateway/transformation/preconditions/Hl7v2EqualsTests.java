@@ -21,7 +21,7 @@ class Hl7v2EqualsTests {
             "/ORDER/OBSERVATION(1)/OBX-3-2,OBX.3.2.SECOND_REPETITION"
     })
     void testTrue(String dataPath, String comparisonValue) throws HL7Exception {
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","",null, DataType.HL7V2, TestMessage1());
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
 
         Hl7v2Equals eq = new Hl7v2Equals();
         eq.setDataPath(dataPath);
@@ -45,7 +45,7 @@ class Hl7v2EqualsTests {
             "/ORDER/OBSERVATION(2)/OBX-3-2,REPETITION_NO_EXIST"
     })
     void testNotTrue(String dataPath, String comparisonValue) throws HL7Exception {
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","",null, DataType.HL7V2, TestMessage1());
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
 
         Hl7v2Equals eq = new Hl7v2Equals();
         eq.setDataPath(dataPath);
