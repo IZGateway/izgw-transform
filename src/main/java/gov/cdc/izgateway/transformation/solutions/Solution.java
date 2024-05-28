@@ -1,15 +1,12 @@
 package gov.cdc.izgateway.transformation.solutions;
 
 import ca.uhn.hl7v2.HL7Exception;
-import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import gov.cdc.izgateway.transformation.configuration.SolutionConfig;
 import gov.cdc.izgateway.transformation.configuration.SolutionOperationsConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
