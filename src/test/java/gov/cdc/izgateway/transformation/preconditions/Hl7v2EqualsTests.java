@@ -1,9 +1,8 @@
-package gov.cdc.izgateway.transformation.operations;
+package gov.cdc.izgateway.transformation.preconditions;
 
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
-import gov.cdc.izgateway.transformation.preconditions.Hl7v2Equals;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
