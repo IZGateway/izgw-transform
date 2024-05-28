@@ -7,7 +7,6 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
-import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import lombok.Data;
 
 import java.io.IOException;

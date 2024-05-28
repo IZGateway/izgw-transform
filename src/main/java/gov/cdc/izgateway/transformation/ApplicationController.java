@@ -20,12 +20,10 @@ import java.util.logging.Level;
 @RestController
 public class ApplicationController {
 
-    private final ServiceConfig serviceConfig;
     private final PipelineBuilder pipelineBuilder;
 
     @Autowired
-    public ApplicationController(ServiceConfig serviceConfig, PipelineBuilder pipelineBuilder) {
-        this.serviceConfig = serviceConfig;
+    public ApplicationController(PipelineBuilder pipelineBuilder) {
         this.pipelineBuilder = pipelineBuilder;
     }
 
