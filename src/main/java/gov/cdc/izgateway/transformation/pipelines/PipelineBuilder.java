@@ -18,14 +18,23 @@ import java.util.Optional;
 @Log
 public class PipelineBuilder {
     private final ServiceConfig serviceConfig;
+private final NewPipelineBuilder newPipeline;
 
     @Autowired
-    public PipelineBuilder(ServiceConfig serviceConfig) {
+    public PipelineBuilder(ServiceConfig serviceConfig, NewPipelineBuilder newPipeline) {
         this.serviceConfig = serviceConfig;
+        this.newPipeline = newPipeline;
     }
 
     public Hl7Pipeline build(ServiceContext context) throws Exception {
 
+
+
+        // TODO - pass HL7Pipeline the context and have it build itself?
+        // TODO - What is best?  Putting config in Context and passing around or having each object able to read config?
+        // TODO - personally I think the latter.
+        // TODO - issue is getting config and context into the "class".  I'd like for the config to "just be there"
+        //        but have not found a good way to do this just yet.
         Hl7Pipeline pipeline = new Hl7Pipeline();
 
         // TODO - clean this up, quick/dirty obviously can be better

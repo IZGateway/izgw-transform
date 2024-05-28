@@ -2,24 +2,41 @@ package gov.cdc.izgateway.transformation.pipelines;
 
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.transformation.configuration.PipelineConfig;
+import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.pipes.Hl7v2Pipe;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+@Service
 @Log
 public class Hl7Pipeline extends BasePipeline implements Pipeline {
 
+//    @Autowired
+//    private final ServiceConfig serviceConfig;
+
     List<Hl7v2Pipe> pipes;
 
-    public Hl7Pipeline() {}
+    public Hl7Pipeline() {
+
+    }
+
+//    public Hl7Pipeline(ServiceConfig serviceConfig) {
+//        this.serviceConfig = serviceConfig;
+//    }
 
     public Hl7Pipeline(PipelineConfig pipelineConfig) {
         super(pipelineConfig);
         pipes = new ArrayList<>();
+    }
+
+    public Hl7Pipeline(ServiceContext context) {
+
     }
 
     @Override
