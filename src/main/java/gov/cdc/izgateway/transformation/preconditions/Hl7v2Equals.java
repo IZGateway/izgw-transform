@@ -13,7 +13,7 @@ public class Hl7v2Equals extends Equals implements Precondition {
     }
 
     @Override
-    public boolean evaluate(Message message) throws HL7Exception {
+    public boolean evaluate(Message message) {
 
         Terser terser = new Terser(message);
 

@@ -11,5 +11,5 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = Equals.class, name = "not_equals")
 })
 public interface Precondition {
-    boolean evaluate(Message message) throws HL7Exception;
+    boolean evaluate(Message message);
 }
