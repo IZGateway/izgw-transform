@@ -4,7 +4,10 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.chains.Hl7v2OperationChain;
 import gov.cdc.izgateway.transformation.configuration.*;
+import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.operations.*;
+import gov.cdc.izgateway.transformation.preconditions.Equals;
+import gov.cdc.izgateway.transformation.preconditions.Hl7v2Equals;
 import gov.cdc.izgateway.transformation.preconditions.Precondition;
 import lombok.extern.java.Log;
 
@@ -18,29 +21,15 @@ public class SolutionOperation {
     private final Hl7v2OperationChain operations;
     private final List<Precondition> preconditions;
 
-    public SolutionOperation(SolutionOperationsConfig configuration) {
+    public SolutionOperation(SolutionOperationsConfig configuration, DataType dataType) {
         operations = new Hl7v2OperationChain();
 
         preconditions = new ArrayList<>();
 
         for (Precondition precondition : configuration.getPreconditions()) {
-            preconditions.add(precondition);
-
-//            if (conditionalConfig instanceof ConditionEqualsConfig operationsEqualsConfig) {
-//                preconditions.add(new Hl7v2EqualsOperation(operationsEqualsConfig));
-//            }
-//
-//            else if (conditionalConfig instanceof ConditionNotEqualsConfig operationsNotEqualsConfig) {
-//                preconditions.add(new Hl7v2NotEqualsOperation(operationsNotEqualsConfig));
-//            }
-//
-//            else if (conditionalConfig instanceof ConditionNotEmptyConfig conditionNotEmptyConfig) {
-//                preconditions.add(new Hl7v2NotEmptyOperation(conditionNotEmptyConfig));
-//            }
-//
-//            else if (conditionalConfig instanceof ConditionEmptyConfig conditionEmptyConfig) {
-//                preconditions.add(new Hl7v2EmptyOperation(conditionEmptyConfig));
-//            }
+            if (dataType.equals(DataType.HL7V2) && precondition instanceof Equals equals) {
+                preconditions.add(new Hl7v2Equals(equals));
+            }
         }
 
         for (OperationConfig operationConfig : configuration.getOperationList()) {

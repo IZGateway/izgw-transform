@@ -9,6 +9,7 @@ import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.UUID;

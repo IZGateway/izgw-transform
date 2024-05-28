@@ -18,28 +18,16 @@ import java.util.Optional;
 @Log
 public class PipelineBuilder {
     private final ServiceConfig serviceConfig;
-private final NewPipelineBuilder newPipeline;
 
     @Autowired
-    public PipelineBuilder(ServiceConfig serviceConfig, NewPipelineBuilder newPipeline) {
+    public PipelineBuilder(ServiceConfig serviceConfig) {
         this.serviceConfig = serviceConfig;
-        this.newPipeline = newPipeline;
     }
 
     public Hl7Pipeline build(ServiceContext context) throws Exception {
-
-
-
-        // TODO - pass HL7Pipeline the context and have it build itself?
-        // TODO - What is best?  Putting config in Context and passing around or having each object able to read config?
-        // TODO - personally I think the latter.
-        // TODO - issue is getting config and context into the "class".  I'd like for the config to "just be there"
-        //        but have not found a good way to do this just yet.
         Hl7Pipeline pipeline = new Hl7Pipeline();
 
-        // TODO - clean this up, quick/dirty obviously can be better
-
-        // Get pipeline from the context
+        // Get pipeline configuration via the context
         // Context has Organzation, Inbound Endpoint & Outbound Endpoint
         // Should only be 1 Pipeline for that combination of information
         PipelineConfig pipelineConfig = serviceConfig.getPipelineConfig(context);
@@ -59,16 +47,12 @@ private final NewPipelineBuilder newPipeline;
                     }
                 }
 
-                // TODO - Hl7v2Pipe gets created with pipeConfig.  Then setSolution pulls solutionConfig
-                // basically does everything internally.  Not here?
-
                 // Get Solution configuration from full system configuration
                 Optional<SolutionConfig> solutionConfig = serviceConfig.getSolutionConfigById(pipeConfig.getSolutionId());
 
                 if (solutionConfig.isPresent()) {
-                    // TODO - need to pass context here to get DataType
-                    //        may require creating a SolutionBuilder???
-                    pipe.setSolution(new Solution(solutionConfig.get()));
+                    // TODO - need to pass context here to get DataType or pass DataType.  Need to clean this up.
+                    pipe.setSolution(new Solution(solutionConfig.get(), context.getDataType()));
                 } else {
                     throw new Exception(String.format("Solution not found in system with ID %s", pipeConfig.getSolutionId()));
                 }
