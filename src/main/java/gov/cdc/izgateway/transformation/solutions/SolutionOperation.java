@@ -6,9 +6,7 @@ import gov.cdc.izgateway.transformation.chains.Hl7v2OperationChain;
 import gov.cdc.izgateway.transformation.configuration.*;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.operations.*;
-import gov.cdc.izgateway.transformation.preconditions.Equals;
-import gov.cdc.izgateway.transformation.preconditions.Hl7v2Equals;
-import gov.cdc.izgateway.transformation.preconditions.Precondition;
+import gov.cdc.izgateway.transformation.preconditions.*;
 import lombok.extern.java.Log;
 
 import java.util.ArrayList;
@@ -27,8 +25,10 @@ public class SolutionOperation {
         preconditions = new ArrayList<>();
 
         for (Precondition precondition : configuration.getPreconditions()) {
-            if (dataType.equals(DataType.HL7V2) && precondition instanceof Equals equals) {
-                preconditions.add(new Hl7v2Equals(equals));
+            if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(Equals.class)) {
+                preconditions.add(new Hl7v2Equals((Equals) precondition));
+            } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(NotEquals.class)) {
+                preconditions.add(new Hl7v2NotEquals((NotEquals) precondition));
             }
         }
 
@@ -43,7 +43,7 @@ public class SolutionOperation {
 
     }
 
-    private boolean preconditionPass(Message message) throws HL7Exception {
+    private boolean preconditionPass(Message message) {
         boolean pass = true;
 
         for (Precondition op : preconditions) {

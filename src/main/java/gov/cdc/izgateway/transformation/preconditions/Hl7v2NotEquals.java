@@ -1,15 +1,17 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
-import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 
-public class Hl7v2NotEquals extends Equals implements Precondition {
-    public Hl7v2NotEquals(Equals equals) {
-        super(equals);
+public class Hl7v2NotEquals extends NotEquals implements Precondition {
+    public Hl7v2NotEquals() {}
+
+    public Hl7v2NotEquals(NotEquals notEquals) {
+        super(notEquals);
     }
 
     @Override
     public boolean evaluate(Message message) {
-        return false;
+        Hl7v2Equals hl7v2Equals = new Hl7v2Equals(new Equals(this.getDataPath(), this.getComparisonValue()));
+        return !hl7v2Equals.evaluate(message);
     }
 }

@@ -1,6 +1,5 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
-import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +17,11 @@ public class Equals implements Precondition {
     protected Equals(Equals equals) {
         this.dataPath = equals.getDataPath();
         this.comparisonValue = equals.getComparisonValue();
+    }
+
+    protected Equals(String dataPath, String comparisonValue) {
+        this.dataPath = dataPath;
+        this.comparisonValue = comparisonValue;
     }
 
     @Override

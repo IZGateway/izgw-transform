@@ -38,7 +38,7 @@
         {
           "preconditions": [
             {
-              "method": "equals",
+              "method": "not_equals",
               "dataPath": "/MSH-3-1",
               "comparisonValue": "IZGATEWAY"
             }

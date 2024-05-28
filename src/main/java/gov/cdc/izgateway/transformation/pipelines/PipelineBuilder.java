@@ -4,9 +4,7 @@ import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.configuration.*;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.pipes.Hl7v2Pipe;
-import gov.cdc.izgateway.transformation.preconditions.Equals;
-import gov.cdc.izgateway.transformation.preconditions.Hl7v2Equals;
-import gov.cdc.izgateway.transformation.preconditions.Precondition;
+import gov.cdc.izgateway.transformation.preconditions.*;
 import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +40,10 @@ public class PipelineBuilder {
                 Hl7v2Pipe pipe = new Hl7v2Pipe();
 
                 for (Precondition precondition : pipeConfig.getPreconditions()) {
-                    if (context.getDataType().equals(DataType.HL7V2) && precondition instanceof Equals equals) {
-                        pipe.addPrecondition(new Hl7v2Equals(equals));
+                    if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(Equals.class)) {
+                        pipe.addPrecondition(new Hl7v2Equals((Equals) precondition));
+                    } else if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(NotEquals.class)) {
+                        pipe.addPrecondition(new Hl7v2NotEquals((NotEquals) precondition));
                     }
                 }
 
