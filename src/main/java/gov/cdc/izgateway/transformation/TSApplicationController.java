@@ -16,13 +16,13 @@ import java.util.logging.Level;
 
 @Log
 @RestController
-public class ApplicationController {
+public class TSApplicationController {
 
     private final ServiceConfig serviceConfig;
     private final PipelineBuilder pipelineBuilder;
 
     @Autowired
-    public ApplicationController(ServiceConfig serviceConfig, PipelineBuilder pipelineBuilder) {
+    public TSApplicationController(ServiceConfig serviceConfig, PipelineBuilder pipelineBuilder) {
         this.serviceConfig = serviceConfig;
         this.pipelineBuilder = pipelineBuilder;
     }
