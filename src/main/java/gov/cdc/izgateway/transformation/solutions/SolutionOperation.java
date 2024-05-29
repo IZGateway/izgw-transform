@@ -4,40 +4,31 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.chains.Hl7v2OperationChain;
 import gov.cdc.izgateway.transformation.configuration.*;
+import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.operations.*;
-import lombok.extern.java.Log;
+import gov.cdc.izgateway.transformation.preconditions.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-@Log
+@Slf4j
 public class SolutionOperation {
 
     private final Hl7v2OperationChain operations;
-    private final List<ConditionalOperation> preconditions;
+    private final List<Precondition> preconditions;
 
-    public SolutionOperation(SolutionOperationsConfig configuration) {
+    public SolutionOperation(SolutionOperationsConfig configuration, DataType dataType) {
         operations = new Hl7v2OperationChain();
 
         preconditions = new ArrayList<>();
 
-        for (OperationConfig conditionalConfig : configuration.getPreconditions()) {
-
-            if (conditionalConfig instanceof ConditionEqualsConfig operationsEqualsConfig) {
-                preconditions.add(new Hl7v2EqualsOperation(operationsEqualsConfig));
-            }
-
-            else if (conditionalConfig instanceof ConditionNotEqualsConfig operationsNotEqualsConfig) {
-                preconditions.add(new Hl7v2NotEqualsOperation(operationsNotEqualsConfig));
-            }
-
-            else if (conditionalConfig instanceof ConditionNotEmptyConfig conditionNotEmptyConfig) {
-                preconditions.add(new Hl7v2NotEmptyOperation(conditionNotEmptyConfig));
-            }
-
-            else if (conditionalConfig instanceof ConditionEmptyConfig conditionEmptyConfig) {
-                preconditions.add(new Hl7v2EmptyOperation(conditionEmptyConfig));
+        for (Precondition precondition : configuration.getPreconditions()) {
+            if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(Equals.class)) {
+                preconditions.add(new Hl7v2Equals((Equals) precondition));
+            } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(NotEquals.class)) {
+                preconditions.add(new Hl7v2NotEquals((NotEquals) precondition));
             }
         }
 
@@ -52,10 +43,10 @@ public class SolutionOperation {
 
     }
 
-    private boolean preconditionPass(Message message) throws HL7Exception {
+    private boolean preconditionPass(Message message) {
         boolean pass = true;
 
-        for (ConditionalOperation op : preconditions) {
+        for (Precondition op : preconditions) {
             pass = pass && op.evaluate(message);
         }
 
@@ -66,10 +57,10 @@ public class SolutionOperation {
     public void execute(Message message) throws HL7Exception {
 
         if (preconditionPass(message)) {
-            log.log(Level.WARNING, "Precondition Passed");
+            log.trace("Solution Operation Precondition Passed");
             operations.execute(message);
         } else {
-            log.log(Level.WARNING, "Precondition Failed");
+            log.trace("Solution Operation Precondition Failed");
         }
 
     }
