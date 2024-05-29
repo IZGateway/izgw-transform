@@ -3,33 +3,31 @@ package gov.cdc.izgateway.transformation.pipes;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
-import gov.cdc.izgateway.transformation.operations.ConditionalOperation;
+import gov.cdc.izgateway.transformation.preconditions.Precondition;
 import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
 @Setter
-@Log
+@Slf4j
 abstract class BasePipe implements Pipe {
     @Setter(AccessLevel.NONE)
     private Pipe next;
 
-    // TODO - Solution level in the pipeline do we give the end user ability to
-    //        set precondition on both Request and Response?  Here is setup to
-    //        execute on Request only and save status so that actions will also
-    //        execute on the Response
     @Setter(AccessLevel.NONE)
     protected boolean preconditionChecked;
+
     @Setter(AccessLevel.NONE)
     protected boolean preconditionPassed;
 
     protected Solution solution;
-    protected List<ConditionalOperation> preconditions;
+    protected List<Precondition> preconditions;
 
     protected BasePipe() {
         preconditions = new ArrayList<>();
@@ -50,25 +48,23 @@ abstract class BasePipe implements Pipe {
 
     @Override
     public void executeCondition(ServiceContext context) throws HL7Exception {
-        // TODO - change to protected?
         if (!preconditionChecked) {
             preconditionPassed = preconditionPass(context.getRequestMessage());
 
-            // TODO - remove or make only log on DEBUG
             if (preconditionPassed) {
-                log.log(Level.WARNING, "Precondition Passed");
+                log.trace("Pipe Precondition Passed");
             } else {
-                log.log(Level.WARNING, "Precondition Failed");
+                log.trace("Pipe Precondition Failed");
             }
 
             preconditionChecked = true;
         }
     }
 
-    private boolean preconditionPass(Message message) throws HL7Exception {
+    private boolean preconditionPass(Message message) {
         boolean pass = true;
 
-        for (ConditionalOperation op : preconditions) {
+        for (Precondition op : preconditions) {
             pass = pass && op.evaluate(message);
         }
 
@@ -86,7 +82,7 @@ abstract class BasePipe implements Pipe {
     }
 
     @Override
-    public void addPrecondition(ConditionalOperation op) {
+    public void addPrecondition(Precondition op) {
         preconditions.add(op);
     }
 

@@ -9,7 +9,6 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 
 abstract class BasePipeline implements Pipeline {
 
-    Pipeline nextPipeline;
     PipelineConfig configuration;
 
     protected BasePipeline() {

@@ -1,6 +1,8 @@
 package gov.cdc.izgateway.transformation;
 
 import ca.uhn.hl7v2.model.Message;
+import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
+import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.pipelines.PipelineBuilder;
 import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
@@ -17,7 +19,6 @@ import java.util.logging.Level;
 @Log
 @RestController
 public class TSApplicationController {
-
     private final ServiceConfig serviceConfig;
     private final PipelineBuilder pipelineBuilder;
 
@@ -36,21 +37,15 @@ public class TSApplicationController {
     public String transform(@RequestBody String incomingMessage, @RequestHeader HttpHeaders headers) {
         try {
 
-            // TODO - need to figure out how to determine Org, IB & OB
-            // TODO - this is all just for DEMO
+            // TODO - Org, IB, OB will likely come from camel.  This is for Demo only.
             UUID organization = UUID.fromString(headers.getFirst("X-izgw-organization"));
             String inboundEndpoint = headers.getFirst("X-izgw-ib");
             String outboundEndpoint = headers.getFirst("X-izgw-ob");
 
-            // TODO - passing config to context, mainly because when we get to the point of
-            //        building the pipes we need to be able to lookup details of the Solutions
-            //        from the solutions section in the configuration.  But that was not there.
-            //        Has to be a better way to do this Spring-y Boot-y.  Going old school
-            //        for now.
             ServiceContext context = new ServiceContext(organization,
                     inboundEndpoint,
                     outboundEndpoint,
-                    serviceConfig,
+                    DataType.HL7V2,
                     incomingMessage);
 
             Hl7Pipeline pipeline = pipelineBuilder.build(context);
@@ -58,7 +53,7 @@ public class TSApplicationController {
 
             // At this point request message has been transformed, we need to send it and deal with the response
             Message responseMessage = MllpSender.send("localhost", 21110, context.getRequestMessage());
-            context.setCurrentDirection("RESPONSE");
+            context.setCurrentDirection(DataFlowDirection.RESPONSE);
             context.setResponseMessage(responseMessage);
 
             pipeline.execute(context);

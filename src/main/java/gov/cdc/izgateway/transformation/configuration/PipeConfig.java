@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.transformation.configuration;
 
+import gov.cdc.izgateway.transformation.preconditions.Precondition;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class PipeConfig {
-    private List<OperationConfig> preconditions;
+    private List<Precondition> preconditions;
     private UUID solutionId;
     private String solutionName;
     private String version;

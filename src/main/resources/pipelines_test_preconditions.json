@@ -1,0 +1,91 @@
+{
+  "organizations": [
+    {
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
+      "organizationName": "Audacious Test Organziation",
+      "pipelines": [
+        {
+          "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
+          "name": "HL7v2 to IZ Gateway hub",
+          "inboundEndpoint": "TS IZGHub WSDL Listener",
+          "outboundEndpoint": "IZG Hub",
+          "description": "REMOTE REQUEST/RESPONSE TRANSFORMATIONS A pipeline for ORG1, receiving from TS IZGHub WSDL Listener and sending to IZG Hub",
+          "pipes": [
+            {
+              "solutionId": "018f7881-7607-7220-a94b-fe0c7e81cbec",
+              "solutionName": "AustinCustom1",
+              "version": "1.0",
+              "preconditions": [
+                {
+                  "method": "equals",
+                  "dataPath": "MSH-4-1",
+                  "comparisonValue": "FLHOSP1"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "solutions": [
+    {
+      "id": "018f7881-7607-7220-a94b-fe0c7e81cbec",
+      "name": "AustinCustom1",
+      "description": "Just implements the example from original demo.  MSH-4-1 to MSH-22-1 (if MSH-22-1 is empty).  MSH-6-1 to MSH-23-1 (is MSH-23-1 is empty). Hardcode MSH-21-1 and MSH-21-2 if they don't already match specified precondition values",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [
+            {
+              "method": "not_equals",
+              "dataPath": "/MSH-3-1",
+              "comparisonValue": "IZGATEWAY"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "copy",
+              "sourceField": "/MSH-4-1",
+              "destinationField": "/MSH-22-1"
+            }
+          ]
+        },
+        {
+          "preconditions": [
+          ],
+          "operationList": [
+            {
+              "method": "copy",
+              "sourceField": "/MSH-6-1",
+              "destinationField": "/MSH-23-1"
+            }
+          ]
+        },
+        {
+          "preconditions": [
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-21-1",
+              "setValue": "CDCPHINVS"
+            }
+          ]
+        },
+        {
+          "preconditions": [
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-21-2",
+              "setValue": "Z22"
+            }
+          ]
+        }
+      ],
+      "responseOperations": []
+    }
+  ]
+}
