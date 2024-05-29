@@ -68,8 +68,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-//import com.zaxxer.hikari.HikariDataSource;
-
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import gov.cdc.izgateway.logging.event.EventId;
@@ -106,7 +104,7 @@ import lombok.extern.slf4j.Slf4j;
         )
 )
 @SpringBootApplication
-@EntityScan(basePackages={"gov.cdc.izgateway.db.model"})
+//@EntityScan(basePackages={"gov.cdc.izgateway.db.model"})
 //@ComponentScan(basePackages={"gov.cdc.izgateway.security.ocsp","gov.cdc.izgateway.service.ICertificateStatusService"})
 // PAUL COMMENTED @EnableJpaRepositories(basePackages={"gov.cdc.izgateway.db.repository"})
 public class Application implements WebMvcConfigurer {
@@ -122,16 +120,7 @@ public class Application implements WebMvcConfigurer {
     @Value("${spring.application.fix-newlines}")
     private boolean fixNewlines;
 
-    // Heartbeat needs it's own thread in order to not be blocked by other background tasks.
-    private static ScheduledExecutorService he =
-            Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "Heartbeat-Scheduler"));
-
-    private static boolean heartbeatEnabled = true;  // Set to false during debugging to disable heartbeat logging
     private static SecureRandom secureRandom;
-
-    public static void setAbortOnNoIIS(boolean abort) {
-        abortOnNoIIS = abort;
-    }
 
     private static AbstractHttp11JsseProtocol<?> protocol;
     public static void reloadSsl() {
@@ -165,9 +154,6 @@ public class Application implements WebMvcConfigurer {
         String build = new String(staticPages.get(BUILD), StandardCharsets.UTF_8);
         log.info("Application loaded\n{}", build);
         // FUTURE: Get from a configuration property
-        long healthStatusCheckInterval = 60;
-        he.scheduleAtFixedRate(Application::heartbeat, healthStatusCheckInterval, healthStatusCheckInterval, TimeUnit.SECONDS);
-        heartbeat();
     }
 
     private static void updateJul() {
@@ -202,21 +188,9 @@ public class Application implements WebMvcConfigurer {
             }
         }
     }
-
     private static void initialize() {
-        Thread.currentThread().setName("IZ Gateway");
-        // Initialize the Utilization Service
-        UtilizationService.getUtilization();
+        Thread.currentThread().setName("Transformation Service");
 
-        System.setProperty("java.util.logging.config.class", JulInit.class.getName());
-
-        // This should no longer be necessary, but it doesn't hurt to leave it here
-        // in case JUL logging doesn't install it for some reason.
-        if (!SLF4JBridgeHandler.isInstalled()) {
-            // Redirect all JUL log records to the SLF4J API
-            SLF4JBridgeHandler.removeHandlersForRootLogger();
-            SLF4JBridgeHandler.install();
-        }
 
         // This is necessary initialization to use BCFKS module
         CryptoServicesRegistrar.setSecureRandom(getSecureRandom());
@@ -246,13 +220,6 @@ public class Application implements WebMvcConfigurer {
 
     public static void shutdown() {
         HealthService.setHealthy(false, "Service Stopped");
-    }
-
-    static void heartbeat() {
-        if (heartbeatEnabled ) {
-            MDC.put(EventId.EVENTID_KEY, EventId.DEFAULT_TX_ID);
-            log.info(Markers2.append("health", HealthService.getHealth(), "utilization", UtilizationService.getUtilization()), "Heartbeat");
-        }
     }
 
     private static void checkApplication(ConfigurableApplicationContext ctx) {
