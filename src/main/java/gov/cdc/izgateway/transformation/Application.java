@@ -145,49 +145,11 @@ public class Application implements WebMvcConfigurer {
             System.exit(1);
         }
 
-        updateJul();
-
-        loadStaticResource(BUILD, BUILD_FILE);
-        loadStaticResource(LOGO, LOGO_FILE);
-        HealthService.setBuildName(getBuild());
-        HealthService.setServerName(serverName);
-        String build = new String(staticPages.get(BUILD), StandardCharsets.UTF_8);
+        String build = getBuild();
         log.info("Application loaded\n{}", build);
         // FUTURE: Get from a configuration property
     }
 
-    private static void updateJul() {
-        String[] classes = {
-                NioEndpoint.class.getName(),
-                NioEndpoint.class.getName() + ".handshake",
-                NioEndpoint.class.getName() + ".certificate"
-        };
-        for (String c: classes) {
-            Logger l = (Logger) LoggerFactory.getLogger(c);
-            l.setLevel(Level.DEBUG);
-        }
-    }
-
-    public static class JulInit {
-        private static final String LOGGING_PROPERTIES =
-                "handlers = org.slf4j.bridge.SLF4JBridgeHandler\n"
-                        + ".level = INFO\n"
-                        // Must enable FINE level logging in SLF4J to capture NioEndpoint handshake exceptions
-                        + "org.apache.tomcat.util.net.NioEndpoint.level = FINE\n"
-                        + "org.apache.tomcat.util.net.NioEndpoint.certificate.level = FINE\n"
-                        + "org.apache.tomcat.util.net.NioEndpoint.handshake.level = FINE\n";
-
-        public JulInit() {
-            try {
-                ByteArrayInputStream bis = new ByteArrayInputStream(LOGGING_PROPERTIES.getBytes(StandardCharsets.UTF_8));
-                LogManager.getLogManager().readConfiguration(bis);
-            } catch (SecurityException e) {
-                throw new ServiceConfigurationError("Security Exception while configuring logging", e);
-            } catch (IOException e) {
-                throw new ServiceConfigurationError("IO Exception while configuring logging", e);
-            }
-        }
-    }
     private static void initialize() {
         Thread.currentThread().setName("Transformation Service");
 
@@ -213,9 +175,6 @@ public class Application implements WebMvcConfigurer {
             }
         });
 
-        // Set the eventId for startup log records to 0
-        MDC.put(EventId.EVENTID_KEY, EventId.DEFAULT_TX_ID);
-        MDC.put("sessionId", "0");
     }
 
     public static void shutdown() {
@@ -223,46 +182,10 @@ public class Application implements WebMvcConfigurer {
     }
 
     private static void checkApplication(ConfigurableApplicationContext ctx) {
-//        IDestinationService destinationService = ctx.getBean(IDestinationService.class);
-//        serverName = destinationService.getServerName();
-//        serverMode = ctx.getBean(AppProperties.class).getServerMode();
-//        IMessageHeaderService messageHeaderService = ctx.getBean(MessageHeaderService.class);
-//        DataSourceProperties ds = ctx.getBean(DataSourceProperties.class);
-//        StatusCheckScheduler sc = ctx.getBean(StatusCheckScheduler.class);
-//        Application app = ctx.getBean(Application.class);
-//        try {
-//            // Test for database connectivity and prefetch caches.
-//            List<IDestination> list = destinationService.getAllDestinations();
-//
-//            if (list.isEmpty() && abortOnNoIIS) {
-//                HealthService.setHealthy(false, "No IIS Connections available");
-//                log.error("No IIS Connections are available from {}", ds.getUrl());
-//                throw new ServiceConfigurationError("No IIS Connections are available from " + ds.getUrl());
-//            } else {
-//                // Prefetch to populate cache
-//                messageHeaderService.getAllMessageHeaders();
-//                if (app.statusCheck) {
-//                    sc.start();
-//                }
-//                HealthService.setHealthy(true, "Normal application startup");
-//                log.info("Connected to {}", ds.getUrl());
-//            }
-//        } catch (RuntimeException hex) { // NOSONAR This is handling the exception correctly
-//            HealthService.setHealthy(hex);
-//            log.error(Markers2.append(hex), "Cannot get a database connection to {}: {}", ds.getUrl(), hex.getMessage(), hex);
-//            throw new ServiceConfigurationError("Cannot get a database connection to " + ds.getUrl(), hex);
-//        }
     }
-
 
     public static String getBuild() {
-        byte[] v = staticPages.get(BUILD);
-        String version = v == null ? "" : new String(v);
-        return StringUtils.substringBetween(version, "Build:", "\n").trim();
-    }
-
-    public static String getPage(String page) {
-        return new String(staticPages.get(page), StandardCharsets.UTF_8);
+        return("TODO: TSBuild");
     }
 
     /**
@@ -295,41 +218,10 @@ public class Application implements WebMvcConfigurer {
         return secureRandom;
     }
 
-    private static byte[] loadStaticResource(String name, String location) {
-        try (InputStream inStream = Application.class.getClassLoader().getResourceAsStream(location)) {
-            byte[] data = IOUtils.toByteArray(inStream);
-            staticPages.put(name, data);
-            return data;
-        } catch (IOException | NullPointerException e) {
-            log.error("Cannot load resource '{}' from {}", name, location);
-            return new byte[0];
-        }
-    }
-
     @Value("${security.enable-csrf:false}")
     private boolean enableCsrf;
     @Value("${server.local-port:9081}")
     private int additionalPort;
-
-//    @Bean
-//    @Primary
-//    @ConfigurationProperties("spring.datasource")
-//    @Profile("!test")
-//    public DataSourceProperties dataSourceProperties() {
-//        return new DataSourceProperties();
-//    }
-
-
-//    @Bean
-//    @ConfigurationProperties("spring.datasource.configuration")
-//    public HikariDataSource dataSource(DataSourceProperties properties) {
-//        try {
-//            log.info("Initializing Data Source: {}", properties.getUrl());
-//            return properties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
-//        } finally {
-//            log.info("Database initialized");
-//        }
-//    }
 
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
@@ -341,13 +233,6 @@ public class Application implements WebMvcConfigurer {
         SoapMessageWriter.setFixNewLines(fixNewlines);
     }
 
-    public static String getServerMode() {
-        return serverMode;
-    }
-
-    public static boolean isProduction() {
-        return !"dev".equalsIgnoreCase(serverMode);
-    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(a -> a.requestMatchers("/**").permitAll())
