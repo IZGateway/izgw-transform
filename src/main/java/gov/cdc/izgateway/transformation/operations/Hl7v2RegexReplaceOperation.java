@@ -18,11 +18,11 @@ public class Hl7v2RegexReplaceOperation extends BaseOperation<OperationRegexRepl
     @Override
     public void executeOperation(Message message) throws HL7Exception {
 
-        log.log(Level.WARNING, String.format("COPY Operation: %s / Copy %s TO %s",
+        log.log(Level.WARNING, String.format("Operation: %s on '%s' with regex '%s' and replacement '%s'",
                 this.getClass().getSimpleName(),
                 this.operationConfig.getField(),
-                this.operationConfig.getReplacement(),
-                this.operationConfig.getRegex()));
+                this.operationConfig.getRegex(),
+                this.operationConfig.getReplacement()));
 
         Terser terser = new Terser(message);
 
