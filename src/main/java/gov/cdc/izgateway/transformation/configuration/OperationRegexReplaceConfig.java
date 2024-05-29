@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component;
 public class OperationRegexReplaceConfig extends OperationConfig {
     private String field;
     private String regex;
+    private String replacement;
 }
