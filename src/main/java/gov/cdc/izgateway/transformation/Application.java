@@ -104,9 +104,6 @@ import lombok.extern.slf4j.Slf4j;
         )
 )
 @SpringBootApplication
-//@EntityScan(basePackages={"gov.cdc.izgateway.db.model"})
-//@ComponentScan(basePackages={"gov.cdc.izgateway.security.ocsp","gov.cdc.izgateway.service.ICertificateStatusService"})
-// PAUL COMMENTED @EnableJpaRepositories(basePackages={"gov.cdc.izgateway.db.repository"})
 public class Application implements WebMvcConfigurer {
     private static final Map<String, byte[]> staticPages = new TreeMap<>();
     private static final String BUILD_FILE = "build.txt";
@@ -174,7 +171,6 @@ public class Application implements WebMvcConfigurer {
                 shutdown();
             }
         });
-
     }
 
     public static void shutdown() {
