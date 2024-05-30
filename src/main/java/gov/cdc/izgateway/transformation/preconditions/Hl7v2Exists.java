@@ -3,11 +3,17 @@ package gov.cdc.izgateway.transformation.preconditions;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Hl7v2Exists extends Exists implements Precondition {
 
     public Hl7v2Exists() {
         super();
+    }
+
+    public Hl7v2Exists(Exists exists) {
+        super(exists);
     }
 
     public Hl7v2Exists(String fieldName) {
@@ -16,6 +22,11 @@ public class Hl7v2Exists extends Exists implements Precondition {
 
     @Override
     public boolean evaluate(Message message) {
+
+        log.trace(String.format("Precondition: %s / dataPath: '%s'",
+                this.getClass().getSimpleName(),
+                this.getDataPath()));
+
         Terser terser = new Terser(message);
 
         String pathValue;
