@@ -13,13 +13,6 @@
     <version>0.1.0-IZGWTS-SNAPSHOT</version>
 	<name>transformation</name>
 	<description>Demo project for Spring Boot</description>
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/IZGateway/izgw-core</url>
-        </repository>
-    </distributionManagement>
     <properties>
 		<java.version>17</java.version>
         <timestamp>${maven.build.timestamp}</timestamp>
@@ -85,20 +78,6 @@
             <artifactId>camel-http</artifactId>
             <version>4.4.1</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>gov.cdc.izgw</groupId>
-            <artifactId>izgw-core</artifactId>
-            <version>2.0.1-IZGW-SNAPSHOT</version>
-        </dependency>
-        -->
-        <!--
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>[8.2.0,)</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>gov.cdc.izgw</groupId>
             <artifactId>izgw-core</artifactId>
