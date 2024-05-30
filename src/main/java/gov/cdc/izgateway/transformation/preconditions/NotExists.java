@@ -1,11 +1,12 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
+import ca.uhn.hl7v2.model.Message;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-abstract class NotExists extends Exists implements Precondition {
+public class NotExists extends Exists implements Precondition {
     protected NotExists() {}
 
     protected NotExists(NotExists notExists) {
@@ -14,5 +15,10 @@ abstract class NotExists extends Exists implements Precondition {
 
     protected NotExists(String dataPath) {
         super(dataPath);
+    }
+
+    @Override
+    public boolean evaluate(Message message) {
+        return false;
     }
 }

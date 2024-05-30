@@ -29,6 +29,10 @@ public class SolutionOperation {
                 preconditions.add(new Hl7v2Equals((Equals) precondition));
             } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(NotEquals.class)) {
                 preconditions.add(new Hl7v2NotEquals((NotEquals) precondition));
+            } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(Exists.class)) {
+                preconditions.add(new Hl7v2Exists((Exists) precondition));
+            } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(NotExists.class)) {
+                preconditions.add(new Hl7v2NotExists((NotExists) precondition));
             }
         }
 

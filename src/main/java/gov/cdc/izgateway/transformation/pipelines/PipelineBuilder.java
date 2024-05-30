@@ -44,6 +44,10 @@ public class PipelineBuilder {
                     pipe.addPrecondition(new Hl7v2Equals((Equals) precondition));
                 } else if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(NotEquals.class)) {
                     pipe.addPrecondition(new Hl7v2NotEquals((NotEquals) precondition));
+                } else if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(Exists.class)) {
+                    pipe.addPrecondition(new Hl7v2Exists((Exists) precondition));
+                } else if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(NotExists.class)) {
+                    pipe.addPrecondition(new Hl7v2NotExists((NotExists) precondition));
                 }
             }
 
