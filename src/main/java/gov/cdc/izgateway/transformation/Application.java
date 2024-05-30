@@ -1,46 +1,24 @@
 package gov.cdc.izgateway.transformation;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.List;
-import java.util.Map;
-import java.util.ServiceConfigurationError;
-import java.util.TreeMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.LogManager;
-
 import org.apache.catalina.connector.Connector;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
-import org.apache.tomcat.util.net.NioEndpoint;
 import org.bouncycastle.crypto.CryptoServicesRegistrar;
 import org.bouncycastle.crypto.EntropySourceProvider;
 import org.bouncycastle.crypto.fips.FipsDRBG;
 import org.bouncycastle.crypto.util.BasicEntropySourceProvider;
 import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
 import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-//import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
@@ -50,10 +28,6 @@ import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.security.config.Customizer;
@@ -68,23 +42,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import gov.cdc.izgateway.logging.event.EventId;
 import gov.cdc.izgateway.logging.markers.Markers2;
-import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.security.SSLImplementation;
-import gov.cdc.izgateway.security.ocsp.RevocationChecker;
-import gov.cdc.izgateway.service.IDestinationService;
-import gov.cdc.izgateway.service.IMessageHeaderService;
 import gov.cdc.izgateway.soap.net.SoapMessageConverter;
 import gov.cdc.izgateway.soap.net.SoapMessageWriter;
-//import gov.cdc.izgateway.status.StatusCheckScheduler;
-import gov.cdc.izgateway.utils.UtilizationService;
 import gov.cdc.izgateway.common.HealthService;
-import gov.cdc.izgateway.configuration.AppProperties;
-import gov.cdc.izgateway.service.ICertificateStatusService;
-//import gov.cdc.izgateway.db.service.MessageHeaderService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.License;
@@ -105,14 +67,6 @@ import lombok.extern.slf4j.Slf4j;
 )
 @SpringBootApplication
 public class Application implements WebMvcConfigurer {
-    private static final Map<String, byte[]> staticPages = new TreeMap<>();
-    private static final String BUILD_FILE = "build.txt";
-    private static final String LOGO_FILE = "izgw-logo-16x16.ico";
-    static final String BUILD = "build";
-    static final String LOGO = "logo";
-    private static boolean abortOnNoIIS = true;
-    private static String serverMode = AppProperties.PROD_MODE_VALUE;
-    private static String serverName;
 
     @Value("${spring.application.fix-newlines}")
     private boolean fixNewlines;
