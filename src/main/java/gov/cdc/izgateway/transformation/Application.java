@@ -3,7 +3,6 @@ package gov.cdc.izgateway.transformation;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.util.List;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.coyote.ProtocolHandler;
@@ -26,10 +25,8 @@ import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactor
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.ApplicationContextException;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -42,11 +39,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import gov.cdc.izgateway.logging.markers.Markers2;
 import gov.cdc.izgateway.security.SSLImplementation;
-import gov.cdc.izgateway.soap.net.SoapMessageConverter;
-import gov.cdc.izgateway.soap.net.SoapMessageWriter;
-import gov.cdc.izgateway.common.HealthService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.License;
@@ -56,9 +49,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @OpenAPIDefinition(
         info = @Info(
-                title = "IZ Gateway 2.0",
-                version = "2.0",
-                description = "Operations and maintenantence APIs for IZ Gateway",
+                title = "Transformation Service",
+                version = "1.0",
+                description = "Operations and maintenantence APIs for Transformation Service",
                 license = @License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0"),
                 contact = @Contact(url = "https://support.izgateway.org/plugins/servlet/desk/portal/3",
                         name = "IZ Gateway",
@@ -84,15 +77,11 @@ public class Application implements WebMvcConfigurer {
         initialize();
 
         try {
-            checkApplication(SpringApplication.run(Application.class, args));
+            SpringApplication.run(Application.class, args);
         } catch (BeanCreationException | ApplicationContextException bce) {
             Throwable rootCause = ExceptionUtils.getRootCause(bce);
-            log.error(Markers2.append(bce), "Unexpected Bean Creation Exception, Root Cause: {}", rootCause.getMessage());
-            HealthService.setHealthy(rootCause);
             System.exit(1);
         } catch (Throwable ex) {  // NOSONAR Catch any error
-            log.error(Markers2.append(ex), "Unexpected exception: {}", ex.getMessage());
-            HealthService.setHealthy(ex);
             System.exit(1);
         }
 
@@ -128,10 +117,6 @@ public class Application implements WebMvcConfigurer {
     }
 
     public static void shutdown() {
-        HealthService.setHealthy(false, "Service Stopped");
-    }
-
-    private static void checkApplication(ConfigurableApplicationContext ctx) {
     }
 
     public static String getBuild() {
@@ -172,16 +157,6 @@ public class Application implements WebMvcConfigurer {
     private boolean enableCsrf;
     @Value("${server.local-port:9081}")
     private int additionalPort;
-
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
-        SoapMessageConverter smc = new SoapMessageConverter(SoapMessageConverter.INBOUND);
-        smc.setHub(true);
-        messageConverters.add(smc);
-        // Sets up SoapMessageWriter to handle \r as &#xD; if true, otherwise
-        // \r in hl7Message will be replaced with \n due to XML Parsing rules.
-        SoapMessageWriter.setFixNewLines(fixNewlines);
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
