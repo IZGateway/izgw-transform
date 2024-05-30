@@ -1,12 +1,14 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
+import ca.uhn.hl7v2.model.Message;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-abstract class Exists implements Precondition {
-   private String dataPath;
+public class Exists implements Precondition {
+
+    private String dataPath;
 
     protected Exists() {}
 
@@ -15,6 +17,12 @@ abstract class Exists implements Precondition {
     }
 
     protected Exists(String dataPath) {
-        this.dataPath = dataPath;
+        this.dataPath =  dataPath;
     }
+
+    @Override
+    public boolean evaluate(Message message) {
+        return false;
+    }
+
 }
