@@ -17,8 +17,9 @@
               "version": "1.0",
               "preconditions": [
                 {
-                  "method": "exists",
-                  "dataPath": "/MSH-4-1"
+                  "method": "regex_match",
+                  "dataPath": "/PID-13-1",
+                  "regex": "\\((\\d{3})\\) (\\d{3})-(\\d{4})"
                 }
               ]
             }

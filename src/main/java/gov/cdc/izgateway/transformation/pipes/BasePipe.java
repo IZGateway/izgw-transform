@@ -50,6 +50,8 @@ abstract class BasePipe implements Pipe {
                 this.addPrecondition(new Hl7v2Exists((Exists) precondition));
             } else if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(NotExists.class)) {
                 this.addPrecondition(new Hl7v2NotExists((NotExists) precondition));
+            } else if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(RegexMatch.class)) {
+                this.addPrecondition(new Hl7v2RegexMatch((RegexMatch) precondition));
             }
         }
 

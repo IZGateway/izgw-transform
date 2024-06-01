@@ -33,6 +33,8 @@ public class SolutionOperation {
                 preconditions.add(new Hl7v2Exists((Exists) precondition));
             } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(NotExists.class)) {
                 preconditions.add(new Hl7v2NotExists((NotExists) precondition));
+            } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(RegexMatch.class)) {
+                preconditions.add(new Hl7v2RegexMatch((RegexMatch) precondition));
             }
         }
 
