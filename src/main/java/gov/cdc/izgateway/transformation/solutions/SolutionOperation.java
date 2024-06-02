@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 @Slf4j
 public class SolutionOperation {
@@ -61,22 +60,11 @@ public class SolutionOperation {
     }
 
     // TODO - make generic not HL7 specific
-    public void execute(Message message) throws HL7Exception {
-
-        if (preconditionPass(message)) {
-            log.trace("Solution Operation Precondition Passed");
-            operations.execute(message);
-        } else {
-            log.trace("Solution Operation Precondition Failed");
-        }
-
-    }
-
-    public void newExecute(ServiceContext context) throws HL7Exception {
+    public void execute(ServiceContext context) throws HL7Exception {
 
         if (preconditionPass(context.getRequestMessage())) {
             log.trace("Solution Operation Precondition Passed");
-            operations.newExecute(context);
+            operations.execute(context);
         } else {
             log.trace("Solution Operation Precondition Failed");
         }

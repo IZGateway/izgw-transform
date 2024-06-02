@@ -20,13 +20,7 @@ public class Hl7v2OperationChain {
         }
     }
 
-    public void execute(Message message) throws HL7Exception {
-        if (firstOperation != null) {
-            firstOperation.transform(message);
-        }
-    }
-
-    public void newExecute(ServiceContext context) throws HL7Exception {
+    public void execute(ServiceContext context) throws HL7Exception {
         if (firstOperation != null) {
             firstOperation.execute(context);
         }

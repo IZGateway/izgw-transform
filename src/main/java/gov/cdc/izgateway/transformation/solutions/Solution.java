@@ -37,15 +37,13 @@ public class Solution {
         if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
 
             for (SolutionOperation op : requestOperations) {
-                //op.execute(context.getRequestMessage());
-                op.newExecute(context);
+                op.execute(context);
             }
 
         } else if (context.getCurrentDirection().equals(DataFlowDirection.RESPONSE)) {
 
             for (SolutionOperation op : responseOperations) {
-                op.newExecute(context);
-                //op.execute(context.getResponseMessage());
+                op.execute(context);
             }
 
         }
