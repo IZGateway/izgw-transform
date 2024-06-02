@@ -6,8 +6,6 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 
 public interface Operation {
 
-    void transform(Message message) throws HL7Exception;
-
     void execute(ServiceContext context) throws HL7Exception;
 
     void setNextOperation(Operation nextOperation);

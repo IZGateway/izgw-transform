@@ -17,19 +17,18 @@ public class Hl7v2SetOperation extends BaseOperation<OperationSetConfig> impleme
         super(config);
     }
     @Override
-    public void executeOperation(Message message) throws HL7Exception {
+    public void thisOperation(ServiceContext context) throws HL7Exception {
 
         log.trace(String.format("SET Operation: %s / SET %s TO %s",
                 this.getClass().getSimpleName(),
                 this.operationConfig.getDestinationField(),
                 this.operationConfig.getSetValue()));
 
+        Message message = context.getCurrentMessage();
+
         Terser terser = new Terser(message);
         terser.set(operationConfig.getDestinationField(), operationConfig.getSetValue());
-    }
 
-    @Override
-    public void thisOperation(ServiceContext context) throws HL7Exception {
-        // TODO - to be implemented
+        context.setCurrentMessage(message);
     }
 }

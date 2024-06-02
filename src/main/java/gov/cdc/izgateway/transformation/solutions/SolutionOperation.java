@@ -44,6 +44,8 @@ public class SolutionOperation {
                 operations.addOperation(new Hl7v2CopyOperation(operationCopyConfig));
             } else if (operationConfig instanceof OperationSetConfig operationSetConfig) {
                 operations.addOperation(new Hl7v2SetOperation(operationSetConfig));
+            } else if (operationConfig instanceof OperationRegexReplaceConfig operationRegexReplaceConfig) {
+                operations.addOperation(new Hl7v2RegexReplaceOperation(operationRegexReplaceConfig));
             }
         }
 

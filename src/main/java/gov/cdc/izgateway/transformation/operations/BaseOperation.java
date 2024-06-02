@@ -24,20 +24,6 @@ abstract class BaseOperation<T> implements Operation {
     }
 
     @Override
-    public final void transform(Message message) throws HL7Exception {
-        executeOperation(message);
-        executeNextOperation(message);
-    }
-
-    public abstract void executeOperation(Message message) throws HL7Exception;
-
-    public void executeNextOperation(Message message) throws HL7Exception {
-        if (nextOperation != null) {
-            nextOperation.transform(message);
-        }
-    }
-
-    @Override
     public final void execute(ServiceContext context) throws HL7Exception {
         thisOperation(context);
         nextOperation(context);
