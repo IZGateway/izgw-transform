@@ -4,6 +4,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.transformation.configuration.OperationSetConfig;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,5 +26,10 @@ public class Hl7v2SetOperation extends BaseOperation<OperationSetConfig> impleme
 
         Terser terser = new Terser(message);
         terser.set(operationConfig.getDestinationField(), operationConfig.getSetValue());
+    }
+
+    @Override
+    public void thisOperation(ServiceContext context) throws HL7Exception {
+        // TODO - to be implemented
     }
 }

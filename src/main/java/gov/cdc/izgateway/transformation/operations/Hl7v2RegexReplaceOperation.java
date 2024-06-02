@@ -4,6 +4,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.transformation.configuration.OperationRegexReplaceConfig;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 import lombok.extern.java.Log;
 
 import java.util.logging.Level;
@@ -32,6 +33,11 @@ public class Hl7v2RegexReplaceOperation extends BaseOperation<OperationRegexRepl
             terser.set(operationConfig.getField(), cleanedValue);
         }
         
+    }
+
+    @Override
+    public void thisOperation(ServiceContext context) throws HL7Exception {
+        // TODO - to be implemented
     }
 }
 

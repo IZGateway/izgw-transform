@@ -4,6 +4,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.chains.Hl7v2OperationChain;
 import gov.cdc.izgateway.transformation.configuration.*;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.operations.*;
 import gov.cdc.izgateway.transformation.preconditions.*;
@@ -69,5 +70,15 @@ public class SolutionOperation {
             log.trace("Solution Operation Precondition Failed");
         }
 
+    }
+
+    public void newExecute(ServiceContext context) throws HL7Exception {
+
+        if (preconditionPass(context.getRequestMessage())) {
+            log.trace("Solution Operation Precondition Passed");
+            operations.newExecute(context);
+        } else {
+            log.trace("Solution Operation Precondition Failed");
+        }
     }
 }
