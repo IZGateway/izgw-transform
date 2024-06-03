@@ -76,8 +76,8 @@ jobs:
             [
               {
                 "id": "github",
-                "username": "${secrets.GH_USERNAME}",
-                "password": "${secrets.GH_TOKEN}"
+                "username": "${{secrets.GH_USERNAME}}",
+                "password": "${{secrets.GH_TOKEN}}"
               }
             ]
           output_file: .m2/settings.xml
