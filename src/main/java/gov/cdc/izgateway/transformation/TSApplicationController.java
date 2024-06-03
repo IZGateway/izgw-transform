@@ -19,7 +19,7 @@ import java.util.logging.Level;
 @Log
 @RestController
 public class TSApplicationController {
-    private final ServiceConfig serviceConfig;
+
     private final PipelineBuilder pipelineBuilder;
     private final ServiceConfig serviceConfig;
 
