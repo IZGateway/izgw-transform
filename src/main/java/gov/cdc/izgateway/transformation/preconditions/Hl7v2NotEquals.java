@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
 import ca.uhn.hl7v2.model.Message;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 
 public class Hl7v2NotEquals extends NotEquals implements Precondition {
     public Hl7v2NotEquals() {}
@@ -10,8 +11,8 @@ public class Hl7v2NotEquals extends NotEquals implements Precondition {
     }
 
     @Override
-    public boolean evaluate(Message message) {
+    public boolean evaluate(ServiceContext context) {
         Hl7v2Equals hl7v2Equals = new Hl7v2Equals(this.getDataPath(), this.getComparisonValue());
-        return !hl7v2Equals.evaluate(message);
+        return !hl7v2Equals.evaluate(context);
     }
 }

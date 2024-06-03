@@ -30,7 +30,7 @@ class Hl7v2NotEqualsTests {
         ne.setComparisonValue(comparisonValue);
 
         assertTrue(
-                ne.evaluate(context.getRequestMessage())
+                ne.evaluate(context)
         );
     }
 
@@ -51,7 +51,7 @@ class Hl7v2NotEqualsTests {
         ne.setComparisonValue(comparisonValue);
 
         assertFalse(
-                ne.evaluate(context.getRequestMessage())
+                ne.evaluate(context)
         );
     }
 
@@ -71,7 +71,7 @@ class Hl7v2NotEqualsTests {
         ne.setComparisonValue(comparisonValue);
 
         assertTrue(
-                ne.evaluate(context.getRequestMessage())
+                ne.evaluate(context)
         );
     }
 

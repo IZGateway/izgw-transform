@@ -3,6 +3,7 @@ package gov.cdc.izgateway.transformation.preconditions;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +21,9 @@ public class Hl7v2RegexMatch extends RegexMatch implements Precondition {
     }
 
     @Override
-    public boolean evaluate(Message message) {
+    public boolean evaluate(ServiceContext context) {
+
+        Message message = context.getCurrentMessage();
 
         Terser terser = new Terser(message);
 

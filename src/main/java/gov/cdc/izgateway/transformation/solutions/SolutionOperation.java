@@ -51,11 +51,11 @@ public class SolutionOperation {
 
     }
 
-    private boolean preconditionPass(Message message) {
+    private boolean preconditionPass(ServiceContext context) {
         boolean pass = true;
 
         for (Precondition op : preconditions) {
-            pass = pass && op.evaluate(message);
+            pass = pass && op.evaluate(context);
         }
 
         return pass;
@@ -64,7 +64,7 @@ public class SolutionOperation {
     // TODO - make generic not HL7 specific
     public void execute(ServiceContext context) throws HL7Exception {
 
-        if (preconditionPass(context.getRequestMessage())) {
+        if (preconditionPass(context)) {
             log.trace("Solution Operation Precondition Passed");
             operations.execute(context);
         } else {
