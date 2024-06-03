@@ -80,7 +80,7 @@ jobs:
                 "password": "${{secrets.GH_TOKEN}}"
               }
             ]
-          output_file: .m2/settings.xml
+          output_file: ~/.m2/settings.xml
 
       - name: Sets env vars for push or pull request to release branch (default behavior)
         run: |
