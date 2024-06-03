@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.transformation.endpoints.hub;
 
+import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.event.TransactionData;
 import gov.cdc.izgateway.model.IDestination;
@@ -13,15 +14,19 @@ import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.soap.message.*;
 import gov.cdc.izgateway.soap.net.MessageSender;
+import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.HubMessageSender;
+import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.security.RolesAllowed;
+import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -29,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 @RestController
 @RolesAllowed({Roles.SOAP, Roles.ADMIN})
@@ -36,15 +42,23 @@ import java.util.Arrays;
 @Lazy(false)
 public class HubController extends SoapControllerBase {
     private MessageSender messageSender;
+    private ServiceConfig serviceConfig;
+    private ProducerTemplate producerTemplate;
+
     @Autowired
     public HubController(
             IMessageHeaderService mshService,
             HubMessageSender messageSender,
-            AccessControlRegistry registry
+            AccessControlRegistry registry,
+            ServiceConfig serviceConfig,
+            ProducerTemplate producerTemplate
     ) {
         // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
         super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));
         this.messageSender = messageSender;
+        this.serviceConfig = serviceConfig;
+        this.producerTemplate = producerTemplate;
+
         registry.register(this);
 
         // TODO: Paul - this is temporary until I have a better understanding of this
@@ -58,6 +72,21 @@ public class HubController extends SoapControllerBase {
         TransactionData t = new TransactionData("TODO: A Real EVENTID");
         RequestContext.setTransactionData(t);
 
+        // Start of Camel Routes for transformations
+        // TODO Implement the organization properly
+        UUID organization = UUID.fromString("0d15449b-fb08-4013-8985-20c148b353fe");
+        ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
+
+        producerTemplate.sendBody("direct:izghubTransform", serviceContext);
+
+        try {
+            submitSingleMessage.setHl7Message(serviceContext.getRequestMessage().encode());
+        }
+        catch (HL7Exception e) {
+            throw new HubControllerFault(e.getMessage());
+        }
+        // End of Camel
+
         IDestination dest = getDestination(destinationId);
         logDestination(dest);
 
@@ -70,6 +99,19 @@ public class HubController extends SoapControllerBase {
         response.getHubHeader().setDestinationUri(uri);
         ResponseEntity<?> result = checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
         return result;
+    }
+
+    private ServiceContext getServiceContext(UUID organization, String incomingMessage) throws Fault {
+        try {
+            return new ServiceContext(organization,
+                    "izgts:IISHubService",
+                    "izghub:IISHubService",
+                    serviceConfig,
+                    incomingMessage);
+        }
+        catch (HL7Exception e) {
+            throw new HubControllerFault(e.getMessage());
+        }
     }
 
     // TODO implement logging
