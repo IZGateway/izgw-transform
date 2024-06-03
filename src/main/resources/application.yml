@@ -1,0 +1,142 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  main:
+    banner-mode: off
+    # Consider whether this should be turned off in production.
+    lazy-initialization: true
+  application:
+    name: transformation
+    fix-newlines: ${FIX_NEWLINES:true}
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 15GB
+      max-request-size: 15GB
+
+management:
+  metrics:
+    export:
+      simple:
+        enabled: false
+  health:
+    defaults:
+      enabled: false
+
+security:
+  enable-csrf: false
+  enable-blacklist: true
+  enable-ocsp: false
+  # Set to the deployment path of the SSL
+  # For test and dev deployments, set SSL_SHARE environment variable to the location of the EFS File system in
+  # the AWS environment.
+  ssl-path: ${SSL_SHARE:}conf/ssl
+
+springdoc:
+  swagger-ui:
+    path: /swagger/ui.html
+  api-docs:
+    path: /swagger/api-docs
+
+server:
+  protocol: https
+  port: ${TS_SERVER_PORT:444}
+  local-port: 9081
+  ssl:
+    enabled: true
+    client-auth: need
+    enabled-protocols:
+      - TLSv1.2
+      - TLSv1.3
+    ciphers:
+      - TLS_AES_256_GCM_SHA384
+      - TLS_AES_128_GCM_SHA256
+      - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+      - TLS_DHE_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_DHE_DSS_WITH_AES_256_GCM_SHA384
+      - TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_DHE_DSS_WITH_AES_128_GCM_SHA256
+
+
+
+    key-store: ${TS_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE:${security.ssl-path}/awsdev_keystore.bcfks}
+    key-store-password: ${COMMON_PASS:}
+    key-store-provider: BCFIPS
+    key-store-type: bcfks
+
+    trust-store: ${TS_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE:${security.ssl-path}/awsdev_keystore.bcfks}
+    trust-store-password: ${COMMON_PASS:}
+    trust-store-provider: BCFIPS
+    trust-store-type: bcfks
+
+client:
+  contentType: text/xml
+  readTimeout: 60
+  connectTimeout: 15
+  maxBufferSize: 65536
+  ssl:
+    enabled: true
+    client-auth: need
+    enabled-protocols:
+      - TLSv1.2
+      - TLSv1.3
+    ciphers:
+      - TLS_AES_256_GCM_SHA384
+      - TLS_AES_128_GCM_SHA256
+      - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+      - TLS_DHE_RSA_WITH_AES_256_GCM_SHA384
+      - TLS_DHE_DSS_WITH_AES_256_GCM_SHA384
+      - TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
+      - TLS_DHE_DSS_WITH_AES_128_GCM_SHA256
+    key-store: ${TS_CRYPTO_STORE_KEY_WS_CLIENT_FILE:${security.ssl-path}/awsdev_keystore.bcfks}
+    key-store-password: ${COMMON_PASS:}
+    key-store-provider: BCFIPS
+    key-store-type: bcfks
+
+    trust-store: ${TS_CRYPTO_STORE_TRUST_WS_CLIENT_FILE:${security.ssl-path}/izgw_client_trust.bcfks}
+    trust-store-password: ${COMMON_PASS:}
+    trust-store-provider: BCFIPS
+    trust-store-type: bcfks
+
+logging:
+  file:
+    enabled: true
+  console:
+    pretty: ${PRETTY:false}
+    enabled: true
+  memory:
+    enabled: true
+
+  heartbeat:
+    interval: 60
+
+  level:
+    gov:
+      cdc:
+        izgateway:
+          security:
+            AccessControlRegistry: DEBUG
+            AccessControlInterceptor: DEBUG
+            client:
+              ClientSecurityInterceptor: DEBUG
+            server:
+              ServerSecurityInterceptor: DEBUG
+    org:
+      springframework:
+        web: DEBUG
+      apache:
+        tomcat:
+          util:
+            net:
+              NioChannel:
+                handshake: DEBUG
+
+
