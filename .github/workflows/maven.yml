@@ -43,6 +43,10 @@ jobs:
           npm install -g newman-reporter-junitfull
           npm install -g xunit-viewer
           mkdir -p ~/.m2 \
+          && cat << EOF > ~/.m2/settings.xml
+          <?xml version="1.0" encoding="UTF-8"?>
+          <settings><servers><server><id>github</id><username>austinmoody</username><password>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</password></server></servers></settings>
+          EOF
           && cat << EOF > ~/.m2/toolchains.xml
           <?xml version="1.0" encoding="UTF8"?>
           <toolchains>
@@ -68,19 +72,6 @@ jobs:
             </toolchain>            
           </toolchains>
           EOF
-
-      - name: maven-settings-xml-action
-        uses: whelk-io/maven-settings-xml-action@v22
-        with:
-          servers: >
-            [
-              {
-                "id": "github",
-                "username": "${{secrets.GH_USERNAME}}",
-                "password": "${{secrets.GH_TOKEN}}"
-              }
-            ]
-          output_file: ~/.m2/settings.xml
 
       - name: Sets env vars for push or pull request to release branch (default behavior)
         run: |
