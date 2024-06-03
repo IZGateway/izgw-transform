@@ -78,7 +78,6 @@ jobs:
                 "id": "github",
                 "username": "${github.actor}",
                 "password": "${secrets.GITHUB_TOKEN}"
-                }
               }
             ]
           output_file: .m2/settings.xml
