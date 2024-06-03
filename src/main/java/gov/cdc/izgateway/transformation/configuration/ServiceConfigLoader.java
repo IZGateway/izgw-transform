@@ -18,7 +18,7 @@ public class ServiceConfigLoader {
         ObjectMapper mapper = new ObjectMapper();
 
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        InputStream is = classloader.getResourceAsStream("pipelines_test2.json");
+        InputStream is = classloader.getResourceAsStream("pipelines_test_preconditions.json");
 
         try {
             return mapper.readValue(is, ServiceConfig.class);
