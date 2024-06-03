@@ -19,6 +19,7 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.HubMessageSender;
+import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -42,7 +43,6 @@ import java.util.UUID;
 @Lazy(false)
 public class HubController extends SoapControllerBase {
     private MessageSender messageSender;
-    private ServiceConfig serviceConfig;
     private ProducerTemplate producerTemplate;
 
     @Autowired
@@ -50,13 +50,11 @@ public class HubController extends SoapControllerBase {
             IMessageHeaderService mshService,
             HubMessageSender messageSender,
             AccessControlRegistry registry,
-            ServiceConfig serviceConfig,
             ProducerTemplate producerTemplate
     ) {
         // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
         super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));
         this.messageSender = messageSender;
-        this.serviceConfig = serviceConfig;
         this.producerTemplate = producerTemplate;
 
         registry.register(this);
@@ -106,7 +104,7 @@ public class HubController extends SoapControllerBase {
             return new ServiceContext(organization,
                     "izgts:IISHubService",
                     "izghub:IISHubService",
-                    serviceConfig,
+                    DataType.HL7V2,
                     incomingMessage);
         }
         catch (HL7Exception e) {
