@@ -2,17 +2,18 @@ package gov.cdc.izgateway.transformation.pipes;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import gov.cdc.izgateway.transformation.configuration.PipeConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
-import gov.cdc.izgateway.transformation.preconditions.Precondition;
+import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.preconditions.*;
 import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.AccessLevel;
 import lombok.Setter;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
+
 
 @Setter
 @Slf4j
@@ -26,6 +27,7 @@ abstract class BasePipe implements Pipe {
     @Setter(AccessLevel.NONE)
     protected boolean preconditionPassed;
 
+    protected PipeConfig config;
     protected Solution solution;
     protected List<Precondition> preconditions;
 
@@ -33,6 +35,24 @@ abstract class BasePipe implements Pipe {
         preconditions = new ArrayList<>();
         preconditionChecked = false;
         preconditionPassed = false;
+    }
+
+    protected BasePipe(PipeConfig config, ServiceContext context) {
+        this();
+        this.config = config;
+
+        for (Precondition precondition : config.getPreconditions()) {
+            if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(Equals.class)) {
+                this.addPrecondition(new Hl7v2Equals((Equals) precondition));
+            } else if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(NotEquals.class)) {
+                this.addPrecondition(new Hl7v2NotEquals((NotEquals) precondition));
+            } else if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(Exists.class)) {
+                this.addPrecondition(new Hl7v2Exists((Exists) precondition));
+            } else if (context.getDataType().equals(DataType.HL7V2) && precondition.getClass().equals(NotExists.class)) {
+                this.addPrecondition(new Hl7v2NotExists((NotExists) precondition));
+            }
+        }
+
     }
 
     @Override
