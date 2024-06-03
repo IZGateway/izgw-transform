@@ -42,12 +42,11 @@ jobs:
           echo COMPUTERNAME=`hostname` >> $GITHUB_ENV
           npm install -g newman-reporter-junitfull
           npm install -g xunit-viewer
-          mkdir -p ~/.m2 \
-          && cat << EOF > ~/.m2/settings.xml
-          <?xml version="1.0" encoding="UTF-8"?>
-          <settings><servers><server><id>github</id><username>austinmoody</username><password>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</password></server></servers></settings>
+          mkdir -p ~/.m2
+          cat << EOF > ~/.m2/settings.xml
+          <?xml version="1.0" encoding="UTF-8"?><settings><servers><server><id>github</id><username>austinmoody</username><password>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</password></server></servers></settings>
           EOF
-          && cat << EOF > ~/.m2/toolchains.xml
+          cat << EOF > ~/.m2/toolchains.xml
           <?xml version="1.0" encoding="UTF8"?>
           <toolchains>
             <toolchain>
