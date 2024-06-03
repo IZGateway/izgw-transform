@@ -93,6 +93,22 @@
             <artifactId>izgw-core</artifactId>
             <version>2.1.0-IGDD-1505_Refactor_Hub_and_Core-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <!-- add -debug to get debug jars -->
+            <artifactId>bc-fips</artifactId>
+            <version>1.0.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-fips</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-fips</artifactId>
+            <version>1.0.19</version>
+        </dependency>
     </dependencies>
 	<build>
 		<plugins>
@@ -114,7 +130,25 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
+                <configuration>
+                    <mainClass>gov.cdc.izgateway.transformation.Application</mainClass>
+                    <jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
+                    <requiresUnpack>
+                        <dependency>
+                            <groupId>org.bouncycastle</groupId>
+                            <artifactId>bcpkix-fips</artifactId>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.bouncycastle</groupId>
+                            <artifactId>bc-fips</artifactId>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.bouncycastle</groupId>
+                            <artifactId>bctls-fips</artifactId>
+                        </dependency>
+                    </requiresUnpack>
+                </configuration>
+            </plugin>
             <!--
             <plugin>
                 <groupId>com.spotify.fmt</groupId>
