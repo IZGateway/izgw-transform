@@ -41,9 +41,10 @@ springdoc:
     path: /swagger/api-docs
 
 server:
+  hostname: ${TS_SERVER_HOSTNAME:dev.izgateway.org}
   protocol: https
   port: ${TS_SERVER_PORT:444}
-  local-port: 9081
+  local-port: 9082
   ssl:
     enabled: true
     client-auth: need
