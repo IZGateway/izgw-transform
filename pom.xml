@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
+    <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.2.3</version>
@@ -13,7 +13,7 @@
     <version>0.1.0-IZGWTS-SNAPSHOT</version>
 	<name>transformation</name>
 	<description>Demo project for Spring Boot</description>
-	<properties>
+    <properties>
 		<java.version>17</java.version>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
@@ -23,6 +23,16 @@
         <image.tag>${project.build.finalName}</image.tag>
         <buildno>${timestamp}</buildno>
     </properties>
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/IZGateway/izgw-core</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases><enabled>true</enabled></releases>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -48,7 +58,58 @@
             <artifactId>hapi-base</artifactId>
             <version>2.3</version>
         </dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-spring-boot-starter</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-mllp</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-stream</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-hl7</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-http</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>gov.cdc.izgw</groupId>
+            <artifactId>izgw-core</artifactId>
+            <version>2.1.0-IGDD-1505_Refactor_Hub_and_Core-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <!-- add -debug to get debug jars -->
+            <artifactId>bc-fips</artifactId>
+            <version>1.0.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-fips</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bctls-fips</artifactId>
+            <version>1.0.19</version>
+        </dependency>
+    </dependencies>
 	<build>
 		<plugins>
             <plugin>
@@ -69,7 +130,25 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
+                <configuration>
+                    <mainClass>gov.cdc.izgateway.transformation.Application</mainClass>
+                    <jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
+                    <requiresUnpack>
+                        <dependency>
+                            <groupId>org.bouncycastle</groupId>
+                            <artifactId>bcpkix-fips</artifactId>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.bouncycastle</groupId>
+                            <artifactId>bc-fips</artifactId>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.bouncycastle</groupId>
+                            <artifactId>bctls-fips</artifactId>
+                        </dependency>
+                    </requiresUnpack>
+                </configuration>
+            </plugin>
             <!--
             <plugin>
                 <groupId>com.spotify.fmt</groupId>
@@ -97,6 +176,13 @@
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
                 <version>1.4.6</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.jnr</groupId>
+                        <artifactId>jnr-unixsocket</artifactId>
+                        <version>0.38.14</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>build-image</id>
