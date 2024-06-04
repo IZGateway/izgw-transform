@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -86,6 +87,21 @@ public class ApiController {
             returnMap.put("data", orgList.subList(min, max));
             returnMap.put("has_more", hasMore);
             return new ResponseEntity<>(mapper.writeValueAsString(returnMap), headers, HttpStatus.OK);
+
+        } catch (JsonProcessingException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping("/api/v1/organizations/{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}}")
+    @ResponseBody
+    public ResponseEntity<String> getOrganizationById(@PathVariable String id){
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            HttpHeaders headers = new HttpHeaders();
+            OrganizationConfig newOrg = configuration.getOrganizaionById(id);
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            return new ResponseEntity<>(mapper.writeValueAsString(newOrg), headers, HttpStatus.OK);
 
         } catch (JsonProcessingException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
