@@ -43,5 +43,10 @@ public class TransformationRouter extends RouteBuilder {
 //        .to("izghub:IISHubService")
 //        .bean(hl7TransformerService);
 
+//      from("direct:izghubTransform")
+//              // automatically set the inbound or outbound param (for transformation logic request or response logic)
+//              .bean(hl7TransformerService)
+//              .to("izghub:IISHubService")
+//              .bean(hl7TransformerService);
   }
 }

@@ -1,6 +1,10 @@
 package gov.cdc.izgateway.transformation.endpoints.hub;
 
+import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.parser.PipeParser;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.event.TransactionData;
 import gov.cdc.izgateway.model.IDestination;
@@ -19,6 +23,7 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.HubMessageSender;
+import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +39,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -74,6 +80,7 @@ public class HubController extends SoapControllerBase {
         // TODO Implement the organization properly
         UUID organization = UUID.fromString("0d15449b-fb08-4013-8985-20c148b353fe");
         ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
+        serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
         producerTemplate.sendBody("direct:izghubTransform", serviceContext);
 
@@ -91,12 +98,39 @@ public class HubController extends SoapControllerBase {
         checkMessage(submitSingleMessage);
 
         SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(dest, submitSingleMessage);
+
+        // Camel start for handling response transformation
+        serviceContext.setCurrentDirection(DataFlowDirection.RESPONSE);
+        try {
+            serviceContext.setResponseMessage(parseHl7v2Message(response.getHl7Message()));
+            producerTemplate.sendBody("direct:izghubTransform", serviceContext);
+            response.setHl7Message(serviceContext.getResponseMessage().encode());
+        }
+        catch (HL7Exception e) {
+            throw new HubControllerFault(e.getMessage());
+        }
+        // Camel end
+
         response.setSchema(SoapMessage.HUB_NS);	// Shift from client to Hub Schema
         response.getHubHeader().setDestinationId(dest.getDestId());
         String uri = dest.getDestinationUri();
         response.getHubHeader().setDestinationUri(uri);
         ResponseEntity<?> result = checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
         return result;
+    }
+
+    private Message parseHl7v2Message(String rawHl7Message) throws HL7Exception {
+        PipeParser parser;
+        try (DefaultHapiContext context = new DefaultHapiContext()) {
+            // This replacement just here because my SOAP client is messing w/ EOL characters
+            rawHl7Message = rawHl7Message.replace("\n", "\r");
+            context.setValidationContext(new NoValidation());
+            parser = context.getPipeParser();
+        } catch (IOException e) {
+            throw new HL7Exception(e);
+        }
+
+        return parser.parse(rawHl7Message);
     }
 
     private ServiceContext getServiceContext(UUID organization, String incomingMessage) throws Fault {
