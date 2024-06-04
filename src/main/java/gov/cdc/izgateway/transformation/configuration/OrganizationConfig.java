@@ -13,5 +13,6 @@ import java.util.UUID;
 public class OrganizationConfig {
     private String organizationName;
     private UUID organizationId;
+    private Boolean active;
     private List<PipelineConfig> pipelines;
 }
