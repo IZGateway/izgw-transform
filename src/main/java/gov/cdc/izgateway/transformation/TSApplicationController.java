@@ -22,7 +22,6 @@ public class TSApplicationController {
 
     private final PipelineBuilder pipelineBuilder;
     private final ServiceConfig serviceConfig;
-
     @Autowired
     public TSApplicationController(ServiceConfig serviceConfig, PipelineBuilder pipelineBuilder) {
         this.serviceConfig = serviceConfig;

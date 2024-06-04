@@ -3,6 +3,9 @@ package gov.cdc.izgateway.transformation;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.util.List;
+
+import gov.cdc.izgateway.soap.net.SoapMessageConverter;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.coyote.ProtocolHandler;
@@ -26,7 +29,9 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -59,6 +64,7 @@ import lombok.extern.slf4j.Slf4j;
         )
 )
 @SpringBootApplication
+@ComponentScan(basePackages={"gov.cdc.izgateway.transformation", "gov.cdc.izgateway.soap.net", "gov.cdc.izgateway.configuration","gov.cdc.izgateway.security","gov.cdc.izgateway.service.impl"})
 public class Application implements WebMvcConfigurer {
 
     @Value("${spring.application.fix-newlines}")
@@ -167,6 +173,13 @@ public class Application implements WebMvcConfigurer {
             http.csrf(AbstractHttpConfigurer::disable);
         }
         return http.build();
+    }
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
+        SoapMessageConverter smc = new SoapMessageConverter(SoapMessageConverter.INBOUND);
+        smc.setHub(true);
+        messageConverters.add(smc);
     }
 
     @Bean
