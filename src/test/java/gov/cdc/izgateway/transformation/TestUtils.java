@@ -6,8 +6,10 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import gov.cdc.izgateway.transformation.configuration.OperationCopyConfig;
+import gov.cdc.izgateway.transformation.configuration.OperationRegexReplaceConfig;
 import gov.cdc.izgateway.transformation.configuration.OperationSetConfig;
 import gov.cdc.izgateway.transformation.operations.Hl7v2CopyOperation;
+import gov.cdc.izgateway.transformation.operations.Hl7v2RegexReplaceOperation;
 import gov.cdc.izgateway.transformation.operations.Hl7v2SetOperation;
 
 public class TestUtils {
@@ -25,6 +27,14 @@ public class TestUtils {
         config.setSetValue(setValue);
         return new Hl7v2SetOperation(config);
     }
+
+    public static Hl7v2RegexReplaceOperation getRegexOperation(String sourceField, String regex, String replacement) {
+        OperationRegexReplaceConfig config = new OperationRegexReplaceConfig();
+        config.setField(sourceField);
+        config.setRegex(regex);
+        config.setReplacement(replacement);
+        return new Hl7v2RegexReplaceOperation(config);
+     }
 
     public static String getEncodedHl7FromString(String hl7String) throws HL7Exception{
 
