@@ -1,23 +1,20 @@
 package gov.cdc.izgateway.transformation.operations;
 
-import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.parser.PipeParser;
-import ca.uhn.hl7v2.validation.impl.NoValidation;
-import gov.cdc.izgateway.transformation.configuration.OperationCopyConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
+import static gov.cdc.izgateway.transformation.TestUtils.getCopyOperation;
+import static gov.cdc.izgateway.transformation.TestUtils.getEncodedHl7FromString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class Hl7v2CopyOperationTests {
 
     @Test
-    void testCopyComponetToComponetSameSegment() throws HL7Exception
+    void testCopyComponentToComponentSameSegment() throws HL7Exception
     {
         String testHL7  ="MSH|^~\\&||DOE|DCC|DOE|20050829141336||ACK|1125342816253.100000055|P|2.3.1";
         String expectedHL7 = "MSH|^~\\&||DOE|DCC|DOE|20050829141336||ACK|1125342816253.100000055|P|2.3.1||||||||||DOE";
@@ -35,7 +32,7 @@ class Hl7v2CopyOperationTests {
     }
 
     @Test
-    void testCopyComponetToComponetDifferentSegment() throws HL7Exception {
+    void testCopyComponentToComponentDifferentSegment() throws HL7Exception {
 
         String testHl7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -60,7 +57,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testCopyComponetToComponetDifferentSegmentNotExist() throws HL7Exception{
+    void testCopyComponentToComponentDifferentSegmentNotExist() throws HL7Exception{
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -86,7 +83,7 @@ GT1|||^John""";
     }
 
     @Test
-    void testCopySubComponetToSubComponetSameSegmentSameField() throws HL7Exception{
+    void testCopySubComponentToSubComponentSameSegmentSameField() throws HL7Exception{
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1|||ER|AL\r
@@ -112,7 +109,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testCopySubComponetToSubComponetSameSegmentDifferentField() throws HL7Exception{
+    void testCopySubComponentToSubComponentSameSegmentDifferentField() throws HL7Exception{
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1|||ER|AL\r
@@ -138,7 +135,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testCopySubComponetToSubComponetDifferentSegment() throws HL7Exception{
+    void testCopySubComponentToSubComponentDifferentSegment() throws HL7Exception{
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1|||ER|AL\r
@@ -267,7 +264,7 @@ PV1|1|I|Ward123^Room456^Bed789^Doe|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testCopyComponetToSubComponetDifferentSegmentNotExist() throws HL7Exception{
+    void testCopyComponentToSubComponentDifferentSegmentNotExist() throws HL7Exception{
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1|||ER|AL\r
@@ -403,8 +400,7 @@ GT1|||Doe""";
     }
 
     @Test
-    void testCopyComponentToComponentShortSyntax() throws HL7Exception
-    {
+    void testCopyComponentToComponentShortSyntax() throws HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||VXU^V04|MSGID12345|P|2.5.1|||ER|AL\r
@@ -432,7 +428,7 @@ GT1|||Doe""";
 
 
     @Test
-    void testCopyComponentToComponentFullSyntaxNotExist() throws HL7Exception{
+    void testCopyComponentToComponentFullSyntaxNotExist() throws HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||VXU^V04|MSGID12345|P|2.5.1|||ER|AL\r
@@ -458,7 +454,7 @@ GT1|||Doe""";
     }
 
     @Test
-    void testCopyComponentToComponentShortSyntaxNotExist() throws HL7Exception{
+    void testCopyComponentToComponentShortSyntaxNotExist() throws HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||VXU^V04|MSGID12345|P|2.5.1|||ER|AL\r
@@ -482,22 +478,5 @@ GT1|||Doe""";
         String test = serviceContext.getCurrentMessage().encode();
         assertEquals(expected, test);
     }
-
-    private Hl7v2CopyOperation getCopyOperation(String sourceField, String destinationField) {
-        OperationCopyConfig config = new OperationCopyConfig();
-        config.setSourceField(sourceField);
-        config.setDestinationField(destinationField);
-        return new Hl7v2CopyOperation(config);
-    }
-
-    private String getEncodedHl7FromString(String hl7String) throws HL7Exception{
-
-        DefaultHapiContext context = new DefaultHapiContext();
-        context.setValidationContext(new NoValidation());
-        PipeParser parser = context.getPipeParser();
-        Message expectedMessage = parser.parse(hl7String);
-        return expectedMessage.encode();
-    }
-
 
 }
