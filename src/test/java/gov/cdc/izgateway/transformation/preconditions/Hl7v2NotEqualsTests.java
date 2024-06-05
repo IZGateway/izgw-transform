@@ -63,7 +63,6 @@ class Hl7v2NotEqualsTests {
             "/ORDER/OBSERVATION(2)/OBX-3-2,REPETITION_NO_EXIST"
     })
     void testFieldDoesNotExist(String dataPath, String comparisonValue) throws HL7Exception {
-        // Testing fields that are not in the message so Hl7v2NotEquals.evaluate() should return true.
         ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
 
         Hl7v2NotEquals ne = new Hl7v2NotEquals();

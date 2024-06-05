@@ -1,6 +1,5 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
-import ca.uhn.hl7v2.model.Message;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import gov.cdc.izgateway.transformation.context.ServiceContext;

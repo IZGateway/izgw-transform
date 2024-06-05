@@ -1,6 +1,5 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
-import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 
 public class Hl7v2NotEquals extends NotEquals implements Precondition {
