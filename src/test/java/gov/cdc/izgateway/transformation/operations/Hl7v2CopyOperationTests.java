@@ -19,16 +19,7 @@ class Hl7v2CopyOperationTests {
         String testHL7  ="MSH|^~\\&||DOE|DCC|DOE|20050829141336||ACK|1125342816253.100000055|P|2.3.1";
         String expectedHL7 = "MSH|^~\\&||DOE|DCC|DOE|20050829141336||ACK|1125342816253.100000055|P|2.3.1||||||||||DOE";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
-
-        Hl7v2CopyOperation testClass = getCopyOperation("MSH-4-1", "MSH-22-1");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
+        runCopyTrueTest(testHL7, expectedHL7, "/MSH-4-1", "/MSH-22-1");
     }
 
     @Test
@@ -44,16 +35,8 @@ MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|202405
 PID|1|1234567890|A1234567^^^HospitalA^MR||Doe^John^Jacob||19800101|M|||123 Main St^^Metropolis^IL^44130^USA|||||||1234567890|||||||||||||||20240516120000\r
 PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHl7);
+        runCopyTrueTest(testHl7, expectedHL7, "/MSH-7-1", "/PID-33-1");
 
-        Hl7v2CopyOperation testClass = getCopyOperation("/MSH-7-1", "/PID-33-1");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
     }
 
     @Test
@@ -70,16 +53,7 @@ PID|1|1234567890|A1234567^^^HospitalA^MR||Doe^John^^Jacob||19800101|M|||123 Main
 PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890\r
 GT1|||^John""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
-
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-5-2", "/GT1-3-2");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-5-2", "/GT1-3-2");
     }
 
     @Test
@@ -95,17 +69,7 @@ MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|202405
 PID|1|1234567890|A1234567^^^HospitalA^MR||Doe&Doe^John^Jacob||19800101|M|||123 Main St^^Metropolis^IL^44130^USA|||||||1234567890\r
 PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
-
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-5-1-1", "/PID-5-1-2");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
-
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-5-1-1", "/PID-5-1-2");
     }
 
     @Test
@@ -121,17 +85,7 @@ MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|202405
 PID|1|1234567890|A1234567^^^HospitalA^MR||Doe^John^Jacob&Doe||19800101|M|||123 Main St^^Metropolis^IL^44130^USA|||||||1234567890\r
 PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
-
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-5-1-1", "/PID-5-3-2");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
-
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-5-1-1", "/PID-5-3-2");
     }
 
     @Test
@@ -147,17 +101,7 @@ MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|202405
 PID|1|1234567890|A1234567^^^HospitalA^MR||Doe^John^Jacob||19800101|M|||123 Main St^^Metropolis^IL^44130^USA|||||||1234567890\r
 PV1|1|I|Ward123^Room456^Bed789^123 Main St|||||||||||||||||1234567890""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
-
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-11-1-1", "/PV1-3-4-1");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
-
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-11-1-1", "/PV1-3-4-1");
     }
 
     @Test
@@ -174,16 +118,7 @@ PID|1|1234567890|A1234567^^^HospitalA^MR||Doe^John^Jacob||19800101|M|||123 Main 
 PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890\r
 GT1|||Doe""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
-
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-5-1-1", "/GT1-3-1-1");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-5-1-1", "/GT1-3-1-1");
 
     }
 
@@ -200,16 +135,7 @@ MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|202405
 PID|1|1234567890|A1234567^^^HospitalA^MR||Doe&Doe^John^Jacob||19800101|M|||123 Main St^^Metropolis^IL^44130^USA|||||||1234567890\r
 PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
-
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-5-1", "/PID-5-1-2");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-5-1", "/PID-5-1-2");
     }
 
     @Test
@@ -225,17 +151,7 @@ MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|202405
 PID|1|1234567890|A1234567^^^HospitalA^MR||Doe^John^Jacob&Doe||19800101|M|||123 Main St^^Metropolis^IL^44130^USA|||||||1234567890\r
 PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
-
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-5-1", "/PID-5-3-2");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
-
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-5-1", "/PID-5-3-2");
     }
 
     @Test
@@ -251,16 +167,7 @@ MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|202405
 PID|1|1234567890|A1234567^^^HospitalA^MR||Doe^John^Jacob||19800101|M|||123 Main St^^Metropolis^IL^44130^USA|||||||1234567890\r
 PV1|1|I|Ward123^Room456^Bed789^Doe|||||||||||||||||1234567890""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
-
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-5-1", "/PV1-3-4-1");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-5-1", "/PV1-3-4-1");
     }
 
     @Test
@@ -277,16 +184,8 @@ PID|1|1234567890|A1234567^^^HospitalA^MR||Doe^John^Jacob||19800101|M|||123 Main 
 PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890\r
 GT1|||Doe""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-5-1", "/GT1-3-1-1");
 
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-5-1", "/GT1-3-1-1");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
     }
 
     @Test
@@ -304,16 +203,8 @@ PID|1|1234567890|A1234567^^^HospitalA^MR||^John^Jacob||19800101|M|||123 Main St^
 PV1|1|I|Ward123^Room456^Bed789^Doe|||||||||||||||||1234567890\r
 GT1|||Doe|Doe""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
+        runCopyTrueTest(testHL7, expectedHL7, "/GT1-3-1-1", "/GT1-4-1-1");
 
-        Hl7v2CopyOperation testClass = getCopyOperation("/GT1-3-1-1", "/GT1-4-1-1");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
     }
 
     @Test
@@ -332,16 +223,8 @@ PV1|1|I|Ward123^Room456^Bed789^Doe|||||||||||||||||1234567890\r
 GT1|||Doe\r
 GT1|||Doe|Doe""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
+        runCopyTrueTest(testHL7, expectedHL7, "/GT1(0)-3-1-1", "/GT1(1)-4-1-1");
 
-        Hl7v2CopyOperation testClass = getCopyOperation("/GT1(0)-3-1-1", "/GT1(1)-4-1-1");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
     }
 
     @Test
@@ -360,16 +243,8 @@ PV1|1|I|Ward123^Room456^Bed789^Doe|||||||||||||||||1234567890\r
 GT1|||Doe\r
 GT1|||Doe""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
+        runCopyTrueTest(testHL7, expectedHL7, "/GT1(0)-3-1-1", "/GT1(1)-3-1-1");
 
-        Hl7v2CopyOperation testClass = getCopyOperation("/GT1(0)-3-1-1", "/GT1(1)-3-1-1");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
     }
 
     @Test
@@ -387,16 +262,8 @@ PID|1|1234567890|A1234567^^^HospitalA^MR||^John^Jacob||19800101|M|||123 Main St^
 PV1|1|I|Ward123^Room456^Bed789^Doe|I||||||||||||||||1234567890\r
 GT1|||Doe""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
+        runCopyTrueTest(testHL7, expectedHL7, "/PATIENT/PV1-2", "/PATIENT/PV1-4");
 
-        Hl7v2CopyOperation testClass = getCopyOperation("/PATIENT/PV1-2", "/PATIENT/PV1-4");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
     }
 
     @Test
@@ -414,16 +281,8 @@ PID|1|1234567890|A1234567^^^HospitalA^MR||^John^Jacob||19800101|M|||123 Main St^
 PV1|1|I|Ward123^Room456^Bed789^Doe|I||||||||||||||||1234567890\r
 GT1|||Doe""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
+        runCopyTrueTest(testHL7, expectedHL7, "/.PV1-2", "/.PV1-4");
 
-        Hl7v2CopyOperation testClass = getCopyOperation("/.PV1-2", "/.PV1-4");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
     }
 
 
@@ -441,16 +300,8 @@ PID|1|1234567890|A1234567^^^HospitalA^MR||^John^Jacob||19800101|M|||123 Main St^
 PV1|1\r
 GT1|||Doe""";
 
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-1-1", "/PATIENT/PV1-1-1");
 
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-1-1", "/PATIENT/PV1-1-1");
-
-        String expected = getEncodedHl7FromString(expectedHL7);
-
-        testClass.execute(serviceContext);
-
-        String test = serviceContext.getCurrentMessage().encode();
-        assertEquals(expected, test);
     }
 
     @Test
@@ -467,9 +318,14 @@ PID|1|1234567890|A1234567^^^HospitalA^MR||^John^Jacob||19800101|M|||123 Main St^
 PV1|1\r
 GT1|||Doe""";
 
+        runCopyTrueTest(testHL7, expectedHL7, "/PID-1-1", "/.PV1-1-1");
+
+    }
+
+    private void runCopyTrueTest(String testHL7, String expectedHL7, String sourceField, String destinationField) throws HL7Exception {
         ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
 
-        Hl7v2CopyOperation testClass = getCopyOperation("/PID-1-1", "/.PV1-1-1");
+        Hl7v2CopyOperation testClass = getCopyOperation(sourceField, destinationField);
 
         String expected = getEncodedHl7FromString(expectedHL7);
 
