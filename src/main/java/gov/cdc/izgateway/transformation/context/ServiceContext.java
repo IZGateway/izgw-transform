@@ -55,6 +55,23 @@ public class ServiceContext {
         }
     }
 
+    public Message getCurrentMessage() {
+        // TODO - need to generalize "message" here so it can be HL7 or FHIR or whatever
+        if (this.currentDirection == DataFlowDirection.REQUEST) {
+            return this.requestMessage;
+        }
+
+        return this.responseMessage;
+    }
+
+    public void setCurrentMessage(Message message) {
+        if (this.currentDirection == DataFlowDirection.REQUEST) {
+            this.requestMessage = message;
+        } else if (this.currentDirection == DataFlowDirection.RESPONSE) {
+            this.responseMessage = message;
+        }
+    }
+
     private Message parseHl7v2Message(String rawHl7Message) throws HL7Exception {
         PipeParser parser;
         try (DefaultHapiContext context = new DefaultHapiContext()) {
