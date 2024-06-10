@@ -127,6 +127,7 @@ logging:
     gov:
       cdc:
         izgateway:
+          transformation: TRACE
           security:
             AccessControlRegistry: DEBUG
             AccessControlInterceptor: DEBUG
