@@ -16,11 +16,6 @@
               "solutionName": "AustinCustom1",
               "version": "1.0",
               "preconditions": [
-                {
-                  "method": "regex_match",
-                  "dataPath": "/PID-13-1",
-                  "regex": "\\((\\d{3})\\) (\\d{3})-(\\d{4})"
-                }
               ]
             }
           ]
@@ -37,31 +32,23 @@
       "requestOperations": [
         {
           "preconditions": [
-            {
-              "method": "exists",
-              "dataPath": "/MSH-3-1"
-            }
           ],
           "operationList": [
             {
               "method": "copy",
               "sourceField": "/MSH-3-1",
               "destinationField": "/MSH-22-1"
-            }
-          ]
-        },
-        {
-          "preconditions": [
-            {
-              "method": "not_exists",
-              "dataPath": "/MSH-4-1"
-            }
-          ],
-          "operationList": [
+            },
             {
               "method": "set",
-              "destinationField": "/MSH-31-1",
-              "setValue": "NOT_EXIST_PASSED"
+              "destinationField": "/MSH-22-2",
+              "setValue": "AUSTIN"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/PID-11-5",
+              "regex": "\\b(\\d{5})(\\d{4})?\\b",
+              "replacement": "$1-$2"
             }
           ]
         }

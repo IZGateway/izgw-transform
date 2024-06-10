@@ -1,3 +1,7 @@
+transformationservice:
+  configurations:
+    main: pipelines_test_preconditions.json
+
 spring:
   autoconfigure:
     exclude:
