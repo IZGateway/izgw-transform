@@ -1,6 +1,6 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
-import ca.uhn.hl7v2.model.Message;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +21,7 @@ public class NotEquals extends Equals implements Precondition {
     }
 
     @Override
-    public boolean evaluate(Message message) {
+    public boolean evaluate(ServiceContext context) {
         return false;
     }
 }

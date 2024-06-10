@@ -204,6 +204,17 @@
               "method": "set",
               "destinationField": "/MSH-21-2",
               "setValue": "Z22"
+            },
+            {
+              "method": "set",
+              "destinationField": "/MSH-22-2",
+              "setValue": "AUSTIN"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/PID-11-5",
+              "regex": "\\b(\\d{5})(\\d{4})?\\b",
+              "replacement": "$1-$2"
             }
           ]
         }

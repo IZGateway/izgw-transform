@@ -26,7 +26,7 @@ class Hl7v2NotExistsTests {
         Hl7v2NotExists notExists = new Hl7v2NotExists(dataPath);
 
         assertTrue(
-            notExists.evaluate(context.getRequestMessage())
+            notExists.evaluate(context)
         );
 
     }
@@ -45,7 +45,7 @@ class Hl7v2NotExistsTests {
         Hl7v2NotExists notExists = new Hl7v2NotExists(dataPath);
 
         assertFalse(
-                notExists.evaluate(context.getRequestMessage())
+                notExists.evaluate(context)
         );
     }
 
