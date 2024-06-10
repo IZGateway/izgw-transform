@@ -1,0 +1,165 @@
+{
+  "organizations": [
+    {
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
+      "organizationName": "Audacious Test Organziation",
+      "pipelines": [
+        {
+          "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
+          "name": "HL7v2 to IZ Gateway hub",
+          "inboundEndpoint": "TS IZGHub WSDL Listener",
+          "outboundEndpoint": "IZG Hub",
+          "description": "Pipeline to call all implemented Preconditions and Operations",
+          "pipes": [
+            {
+              "solutionId": "018f7881-7607-7220-a94b-fe0c7e81cbec",
+              "version": "1.0",
+              "preconditions": [
+                {
+                  "method": "equals",
+                  "dataPath": "/MSH-1-1",
+                  "comparisonValue": "|"
+                }
+              ]
+            },
+            {
+              "solutionId": "64bc92f4-053c-4e55-85b5-5ff52f5ff47f",
+              "version": "1.0",
+              "preconditions": [
+                {
+                  "method": "not_equals",
+                  "dataPath": "/MSH-1-1",
+                  "comparisonValue": "x"
+                }
+              ]
+            },
+            {
+              "solutionId": "79def078-5953-4d31-b44a-79d4da9beef9",
+              "version": "1.0",
+              "preconditions": [
+                {
+                  "method": "regex_match",
+                  "dataPath": "/MSH-1-1",
+                  "regex": "^\\|$"
+                }
+
+              ]
+            },
+            {
+              "solutionId": "8abc8887-1cab-4a96-98ea-29f8f6c977d5",
+              "version": "1.0",
+              "preconditions": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "solutions": [
+    {
+      "id": "018f7881-7607-7220-a94b-fe0c7e81cbec",
+      "name": "EqualsPrecondition",
+      "description": "Sets a field if Equals precondition is met",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [
+            {
+              "method": "equals",
+              "dataPath": "/MSH-1-1",
+              "comparisonValue": "|"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-22-1",
+              "setValue": "EqualsPrecondition_Solution"
+            }
+          ]
+        }
+      ],
+      "responseOperations": []
+    },
+    {
+      "id": "64bc92f4-053c-4e55-85b5-5ff52f5ff47f",
+      "name": "NotEqualsPrecondition",
+      "description": "Sets a field if NotEquals precondition is met",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [
+            {
+              "method": "not_equals",
+              "dataPath": "/MSH-1-1",
+              "comparisonValue": "x"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-22-2",
+              "setValue": "NotEqualsPrecondition_Solution"
+            }
+          ]
+        }
+      ],
+      "responseOperations": []
+    },
+    {
+      "id": "79def078-5953-4d31-b44a-79d4da9beef9",
+      "name": "RegexMatchPrecondition",
+      "description": "Sets a field if RegexMatch precondition is met",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [
+            {
+              "method": "regex_match",
+              "dataPath": "/MSH-1-1",
+              "regex": "^\\|$"
+            }
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-22-3",
+              "setValue": "RegexMatchPrecondition_Solution"
+            }
+          ]
+        }
+      ],
+      "responseOperations": []
+    },
+    {
+      "id": "8abc8887-1cab-4a96-98ea-29f8f6c977d5",
+      "name": "AllOperations",
+      "description": "Calls all implemented Operations.  Sets MSH-23-1 to a value.  Then copies that value to MSH-23-2.  Then does a goofy regex on it to reverse the first two characters",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-23-1",
+              "setValue": "HELLO THERE!"
+            },
+            {
+              "method": "copy",
+              "sourceField": "/MSH-23-1",
+              "destinationField": "/MSH-23-2"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/MSH-23-2",
+              "regex": "([\\S]{1})([\\S]{1})(.+)",
+              "replacement": "$2$1$3"
+            }
+          ]
+        }
+      ],
+      "responseOperations": []
+    }
+  ]
+}

@@ -71,7 +71,7 @@ abstract class BasePipe implements Pipe {
     @Override
     public void executeCondition(ServiceContext context) throws HL7Exception {
         if (!preconditionChecked) {
-            preconditionPassed = preconditionPass(context.getRequestMessage());
+            preconditionPassed = preconditionPass(context);
 
             if (preconditionPassed) {
                 log.trace("Pipe Precondition Passed");
@@ -83,11 +83,11 @@ abstract class BasePipe implements Pipe {
         }
     }
 
-    private boolean preconditionPass(Message message) {
+    private boolean preconditionPass(ServiceContext context) {
         boolean pass = true;
 
         for (Precondition op : preconditions) {
-            pass = pass && op.evaluate(message);
+            pass = pass && op.evaluate(context);
         }
 
         return pass;

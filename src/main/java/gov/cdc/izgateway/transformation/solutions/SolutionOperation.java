@@ -4,6 +4,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.chains.Hl7v2OperationChain;
 import gov.cdc.izgateway.transformation.configuration.*;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.operations.*;
 import gov.cdc.izgateway.transformation.preconditions.*;
@@ -11,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 @Slf4j
 public class SolutionOperation {
@@ -51,25 +51,24 @@ public class SolutionOperation {
 
     }
 
-    private boolean preconditionPass(Message message) {
+    private boolean preconditionPass(ServiceContext context) {
         boolean pass = true;
 
         for (Precondition op : preconditions) {
-            pass = pass && op.evaluate(message);
+            pass = pass && op.evaluate(context);
         }
 
         return pass;
     }
 
     // TODO - make generic not HL7 specific
-    public void execute(Message message) throws HL7Exception {
+    public void execute(ServiceContext context) throws HL7Exception {
 
-        if (preconditionPass(message)) {
+        if (preconditionPass(context)) {
             log.trace("Solution Operation Precondition Passed");
-            operations.execute(message);
+            operations.execute(context);
         } else {
             log.trace("Solution Operation Precondition Failed");
         }
-
     }
 }

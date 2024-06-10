@@ -2,9 +2,11 @@ package gov.cdc.izgateway.transformation.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -13,12 +15,19 @@ import java.util.logging.Level;
 @Log
 public class ServiceConfigLoader {
 
+    @Value("${transformationservice.configurations.main}")
+    private String configFile;
+
     @Bean
     public ServiceConfig serviceConfig() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
 
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        InputStream is = classloader.getResourceAsStream("pipelines_test_preconditions.json");
+
+        InputStream is = classloader.getResourceAsStream(configFile);
+        if (is == null) {
+            is = new FileInputStream(configFile);
+        }
 
         try {
             return mapper.readValue(is, ServiceConfig.class);
