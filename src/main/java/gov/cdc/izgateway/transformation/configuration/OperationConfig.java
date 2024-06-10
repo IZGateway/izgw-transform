@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
         @JsonSubTypes.Type(value = OperationCopyConfig.class, name = "copy"),
         @JsonSubTypes.Type(value = OperationSetConfig.class, name = "set"),
         @JsonSubTypes.Type(value = OperationRegexReplaceConfig.class, name = "regex_replace"),
+        @JsonSubTypes.Type(value = OperationSaveStateConfig.class, name = "save_state"),
         @JsonSubTypes.Type(value = OperationMapperConfig.class, name = "mapper")
 })
 public class OperationConfig {

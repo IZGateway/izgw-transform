@@ -155,6 +155,11 @@
               "field": "/MSH-23-2",
               "regex": "([\\S]{1})([\\S]{1})(.+)",
               "replacement": "$2$1$3"
+            },
+            {
+              "method": "save_state",
+              "field": "/MSH-23-2",
+              "key": "myKey"
             }
           ]
         }
