@@ -213,7 +213,161 @@
                     </buildArgs>
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-test-keystores</id>
+                        <phase>process-test-resources</phase>
+                        <configuration>
+                            <target>
+                                <exec executable="openssl" failonerror="true">
+                                    <arg value="genrsa"/>
+                                    <arg value="-out"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.key"/>
+                                    <arg value="4096"/>
+                                </exec>
+                                <exec executable="openssl" failonerror="true">
+                                    <arg value="req"/>
+                                    <arg value="-new"/>
+                                    <arg value="-key"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.key"/>
+                                    <arg value="-out"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.csr"/>
+                                    <arg value="-subj"/>
+                                    <arg value="/C=US/ST=Maryland/L=Baltimore/O=Audacious Inquiry/OU=Strategic Advisory/CN=localhost"/>
+                                </exec>
+                                <exec executable="openssl" failonerror="true">
+                                    <arg value="x509"/>
+                                    <arg value="-req"/>
+                                    <arg value="-days"/>
+                                    <arg value="3650"/>
+                                    <arg value="-in"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.csr"/>
+                                    <arg value="-signkey"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.key"/>
+                                    <arg value="-out"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.crt"/>
+                                </exec>
+                                <exec executable="openssl" failonerror="true">
+                                    <arg value="pkcs12"/>
+                                    <arg value="-keypbe"/>
+                                    <arg value="PBE-SHA1-3DES"/>
+                                    <arg value="-certpbe"/>
+                                    <arg value="PBE-SHA1-3DES"/>
+                                    <arg value="-export"/>
+                                    <arg value="-in"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.crt"/>
+                                    <arg value="-inkey"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.key"/>
+                                    <arg value="-passout"/>
+                                    <arg value="pass:"/>
+                                    <arg value="-out"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.pfx"/>
+                                    <arg value="-name"/>
+                                    <arg value="IZG Transformation Service Unit Tests"/>
+                                </exec>
+                                <exec executable="keytool" failonerror="true">
+                                    <arg value="-keystore"/>
+                                    <arg value="${project.build.directory}/awsdev_keystore.jks"/>
+                                    <arg value="-storepass"/>
+                                    <arg value="password"/>
+                                    <arg value="-noprompt"/>
+                                    <arg value="-trustcacerts"/>
+                                    <arg value="-importcert"/>
+                                    <arg value="-alias"/>
+                                    <arg value="localhost"/>
+                                    <arg value="-file"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.crt"/>
+                                </exec>
+                                <exec executable="keytool" failonerror="true">
+                                    <arg value="-genkeypair"/>
+                                    <arg value="-sigalg"/>
+                                    <arg value="SHA512withRSA"/>
+                                    <arg value="-keyalg"/>
+                                    <arg value="RSA"/>
+                                    <arg value="-storepass"/>
+                                    <arg value="password"/>
+                                    <arg value="-keystore"/>
+                                    <arg value="${project.build.directory}/awsdev_keystore.jks"/>
+                                    <arg value="-dname"/>
+                                    <arg value="CN=localhost"/>
+                                </exec>
+                                <exec executable="keytool" failonerror="true">
+                                    <arg value="-importkeystore"/>
+                                    <arg value="-srckeystore"/>
+                                    <arg value="${project.build.directory}/awsdev_keystore.jks"/>
+                                    <arg value="-srcstoretype"/>
+                                    <arg value="JKS"/>
+                                    <arg value="-srcstorepass"/>
+                                    <arg value="password"/>
+                                    <arg value="-destkeystore"/>
+                                    <arg value="${project.build.directory}/awsdev_keystore.bcfks"/>
+                                    <arg value="-deststorepass"/>
+                                    <arg value="password"/>
+                                    <arg value="-deststoretype"/>
+                                    <arg value="BCFKS"/>
+                                    <arg value="-providername"/>
+                                    <arg value="BCFIPS"/>
+                                    <arg value="-provider"/>
+                                    <arg value="org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider"/>
+                                    <arg value="-providerpath"/>
+                                    <arg value="${project.basedir}/docker/data/bc-fips-1.0.2.4.jar"/>
+                                </exec>
+                                <exec executable="keytool" failonerror="true">
+                                    <arg value="-keystore"/>
+                                    <arg value="${project.build.directory}/izgw_client_trust.jks"/>
+                                    <arg value="-storepass"/>
+                                    <arg value="password"/>
+                                    <arg value="-noprompt"/>
+                                    <arg value="-trustcacerts"/>
+                                    <arg value="-importcert"/>
+                                    <arg value="-alias"/>
+                                    <arg value="localhost"/>
+                                    <arg value="-file"/>
+                                    <arg value="${project.build.directory}/self_signed_unit_tests.crt"/>
+                                </exec>
+                                <exec executable="keytool" failonerror="true">
+                                    <arg value="-importkeystore"/>
+                                    <arg value="-srckeystore"/>
+                                    <arg value="${project.build.directory}/izgw_client_trust.jks"/>
+                                    <arg value="-srcstoretype"/>
+                                    <arg value="JKS"/>
+                                    <arg value="-srcstorepass"/>
+                                    <arg value="password"/>
+                                    <arg value="-destkeystore"/>
+                                    <arg value="${project.build.directory}/izgw_client_trust.bcfks"/>
+                                    <arg value="-deststorepass"/>
+                                    <arg value="password"/>
+                                    <arg value="-deststoretype"/>
+                                    <arg value="BCFKS"/>
+                                    <arg value="-providername"/>
+                                    <arg value="BCFIPS"/>
+                                    <arg value="-provider"/>
+                                    <arg value="org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider"/>
+                                    <arg value="-providerpath"/>
+                                    <arg value="${project.basedir}/docker/data/bc-fips-1.0.2.4.jar"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <environmentVariables>
+                        <security.ssl-path>${project.build.directory}</security.ssl-path>
+                    </environmentVariables>
+                </configuration>
+            </plugin>
         </plugins>
+
 	</build>
 
 </project>
