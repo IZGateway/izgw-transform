@@ -90,6 +90,7 @@ public class ApiController {
             }
 
             if (min < 0) {
+
                 min = 0;
                 hasMore = "false";
             }
