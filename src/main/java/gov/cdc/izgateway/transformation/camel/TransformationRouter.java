@@ -38,15 +38,22 @@ public class TransformationRouter extends RouteBuilder {
      * the IZ Gateway Hub will be transformed using the
      * hl7TransformerService.
      */
-    from("direct:izghubTransform")
+    // THIS WAS WORKING - June 11 2024
+    from("direct:izghubTransformX")
         .bean(hl7TransformerService);
-//        .to("izghub:IISHubService")
-//        .bean(hl7TransformerService);
 
-//      from("direct:izghubTransform")
-//              // automatically set the inbound or outbound param (for transformation logic request or response logic)
-//              .bean(hl7TransformerService)
-//              .to("izghub:IISHubService")
-//              .bean(hl7TransformerService);
+      // Work on this next:
+      from("direct:izghubTransform")
+              .bean(hl7TransformerService);
+              //.to("izghub:IISHubService");
+              // TODO: handle the response transformation next .bean(hl7TransformerService);
+
+//    // what would be cool:
+//        from("direct:fhirTransform")
+//                .bean(hl7TransformerService)
+//                .to("izghub:IISHubService")
+//                .bean(hl7TransformerService);
+//        .bean(hl7TransformerService)
+
   }
 }

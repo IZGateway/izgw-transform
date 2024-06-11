@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.transformation.camel;
+package gov.cdc.izgateway.transformation.camel.producers.hub;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
