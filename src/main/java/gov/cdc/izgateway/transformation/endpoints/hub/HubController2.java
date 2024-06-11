@@ -16,16 +16,18 @@ import gov.cdc.izgateway.soap.SoapControllerBase;
 import gov.cdc.izgateway.soap.fault.Fault;
 import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
-import gov.cdc.izgateway.soap.message.*;
+import gov.cdc.izgateway.soap.message.HasCredentials;
+import gov.cdc.izgateway.soap.message.SoapMessage;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.soap.net.MessageSender;
-import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
+import gov.cdc.izgateway.transformation.camel.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.HubMessageSender;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
-import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -46,15 +48,15 @@ import java.util.UUID;
 
 @RestController
 @RolesAllowed({Roles.SOAP, Roles.ADMIN})
-@RequestMapping("/IISHubService_PaulWasWorking")
+@RequestMapping("/IISHubService")
 @Lazy(false)
 @Slf4j
-public class HubController extends SoapControllerBase {
+public class HubController2 extends SoapControllerBase {
     private MessageSender messageSender;
     private ProducerTemplate producerTemplate;
 
     @Autowired
-    public HubController(
+    public HubController2(
             IMessageHeaderService mshService,
             HubMessageSender messageSender,
             AccessControlRegistry registry,
@@ -87,31 +89,19 @@ public class HubController extends SoapControllerBase {
         ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
-        try {
-            String msg = serviceContext.getRequestMessage().encode().replace("\r", "\n");
-            log.info("Message pre-transformation:\n\n{}", msg);
-        }
-        catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
-        }
+        HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage, null);
 
-        producerTemplate.sendBody("direct:izghubTransform", serviceContext);
-        // TODO PCahill move the logging to the transformation service class
-        try {
-            String msg = serviceContext.getRequestMessage().encode().replace("\r", "\n");
-            log.info("Message post-transformation:\n\n{}", msg);
-        }
-        catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
-        }
+        producerTemplate.sendBody("direct:izghubTransform", context);
 
+        // Start of where I think the Camel components take over
+        // End of Camel
         try {
             submitSingleMessage.setHl7Message(serviceContext.getRequestMessage().encode());
         }
         catch (HL7Exception e) {
             throw new HubControllerFault(e.getMessage());
         }
-        // End of Camel
+
         // TODO: Paul - discussed with Keith and this destination will be a fixed thing - not a destination IIS... think about this more.
         IDestination dest = getDestination(destinationId);
         logDestination(dest);
@@ -124,14 +114,15 @@ public class HubController extends SoapControllerBase {
         serviceContext.setCurrentDirection(DataFlowDirection.RESPONSE);
         try {
             serviceContext.setResponseMessage(parseHl7v2Message(response.getHl7Message()));
-            producerTemplate.sendBody("direct:izghubTransform", serviceContext);
-            response.setHl7Message(serviceContext.getResponseMessage().encode());
+            producerTemplate.sendBody("direct:izghubTransform", context);
+            response.setHl7Message(context.getServiceContext().getResponseMessage().encode());
         }
         catch (HL7Exception e) {
             throw new HubControllerFault(e.getMessage());
         }
         // Camel end
-
+        // End of where I think the Camel components take over
+        //SubmitSingleMessageResponse response = context.getSubmitSingleMessageResponse();
         response.setSchema(SoapMessage.HUB_NS);	// Shift from client to Hub Schema
         response.getHubHeader().setDestinationId(dest.getDestId());
         String uri = dest.getDestinationUri();

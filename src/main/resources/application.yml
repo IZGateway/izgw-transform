@@ -124,15 +124,15 @@ logging:
       cdc:
         izgateway:
           security:
-            AccessControlRegistry: DEBUG
-            AccessControlInterceptor: DEBUG
+            AccessControlRegistry: INFO
+            AccessControlInterceptor: INFO
             client:
-              ClientSecurityInterceptor: DEBUG
+              ClientSecurityInterceptor: INFO
             server:
-              ServerSecurityInterceptor: DEBUG
+              ServerSecurityInterceptor: INFO
     org:
       springframework:
-        web: DEBUG
+        web: INFO
       apache:
         tomcat:
           util:

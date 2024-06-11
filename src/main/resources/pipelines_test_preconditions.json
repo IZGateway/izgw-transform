@@ -7,19 +7,29 @@
         {
           "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
           "name": "HL7v2 to IZ Gateway hub",
-          "inboundEndpoint": "TS IZGHub WSDL Listener",
-          "outboundEndpoint": "IZG Hub",
+          "inboundEndpoint": "izgts:IISHubService",
+          "outboundEndpoint": "izghub:IISHubService",
           "description": "REMOTE REQUEST/RESPONSE TRANSFORMATIONS A pipeline for ORG1, receiving from TS IZGHub WSDL Listener and sending to IZG Hub",
           "pipes": [
             {
-              "solutionId": "018f7881-7607-7220-a94b-fe0c7e81cbec",
-              "solutionName": "AustinCustom1",
+              "solutionId": "33347b9a-10c7-41c0-b3f3-1ff5f8245ffa",
               "version": "1.0",
               "preconditions": [
                 {
-                  "method": "regex_match",
-                  "dataPath": "/PID-13-1",
-                  "regex": "\\((\\d{3})\\) (\\d{3})-(\\d{4})"
+                  "method": "equals",
+                  "dataPath": "/MSH-9-1",
+                  "comparisonValue": "VXU"
+                }
+              ]
+            },
+            {
+              "solutionId": "8e41e4c3-6c3a-456b-bc9d-74eac0de561b",
+              "version": "1.0",
+              "preconditions": [
+                {
+                  "method": "equals",
+                  "dataPath": "/MSH-9-1",
+                  "comparisonValue": "QBP"
                 }
               ]
             }
@@ -30,6 +40,119 @@
   ],
   "solutions": [
     {
+      "id": "8e41e4c3-6c3a-456b-bc9d-74eac0de561b",
+      "name": "ZipFixer_QBP",
+      "description": "Just implements the example from original demo.  MSH-4-1 to MSH-22-1 (if MSH-22-1 is empty).  MSH-6-1 to MSH-23-1 (is MSH-23-1 is empty). Hardcode MSH-21-1 and MSH-21-2 if they don't already match specified precondition values",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [],
+          "operationList": [
+            {
+              "method": "regex_replace",
+              "field": "/QPD-8-5",
+              "regex": "^(\\d{5})(\\d{4})$",
+              "replacement": "$1-$2"
+            }
+          ]
+        }
+      ],
+      "responseOperations": [
+        {
+          "preconditions": [
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-6-1",
+              "setValue": "MSH 6 NEW VALUE"
+            }
+          ]
+        }
+
+      ]
+    },
+    {
+      "id": "33347b9a-10c7-41c0-b3f3-1ff5f8245ffa",
+      "name": "ZipFixer",
+      "description": "",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [],
+          "operationList": [
+            {
+              "method": "regex_replace",
+              "field": "/PID-11-5",
+              "regex": "^(\\d{5})(\\d{4})$",
+              "replacement": "$1-$2"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/NK1-4-5",
+              "regex": "^(\\d{5})(\\d{4})$",
+              "replacement": "$1-$2"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/NK1-32-5",
+              "regex": "^(\\d{5})(\\d{4})$",
+              "replacement": "$1-$2"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/GT1-5-5",
+              "regex": "^(\\d{5})(\\d{4})$",
+              "replacement": "$1-$2"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/GT1-17-5",
+              "regex": "^(\\d{5})(\\d{4})$",
+              "replacement": "$1-$2"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/GT1-17-5",
+              "regex": "^(\\d{5})(\\d{4})$",
+              "replacement": "$1-$2"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/INSURANCE/IN1-5-5",
+              "regex": "^(\\d{5})(\\d{4})$",
+              "replacement": "$1-$2"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/ORDER(0)/ORC-22-5",
+              "regex": "^(\\d{5})(\\d{4})$",
+              "replacement": "$1-$2"
+            },
+            {
+              "method": "regex_replace",
+              "field": "/ORDER(1)/ORC-22-5",
+              "regex": "^(\\d{5})(\\d{4})$",
+              "replacement": "$1-$2"
+            }
+          ]
+        }
+      ],
+      "responseOperations": [
+        {
+          "preconditions": [
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-6-1",
+              "setValue": "MSH 6 NEW VALUE"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "018f7881-7607-7220-a94b-fe0c7e81cbec",
       "name": "AustinCustom1",
       "description": "Just implements the example from original demo.  MSH-4-1 to MSH-22-1 (if MSH-22-1 is empty).  MSH-6-1 to MSH-23-1 (is MSH-23-1 is empty). Hardcode MSH-21-1 and MSH-21-2 if they don't already match specified precondition values",
@@ -38,30 +161,49 @@
         {
           "preconditions": [
             {
-              "method": "exists",
-              "dataPath": "/MSH-3-1"
+              "method": "not_equals",
+              "dataPath": "/MSH-3-1",
+              "comparisonValue": "IZGATEWAY"
             }
           ],
           "operationList": [
             {
               "method": "copy",
-              "sourceField": "/MSH-3-1",
+              "sourceField": "/MSH-4-1",
               "destinationField": "/MSH-22-1"
             }
           ]
         },
         {
           "preconditions": [
+          ],
+          "operationList": [
             {
-              "method": "not_exists",
-              "dataPath": "/MSH-4-1"
+              "method": "copy",
+              "sourceField": "/MSH-6-1",
+              "destinationField": "/MSH-23-1"
             }
+          ]
+        },
+        {
+          "preconditions": [
           ],
           "operationList": [
             {
               "method": "set",
-              "destinationField": "/MSH-31-1",
-              "setValue": "NOT_EXIST_PASSED"
+              "destinationField": "/MSH-21-1",
+              "setValue": "CDCPHINVS"
+            }
+          ]
+        },
+        {
+          "preconditions": [
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-21-2",
+              "setValue": "Z22"
             }
           ]
         }

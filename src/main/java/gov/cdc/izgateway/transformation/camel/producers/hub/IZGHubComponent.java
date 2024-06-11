@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.transformation.camel;
+package gov.cdc.izgateway.transformation.camel.producers.hub;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.support.DefaultComponent;
