@@ -222,6 +222,14 @@
                         <phase>process-test-resources</phase>
                         <configuration>
                             <target>
+                                <delete file="${project.build.directory}/self_signed_unit_tests.crt"/>
+                                <delete file="${project.build.directory}/self_signed_unit_tests.csr"/>
+                                <delete file="${project.build.directory}/self_signed_unit_tests.key"/>
+                                <delete file="${project.build.directory}/self_signed_unit_tests.pfx"/>
+                                <delete file="${project.build.directory}/awsdev_keystore.jks"/>
+                                <delete file="${project.build.directory}/awsdev_keystore.bcfks"/>
+                                <delete file="${project.build.directory}/izgw_client_trust.jks"/>
+                                <delete file="${project.build.directory}/izgw_client_trust.bcfks"/>
                                 <exec executable="openssl" failonerror="true">
                                     <arg value="genrsa"/>
                                     <arg value="-out"/>
