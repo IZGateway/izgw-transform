@@ -44,8 +44,8 @@ public class TransformationRouter extends RouteBuilder {
 
       // Work on this next:
       from("direct:izghubTransform")
-              .bean(hl7TransformerService);
-              //.to("izghub:IISHubService");
+              .bean(hl7TransformerService)
+              .to("izghub:IISHubService");
               // TODO: handle the response transformation next .bean(hl7TransformerService);
 
 //    // what would be cool:

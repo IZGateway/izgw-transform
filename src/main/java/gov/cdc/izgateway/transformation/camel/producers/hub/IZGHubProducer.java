@@ -22,8 +22,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 public class IZGHubProducer  extends DefaultProducer {
-    @Autowired
-    private HubMessageSender messageSender;
 
     public IZGHubProducer(Endpoint endpoint) {
         super(endpoint);
@@ -31,7 +29,10 @@ public class IZGHubProducer  extends DefaultProducer {
 
     @Override
     public void process(Exchange exchange) throws Exception {
-//        log.info("IZGHubProducer");
+        log.info("IZGHubProducer");
+        IZGHubComponent hubComponent = (IZGHubComponent) getEndpoint().getComponent();
+        log.info("IZGHubProducer 2");
+
 //        HubWsdlTransformationContext context = exchange.getIn().getBody(HubWsdlTransformationContext.class);
 //        try {
 //            context.getSubmitSingleMessageRequest().setHl7Message(context.getServiceContext().getRequestMessage().encode());
