@@ -1,6 +1,10 @@
 package gov.cdc.izgateway.transformation.camel.producers.hub;
 
+import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.parser.PipeParser;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
@@ -20,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.IOException;
+
 @Slf4j
 public class IZGHubProducer  extends DefaultProducer {
 
@@ -31,27 +37,29 @@ public class IZGHubProducer  extends DefaultProducer {
     public void process(Exchange exchange) throws Exception {
         log.info("IZGHubProducer");
         IZGHubComponent hubComponent = (IZGHubComponent) getEndpoint().getComponent();
+        HubMessageSender messageSender = hubComponent.getMessageSender();
         log.info("IZGHubProducer 2");
 
-//        HubWsdlTransformationContext context = exchange.getIn().getBody(HubWsdlTransformationContext.class);
+        HubWsdlTransformationContext context = exchange.getIn().getBody(HubWsdlTransformationContext.class);
+        try {
+            context.getSubmitSingleMessageRequest().setHl7Message(context.getServiceContext().getRequestMessage().encode());
+        }
+        catch (HL7Exception e) {
+            throw new HubControllerFault(e.getMessage());
+        }
+        // TODO: Paul - discussed with Keith and this destination will be a fixed thing - not a destination IIS... think about this more.
+        IDestination dest = getDestination("0");
+        // logDestination(dest);
+
+        // checkMessage(submitSingleMessage);
+
+        SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(dest, context.getSubmitSingleMessageRequest());
+        // Camel start for handling response transformation
+        context.getServiceContext().setCurrentDirection(DataFlowDirection.RESPONSE);
+        context.getServiceContext().setResponseMessage(parseHl7v2Message(response.getHl7Message()));
+        context.setSubmitSingleMessageResponse(response);
+
 //        try {
-//            context.getSubmitSingleMessageRequest().setHl7Message(context.getServiceContext().getRequestMessage().encode());
-//        }
-//        catch (HL7Exception e) {
-//            throw new HubControllerFault(e.getMessage());
-//        }
-//        // TODO: Paul - discussed with Keith and this destination will be a fixed thing - not a destination IIS... think about this more.
-//        IDestination dest = getDestination("0");
-//        // logDestination(dest);
-//
-//        // checkMessage(submitSingleMessage);
-//
-//        SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(dest, context.getSubmitSingleMessageRequest());
-//
-//        // Camel start for handling response transformation
-//        context.getServiceContext().setCurrentDirection(DataFlowDirection.RESPONSE);
-//        try {
-//            context.getServiceContext().setResponseMessage(parseHl7v2Message(response.getHl7Message()));
 //            producerTemplate.sendBody("direct:izghubTransform", context);
 //            response.setHl7Message(serviceContext.getResponseMessage().encode());
 //        }
@@ -73,6 +81,20 @@ public class IZGHubProducer  extends DefaultProducer {
 //
 //        System.out.println("Response: " + response);
 
+    }
+
+    private Message parseHl7v2Message(String rawHl7Message) throws HL7Exception {
+        PipeParser parser;
+        try (DefaultHapiContext context = new DefaultHapiContext()) {
+            // This replacement just here because my SOAP client is messing w/ EOL characters
+            rawHl7Message = rawHl7Message.replace("\n", "\r");
+            context.setValidationContext(new NoValidation());
+            parser = context.getPipeParser();
+        } catch (IOException e) {
+            throw new HL7Exception(e);
+        }
+
+        return parser.parse(rawHl7Message);
     }
 
     private IDestination getDestination(String destinationId) throws UnknownDestinationFault {

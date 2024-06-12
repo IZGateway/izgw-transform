@@ -93,39 +93,22 @@ public class HubController2 extends SoapControllerBase {
 
         producerTemplate.sendBody("direct:izghubTransform", context);
 
-        // Start of where I think the Camel components take over
-        // End of Camel
-        try {
-            submitSingleMessage.setHl7Message(serviceContext.getRequestMessage().encode());
-        }
-        catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
-        }
-
-        // TODO: Paul - discussed with Keith and this destination will be a fixed thing - not a destination IIS... think about this more.
-        IDestination dest = getDestination(destinationId);
-        logDestination(dest);
-
-        checkMessage(submitSingleMessage);
-
-        SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(dest, submitSingleMessage);
-
-        // Camel start for handling response transformation
-        serviceContext.setCurrentDirection(DataFlowDirection.RESPONSE);
-        try {
-            serviceContext.setResponseMessage(parseHl7v2Message(response.getHl7Message()));
-            producerTemplate.sendBody("direct:izghubTransform", context);
-            response.setHl7Message(context.getServiceContext().getResponseMessage().encode());
-        }
-        catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
-        }
+//        // Camel start for handling response transformation
+//        serviceContext.setCurrentDirection(DataFlowDirection.RESPONSE);
+//        try {
+//            serviceContext.setResponseMessage(parseHl7v2Message(response.getHl7Message()));
+//            producerTemplate.sendBody("direct:izghubTransform", context);
+//            response.setHl7Message(context.getServiceContext().getResponseMessage().encode());
+//        }
+//        catch (HL7Exception e) {
+//            throw new HubControllerFault(e.getMessage());
+//        }
         // Camel end
         // End of where I think the Camel components take over
-        //SubmitSingleMessageResponse response = context.getSubmitSingleMessageResponse();
+        SubmitSingleMessageResponse response = context.getSubmitSingleMessageResponse();
         response.setSchema(SoapMessage.HUB_NS);	// Shift from client to Hub Schema
-        response.getHubHeader().setDestinationId(dest.getDestId());
-        String uri = dest.getDestinationUri();
+        response.getHubHeader().setDestinationId("413");  // TODO fix this
+        String uri = "fakeURI";
         response.getHubHeader().setDestinationUri(uri);
         ResponseEntity<?> result = checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
         return result;
