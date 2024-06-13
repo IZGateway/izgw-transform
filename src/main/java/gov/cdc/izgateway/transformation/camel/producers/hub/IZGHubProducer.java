@@ -16,6 +16,7 @@ import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.HubMessageSender;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
+import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
@@ -49,52 +50,12 @@ public class IZGHubProducer  extends DefaultProducer {
         }
         // TODO: Paul - discussed with Keith and this destination will be a fixed thing - not a destination IIS... think about this more.
         IDestination dest = getDestination("0");
-        // logDestination(dest);
-
-        // checkMessage(submitSingleMessage);
 
         SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(dest, context.getSubmitSingleMessageRequest());
-        // Camel start for handling response transformation
         context.getServiceContext().setCurrentDirection(DataFlowDirection.RESPONSE);
-        context.getServiceContext().setResponseMessage(parseHl7v2Message(response.getHl7Message()));
+        context.getServiceContext().setResponseMessage(Hl7Utils.parseHl7v2Message(response.getHl7Message()));
         context.setSubmitSingleMessageResponse(response);
 
-//        try {
-//            producerTemplate.sendBody("direct:izghubTransform", context);
-//            response.setHl7Message(serviceContext.getResponseMessage().encode());
-//        }
-//        catch (HL7Exception e) {
-//            throw new HubControllerFault(e.getMessage());
-//        }
-
-//        System.out.println("IZGHubProducer");
-//        System.out.println("Endpoint: " + getEndpoint().getEndpointUri());
-//        // Your custom logic here
-//        String body = exchange.getIn().getBody(String.class);
-//        WebClient webClient = WebClient.create();
-//        String response = webClient.put()
-//                .uri("http://localhost:8081/izghubstub")
-//                .body(BodyInserters.fromValue(body))
-//                .retrieve()
-//                .bodyToMono(String.class)
-//                .block();
-//
-//        System.out.println("Response: " + response);
-
-    }
-
-    private Message parseHl7v2Message(String rawHl7Message) throws HL7Exception {
-        PipeParser parser;
-        try (DefaultHapiContext context = new DefaultHapiContext()) {
-            // This replacement just here because my SOAP client is messing w/ EOL characters
-            rawHl7Message = rawHl7Message.replace("\n", "\r");
-            context.setValidationContext(new NoValidation());
-            parser = context.getPipeParser();
-        } catch (IOException e) {
-            throw new HL7Exception(e);
-        }
-
-        return parser.parse(rawHl7Message);
     }
 
     private IDestination getDestination(String destinationId) throws UnknownDestinationFault {
