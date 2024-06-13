@@ -1,8 +1,8 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
-import ca.uhn.hl7v2.model.Message;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "method")
 @JsonSubTypes({
@@ -13,5 +13,5 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = RegexMatch.class, name = "regex_match")
 })
 public interface Precondition {
-    boolean evaluate(Message message);
+    boolean evaluate(ServiceContext context);
 }

@@ -1,5 +1,8 @@
 transformationservice:
   destination: https://dev.izgateway.org/IISHubService
+  configurations:
+    main: pipelines_test_preconditions.json
+
 spring:
   autoconfigure:
     exclude:
@@ -125,6 +128,7 @@ logging:
     gov:
       cdc:
         izgateway:
+          transformation: TRACE
           security:
             AccessControlRegistry: DEBUG
             AccessControlInterceptor: DEBUG
