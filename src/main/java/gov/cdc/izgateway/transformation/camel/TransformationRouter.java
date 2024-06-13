@@ -42,19 +42,23 @@ public class TransformationRouter extends RouteBuilder {
     from("direct:izghubTransformX")
         .bean(hl7TransformerService);
 
-      // Work on this next:
-      from("direct:izghubTransform")
-              .bean(hl7TransformerService)
-              .to("izghub:IISHubService")
-              .bean(hl7TransformerService);
-              // TODO: handle the response transformation next .bean(hl7TransformerService);
 
-//    // what would be cool:
-//        from("direct:fhirTransform")
-//                .bean(hl7TransformerService)
-//                .to("izghub:IISHubService")
-//                .bean(hl7TransformerService);
-//        .bean(hl7TransformerService)
+    /*
+     * This route is an In/Out message exchange pattern.
+     * The direct:izghubTransform defines the start of the route that will take the incoming message
+     * and start processing it.
+     */
+    from("direct:izghubTransform")
+        .bean(hl7TransformerService)
+        .to("izghub:IISHubService")
+        .bean(hl7TransformerService);
 
+    /* This would be cool */
+    /*
+    from("direct:fhirTransform")
+        .bean(hl7TransformerService)
+        .to("izghub:IISHubService")
+        .bean(hl7TransformerService);
+    */
   }
 }
