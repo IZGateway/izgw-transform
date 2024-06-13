@@ -1,3 +1,5 @@
+transformationservice:
+  destination: https://dev.izgateway.org/IISHubService
 spring:
   autoconfigure:
     exclude:
