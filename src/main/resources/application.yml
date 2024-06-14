@@ -1,4 +1,5 @@
 transformationservice:
+  destination: https://dev.izgateway.org/IISHubService
   configurations:
     main: pipelines_test_preconditions.json
 
@@ -36,7 +37,7 @@ security:
   # Set to the deployment path of the SSL
   # For test and dev deployments, set SSL_SHARE environment variable to the location of the EFS File system in
   # the AWS environment.
-  ssl-path: ${SSL_SHARE:}conf/ssl
+  ssl-path: ${SSL_SHARE:}
 
 springdoc:
   swagger-ui:
