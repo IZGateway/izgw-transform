@@ -28,7 +28,7 @@ class Hl7v2EqualsTests {
         eq.setComparisonValue(comparisonValue);
 
         assertTrue(
-                eq.evaluate(context.getRequestMessage())
+                eq.evaluate(context)
         );
     }
 
@@ -52,7 +52,7 @@ class Hl7v2EqualsTests {
         eq.setComparisonValue(comparisonValue);
 
         assertFalse(
-                eq.evaluate(context.getRequestMessage())
+                eq.evaluate(context)
         );
     }
 
