@@ -28,7 +28,7 @@ class Hl7v2ExistsTests {
         exists.setDataPath(dataPath);
 
         assertTrue(
-                exists.evaluate(context.getRequestMessage())
+                exists.evaluate(context)
         );
     }
 
@@ -46,7 +46,7 @@ class Hl7v2ExistsTests {
         exists.setDataPath(dataPath);
 
         assertFalse(
-                exists.evaluate(context.getRequestMessage())
+                exists.evaluate(context)
         );
     }
 
