@@ -88,6 +88,7 @@ jobs:
         env:
           COMMON_PASS: ${{ secrets.COMMON_PASS }}
           ELASTIC_API_KEY: ${{ secrets.ELASTIC_API_KEY }}
+          SSL_SHARE: ${{ github.workspace }}/target
 
         run: |
           env && mvn -B clean package install -Dbuildno=${{github.run_number}} \
