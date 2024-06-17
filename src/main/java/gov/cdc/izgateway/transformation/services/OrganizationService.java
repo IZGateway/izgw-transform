@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.LinkedHashSet;
+
 import java.util.UUID;
 
 @Service
@@ -22,6 +24,10 @@ public class OrganizationService {
         return repo.getOrganization(id);
     }
 
+    public LinkedHashSet<Organization> getOrganizationSet(){
+    return repo.getOrganizationSet();
+    }
+
     public void updateOrganization(Organization organization) {
         Organization existingOrganization = getOrganization(organization.getOrganizationId());
         if (existingOrganization == null) {
@@ -31,4 +37,6 @@ public class OrganizationService {
         repo.updateOrganization(organization);
 
     }
+
+    public void createOrganization(Organization org){repo.createOrganization(org);}
 }

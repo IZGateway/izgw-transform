@@ -140,5 +140,6 @@ logging:
               NioChannel:
                 handshake: DEBUG
 transformation:
-  organization-file-path: /Users/cahilp/projects/izg-transform-code/izgw-transform/src/main/resources/organizations.json
+  organization-file-path: src/main/resources/organizations.json
+
 
