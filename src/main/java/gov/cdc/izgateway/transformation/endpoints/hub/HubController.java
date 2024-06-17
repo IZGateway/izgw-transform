@@ -18,14 +18,12 @@ import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.soap.message.*;
 import gov.cdc.izgateway.soap.net.MessageSender;
-import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.HubMessageSender;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
-import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,6 +32,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.security.RolesAllowed;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +49,9 @@ import java.util.UUID;
 public class HubController extends SoapControllerBase {
     private MessageSender messageSender;
     private ProducerTemplate producerTemplate;
+
+    @Value("${transformationservice.destination}")
+    private String destinationUri;
 
     @Autowired
     public HubController(
@@ -161,7 +163,8 @@ public class HubController extends SoapControllerBase {
 
         IDestination hubDestination = new Destination();
         hubDestination.setId(destinationIdObject);
-        hubDestination.setDestUri("https://localhost/IISHubService");
+
+        hubDestination.setDestUri(destinationUri);
 
         return hubDestination;
     }

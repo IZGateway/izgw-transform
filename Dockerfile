@@ -6,7 +6,8 @@ RUN apk update && apk add --no-cache openjdk17-jre
 ARG JAR_FILENAME
 
 # Ports
-EXPOSE 8080
+EXPOSE 444
+EXPOSE 9082
 # Remote debugging
 EXPOSE 8000
 

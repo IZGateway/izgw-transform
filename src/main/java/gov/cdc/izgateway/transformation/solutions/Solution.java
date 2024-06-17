@@ -33,16 +33,17 @@ public class Solution {
 
     // TODO - make generic not HL7 specific
     public void execute(ServiceContext context) throws HL7Exception {
+
         if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
 
             for (SolutionOperation op : requestOperations) {
-                op.execute(context.getRequestMessage());
+                op.execute(context);
             }
 
         } else if (context.getCurrentDirection().equals(DataFlowDirection.RESPONSE)) {
 
             for (SolutionOperation op : responseOperations) {
-                op.execute(context.getResponseMessage());
+                op.execute(context);
             }
 
         }
