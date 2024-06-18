@@ -7,6 +7,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class Hl7Utils {
     public static String getHl7Message(String message) {
@@ -24,6 +25,16 @@ public class Hl7Utils {
         }
 
         return parser.parse(rawHl7Message);
+    }
+
+    public static UUID getOrganizationId(String organization) {
+
+        switch (organization) {
+            case "IZG":
+                return UUID.fromString("0d15449b-fb08-4013-8985-20c148b353fe");
+        }
+
+        return null;
     }
 
 }
