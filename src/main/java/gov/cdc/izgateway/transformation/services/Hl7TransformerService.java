@@ -1,8 +1,7 @@
 package gov.cdc.izgateway.transformation.services;
 
 import ca.uhn.hl7v2.HL7Exception;
-import gov.cdc.izgateway.transformation.camel.HubWsdlTransformationContext;
-import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubControllerFault;
 import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import gov.cdc.izgateway.transformation.pipelines.PipelineBuilder;
@@ -43,5 +42,11 @@ public class Hl7TransformerService {
 
       return context;
   }
+
+//    // This method is just for discovery and should never be needed.
+//    public String transform(String context) throws Exception {
+//        log.info("In the second transform!!");
+//        return context + " - transformed";
+//    }
 
 }
