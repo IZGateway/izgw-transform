@@ -38,6 +38,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +55,9 @@ import java.util.UUID;
 @Slf4j
 public class HubController2 extends SoapControllerBase {
     private final ProducerTemplate producerTemplate;
+
+    @Value("${transformationservice.destination}")
+    private String destinationUri;
 
     @Autowired
     public HubController2(
@@ -114,7 +118,8 @@ public class HubController2 extends SoapControllerBase {
 
         IDestination hubDestination = new Destination();
         hubDestination.setId(destinationIdObject);
-        hubDestination.setDestUri("https://localhost/IISHubService");
+
+        hubDestination.setDestUri(destinationUri);
 
         return hubDestination;
     }
