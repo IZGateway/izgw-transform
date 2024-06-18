@@ -20,12 +20,10 @@ import gov.cdc.izgateway.soap.message.HasCredentials;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
-import gov.cdc.izgateway.soap.net.MessageSender;
-import gov.cdc.izgateway.transformation.camel.HubWsdlTransformationContext;
+import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
-import gov.cdc.izgateway.transformation.endpoints.hub.forreview.HubMessageSender;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +33,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
+import org.apache.camel.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -52,19 +52,16 @@ import java.util.UUID;
 @Lazy(false)
 @Slf4j
 public class HubController2 extends SoapControllerBase {
-    private MessageSender messageSender;
     private ProducerTemplate producerTemplate;
 
     @Autowired
     public HubController2(
             IMessageHeaderService mshService,
-            HubMessageSender messageSender,
             AccessControlRegistry registry,
             ProducerTemplate producerTemplate
     ) {
         // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
         super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));
-        this.messageSender = messageSender;
         this.producerTemplate = producerTemplate;
 
         registry.register(this);
@@ -79,6 +76,7 @@ public class HubController2 extends SoapControllerBase {
 
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
+
         // TODO: This is a placeholder for the real EVENTID
         TransactionData t = new TransactionData("TODO: A Real EVENTID");
         RequestContext.setTransactionData(t);
@@ -91,20 +89,16 @@ public class HubController2 extends SoapControllerBase {
 
         HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage, null);
 
+        CamelContext camelContext = producerTemplate.getCamelContext();
+
+        for (Route route : camelContext.getRoutes()) {
+            log.info("Route ID: {}", route.getId());
+            log.info("Route Input Endpoint: {}", route.getEndpoint());
+            route.getEventDrivenProcessors().forEach(processor -> log.info("Processor: {}", processor));
+        }
+
         producerTemplate.sendBody("direct:izghubTransform", context);
 
-//        // Camel start for handling response transformation
-//        serviceContext.setCurrentDirection(DataFlowDirection.RESPONSE);
-//        try {
-//            serviceContext.setResponseMessage(parseHl7v2Message(response.getHl7Message()));
-//            producerTemplate.sendBody("direct:izghubTransform", context);
-//            response.setHl7Message(context.getServiceContext().getResponseMessage().encode());
-//        }
-//        catch (HL7Exception e) {
-//            throw new HubControllerFault(e.getMessage());
-//        }
-        // Camel end
-        // End of where I think the Camel components take over
         SubmitSingleMessageResponse response = context.getSubmitSingleMessageResponse();
         response.setSchema(SoapMessage.HUB_NS);	// Shift from client to Hub Schema
         response.getHubHeader().setDestinationId("413");  // TODO fix this

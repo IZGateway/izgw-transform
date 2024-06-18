@@ -1,8 +1,7 @@
-package gov.cdc.izgateway.transformation.camel;
+package gov.cdc.izgateway.transformation.context;
 
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
-import gov.cdc.izgateway.transformation.context.ServiceContext;
 import lombok.Getter;
 import lombok.Setter;
 
