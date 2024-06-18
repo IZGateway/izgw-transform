@@ -5,6 +5,9 @@ import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Context object required for a pipeline that uses the Hub outbound endpoint.
+ */
 @Getter
 @Setter
 public class HubWsdlTransformationContext {

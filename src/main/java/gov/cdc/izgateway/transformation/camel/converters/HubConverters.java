@@ -32,39 +32,9 @@ public class HubConverters implements TypeConverters {
         return hl7Message;
     }
 
-//    @Converter
-//    public HubWsdlTransformationContext StringToContext(GenericFile<String> file) {
-//        // Object thebody = file.getBody();
-//        String thebody = file.getBody().toString();
-//        String body = "";
-//
-//        log.info("Read file with content: \n{}", body);
-//
-//        UUID organization = UUID.fromString("0d15449b-fb08-4013-8985-20c148b353fe");
-//        ServiceContext serviceContext = null;
-//        try {
-//            serviceContext = new ServiceContext(organization,
-//                    "izgts:IISHubService",
-//                    "izghub:IISHubService",
-//                    DataType.HL7V2,
-//                    body);
-//        } catch (Exception e) {
-//            log.error("Error creating ServiceContext: " + e.getMessage());
-//            throw new RuntimeException("Error creating ServiceContext: " + e.getMessage());
-//        }
-//
-//        SubmitSingleMessageRequest request = new SubmitSingleMessageRequest();
-//        request.getHubHeader().setDestinationId("dev");
-//
-//        return new HubWsdlTransformationContext(serviceContext, request, null);
-//
-//    }
-
     @Converter
     public HubWsdlTransformationContext fileToContext(GenericFile<File> file) {
-        // Object thebody = file.getBody();
         File thebody = (File) file.getBody();
-
 
         UUID organization = UUID.fromString("0d15449b-fb08-4013-8985-20c148b353fe");
         ServiceContext serviceContext = null;
@@ -85,8 +55,8 @@ public class HubConverters implements TypeConverters {
         request.getHubHeader().setDestinationId("dev");
 
         // TODO this needs to be addressed
-        TransactionData t = new TransactionData("TODO: A Real EVENTID");
-        RequestContext.setTransactionData(t);
+//        TransactionData t = new TransactionData("TODO: A Real EVENTID");
+//        RequestContext.setTransactionData(t);
 
         return new HubWsdlTransformationContext(serviceContext, request, null);
 
