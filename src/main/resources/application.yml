@@ -1,5 +1,5 @@
 transformationservice:
-  destination: https://dev.izgateway.org/IISHubService
+  destination: https://localhost/IISHubService
   configurations:
     main: pipelines_test_preconditions.json
 

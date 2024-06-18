@@ -1,10 +1,6 @@
 package gov.cdc.izgateway.transformation.endpoints.hub;
 
-import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.parser.PipeParser;
-import ca.uhn.hl7v2.validation.impl.NoValidation;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.event.TransactionData;
 import gov.cdc.izgateway.model.IDestination;
@@ -19,7 +15,6 @@ import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.soap.message.HasCredentials;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
-import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
@@ -34,9 +29,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
-import org.apache.camel.Route;
 import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -44,7 +37,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -53,14 +45,14 @@ import java.util.UUID;
 @RequestMapping("/IISHubService")
 @Lazy(false)
 @Slf4j
-public class HubController2 extends SoapControllerBase {
+public class HubController extends SoapControllerBase {
     private final ProducerTemplate producerTemplate;
 
     @Value("${transformationservice.destination}")
     private String destinationUri;
 
     @Autowired
-    public HubController2(
+    public HubController(
             IMessageHeaderService mshService,
             AccessControlRegistry registry,
             ProducerTemplate producerTemplate
@@ -78,19 +70,15 @@ public class HubController2 extends SoapControllerBase {
         // TODO Discuss the organizationId - should we just use a simple string
         UUID organization = Hl7Utils.getOrganizationId(submitSingleMessage.getFacilityID());
 
+        // TODO Potentially refactor to not extract single pieces
         ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
         HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
 
-        producerTemplate.sendBody("direct:izghubTransform", context);
+        producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
 
-        SubmitSingleMessageResponse response = context.getSubmitSingleMessageResponse();
-        response.setSchema(SoapMessage.HUB_NS);	// Shift from client to Hub Schema
-        response.getHubHeader().setDestinationId(submitSingleMessage.getHubHeader().getDestinationId());
-        response.getHubHeader().setDestinationUri("fakeUri");  // TODO Paul - resolve this correctly.
-        ResponseEntity<?> result = checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
-        return result;
+        return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
     }
 
     private ServiceContext getServiceContext(UUID organization, String incomingMessage) throws Fault {

@@ -28,8 +28,7 @@ public class HubConverters implements TypeConverters {
 
     @Converter
     public String contextToString(HubWsdlTransformationContext context) {
-        String hl7Message = context.getSubmitSingleMessageResponse().getHl7Message();
-        return hl7Message;
+        return context.getSubmitSingleMessageResponse().getHl7Message();
     }
 
     @Converter
@@ -55,8 +54,8 @@ public class HubConverters implements TypeConverters {
         request.getHubHeader().setDestinationId("dev");
 
         // TODO this needs to be addressed
-//        TransactionData t = new TransactionData("TODO: A Real EVENTID");
-//        RequestContext.setTransactionData(t);
+        TransactionData t = new TransactionData("TODO: A Real EVENTID");
+        RequestContext.setTransactionData(t);
 
         return new HubWsdlTransformationContext(serviceContext, request, null);
 

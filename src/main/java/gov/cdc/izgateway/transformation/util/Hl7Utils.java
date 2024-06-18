@@ -27,6 +27,7 @@ public class Hl7Utils {
         return parser.parse(rawHl7Message);
     }
 
+    // TODO: This is temporary until we discuss this.
     public static UUID getOrganizationId(String organization) {
 
         switch (organization) {

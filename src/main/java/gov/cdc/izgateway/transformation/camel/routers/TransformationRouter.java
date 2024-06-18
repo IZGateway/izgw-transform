@@ -48,23 +48,19 @@ public class TransformationRouter extends RouteBuilder {
      * the IZ Gateway Hub will be transformed using the
      * hl7TransformerService.
      */
-    from("direct:izghubTransform")
+    from("direct:izghubTransformerPipeline")
         .bean(hl7TransformerService)
         .to("izghub:IISHubService")
         .bean(hl7TransformerService);
 
-//    from("file:/Users/cahilp/temp/hl7?noop=true")
-//      .to("direct:izghubTransform")
-//      .to("file:/Users/cahilp/temp/hl7/processed?fileName=${date:now:yyyyMMddHHmmssSSS}.txt");
-
-
+    from("file:/Users/cahilp/temp/hl7?noop=true")
+      .to("direct:izghubTransformerPipeline")
+      .to("file:/Users/cahilp/temp/hl7/processed?fileName=${date:now:yyyyMMddHHmmssSSS}.txt");
 
     /* This would be cool */
     /*
-    from("direct:fhirTransform")
-        .bean(hl7TransformerService)
-        .to("izghub:IISHubService")
-        .bean(hl7TransformerService);
+    from("direct:fhir")
+        .to("direct:izghubTransformerPipeline");
     */
   }
 
