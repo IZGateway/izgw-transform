@@ -26,6 +26,7 @@ import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -70,24 +71,20 @@ public class HubController2 extends SoapControllerBase {
 
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
-        // TODO Discuss if this logic is correct
-        String organizationId = submitSingleMessage.getFacilityID();
+        // TODO Discuss the organizationId - should we just use a simple string
+        UUID organization = Hl7Utils.getOrganizationId(submitSingleMessage.getFacilityID());
 
-        // Start of Camel Routes for transformations
-        // TODO Implement the organization properly
-        UUID organization = UUID.fromString("0d15449b-fb08-4013-8985-20c148b353fe");
         ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
-        HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage, null);
+        HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
 
         producerTemplate.sendBody("direct:izghubTransform", context);
 
         SubmitSingleMessageResponse response = context.getSubmitSingleMessageResponse();
         response.setSchema(SoapMessage.HUB_NS);	// Shift from client to Hub Schema
-        response.getHubHeader().setDestinationId("413");  // TODO fix this
-        String uri = "fakeURI";
-        response.getHubHeader().setDestinationUri(uri);
+        response.getHubHeader().setDestinationId(submitSingleMessage.getHubHeader().getDestinationId());
+        response.getHubHeader().setDestinationUri("fakeUri");  // TODO Paul - resolve this correctly.
         ResponseEntity<?> result = checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
         return result;
     }

@@ -15,6 +15,12 @@ public class HubWsdlTransformationContext {
     private SubmitSingleMessageRequest submitSingleMessageRequest;
     private SubmitSingleMessageResponse submitSingleMessageResponse;
 
+    public HubWsdlTransformationContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest) {
+        this.serviceContext = serviceContext;
+        this.submitSingleMessageRequest = submitSingleMessageRequest;
+        this.submitSingleMessageResponse = null;
+    }
+
     public HubWsdlTransformationContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest, SubmitSingleMessageResponse submitSingleMessageResponse) {
         this.serviceContext = serviceContext;
         this.submitSingleMessageRequest = submitSingleMessageRequest;
