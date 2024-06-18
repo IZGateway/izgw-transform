@@ -52,7 +52,7 @@ import java.util.UUID;
 @Lazy(false)
 @Slf4j
 public class HubController2 extends SoapControllerBase {
-    private ProducerTemplate producerTemplate;
+    private final ProducerTemplate producerTemplate;
 
     @Autowired
     public HubController2(
@@ -66,20 +66,12 @@ public class HubController2 extends SoapControllerBase {
 
         registry.register(this);
 
-        // TODO: Paul - this is temporary until I have a better understanding of this
-        // Need to understand what we need to log and any other cross-cutting concerns
-        // May be able to reuse the EventId class in core
-        // We may want a new "thing" other TransactionData
-        TransactionData t = new TransactionData("TODO: A Real EVENTID 1");
-        RequestContext.setTransactionData(t);
     }
 
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
-
-        // TODO: This is a placeholder for the real EVENTID
-        TransactionData t = new TransactionData("TODO: A Real EVENTID");
-        RequestContext.setTransactionData(t);
+        // TODO Discuss if this logic is correct
+        String organizationId = submitSingleMessage.getFacilityID();
 
         // Start of Camel Routes for transformations
         // TODO Implement the organization properly
@@ -88,14 +80,6 @@ public class HubController2 extends SoapControllerBase {
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
         HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage, null);
-
-        CamelContext camelContext = producerTemplate.getCamelContext();
-
-        for (Route route : camelContext.getRoutes()) {
-            log.info("Route ID: {}", route.getId());
-            log.info("Route Input Endpoint: {}", route.getEndpoint());
-            route.getEventDrivenProcessors().forEach(processor -> log.info("Processor: {}", processor));
-        }
 
         producerTemplate.sendBody("direct:izghubTransform", context);
 
@@ -106,20 +90,6 @@ public class HubController2 extends SoapControllerBase {
         response.getHubHeader().setDestinationUri(uri);
         ResponseEntity<?> result = checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
         return result;
-    }
-
-    private Message parseHl7v2Message(String rawHl7Message) throws HL7Exception {
-        PipeParser parser;
-        try (DefaultHapiContext context = new DefaultHapiContext()) {
-            // This replacement just here because my SOAP client is messing w/ EOL characters
-            rawHl7Message = rawHl7Message.replace("\n", "\r");
-            context.setValidationContext(new NoValidation());
-            parser = context.getPipeParser();
-        } catch (IOException e) {
-            throw new HL7Exception(e);
-        }
-
-        return parser.parse(rawHl7Message);
     }
 
     private ServiceContext getServiceContext(UUID organization, String incomingMessage) throws Fault {
@@ -177,7 +147,11 @@ public class HubController2 extends SoapControllerBase {
     )
     @Override
     public ResponseEntity<?> submitSoapRequest(@RequestBody SoapMessage soapMessage, @Schema(description = "Throws the fault specified in the header parameter") @RequestHeader(value = "X-IIS-Hub-Dev-Action",required = false) String devAction) {
-        // TODO: This is a placeholder for the real EVENTID.  Paul to ask about how transaction data is set initially.
+        // TODO: Paul - this is temporary until I have a better understanding of this
+        // Need to understand what we need to log and any other cross-cutting concerns
+        // May be able to reuse the EventId class in core
+        // We may want a new "thing" other TransactionData
+
         TransactionData t = new TransactionData("TODO: A Real EVENTID");
         RequestContext.setTransactionData(t);
 
