@@ -11,6 +11,7 @@ import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import lombok.Data;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.UUID;
 
 @Data
@@ -22,6 +23,7 @@ public class ServiceContext {
     private Message responseMessage;
     private DataFlowDirection currentDirection;
     private DataType dataType;
+    private HashMap<String, String> state;
 
     public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, DataType dataType, String rawMessage) throws HL7Exception {
         this.organizationId = organizationId;
@@ -33,6 +35,25 @@ public class ServiceContext {
             this.requestMessage = Hl7Utils.parseHl7v2Message(rawMessage);
         }
         this.currentDirection = DataFlowDirection.REQUEST;
+
+        this.state = new HashMap<>();
+    }
+
+    public Message getCurrentMessage() {
+        // TODO - need to generalize "message" here so it can be HL7 or FHIR or whatever
+        if (this.currentDirection == DataFlowDirection.REQUEST) {
+            return this.requestMessage;
+        }
+
+        return this.responseMessage;
+    }
+
+    public void setCurrentMessage(Message message) {
+        if (this.currentDirection == DataFlowDirection.REQUEST) {
+            this.requestMessage = message;
+        } else if (this.currentDirection == DataFlowDirection.RESPONSE) {
+            this.responseMessage = message;
+        }
     }
 
 }

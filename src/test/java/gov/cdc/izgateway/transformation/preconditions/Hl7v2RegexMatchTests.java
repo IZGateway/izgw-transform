@@ -30,7 +30,7 @@ class Hl7v2RegexMatchTests {
         Hl7v2RegexMatch regexMatch = new Hl7v2RegexMatch(dataPath, regex);
 
         assertTrue(
-                regexMatch.evaluate(context.getRequestMessage())
+                regexMatch.evaluate(context)
         );
     }
 
