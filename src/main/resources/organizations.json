@@ -1,4 +1,8 @@
 [ {
+  "organizationName" : "Audacious Test Organization 1",
+  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353af",
+  "active" : false
+},{
   "organizationName" : "Audacious Test Organization 2",
   "organizationId" : "0d15449b-fb08-4013-8985-20c148b353be",
   "active" : true
@@ -45,17 +49,5 @@
 }, {
   "organizationName" : "Audacious Test Organization 14",
   "organizationId" : "0d15449b-fb08-4013-8985-20c148b353ac",
-  "active" : false
-}, {
-  "organizationName" : "\"Test 20\"",
-  "organizationId" : "64ea59bd-8863-44ea-b5a4-4b24f0a760d2",
-  "active" : true
-}, {
-  "organizationName" : "\"Test 20\"",
-  "organizationId" : "df93e710-0905-4ddb-9c31-502340bc510a",
-  "active" : true
-}, {
-  "organizationName" : "Audacious Test Organization 1",
-  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353af",
   "active" : false
 } ]
