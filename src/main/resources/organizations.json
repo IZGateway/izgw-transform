@@ -1,7 +1,7 @@
 [ {
   "organizationName" : "Audacious Test Organization 1",
   "organizationId" : "0d15449b-fb08-4013-8985-20c148b353af",
-  "active" : false
+  "active" : true
 },{
   "organizationName" : "Audacious Test Organization 2",
   "organizationId" : "0d15449b-fb08-4013-8985-20c148b353be",

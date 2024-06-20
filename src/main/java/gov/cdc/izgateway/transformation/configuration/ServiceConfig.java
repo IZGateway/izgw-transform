@@ -24,13 +24,7 @@ public class ServiceConfig {
                     throw new IllegalStateException("More than one OrganizationConfig found for id " + context.getOrganizationId());
                 }).orElse(null);
     }
-    public OrganizationConfig getOrganizaionById(String id){
-        return getOrganizations()
-        .stream()
-        .filter(org -> id.equals(org.getOrganizationId().toString()))
-        .findAny()
-        .orElse(null);
-    }
+
     public PipelineConfig getPipelineConfig(ServiceContext context) {
         return getOrganizationConfig(context).getPipelines()
                 .stream()
