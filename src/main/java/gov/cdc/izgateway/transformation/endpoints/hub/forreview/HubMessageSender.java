@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 // TODO Paul - discuss HubMessageSender - can we modify the MessageSender in core to handle the "hub header clear method call" toBeSent.getHubHeader().clear();
-
+// 6/10 - change core MessageSender to only clear the hub header if the destination is not a hub destination
 @Component
 public class HubMessageSender extends MessageSender {
     private EndpointStatusService statusService;
