@@ -7,6 +7,7 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import lombok.Data;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class ServiceContext {
         this.dataType = dataType;
 
         if (dataType.equals(DataType.HL7V2)) {
-            this.requestMessage = parseHl7v2Message(rawMessage);
+            this.requestMessage = Hl7Utils.parseHl7v2Message(rawMessage);
         }
         this.currentDirection = DataFlowDirection.REQUEST;
 
@@ -55,17 +56,4 @@ public class ServiceContext {
         }
     }
 
-    private Message parseHl7v2Message(String rawHl7Message) throws HL7Exception {
-        PipeParser parser;
-        try (DefaultHapiContext context = new DefaultHapiContext()) {
-            // This replacement just here because my SOAP client is messing w/ EOL characters
-            rawHl7Message = rawHl7Message.replace("\n", "\r");
-            context.setValidationContext(new NoValidation());
-            parser = context.getPipeParser();
-        } catch (IOException e) {
-            throw new HL7Exception(e);
-        }
-
-        return parser.parse(rawHl7Message);
-    }
 }

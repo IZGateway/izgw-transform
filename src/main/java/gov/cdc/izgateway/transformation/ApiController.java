@@ -5,31 +5,47 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gov.cdc.izgateway.transformation.configuration.OrganizationConfig;
 import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
+import gov.cdc.izgateway.transformation.model.Organization;
+import gov.cdc.izgateway.transformation.services.OrganizationService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 
 @Log
 @RestController
 public class ApiController {
     private final ServiceConfig configuration;
+    private final OrganizationService organizationService;;
 
     @Autowired
-    public ApiController(ServiceConfig configuration) {
+    public ApiController(ServiceConfig configuration, OrganizationService organizationService) {
         this.configuration = configuration;
+        this.organizationService = organizationService;
+    }
+
+    @GetMapping("/api/v1/organizations/{uuid}")
+    public ResponseEntity<Organization> getOrganizationByUUID(@PathVariable UUID uuid) {
+        Organization organization = organizationService.getOrganization(uuid);
+
+        if ( organization == null ) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(organization, HttpStatus.OK);
+    }
+
+    @PutMapping("/api/v1/organizations/{uuid}")
+    public ResponseEntity<Organization> updateOrganization(@PathVariable UUID uuid, @RequestBody Organization updatedOrganization) {
+        organizationService.updateOrganization(updatedOrganization);
+        return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
     }
 
     @GetMapping("/api/v1/organizations")

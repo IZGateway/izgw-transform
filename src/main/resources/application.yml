@@ -1,5 +1,5 @@
 transformationservice:
-  destination: https://dev.izgateway.org/IISHubService
+  destination: https://localhost/IISHubService
   configurations:
     main: pipelines_test_preconditions.json
 
@@ -130,20 +130,21 @@ logging:
         izgateway:
           transformation: TRACE
           security:
-            AccessControlRegistry: DEBUG
-            AccessControlInterceptor: DEBUG
+            AccessControlRegistry: INFO
+            AccessControlInterceptor: INFO
             client:
-              ClientSecurityInterceptor: DEBUG
+              ClientSecurityInterceptor: INFO
             server:
-              ServerSecurityInterceptor: DEBUG
+              ServerSecurityInterceptor: INFO
     org:
       springframework:
-        web: DEBUG
+        web: INFO
       apache:
         tomcat:
           util:
             net:
               NioChannel:
                 handshake: DEBUG
-
+transformation:
+  organization-file-path: /Users/cahilp/projects/izg-transform-code/izgw-transform/src/main/resources/organizations.json
 
