@@ -1,5 +1,5 @@
 transformationservice:
-  destination: https://dev.izgateway.org/IISHubService
+  destination: https://localhost/IISHubService
   configurations:
     main: pipelines_test_preconditions.json
 
@@ -130,15 +130,15 @@ logging:
         izgateway:
           transformation: TRACE
           security:
-            AccessControlRegistry: DEBUG
-            AccessControlInterceptor: DEBUG
+            AccessControlRegistry: INFO
+            AccessControlInterceptor: INFO
             client:
-              ClientSecurityInterceptor: DEBUG
+              ClientSecurityInterceptor: INFO
             server:
-              ServerSecurityInterceptor: DEBUG
+              ServerSecurityInterceptor: INFO
     org:
       springframework:
-        web: DEBUG
+        web: INFO
       apache:
         tomcat:
           util:
@@ -147,5 +147,4 @@ logging:
                 handshake: DEBUG
 transformation:
   organization-file-path: src/main/resources/organizations.json
-
 

@@ -1,10 +1,6 @@
 package gov.cdc.izgateway.transformation.endpoints.hub;
 
-import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.parser.PipeParser;
-import ca.uhn.hl7v2.validation.impl.NoValidation;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.event.TransactionData;
 import gov.cdc.izgateway.model.IDestination;
@@ -16,20 +12,23 @@ import gov.cdc.izgateway.soap.SoapControllerBase;
 import gov.cdc.izgateway.soap.fault.Fault;
 import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
-import gov.cdc.izgateway.soap.message.*;
-import gov.cdc.izgateway.soap.net.MessageSender;
+import gov.cdc.izgateway.soap.message.HasCredentials;
+import gov.cdc.izgateway.soap.message.SoapMessage;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
-import gov.cdc.izgateway.transformation.endpoints.hub.forreview.HubMessageSender;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.security.RolesAllowed;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +37,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -46,9 +44,9 @@ import java.util.UUID;
 @RolesAllowed({Roles.SOAP, Roles.ADMIN})
 @RequestMapping("/IISHubService")
 @Lazy(false)
+@Slf4j
 public class HubController extends SoapControllerBase {
-    private MessageSender messageSender;
-    private ProducerTemplate producerTemplate;
+    private final ProducerTemplate producerTemplate;
 
     @Value("${transformationservice.destination}")
     private String destinationUri;
@@ -56,13 +54,11 @@ public class HubController extends SoapControllerBase {
     @Autowired
     public HubController(
             IMessageHeaderService mshService,
-            HubMessageSender messageSender,
             AccessControlRegistry registry,
             ProducerTemplate producerTemplate
     ) {
         // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
         super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));
-        this.messageSender = messageSender;
         this.producerTemplate = producerTemplate;
 
         registry.register(this);
@@ -77,13 +73,10 @@ public class HubController extends SoapControllerBase {
 
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
-        // TODO: This is a placeholder for the real EVENTID
-        TransactionData t = new TransactionData("TODO: A Real EVENTID");
-        RequestContext.setTransactionData(t);
+        // TODO Discuss the organizationId - should we just use a simple string
+        UUID organization = Hl7Utils.getOrganizationId(submitSingleMessage.getFacilityID());
 
-        // Start of Camel Routes for transformations
-        // TODO Implement the organization properly
-        UUID organization = UUID.fromString("0d15449b-fb08-4013-8985-20c148b353fe");
+        // TODO Potentially refactor to not extract single pieces
         ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
@@ -102,40 +95,9 @@ public class HubController extends SoapControllerBase {
 
         checkMessage(submitSingleMessage);
 
-        SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(dest, submitSingleMessage);
+        producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
 
-        // Camel start for handling response transformation
-        serviceContext.setCurrentDirection(DataFlowDirection.RESPONSE);
-        try {
-            serviceContext.setResponseMessage(parseHl7v2Message(response.getHl7Message()));
-            producerTemplate.sendBody("direct:izghubTransform", serviceContext);
-            response.setHl7Message(serviceContext.getResponseMessage().encode());
-        }
-        catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
-        }
-        // Camel end
-
-        response.setSchema(SoapMessage.HUB_NS);	// Shift from client to Hub Schema
-        response.getHubHeader().setDestinationId(dest.getDestId());
-        String uri = dest.getDestinationUri();
-        response.getHubHeader().setDestinationUri(uri);
-        ResponseEntity<?> result = checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
-        return result;
-    }
-
-    private Message parseHl7v2Message(String rawHl7Message) throws HL7Exception {
-        PipeParser parser;
-        try (DefaultHapiContext context = new DefaultHapiContext()) {
-            // This replacement just here because my SOAP client is messing w/ EOL characters
-            rawHl7Message = rawHl7Message.replace("\n", "\r");
-            context.setValidationContext(new NoValidation());
-            parser = context.getPipeParser();
-        } catch (IOException e) {
-            throw new HL7Exception(e);
-        }
-
-        return parser.parse(rawHl7Message);
+        return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
     }
 
     private ServiceContext getServiceContext(UUID organization, String incomingMessage) throws Fault {
@@ -194,7 +156,11 @@ public class HubController extends SoapControllerBase {
     )
     @Override
     public ResponseEntity<?> submitSoapRequest(@RequestBody SoapMessage soapMessage, @Schema(description = "Throws the fault specified in the header parameter") @RequestHeader(value = "X-IIS-Hub-Dev-Action",required = false) String devAction) {
-        // TODO: This is a placeholder for the real EVENTID.  Paul to ask about how transaction data is set initially.
+        // TODO: Paul - this is temporary until I have a better understanding of this
+        // Need to understand what we need to log and any other cross-cutting concerns
+        // May be able to reuse the EventId class in core
+        // We may want a new "thing" other TransactionData
+
         TransactionData t = new TransactionData("TODO: A Real EVENTID");
         RequestContext.setTransactionData(t);
 
