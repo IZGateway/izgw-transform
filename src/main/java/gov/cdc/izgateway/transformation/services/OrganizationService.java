@@ -89,6 +89,7 @@ public class OrganizationService {
 
     public void updateOrganization(Organization organization) {
         Organization existingOrganization = getOrganizationObject(organization.getOrganizationId());
+
         if (existingOrganization == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization not found");
         }
@@ -103,3 +104,4 @@ public class OrganizationService {
         return newOrg;
     }
 }
+
