@@ -27,10 +27,10 @@ public class ApiController {
     }
 
     @PutMapping("/api/v1/organizations/{uuid}")
-    public ResponseEntity<Organization> updateOrganization(@PathVariable UUID uuid, @RequestBody Map<String, Object> updatedOrganization) {
-        Organization newOrg = new Organization(UUID.fromString(updatedOrganization.get("organizationId").toString()), updatedOrganization.get("organizationName").toString(), (Boolean) updatedOrganization.get("active"));
-        organizationService.updateOrganization(newOrg);
-        return new ResponseEntity<>(newOrg, HttpStatus.OK);
+    public ResponseEntity<Organization> updateOrganization(@PathVariable UUID uuid, @RequestBody Organization updatedOrganization) {
+        updatedOrganization.setOrganizationId(uuid);
+        organizationService.updateOrganization(updatedOrganization);
+        return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
     }
 
     @GetMapping("/api/v1/organizations")
