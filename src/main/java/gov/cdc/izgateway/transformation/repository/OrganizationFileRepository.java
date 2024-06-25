@@ -2,6 +2,7 @@ package gov.cdc.izgateway.transformation.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import gov.cdc.izgateway.transformation.model.Organization;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -11,13 +12,13 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Repository
 public class OrganizationFileRepository implements OrganizationRepository {
-    private Set<Organization> organizations;
-
+    private LinkedHashSet<Organization> organizations;
     @Value("${transformation.organization-file-path:organizations.json}")
     private String organizationFilePath ;
 
@@ -42,10 +43,11 @@ public class OrganizationFileRepository implements OrganizationRepository {
         writeOrganizationsToFile();
     }
 
-    private Set<Organization> getOrganizationSet() {
+    @Override
+    public LinkedHashSet<Organization> getOrganizationSet() {
         if (organizations == null) {
             ObjectMapper mapper = new ObjectMapper();
-            TypeReference<Set<Organization>> typeReference = new TypeReference<>() {};
+            TypeReference<LinkedHashSet<Organization>> typeReference = new TypeReference<>() {};
             try (InputStream inputStream = Files.newInputStream(Paths.get(organizationFilePath))) {
                 organizations = mapper.readValue(inputStream, typeReference);
             } catch (IOException e) {

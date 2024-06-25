@@ -1,41 +1,94 @@
 {
   "organizations": [
     {
-      "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353aa",
       "organizationName": "Audacious Test Organziation",
-      "pipelines": [
-        {
-          "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
-          "name": "HL7v2 to IZ Gateway hub",
-          "inboundEndpoint": "izgts:IISHubService",
-          "outboundEndpoint": "izghub:IISHubService",
-          "description": "REMOTE REQUEST/RESPONSE TRANSFORMATIONS A pipeline for ORG1, receiving from TS IZGHub WSDL Listener and sending to IZG Hub",
-          "pipes": [
-            {
-              "solutionId": "33347b9a-10c7-41c0-b3f3-1ff5f8245ffa",
-              "version": "1.0",
-              "preconditions": [
-                {
-                  "method": "equals",
-                  "dataPath": "/MSH-9-1",
-                  "comparisonValue": "VXU"
-                }
-              ]
-            },
-            {
-              "solutionId": "8e41e4c3-6c3a-456b-bc9d-74eac0de561b",
-              "version": "1.0",
-              "preconditions": [
-                {
-                  "method": "equals",
-                  "dataPath": "/MSH-9-1",
-                  "comparisonValue": "QBP"
-                }
-              ]
-            }
-          ]
-        }
-      ]
+      "active": true,
+      "pipelines": []
+    },
+    {
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353ab",
+      "organizationName": "Audacious Test Organziation 2",
+      "active": true,
+      "pipelines": []
+    },
+    {
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353ac",
+      "organizationName": "Audacious Test Organziation 3",
+      "active": false,
+      "pipelines": []
+    },
+    {
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353ad",
+      "organizationName": "Audacious Test Organziation 4",
+      "active": false,
+      "pipelines": []
+    },
+    {
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353ae",
+      "organizationName": "Audacious Test Organziation 5",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353af",
+      "organizationName": "Audacious Test Organziation 6",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353ba",
+      "organizationName": "Audacious Test Organziation 7",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353bb",
+      "organizationName": "Audacious Test Organziation 8",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353be",
+      "organizationName": "Audacious Test Organziation 9",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353bf",
+      "organizationName": "Audacious Test Organziation 10",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353ca",
+      "organizationName": "Audacious Test Organziation 11",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353cb",
+      "organizationName": "Audacious Test Organziation 12",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353cc",
+      "organizationName": "Audacious Test Organziation 13",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353cd",
+      "organizationName": "Audacious Test Organziation 14",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353ce",
+      "organizationName": "Audacious Test Organziation 15",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353cf",
+      "organizationName": "Audacious Test Organziation 16",
+      "active": true,
+      "pipelines": []
+    },{
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353da",
+      "organizationName": "Audacious Test Organziation 17",
+      "active": true,
+      "pipelines": []
     }
   ],
   "solutions": [
