@@ -95,6 +95,7 @@ public class HubController extends SoapControllerBase {
 
         checkMessage(submitSingleMessage);
 
+        HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
         producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
 
         return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
