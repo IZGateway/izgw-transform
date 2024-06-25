@@ -63,12 +63,6 @@ public class HubController extends SoapControllerBase {
 
         registry.register(this);
 
-        // TODO: Paul - this is temporary until I have a better understanding of this
-        // Need to understand what we need to log and any other cross-cutting concerns
-        // May be able to reuse the EventId class in core
-        // We may want a new "thing" other TransactionData
-        TransactionData t = new TransactionData("TODO: A Real EVENTID 1");
-        RequestContext.setTransactionData(t);
     }
 
     @Override
@@ -80,22 +74,8 @@ public class HubController extends SoapControllerBase {
         ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
-        producerTemplate.sendBody("direct:izghubTransform", serviceContext);
-
-        try {
-            submitSingleMessage.setHl7Message(serviceContext.getRequestMessage().encode());
-        }
-        catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
-        }
-        // End of Camel
-        // TODO: Paul - discussed with Keith and this destination will be a fixed thing - not a destination IIS... think about this more.
-        IDestination dest = getDestination(destinationId);
-        logDestination(dest);
-
-        checkMessage(submitSingleMessage);
-
         HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
+
         producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
 
         return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
