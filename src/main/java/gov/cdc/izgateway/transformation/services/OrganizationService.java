@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrganizationService {
@@ -44,13 +45,12 @@ public class OrganizationService {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> returnMap = new HashMap<>();
         int min = 0, max = limit;
-        List<Organization> orgList = new ArrayList<>();
         String hasMore = "true";
         List<Organization> allOrgList = new ArrayList<>(repo.getOrganizationSet());
 
-        getActiveList(includeInactive, allOrgList, orgList);
-        for (int i = 0; i < orgList.size(); i++){
-            Organization newOrg = orgList.get(i);
+        List<Organization> filteredOrgList = filterList(includeInactive, allOrgList);
+        for (int i = 0; i < filteredOrgList.size(); i++){
+            Organization newOrg = filteredOrgList.get(i);
             if(newOrg.getOrganizationId().toString().equals(nextCursor)){
                 min = i+1;
                 max = i+limit+1;
@@ -60,33 +60,30 @@ public class OrganizationService {
                 max = i;
                 }
         }
-        if (max > orgList.size()) {
-            max = orgList.size();
+        if (max > filteredOrgList.size()) {
+            max = filteredOrgList.size();
             hasMore = "false";
         }
 
         if (min < 0) {
-
             min = 0;
             hasMore = "false";
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        returnMap.put("data", orgList.subList(min, max));
+        returnMap.put("data", filteredOrgList.subList(min, max));
         returnMap.put("has_more", hasMore);
         return new ResponseEntity<>(mapper.writeValueAsString(returnMap), headers, HttpStatus.OK);
     }
 
-    private static void getActiveList(Boolean includeInactive, List<Organization> allOrgList, List<Organization> orgList) {
-        for (Organization newOrg : allOrgList) {
-            if (Boolean.FALSE.equals(includeInactive)) {
-                if (Boolean.TRUE.equals(newOrg.getActive())) {
-                    orgList.add(newOrg);
-                }
-            } else {
-                orgList.add(newOrg);
-            }
+    private static List<Organization> filterList(Boolean includeInactive, List<Organization> allOrgList) {
+        if (Boolean.FALSE.equals(includeInactive)) {
+            return allOrgList.stream()
+                    .filter(Organization::getActive)
+                    .collect(Collectors.toList());
+        } else {
+            return new ArrayList<>(allOrgList);
         }
     }
 
