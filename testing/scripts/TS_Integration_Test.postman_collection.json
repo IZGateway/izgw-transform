@@ -47,12 +47,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations/0d15449b-fb08-4013-8985-20c148b353af",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/0d15449b-fb08-4013-8985-20c148b353af",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
@@ -96,12 +96,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations/1d15449b-fb08-4013-8985-20c148b353aa",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/1d15449b-fb08-4013-8985-20c148b353aa",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
@@ -173,12 +173,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations?limit=5",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations?limit=5",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
@@ -246,12 +246,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations?limit=5&include_inactive=true",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations?limit=5&includeInactive=true",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
@@ -263,7 +263,7 @@
 									"value": "5"
 								},
 								{
-									"key": "include_inactive",
+									"key": "includeInactive",
 									"value": "true"
 								}
 							]
@@ -283,59 +283,9 @@
 									"    {\r",
 									"    \"data\": [\r",
 									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 1\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353af\",\r",
-									"            \"active\": true\r",
-									"        },\r",
-									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 2\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353be\",\r",
-									"            \"active\": true\r",
-									"        },\r",
-									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 3\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353cc\",\r",
-									"            \"active\": true\r",
-									"        },\r",
-									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 4\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353cb\",\r",
-									"            \"active\": true\r",
-									"        },\r",
-									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 5\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ba\",\r",
-									"            \"active\": true\r",
-									"        },\r",
-									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 6\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353cd\",\r",
-									"            \"active\": true\r",
-									"        },\r",
-									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 7\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ae\",\r",
-									"            \"active\": true\r",
-									"        },\r",
-									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 8\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ca\",\r",
-									"            \"active\": true\r",
-									"        },\r",
-									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 9\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353bf\",\r",
-									"            \"active\": true\r",
-									"        },\r",
-									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 10\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ab\",\r",
-									"            \"active\": true\r",
-									"        },\r",
-									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 11\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353bb\",\r",
-									"            \"active\": true\r",
+									"            \"organizationName\" : \"Audacious Test Organization 14\",\r",
+									"            \"organizationId\" : \"0d15449b-fb08-4013-8985-20c148b353ac\",\r",
+									"            \"active\" : true\r",
 									"        }\r",
 									"    ],\r",
 									"    \"has_more\": \"false\"\r",
@@ -352,12 +302,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations?limit=20",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations?limit=20&nextCursor=0d15449b-fb08-4013-8985-20c148b353ad&includeInactive=true",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
@@ -367,6 +317,14 @@
 								{
 									"key": "limit",
 									"value": "20"
+								},
+								{
+									"key": "nextCursor",
+									"value": "0d15449b-fb08-4013-8985-20c148b353ad"
+								},
+								{
+									"key": "includeInactive",
+									"value": "true"
 								}
 							]
 						}
@@ -385,12 +343,28 @@
 									"    {\r",
 									"    \"data\": [\r",
 									"        {\r",
-									"            \"organizationName\": \"Audacious Test Organization 11\",\r",
-									"            \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353bb\",\r",
-									"            \"active\": true\r",
+									"            \"organizationName\" : \"Audacious Test Organization 5\",\r",
+									"            \"organizationId\" : \"0d15449b-fb08-4013-8985-20c148b353ba\",\r",
+									"            \"active\" : true\r",
+									"        }, {\r",
+									"            \"organizationName\" : \"Audacious Test Organization 6\",\r",
+									"            \"organizationId\" : \"0d15449b-fb08-4013-8985-20c148b353cd\",\r",
+									"            \"active\" : true\r",
+									"        }, {\r",
+									"            \"organizationName\" : \"Audacious Test Organization 7\",\r",
+									"            \"organizationId\" : \"0d15449b-fb08-4013-8985-20c148b353ae\",\r",
+									"            \"active\" : true\r",
+									"        }, {\r",
+									"            \"organizationName\" : \"Audacious Test Organization 8\",\r",
+									"            \"organizationId\" : \"0d15449b-fb08-4013-8985-20c148b353ca\",\r",
+									"            \"active\" : true\r",
+									"        }, {\r",
+									"            \"organizationName\" : \"Audacious Test Organization 9\",\r",
+									"            \"organizationId\" : \"0d15449b-fb08-4013-8985-20c148b353bf\",\r",
+									"            \"active\" : true\r",
 									"        }\r",
 									"    ],\r",
-									"    \"has_more\": \"false\"\r",
+									"    \"has_more\": \"true\"\r",
 									"}\r",
 									"    );\r",
 									"});"
@@ -404,12 +378,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations?next_cursor=0d15449b-fb08-4013-8985-20c148b353ab&limit=5",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations?nextCursor=0d15449b-fb08-4013-8985-20c148b353cb&limit=5",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
@@ -417,8 +391,8 @@
 							],
 							"query": [
 								{
-									"key": "next_cursor",
-									"value": "0d15449b-fb08-4013-8985-20c148b353ab"
+									"key": "nextCursor",
+									"value": "0d15449b-fb08-4013-8985-20c148b353cb"
 								},
 								{
 									"key": "limit",
@@ -485,12 +459,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations?prev_cursor=0d15449b-fb08-4013-8985-20c148b353ab&limit=5",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations?prevCursor=0d15449b-fb08-4013-8985-20c148b353ab&limit=5",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
@@ -498,7 +472,7 @@
 							],
 							"query": [
 								{
-									"key": "prev_cursor",
+									"key": "prevCursor",
 									"value": "0d15449b-fb08-4013-8985-20c148b353ab"
 								},
 								{
@@ -586,12 +560,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations?next_cursor=1d15449b-fb08-4013-8985-20c148b353ab",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations?nextCursor=1d15449b-fb08-4013-8985-20c148b353ab",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
@@ -599,7 +573,7 @@
 							],
 							"query": [
 								{
-									"key": "next_cursor",
+									"key": "nextCursor",
 									"value": "1d15449b-fb08-4013-8985-20c148b353ab"
 								}
 							]
@@ -683,12 +657,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations?prev_cursor=1d15449b-fb08-4013-8985-20c148b353ab",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations?prevCursor=1d15449b-fb08-4013-8985-20c148b353ab",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
@@ -696,7 +670,7 @@
 							],
 							"query": [
 								{
-									"key": "prev_cursor",
+									"key": "prevCursor",
 									"value": "1d15449b-fb08-4013-8985-20c148b353ab"
 								}
 							]
@@ -733,12 +707,12 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
@@ -768,16 +742,67 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
 								"organizations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateOrgExistsV2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"returns new org\", function() {\r",
+									"    pm.expect(pm.response.json()).to.eql(\r",
+									"    {\r",
+									"    \"active\": true,\r",
+									"    \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ad\",\r",
+									"    \"organizationName\": \"Audacious Test Organization 13\"\r",
+									"    }   \r",
+									"    );\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ad\",\r\n    \"organizationName\": \"Audacious Test Organization 13\",\r\n    \"active\": true\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/0d15449b-fb08-4013-8985-20c148b353ad",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"organizations",
+								"0d15449b-fb08-4013-8985-20c148b353ad"
 							]
 						}
 					},
@@ -794,8 +819,8 @@
 									"    pm.expect(pm.response.json()).to.eql(\r",
 									"    {\r",
 									"    \"active\": false,\r",
-									"    \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353af\",\r",
-									"    \"organizationName\": \"Audacious Test Organization 1\"\r",
+									"    \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ac\",\r",
+									"    \"organizationName\": \"Audacious Test Organization 14\"\r",
 									"    }   \r",
 									"    );\r",
 									"});"
@@ -810,7 +835,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353af\",\r\n    \"organizationName\": \"Audacious Test Organization 1\",\r\n    \"active\": false\r\n  }",
+							"raw": "{\r\n    \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ac\",\r\n    \"organizationName\": \"Audacious Test Organization 14\",\r\n    \"active\": false\r\n  }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -818,17 +843,119 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations/0d15449b-fb08-4013-8985-20c148b353af",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/0d15449b-fb08-4013-8985-20c148b353ac",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
 								"organizations",
-								"0d15449b-fb08-4013-8985-20c148b353af"
+								"0d15449b-fb08-4013-8985-20c148b353ac"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resetUpdateOrgExistsV2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"returns new org\", function() {\r",
+									"    pm.expect(pm.response.json()).to.eql(\r",
+									"    {\r",
+									"    \"active\": false,\r",
+									"    \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ad\",\r",
+									"    \"organizationName\": \"Audacious Test Organization 13\"\r",
+									"    }   \r",
+									"    );\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ad\",\r\n    \"organizationName\": \"Audacious Test Organization 13\",\r\n    \"active\": false\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/0d15449b-fb08-4013-8985-20c148b353ad",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"organizations",
+								"0d15449b-fb08-4013-8985-20c148b353ad"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resetUpdateOrgExists",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"returns new org\", function() {\r",
+									"    pm.expect(pm.response.json()).to.eql(\r",
+									"    {\r",
+									"    \"active\": true,\r",
+									"    \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ac\",\r",
+									"    \"organizationName\": \"Audacious Test Organization 14\"\r",
+									"    }   \r",
+									"    );\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"organizationId\": \"0d15449b-fb08-4013-8985-20c148b353ac\",\r\n    \"organizationName\": \"Audacious Test Organization 14\",\r\n    \"active\": true\r\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/0d15449b-fb08-4013-8985-20c148b353ac",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"api",
+								"v1",
+								"organizations",
+								"0d15449b-fb08-4013-8985-20c148b353ac"
 							]
 						}
 					},
@@ -854,12 +981,12 @@
 						"method": "PUT",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:9082/api/v1/organizations/1d15449b-fb08-4013-8985-20c148b353aa",
-							"protocol": "http",
+							"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/1d15449b-fb08-4013-8985-20c148b353aa",
+							"protocol": "{{protocol}}",
 							"host": [
-								"localhost"
+								"{{host}}"
 							],
-							"port": "9082",
+							"port": "{{port}}",
 							"path": [
 								"api",
 								"v1",
