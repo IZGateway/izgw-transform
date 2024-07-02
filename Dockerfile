@@ -11,6 +11,20 @@ EXPOSE 9082
 # Remote debugging
 EXPOSE 8000
 
+COPY src/main/resources/organizations.json /data/organizations.json
+COPY docker/data/filebeat.yml /usr/share/izgateway/
+
+# Install logrotate
+RUN rm /etc/logrotate.conf
+COPY docker/data/logrotate.conf /etc/logrotate.conf
+RUN (crontab -l 2>/dev/null; echo "*/15 * * * * /etc/periodic/daily/logrotate") | crontab -
+
+WORKDIR /
+
+# Install filebeat
+RUN rm -f /filebeat/filebeat.yml && cp /usr/share/izgateway/filebeat.yml /filebeat/ 
+RUN rm -f /metricbeat/metricbeat.yml && cp /usr/share/izgateway/metricbeat.yml /metricbeat/
+
 #Rename default dnsmasq file to make sure dnsmasq does not read its entries
 RUN mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bkup
 RUN echo 'cache-size=10000' > /etc/dnsmasq.conf

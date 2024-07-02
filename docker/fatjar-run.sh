@@ -15,6 +15,16 @@ then
     JAVA_TOOL_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address="*:8000"
 fi
 
+# If an API Key has been given, then send data to elastic search.
+if [[ $ELASTIC_API_KEY ]]
+then
+    filebeat -e &
+    echo Started Filebeat
+else
+    echo Filebeat logging not enabled
+fi
+
+
 #Save original nameserver in temp file and empty contents
 echo nameserver 127.0.0.1 > /tmp/newresolv.conf
 cat /etc/resolv.conf >> /tmp/newresolv.conf
