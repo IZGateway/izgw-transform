@@ -22,6 +22,7 @@
         <project.build.finalName>${project.artifactId}-${project.version}-${timestamp}</project.build.finalName>
         <image.tag>${project.build.finalName}</image.tag>
         <buildno>${timestamp}</buildno>
+        <maven.build.timestamp.format>yyyyMMddHHmmssSSSZ</maven.build.timestamp.format>
     </properties>
     <repositories>
         <repository>
@@ -292,7 +293,7 @@
                                     <arg value="-keystore"/>
                                     <arg value="${project.build.directory}/awsdev_keystore.jks"/>
                                     <arg value="-storepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-noprompt"/>
                                     <arg value="-trustcacerts"/>
                                     <arg value="-importcert"/>
@@ -308,7 +309,7 @@
                                     <arg value="-keyalg"/>
                                     <arg value="RSA"/>
                                     <arg value="-storepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-keystore"/>
                                     <arg value="${project.build.directory}/awsdev_keystore.jks"/>
                                     <arg value="-dname"/>
@@ -321,11 +322,11 @@
                                     <arg value="-srcstoretype"/>
                                     <arg value="JKS"/>
                                     <arg value="-srcstorepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-destkeystore"/>
                                     <arg value="${project.build.directory}/awsdev_keystore.bcfks"/>
                                     <arg value="-deststorepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-deststoretype"/>
                                     <arg value="BCFKS"/>
                                     <arg value="-providername"/>
@@ -339,7 +340,7 @@
                                     <arg value="-keystore"/>
                                     <arg value="${project.build.directory}/izgw_client_trust.jks"/>
                                     <arg value="-storepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-noprompt"/>
                                     <arg value="-trustcacerts"/>
                                     <arg value="-importcert"/>
@@ -355,11 +356,11 @@
                                     <arg value="-srcstoretype"/>
                                     <arg value="JKS"/>
                                     <arg value="-srcstorepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-destkeystore"/>
                                     <arg value="${project.build.directory}/izgw_client_trust.bcfks"/>
                                     <arg value="-deststorepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-deststoretype"/>
                                     <arg value="BCFKS"/>
                                     <arg value="-providername"/>
@@ -383,6 +384,7 @@
                 <configuration>
                     <environmentVariables>
                         <security.ssl-path>${project.build.directory}</security.ssl-path>
+                        <COMMON_PASS>${maven.build.timestamp}</COMMON_PASS>
                     </environmentVariables>
                 </configuration>
             </plugin>
