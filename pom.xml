@@ -124,7 +124,7 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
-                            <configLocation>AiCheckstyle.xml</configLocation>
+                            <configLocation>ai-checkstyle.xml</configLocation>
                             <consoleOutput>true</consoleOutput>
                             <failsOnError>true</failsOnError>
                             <!-- Optionally, specify the location of the violations file -->
