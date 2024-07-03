@@ -1,6 +1,43 @@
 {
   "organizations": [
     {
+      "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
+      "organizationName": "Audacious Test Organziation",
+      "pipelines": [
+        {
+          "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
+          "name": "HL7v2 to IZ Gateway hub",
+          "inboundEndpoint": "izgts:IISHubService",
+          "outboundEndpoint": "izghub:IISHubService",
+          "description": "REMOTE REQUEST/RESPONSE TRANSFORMATIONS A pipeline for ORG1, receiving from TS IZGHub WSDL Listener and sending to IZG Hub",
+          "pipes": [
+            {
+              "solutionId": "33347b9a-10c7-41c0-b3f3-1ff5f8245ffa",
+              "version": "1.0",
+              "preconditions": [
+                {
+                  "method": "equals",
+                  "dataPath": "/MSH-9-1",
+                  "comparisonValue": "VXU"
+                }
+              ]
+            },
+            {
+              "solutionId": "8e41e4c3-6c3a-456b-bc9d-74eac0de561b",
+              "version": "1.0",
+              "preconditions": [
+                {
+                  "method": "equals",
+                  "dataPath": "/MSH-9-1",
+                  "comparisonValue": "QBP"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "organizationId": "0d15449b-fb08-4013-8985-20c148b353aa",
       "organizationName": "Audacious Test Organziation",
       "active": true,
