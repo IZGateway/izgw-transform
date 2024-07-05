@@ -2,6 +2,7 @@ transformationservice:
   destination: https://localhost/IISHubService
   configurations:
     main: pipelines_test_preconditions.json
+    organizations: src/main/resources/organizations.json
 
 spring:
   autoconfigure:
@@ -145,6 +146,3 @@ logging:
             net:
               NioChannel:
                 handshake: DEBUG
-transformation:
-  organization-file-path: src/main/resources/organizations.json
-
