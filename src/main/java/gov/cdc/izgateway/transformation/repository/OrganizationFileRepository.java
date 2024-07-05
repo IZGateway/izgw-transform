@@ -2,7 +2,6 @@ package gov.cdc.izgateway.transformation.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import gov.cdc.izgateway.transformation.model.Organization;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
@@ -11,15 +10,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Repository
 public class OrganizationFileRepository implements OrganizationRepository {
     private LinkedHashSet<Organization> organizations;
-    @Value("${transformation.organization-file-path:organizations.json}")
+    @Value("${transformationservice.configurations.organizations}")
     private String organizationFilePath ;
 
     @Override
