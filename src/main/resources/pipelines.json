@@ -1,0 +1,29 @@
+[
+  {
+    "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a67",
+    "name": "HL7v2 to IZ Gateway hub",
+    "description": "Pipeline to call all implemented Preconditions and Operations",
+    "inboundEndpoint": "TS IZGHub WSDL Listener",
+    "outboundEndpoint": "IZG Hub",
+    "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
+    "active": true
+  },
+  {
+    "id": "7E9D113C-394F-43AD-B887-641185D49F1A",
+    "name": "Test Pipeline 3",
+    "description": "A 3rd Test Pipeline",
+    "inboundEndpoint": "TS IZGHub WSDL Listener",
+    "outboundEndpoint": "IZG Hub",
+    "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
+    "active": true
+  },
+  {
+    "id": "8D0C8C23-F415-4F9E-B580-676D66AC24FF",
+    "name": "Test Pipeline 2",
+    "description": "A 2nd Test Pipeline",
+    "inboundEndpoint": "TS IZGHub WSDL Listener",
+    "outboundEndpoint": "IZG Hub",
+    "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
+    "active": false
+  }
+]
