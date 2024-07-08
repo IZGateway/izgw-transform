@@ -34,3 +34,9 @@ build/
 
 ### Mac Files ###
 **/.DS_Store
+
+### Local .env Files ###
+**/.env
+
+### Logs
+logs/*
