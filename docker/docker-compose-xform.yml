@@ -1,0 +1,19 @@
+version: '3.1'
+services:
+  xform:
+    image: izgw-transform:latest
+    container_name: xform
+    ports:
+      - '444:444'
+    environment:
+      COMMON_PASS: "${COMMON_PASS}"
+      SSL_SHARE: '/ssl'
+      TS_SERVER_PORT: '444'
+      TS_HUB_DESTINATION: "${TS_HUB_DESTINATION}"
+      ELASTIC_API_KEY: "${ELASTIC_API_KEY}"
+    volumes:
+      - type: bind
+        source: "${SSL_SOURCE}"
+        target: /ssl
+    networks:
+      - izgw-network
