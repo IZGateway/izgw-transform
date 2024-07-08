@@ -6,14 +6,14 @@ services:
     ports:
       - '444:444'
     environment:
-      COMMON_PASS: 'password'
+      COMMON_PASS: "${COMMON_PASS}"
       SSL_SHARE: '/ssl'
       TS_SERVER_PORT: '444'
       TS_HUB_DESTINATION: "${TS_HUB_DESTINATION}"
       ELASTIC_API_KEY: "${ELASTIC_API_KEY}"
     volumes:
       - type: bind
-        source: /Users/cahilp/ssl
+        source: "${SSL_SOURCE}"
         target: /ssl
     networks:
       - izgw-network

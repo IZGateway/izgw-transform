@@ -35,7 +35,7 @@ services:
       - '9081:9081'
     volumes:
       - type: bind
-        source: /Users/cahilp/ssl
+        source: "${SSL_SOURCE}"
         target: /usr/share/izgateway/conf/ssl
     networks:
       - izgw-network
