@@ -1,5 +1,5 @@
 transformationservice:
-  destination: https://localhost/IISHubService
+  destination: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
   configurations:
     main: pipelines_test_preconditions.json
 
@@ -20,6 +20,11 @@ spring:
       enabled: true
       max-file-size: 15GB
       max-request-size: 15GB
+
+elastic:
+  api-key: ${ELASTIC_API_KEY:}
+  host: ${ELASTIC_HOST:https://audacioussearchtest.es.us-east-1.aws.found.io:9243}
+  index: ${ELASTIC_INDEX:izgw-dev-logstash}
 
 management:
   metrics:
@@ -146,5 +151,5 @@ logging:
               NioChannel:
                 handshake: DEBUG
 transformation:
-  organization-file-path: src/main/resources/organizations.json
+  organization-file-path: /data/organizations.json
 
