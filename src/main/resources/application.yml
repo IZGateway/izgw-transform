@@ -3,6 +3,7 @@ transformationservice:
   configurations:
     main: pipelines_test_preconditions.json
     organizations: src/main/resources/organizations.json
+    pipelines: src/main/resources/pipelines.json
 
 spring:
   autoconfigure:
