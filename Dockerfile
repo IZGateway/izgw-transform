@@ -12,7 +12,7 @@ EXPOSE 9082
 EXPOSE 8000
 
 COPY src/main/resources/organizations.json /data/organizations.json
-COPY docker/data/filebeat.yml /usr/share/izgateway/
+COPY docker/data/filebeat.yml /usr/share/izg-transform/
 
 # Install logrotate
 RUN rm /etc/logrotate.conf
@@ -22,8 +22,8 @@ RUN (crontab -l 2>/dev/null; echo "*/15 * * * * /etc/periodic/daily/logrotate") 
 WORKDIR /
 
 # Install filebeat
-RUN rm -f /filebeat/filebeat.yml && cp /usr/share/izgateway/filebeat.yml /filebeat/ 
-RUN rm -f /metricbeat/metricbeat.yml && cp /usr/share/izgateway/metricbeat.yml /metricbeat/
+RUN rm -f /filebeat/filebeat.yml && cp /usr/share/izg-transform/filebeat.yml /filebeat/
+# This is fialing - need to debug RUN rm -f /metricbeat/metricbeat.yml && cp /usr/share/izgateway/metricbeat.yml /metricbeat/
 
 #Rename default dnsmasq file to make sure dnsmasq does not read its entries
 RUN mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bkup

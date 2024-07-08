@@ -6,7 +6,7 @@ filebeat.inputs:
     id: izgw-filestream
     enabled: true
     paths:
-      - /usr/share/izgateway/logs/*.json
+      - /usr/share/izg-transform/logs/*.json
     json.message_key: message
     parsers:
       - ndjson:
@@ -29,7 +29,7 @@ filebeat.inputs:
           target: 'cloud'
           fields:
             service: "${SERVICE_NAME:unknown}"
-            
+
     # change tag to dev/onboard/prod for selected environment
     tags: ["${ELASTIC_ENV_TAG:dev}"] # https://www.elastic.co/guide/en/beats/filebeat/7.14/configuration-general-options.html#_tags_21
   - type: "filestream"
@@ -43,9 +43,9 @@ filebeat.inputs:
     id: izgw-backups
     enabled: true
     paths:
-     - /usr/share/izgateway/conf/backups/izgwbackup.log
+      - /usr/share/izg-transform/conf/backups/izgwbackup.log
     tags: [ "${ELASTIC_ENV_TAG:dev}" ] # https://www.elastic.co/guide/en/beats/filebeat/7.14/configuration-general-options.html#_tags_21
-       
+
 # The Kibana section can be enabled to import dashboards and visualizations for specific Elastic Beats.
 # The ILM and Template settings are not recommended, as you should be controlling those from within Kibana and Elasticsearch itself.
 setup.ilm.enabled: false

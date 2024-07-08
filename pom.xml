@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>gov.cdc.izgateway</groupId>
-	<artifactId>transformation</artifactId>
-    <version>0.1.0-izgwts-snapshot</version>
-	<name>transformation</name>
-	<description>Demo project for Spring Boot</description>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.3</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>gov.cdc.izgateway</groupId>
+    <artifactId>transformation</artifactId>
+    <version>0.1.0-IZGWTS-SNAPSHOT</version>
+    <name>transformation</name>
+    <description>Demo project for Spring Boot</description>
     <properties>
-		<java.version>17</java.version>
+        <java.version>17</java.version>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
         <project.java.package>${project.groupId}</project.java.package>
@@ -22,7 +22,6 @@
         <project.build.finalName>${project.artifactId}-${project.version}-${timestamp}</project.build.finalName>
         <image.tag>${project.build.finalName}</image.tag>
         <buildno>${timestamp}</buildno>
-        <maven.build.timestamp.format>yyyyMMddHHmmssSSSZ</maven.build.timestamp.format>
     </properties>
     <repositories>
         <repository>
@@ -40,22 +39,10 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <!-- spring-boot-starter-web pulls 6.1.4 which has CVE-2024-22259 -->
-            <version>6.1.10</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <!-- spring-boot-starter-web pulls 6.2.2 which has CVE-2024-22257 -->
-            <version>6.3.1</version>
-        </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -123,8 +110,30 @@
             <version>1.0.19</version>
         </dependency>
     </dependencies>
-	<build>
-		<plugins>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <configLocation>AiCheckstyle.xml</configLocation>
+                            <encoding>UTF-8</encoding>
+                            <consoleOutput>true</consoleOutput>
+                            <failsOnError>true</failsOnError>
+                            <!-- Optionally, specify the location of the violations file -->
+                            <outputFile>${project.build.directory}/checkstyle-result.xml</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -140,9 +149,9 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>gov.cdc.izgateway.transformation.Application</mainClass>
                     <jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
@@ -162,64 +171,47 @@
                     </requiresUnpack>
                 </configuration>
             </plugin>
-            <!--
             <plugin>
-                <groupId>com.spotify.fmt</groupId>
-                <artifactId>fmt-maven-plugin</artifactId>
-                <version>2.23</version>
-                <configuration>
-                    <sourceDirectory>src/main/java</sourceDirectory>
-                    <testSourceDirectory>src/test/java</testSourceDirectory>
-                    <verbose>true</verbose>
-                    <filesNamePattern>.*\.java</filesNamePattern>
-                    <skip>false</skip>
-                    <skipSortingImports>false</skipSortingImports>
-                    <style>google</style>
-                </configuration>
+                <groupId>com.spotify</groupId>
+                <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.7</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.jnr</groupId>
+                        <artifactId>jnr-unixsocket</artifactId>
+                        <version>0.38.14</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
+                        <id>build-image</id>
+                        <phase>install</phase>
                         <goals>
-                            <goal>check</goal>
+                            <goal>build</goal>
+                            <goal>tag</goal>
                         </goals>
+                        <configuration>
+                            <tag>${image.tag}-${buildno}</tag>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tag-latest</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>tag</goal>
+                        </goals>
+                        <configuration>
+                            <tag>latest</tag>
+                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <repository>izgw-transform</repository>
+                    <buildArgs>
+                        <JAR_FILENAME>${project.build.finalName}.jar</JAR_FILENAME>
+                    </buildArgs>
+                </configuration>
             </plugin>
-            -->
-            <plugin>
-<groupId>com.spotify</groupId>
-<artifactId>dockerfile-maven-plugin</artifactId>
-<version>1.4.7</version>
-<configuration>
-<repository>iz-gateway</repository>
-<buildArgs>
-<JAR_FILENAME>${image.tag}.jar</JAR_FILENAME>
-<IZGW_VERSION>${project.version}</IZGW_VERSION>
-</buildArgs>
-</configuration>
-<executions>
-<execution>
-<id>build-image</id>
-<goals>
-<goal>build</goal>
-<goal>tag</goal>
-</goals>
-<phase>install</phase>
-<configuration>
-<tag>${image.tag}</tag>
-</configuration>
-</execution>
-<execution>
-<id>tag-latest</id>
-<goals>
-<goal>tag</goal>
-</goals>
-<phase>install</phase>
-<configuration>
-<tag>latest</tag>
-</configuration>
-</execution>
-</executions>
-</plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>3.1.0</version>
@@ -287,7 +279,7 @@
                                     <arg value="-keystore"/>
                                     <arg value="${project.build.directory}/awsdev_keystore.jks"/>
                                     <arg value="-storepass"/>
-                                    <arg value="${maven.build.timestamp}"/>
+                                    <arg value="password"/>
                                     <arg value="-noprompt"/>
                                     <arg value="-trustcacerts"/>
                                     <arg value="-importcert"/>
@@ -303,7 +295,7 @@
                                     <arg value="-keyalg"/>
                                     <arg value="RSA"/>
                                     <arg value="-storepass"/>
-                                    <arg value="${maven.build.timestamp}"/>
+                                    <arg value="password"/>
                                     <arg value="-keystore"/>
                                     <arg value="${project.build.directory}/awsdev_keystore.jks"/>
                                     <arg value="-dname"/>
@@ -316,11 +308,11 @@
                                     <arg value="-srcstoretype"/>
                                     <arg value="JKS"/>
                                     <arg value="-srcstorepass"/>
-                                    <arg value="${maven.build.timestamp}"/>
+                                    <arg value="password"/>
                                     <arg value="-destkeystore"/>
                                     <arg value="${project.build.directory}/awsdev_keystore.bcfks"/>
                                     <arg value="-deststorepass"/>
-                                    <arg value="${maven.build.timestamp}"/>
+                                    <arg value="password"/>
                                     <arg value="-deststoretype"/>
                                     <arg value="BCFKS"/>
                                     <arg value="-providername"/>
@@ -334,7 +326,7 @@
                                     <arg value="-keystore"/>
                                     <arg value="${project.build.directory}/izgw_client_trust.jks"/>
                                     <arg value="-storepass"/>
-                                    <arg value="${maven.build.timestamp}"/>
+                                    <arg value="password"/>
                                     <arg value="-noprompt"/>
                                     <arg value="-trustcacerts"/>
                                     <arg value="-importcert"/>
@@ -350,11 +342,11 @@
                                     <arg value="-srcstoretype"/>
                                     <arg value="JKS"/>
                                     <arg value="-srcstorepass"/>
-                                    <arg value="${maven.build.timestamp}"/>
+                                    <arg value="password"/>
                                     <arg value="-destkeystore"/>
                                     <arg value="${project.build.directory}/izgw_client_trust.bcfks"/>
                                     <arg value="-deststorepass"/>
-                                    <arg value="${maven.build.timestamp}"/>
+                                    <arg value="password"/>
                                     <arg value="-deststoretype"/>
                                     <arg value="BCFKS"/>
                                     <arg value="-providername"/>
@@ -378,11 +370,11 @@
                 <configuration>
                     <environmentVariables>
                         <security.ssl-path>${project.build.directory}</security.ssl-path>
-                        <COMMON_PASS>${maven.build.timestamp}</COMMON_PASS>
                     </environmentVariables>
                 </configuration>
             </plugin>
         </plugins>
 
-	</build>
+    </build>
+
 </project>

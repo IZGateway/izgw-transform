@@ -1,5 +1,5 @@
 transformationservice:
-  destination: https://localhost/IISHubService
+  destination: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
   configurations:
     main: pipelines_test_preconditions.json
 
