@@ -15,27 +15,11 @@
   "outboundEndpoint" : "IZG Hub",
   "active" : false
 }, {
-  "name" : "Test Pipeline 3",
-  "id" : "7e9d113c-394f-43ad-b887-641185d49f1a",
-  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
-  "description" : "A 3rd Test Pipeline (Updated)",
-  "inboundEndpoint" : "TS IZGHub WSDL Listener",
-  "outboundEndpoint" : "IZG Hub",
-  "active" : true
-}, {
   "name" : "Created Via API 1",
-  "id" : "a21c7f6a-835e-4526-9653-d8825b2e570e",
+  "id" : "ed287dc4-2616-4d5c-a12f-0c1285938f6d",
   "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
   "description" : null,
   "inboundEndpoint" : "TS IZGHub WSDL Listener",
   "outboundEndpoint" : "IZG Hub",
-  "active" : true
-}, {
-  "name" : "Created Via API 1",
-  "id" : "f8da9ccb-777e-48d7-a888-522e9a63b5bc",
-  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
-  "description" : null,
-  "inboundEndpoint" : null,
-  "outboundEndpoint" : null,
   "active" : true
 } ]
