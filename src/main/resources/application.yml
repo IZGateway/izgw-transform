@@ -46,6 +46,7 @@ springdoc:
     path: /swagger/ui.html
   api-docs:
     path: /swagger/api-docs
+  paths-to-match: /api/**
 
 server:
   error:
