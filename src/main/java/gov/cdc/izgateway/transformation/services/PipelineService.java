@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,6 +22,14 @@ public class PipelineService {
     @Autowired
     public PipelineService(PipelineRepository repo) {
         this.repo = repo;
+    }
+
+    public ResponseEntity<Pipeline> getPipelineResponse(UUID id){
+        Pipeline pipeline = repo.getPipeline(id);
+        if ( pipeline == null ) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(pipeline, HttpStatus.OK);
     }
 
     public ResponseEntity<String> getPipelineList(String nextCursor, String prevCursor, Boolean includeInactive, int limit) throws JsonProcessingException {
@@ -60,6 +69,26 @@ public class PipelineService {
         returnMap.put("has_more", hasMore);
         return new ResponseEntity<>(mapper.writeValueAsString(returnMap), headers, HttpStatus.OK);
 
+    }
+
+    public void updatePipeline(Pipeline pipeline) {
+        Pipeline existingPipeline = repo.getPipeline(pipeline.getId());
+
+        if (existingPipeline == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pipeline not found");
+        }
+
+        repo.updatePipeline(pipeline);
+    }
+
+    public void createPipeline(Pipeline pipeline) {
+        Pipeline existingPipeline = repo.getPipeline(pipeline.getId());
+
+        if (existingPipeline != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Pipeline already exists");
+        }
+
+        repo.createPipeline(pipeline);
     }
 
     private static List<Pipeline> filterList(Boolean includeInactive, List<Pipeline> allPipelineList) {

@@ -8,4 +8,6 @@ import java.util.UUID;
 public interface PipelineRepository {
     public Pipeline getPipeline(UUID id);
     public Set<Pipeline> getPipelineSet();
+    public void createPipeline(Pipeline pipeline);
+    public void updatePipeline(Pipeline pipeline);
 }
