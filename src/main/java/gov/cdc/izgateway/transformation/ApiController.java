@@ -5,6 +5,7 @@ import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.model.Pipeline;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.services.PipelineService;
+import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -83,7 +84,7 @@ public class ApiController {
 
     @PostMapping("/api/v1/pipelines")
     public ResponseEntity<Pipeline> createPipeline(
-            @RequestBody() Pipeline pipeline
+            @Valid @RequestBody() Pipeline pipeline
     ) {
         pipelineService.createPipeline(pipeline);
         return new ResponseEntity<>(pipeline, HttpStatus.OK);
