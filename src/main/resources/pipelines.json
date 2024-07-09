@@ -1,29 +1,41 @@
-[
-  {
-    "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a67",
-    "name": "HL7v2 to IZ Gateway hub",
-    "description": "Pipeline to call all implemented Preconditions and Operations",
-    "inboundEndpoint": "TS IZGHub WSDL Listener",
-    "outboundEndpoint": "IZG Hub",
-    "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
-    "active": true
-  },
-  {
-    "id": "7E9D113C-394F-43AD-B887-641185D49F1A",
-    "name": "Test Pipeline 3",
-    "description": "A 3rd Test Pipeline",
-    "inboundEndpoint": "TS IZGHub WSDL Listener",
-    "outboundEndpoint": "IZG Hub",
-    "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
-    "active": true
-  },
-  {
-    "id": "8D0C8C23-F415-4F9E-B580-676D66AC24FF",
-    "name": "Test Pipeline 2",
-    "description": "A 2nd Test Pipeline",
-    "inboundEndpoint": "TS IZGHub WSDL Listener",
-    "outboundEndpoint": "IZG Hub",
-    "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
-    "active": false
-  }
-]
+[ {
+  "name" : "HL7v2 to IZ Gateway hub",
+  "id" : "018f5ebf-fe48-709a-aaa4-e74552ae3a67",
+  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
+  "description" : "Pipeline to call all implemented Preconditions and Operations",
+  "inboundEndpoint" : "TS IZGHub WSDL Listener",
+  "outboundEndpoint" : "IZG Hub",
+  "active" : true
+}, {
+  "name" : "Test Pipeline 2",
+  "id" : "8d0c8c23-f415-4f9e-b580-676d66ac24ff",
+  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
+  "description" : "A 2nd Test Pipeline",
+  "inboundEndpoint" : "TS IZGHub WSDL Listener",
+  "outboundEndpoint" : "IZG Hub",
+  "active" : false
+}, {
+  "name" : "Test Pipeline 3",
+  "id" : "7e9d113c-394f-43ad-b887-641185d49f1a",
+  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
+  "description" : "A 3rd Test Pipeline (Updated)",
+  "inboundEndpoint" : "TS IZGHub WSDL Listener",
+  "outboundEndpoint" : "IZG Hub",
+  "active" : true
+}, {
+  "name" : "Created Via API 1",
+  "id" : "a21c7f6a-835e-4526-9653-d8825b2e570e",
+  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
+  "description" : null,
+  "inboundEndpoint" : "TS IZGHub WSDL Listener",
+  "outboundEndpoint" : "IZG Hub",
+  "active" : true
+}, {
+  "name" : "Created Via API 1",
+  "id" : "f8da9ccb-777e-48d7-a888-522e9a63b5bc",
+  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
+  "description" : null,
+  "inboundEndpoint" : null,
+  "outboundEndpoint" : null,
+  "active" : true
+} ]

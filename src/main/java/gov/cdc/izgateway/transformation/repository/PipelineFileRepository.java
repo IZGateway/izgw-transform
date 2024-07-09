@@ -21,12 +21,9 @@ public class PipelineFileRepository implements PipelineRepository {
     @Value("${transformationservice.configurations.pipelines}")
     private String pipelinesFilePath;
 
-    @Value("${transformationservice.configurations.organizations}")
-    private String organizationFilePath ;
-
     @Override
     public Pipeline getPipeline(UUID id) {
-        return null;
+        return getPipelineSet().stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
     }
 
     @Override
@@ -41,5 +38,27 @@ public class PipelineFileRepository implements PipelineRepository {
             }
         }
         return pipelines;
+    }
+
+    @Override
+    public void createPipeline(Pipeline pipeline) {
+        getPipelineSet().add(pipeline);
+        writePipelinesToFile();
+    }
+
+    @Override
+    public void updatePipeline(Pipeline pipeline) {
+        pipelines.removeIf(p -> p.getId().equals(pipeline.getId()));
+        createPipeline(pipeline);
+    }
+
+    private void writePipelinesToFile() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(pipelines);
+            Files.write(Paths.get(pipelinesFilePath), json.getBytes());
+        } catch (IOException e) {
+            throw new RepositoryRuntimeException("Error writing pipelines file.", e);
+        }
     }
 }

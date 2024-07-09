@@ -2,6 +2,7 @@ package gov.cdc.izgateway.transformation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import gov.cdc.izgateway.transformation.model.Organization;
+import gov.cdc.izgateway.transformation.model.Pipeline;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.services.PipelineService;
 import lombok.extern.java.Log;
@@ -24,6 +25,18 @@ public class ApiController {
     public ApiController(OrganizationService organizationService, PipelineService pipelineService) {
         this.organizationService = organizationService;
         this.pipelineService = pipelineService;
+    }
+
+    @GetMapping("/api/v1/pipelines/{uuid}")
+    public ResponseEntity<Pipeline> getPipelineByUUID(@PathVariable UUID uuid) {
+        return pipelineService.getPipelineResponse(uuid);
+    }
+
+    @PutMapping("/api/v1/pipelines/{uuid}")
+    public ResponseEntity<Pipeline> updatePipeline(@PathVariable UUID uuid, @RequestBody Pipeline updatedPipeline) {
+        updatedPipeline.setId(uuid);
+        pipelineService.updatePipeline(updatedPipeline);
+        return new ResponseEntity<>(updatedPipeline, HttpStatus.OK);
     }
 
     @GetMapping("/api/v1/organizations/{uuid}")
@@ -66,6 +79,14 @@ public class ApiController {
             log.log(Level.SEVERE, e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/api/v1/pipelines")
+    public ResponseEntity<Pipeline> createPipeline(
+            @RequestBody() Pipeline pipeline
+    ) {
+        pipelineService.createPipeline(pipeline);
+        return new ResponseEntity<>(pipeline, HttpStatus.OK);
     }
 
     @PostMapping("/api/v1/organizations")
