@@ -5,9 +5,12 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 public class Equals implements Precondition {
+    private UUID id;
     private String dataPath;
     private String comparisonValue;
 

@@ -13,8 +13,10 @@ import java.util.UUID;
 public class PipelineConfig {
     private String name;
     private UUID id;
+    private UUID organizationId;
     private String description;
     private String inboundEndpoint;
     private String outboundEndpoint;
+    private Boolean active;
     private List<PipeConfig> pipes;
 }
