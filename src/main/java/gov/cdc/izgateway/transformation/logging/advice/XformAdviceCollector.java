@@ -2,7 +2,7 @@ package gov.cdc.izgateway.transformation.logging.advice;
 
 public class XformAdviceCollector {
 	private XformAdviceCollector() {}
-	private static ThreadLocal<XformTransactionData> transactionDataVar = new ThreadLocal<>();
+	private static final ThreadLocal<XformTransactionData> transactionDataVar = new ThreadLocal<>();
 
 	public static XformTransactionData getTransactionData() {
 		return transactionDataVar.get();
