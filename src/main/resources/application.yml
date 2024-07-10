@@ -1,5 +1,6 @@
 transformationservice:
   destination: https://localhost/IISHubService
+  allow-delete-via-api: false
   configurations:
     main: all_preconditions_all_operations.json
     organizations: src/main/resources/organizations.json

@@ -8,6 +8,7 @@ import gov.cdc.izgateway.transformation.services.PipelineService;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,9 @@ import java.util.logging.Level;
 public class ApiController {
     private final OrganizationService organizationService;
     private final PipelineService pipelineService;
+
+    @Value("${transformationservice.allow-delete-via-api}")
+    private Boolean allowDelete;
 
     @Autowired
     public ApiController(OrganizationService organizationService, PipelineService pipelineService) {
@@ -98,7 +102,14 @@ public class ApiController {
     }
 
     @DeleteMapping("/api/v1/pipelines/{uuid}")
-    public ResponseEntity<Pipeline> deletePipeline(@PathVariable UUID uuid) {
+    public ResponseEntity<Pipeline> deletePipeline(
+            @PathVariable UUID uuid
+    ) {
+
+        if (Boolean.FALSE.equals(allowDelete)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
         pipelineService.deletePipeline(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
