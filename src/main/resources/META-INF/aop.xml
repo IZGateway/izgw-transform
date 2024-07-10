@@ -1,0 +1,11 @@
+<aspectj>
+    <weaver>
+        <!-- <weaver options="-verbose -showWeaveInfo"> -->
+        <!-- Specify packages to be woven -->
+        <include within="gov.cdc.izgateway.transformation..*"/>
+    </weaver>
+    <aspects>
+        <!-- Specify your aspects here -->
+        <aspect name="gov.cdc.izgateway.transformation.aspects.XformAdviceAspect"/>
+    </aspects>
+</aspectj>
