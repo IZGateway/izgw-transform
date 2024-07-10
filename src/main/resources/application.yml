@@ -1,6 +1,6 @@
 transformationservice:
-  destination: https://localhost/IISHubService
   allow-delete-via-api: false
+  destination: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
   configurations:
     main: all_preconditions_all_operations.json
     organizations: src/main/resources/organizations.json
@@ -23,6 +23,11 @@ spring:
       enabled: true
       max-file-size: 15GB
       max-request-size: 15GB
+
+elastic:
+  api-key: ${ELASTIC_API_KEY:}
+  host: ${ELASTIC_HOST:https://audacioussearchtest.es.us-east-1.aws.found.io:9243}
+  index: ${ELASTIC_INDEX:izgw-dev-logstash}
 
 management:
   metrics:
