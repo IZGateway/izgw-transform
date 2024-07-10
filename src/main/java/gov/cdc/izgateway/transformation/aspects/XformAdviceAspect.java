@@ -4,6 +4,7 @@ import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.logging.advice.Action;
+import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.logging.advice.XformAdvice;
 import gov.cdc.izgateway.transformation.logging.advice.XformAdviceCollector;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -13,59 +14,51 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 @Aspect
-@Component
+//@Component
 public class XformAdviceAspect {
 
     //@Around("@annotation(gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice)")
-    @Around("@annotation(gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice)")
+    @Around("execution(* *(..)) && @annotation(gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice)")
     public Object logSolutionExecutionAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
-        Object response = joinPoint.proceed(); // Continue with the method execution
-
-        // Extract the ServiceContext parameter from the method arguments
-        for (Object arg : joinPoint.getArgs()) {
-            if (arg instanceof ServiceContext) {
-                ServiceContext context = (ServiceContext) arg;
-                Message responseMessage = context.getResponseMessage();
-                String configurationName = "Unknown"; // Default name, adjust based on your method to retrieve the actual name
-
-                // Attempt to retrieve configuration name if possible
-                try {
-                    configurationName = joinPoint.getTarget().getClass().getDeclaredField("configuration").get(joinPoint.getTarget()).toString();
-                } catch (IllegalAccessException | NoSuchFieldException e) {
-                    // Handle the case where the configuration name cannot be retrieved
-                }
-
-                XformAdviceCollector.getTransactionData().addAdvice(
-                        new XformAdvice(Action.SOLUTION, "Executing Solution: " + configurationName,
-                                context.getRequestMessage().encode(), responseMessage == null ? null : responseMessage.encode()));
-            }
-        }
+        System.out.println("(PRE) Before method: " + joinPoint.getSignature().getName());
+        System.out.println("(PRE) Belongs to class: " + joinPoint.getTarget().getClass().getSimpleName());
+        System.out.println("(PRE) In the annoation: " + joinPoint.getTarget().getClass().getSimpleName());
+        addAdvice(joinPoint, "(pre-execution)");
+        Object response = joinPoint.proceed();
+        addAdvice(joinPoint, "(post-execution)");
+        System.out.println("(POST) Before method: " + joinPoint.getSignature().getName());
+        System.out.println("(POST) Belongs to class: " + joinPoint.getTarget().getClass().getSimpleName());
+        System.out.println("(POST) In the annoation: " + joinPoint.getTarget().getClass().getSimpleName());
 
         return response;
     }
 
-    @Around("execution(* gov.cdc.izgateway.transformation.endpoints.hub.*.*(..))")
-    public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-        long start = System.currentTimeMillis();
+    private void addAdvice(ProceedingJoinPoint joinPoint, String descriptor) throws Throwable {
+        for (Object arg : joinPoint.getArgs()) {
+            if (arg instanceof ServiceContext) {
+                ServiceContext context = (ServiceContext) arg;
 
-        Object proceed = joinPoint.proceed(); // Execute the advised method
+                XformAdviceCollector.getTransactionData().addAdvice(createXformAdvice(joinPoint, context, descriptor));
+            }
+        }
 
-        long executionTime = System.currentTimeMillis() - start;
-        System.out.println(joinPoint.getSignature() + " executed in " + executionTime + "ms");
-
-        return proceed; // Return the result of the advised method
     }
 
-//    @Around("@annotation(gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice)")
-//    public Object logExecutionTime2(ProceedingJoinPoint joinPoint) throws Throwable {
-//        long start = System.currentTimeMillis();
-//
-//        Object proceed = joinPoint.proceed(); // Execute the advised method
-//
-//        long executionTime = System.currentTimeMillis() - start;
-//        System.out.println(joinPoint.getSignature() + " executed in " + executionTime + "ms");
-//
-//        return proceed; // Return the result of the advised method
-//    }
+    private XformAdvice createXformAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, String descriptor) throws Throwable {
+        Message responseMessage = context.getResponseMessage();
+        String name = "Unknown";
 
+        Object targetObject = joinPoint.getTarget();
+        if ( targetObject instanceof Advisable ) {
+            name = ((Advisable) targetObject).getName();
+        }
+
+        return new XformAdvice(
+                joinPoint.getTarget().getClass().getSimpleName(),
+                joinPoint.getSignature().getName() + " " + descriptor,
+                name,
+                context.getRequestMessage().encode(),
+                responseMessage == null ? null : responseMessage.encode());
+
+    }
 }

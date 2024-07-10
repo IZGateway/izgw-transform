@@ -6,7 +6,7 @@
       "pipelines": [
         {
           "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
-          "name": "HL7v2 to IZ Gateway hub",
+          "name": "HL7v2 to IZ Gateway hub v2",
           "inboundEndpoint": "izgts:IISHubService",
           "outboundEndpoint": "izghub:IISHubService",
           "description": "REMOTE REQUEST/RESPONSE TRANSFORMATIONS A pipeline for ORG1, receiving from TS IZGHub WSDL Listener and sending to IZG Hub",

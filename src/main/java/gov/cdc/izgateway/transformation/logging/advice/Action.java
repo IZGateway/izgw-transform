@@ -4,5 +4,6 @@ public enum Action {
     ORIGINAL,
     PIPELINE,
     SOLUTION,
-    OPERATION
+    OPERATION,
+    UNKNOWN
 }

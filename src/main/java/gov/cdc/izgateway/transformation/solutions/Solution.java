@@ -7,13 +7,17 @@ import gov.cdc.izgateway.transformation.configuration.SolutionOperationsConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.logging.advice.Advisable;
+import lombok.Data;
+import lombok.Getter;
 import lombok.extern.java.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Log
-public class Solution {
+@Getter
+public class Solution implements Advisable {
 
     // TODO - Create SolutionOperationChain instead of list?
     private final List<SolutionOperation> requestOperations;
@@ -37,7 +41,7 @@ public class Solution {
     // TODO - make generic not HL7 specific
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws HL7Exception {
-
+        System.out.println("Executing Solution: " + configuration.getName());
         if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
 
             for (SolutionOperation op : requestOperations) {
@@ -56,5 +60,10 @@ public class Solution {
 //        XformAdviceCollector.getTransactionData().addAdvice(
 //                new XformAdvice(Action.SOLUTION, "Executing Solution: " + configuration.getName(),
 //                        context.getRequestMessage().encode(), responseMessage == null ? null : responseMessage.encode()));
+    }
+
+    @Override
+    public String getName() {
+        return configuration.getName();
     }
 }

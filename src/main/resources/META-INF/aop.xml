@@ -1,5 +1,5 @@
 <aspectj>
-    <weaver>
+    <weaver options="-verbose -showWeaveInfo">
         <!-- <weaver options="-verbose -showWeaveInfo"> -->
         <!-- Specify packages to be woven -->
         <include within="gov.cdc.izgateway.transformation..*"/>
