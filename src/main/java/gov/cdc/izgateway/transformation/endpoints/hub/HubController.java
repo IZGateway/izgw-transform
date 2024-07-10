@@ -150,6 +150,7 @@ public class HubController extends SoapControllerBase {
 
         ResponseEntity<?> response = super.submitSoapRequest(soapMessage, devAction);
         t.logIt();
+        XformAdviceCollector.clear();
         return response;
     }
 }
