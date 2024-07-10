@@ -96,4 +96,10 @@ public class ApiController {
              ){
             return new ResponseEntity<>(organizationService.createOrganization(orgName), HttpStatus.OK);
     }
+
+    @DeleteMapping("/api/v1/pipelines/{uuid}")
+    public ResponseEntity<Pipeline> deletePipeline(@PathVariable UUID uuid) {
+        pipelineService.deletePipeline(uuid);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

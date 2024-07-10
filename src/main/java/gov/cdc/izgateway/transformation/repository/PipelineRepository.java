@@ -10,4 +10,5 @@ public interface PipelineRepository {
     public Set<Pipeline> getPipelineSet();
     public void createPipeline(Pipeline pipeline);
     public void updatePipeline(Pipeline pipeline);
+    public void deletePipeline(UUID id);
 }

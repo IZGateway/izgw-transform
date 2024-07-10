@@ -91,6 +91,14 @@ public class PipelineService {
         repo.createPipeline(pipeline);
     }
 
+    public void deletePipeline(UUID id) {
+        Pipeline pipeline = repo.getPipeline(id);
+        if (pipeline == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pipeline not found");
+        }
+        repo.deletePipeline(id);
+    }
+
     private static List<Pipeline> filterList(Boolean includeInactive, List<Pipeline> allPipelineList) {
         if (Boolean.FALSE.equals(includeInactive)) {
             return allPipelineList.stream()
