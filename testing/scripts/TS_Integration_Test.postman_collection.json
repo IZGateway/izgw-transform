@@ -155,12 +155,12 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -211,12 +211,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines/{{currentId}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines/{{currentId}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -257,12 +257,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines/{{nonExistingId}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines/{{nonExistingId}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -302,12 +302,12 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -370,12 +370,12 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines/{{currentId}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines/{{currentId}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -416,12 +416,12 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines/{{currentId}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines/{{currentId}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -462,12 +462,12 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines/{{nonExistingId}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines/{{nonExistingId}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -522,12 +522,12 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines/{{currentId}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines/{{currentId}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -595,12 +595,12 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -667,12 +667,12 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -739,12 +739,12 @@
 									}
 								},
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -804,12 +804,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -876,12 +876,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines?includeInactive=true",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines?includeInactive=true",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -939,12 +939,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines?limit=2",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines?limit=2",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -996,12 +996,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines?limit=1000000",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines?limit=1000000",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -1080,12 +1080,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines?includeInactive=true&nextCursor={{id2}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines?includeInactive=true&nextCursor={{id2}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -1164,12 +1164,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines?includeInactive=true&nextCursor=5926368C-F578-4D62-BD3C-CE11AA0187E7",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines?includeInactive=true&nextCursor=5926368C-F578-4D62-BD3C-CE11AA0187E7",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -1248,12 +1248,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines?includeInactive=true&prevCursor={{id2}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines?includeInactive=true&prevCursor={{id2}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -1332,12 +1332,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines?includeInactive=true&prevCursor=407A00CB-7B00-4682-AA4E-B2C0C0FFFBB6",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines?includeInactive=true&prevCursor=407A00CB-7B00-4682-AA4E-B2C0C0FFFBB6",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -1387,12 +1387,12 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines/{{id0}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines/{{id0}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -1433,12 +1433,12 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines/{{id1}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines/{{id1}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -1458,7 +1458,9 @@
 										"exec": [
 											"pm.test(\"returns 204 NO CONTENT code\", function() {",
 											"    pm.expect(pm.response.code).to.equal(204);",
-											"});"
+											"});",
+											"",
+											"pm.collectionVariables.clear();"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -1479,12 +1481,12 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "https://localhost:444/api/v1/pipelines/{{id2}}",
-									"protocol": "https",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines/{{id2}}",
+									"protocol": "{{protocol}}",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "444",
+									"port": "{{port}}",
 									"path": [
 										"api",
 										"v1",
@@ -3591,213 +3593,6 @@
 					""
 				]
 			}
-		}
-	],
-	"variable": [
-		{
-			"key": "GoodMessage",
-			"value": "MSH|^~\\&amp;|IRIS IIS|IRIS|TEST|TC_04|20210402091512.000-0100||QBP^Q11^QBP_Q11|20210330093013AZQ231|P|2.5.1|||ER|AL|||||Z34^CDCPHINVS|SIISCLIENT28374|\nQPD|Z34^Request Immunization History^CDCPHINVS|20210330093013LA231|LAMASM77BF4BA6^^^IZGATEWAYTEST&amp;2.16.840.1.113883.40.1&amp;ISO^MR|Johnson^James^Andrew^^^^L|Leung^Jen^^^^^M|20160414|M|Main Street&amp;&amp;123^^New Orleans^LA^70115^^L|^PRN^PH^^^555^5551111|Y|1",
-			"type": "string"
-		},
-		{
-			"key": "GoodResponse",
-			"value": ""
-		},
-		{
-			"key": "GoodResponseLF",
-			"value": ""
-		},
-		{
-			"key": "GoodResponseCRLF",
-			"value": ""
-		},
-		{
-			"key": "GoodMessageLF",
-			"value": ""
-		},
-		{
-			"key": "GoodMessageCRLF",
-			"value": ""
-		},
-		{
-			"key": "TooLargeMessage",
-			"value": ""
-		},
-		{
-			"key": "IisTooLargeMessage",
-			"value": ""
-		},
-		{
-			"key": "hex0b",
-			"value": ""
-		},
-		{
-			"key": "hex1b",
-			"value": ""
-		},
-		{
-			"key": "myIpAddr",
-			"value": ""
-		},
-		{
-			"key": "azure-endpoint",
-			"value": "azurite",
-			"type": "string"
-		},
-		{
-			"key": "dex-endpoint",
-			"value": "dex-dev",
-			"type": "string"
-		},
-		{
-			"key": "GoodMessageCRLFVXU",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "GoodMessageQBP",
-			"value": "MSH|^~\\&amp;|DE0000|DE0000|TEST|TEST|TEST||QBP^Q11^QBP_Q11|DE000020231031303563|P|2.5.1|||||||||Z34^CDCPHINVS\nQPD|Z34^Request Immunization History^CDCPHINVS|20210330093013MD231|112258-9^^^MD^MR|JohnsonIZG^JamesIZG^AlbertIZG^^^^L|PearsonIZG^SarahIZG^^^^^M|20160414|M|Main Street&amp;&amp;123^^Baltimore^MD^212021234^^L|^PRN^PH^^^555^5551111|Y|1\nRCP|I|10^RD&amp;Records&amp;HL70126",
-			"type": "string"
-		},
-		{
-			"key": "createdPipeline",
-			"value": ""
-		},
-		{
-			"key": "currentName",
-			"value": ""
-		},
-		{
-			"key": "currentId",
-			"value": ""
-		},
-		{
-			"key": "currentOrganizationId",
-			"value": ""
-		},
-		{
-			"key": "currentInboundEndpoint",
-			"value": ""
-		},
-		{
-			"key": "currentOutboundEndpoint",
-			"value": ""
-		},
-		{
-			"key": "currentActive",
-			"value": ""
-		},
-		{
-			"key": "nonExistingId",
-			"value": ""
-		},
-		{
-			"key": "pipelineData",
-			"value": ""
-		},
-		{
-			"key": "pipelineData2",
-			"value": ""
-		},
-		{
-			"key": "name0",
-			"value": ""
-		},
-		{
-			"key": "austin",
-			"value": ""
-		},
-		{
-			"key": "id0",
-			"value": ""
-		},
-		{
-			"key": "organizationId0",
-			"value": ""
-		},
-		{
-			"key": "inboundEndpoint0",
-			"value": ""
-		},
-		{
-			"key": "outboundEndpoint0",
-			"value": ""
-		},
-		{
-			"key": "active0",
-			"value": ""
-		},
-		{
-			"key": "thisName",
-			"value": ""
-		},
-		{
-			"key": "thisId",
-			"value": ""
-		},
-		{
-			"key": "thisOrganizationId",
-			"value": ""
-		},
-		{
-			"key": "thisInboundEndpoint",
-			"value": ""
-		},
-		{
-			"key": "thisOutboundEndpoint",
-			"value": ""
-		},
-		{
-			"key": "thisActive",
-			"value": ""
-		},
-		{
-			"key": "name1",
-			"value": ""
-		},
-		{
-			"key": "id1",
-			"value": ""
-		},
-		{
-			"key": "organizationId1",
-			"value": ""
-		},
-		{
-			"key": "inboundEndpoint1",
-			"value": ""
-		},
-		{
-			"key": "outboundEndpoint1",
-			"value": ""
-		},
-		{
-			"key": "active1",
-			"value": ""
-		},
-		{
-			"key": "name2",
-			"value": ""
-		},
-		{
-			"key": "id2",
-			"value": ""
-		},
-		{
-			"key": "organizationId2",
-			"value": ""
-		},
-		{
-			"key": "inboundEndpoint2",
-			"value": ""
-		},
-		{
-			"key": "outboundEndpoint2",
-			"value": ""
-		},
-		{
-			"key": "active2",
-			"value": ""
 		}
 	]
 }
