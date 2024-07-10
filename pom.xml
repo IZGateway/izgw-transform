@@ -30,13 +30,27 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-            <releases><enabled>true</enabled></releases>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
         </repository>
     </repositories>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <!-- spring-boot-starter-web pulls 6.1.4 which has CVE-2024-22259 -->
+            <version>6.1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <!-- spring-boot-starter-web pulls 6.2.2 which has CVE-2024-22257 -->
+            <version>6.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -112,28 +126,6 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.4.0</version>
-                <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                        <configuration>
-                            <configLocation>AiCheckstyle.xml</configLocation>
-                            <encoding>UTF-8</encoding>
-                            <consoleOutput>true</consoleOutput>
-                            <failsOnError>true</failsOnError>
-                            <!-- Optionally, specify the location of the violations file -->
-                            <outputFile>${project.build.directory}/checkstyle-result.xml</outputFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -300,7 +292,7 @@
                                     <arg value="-keystore"/>
                                     <arg value="${project.build.directory}/awsdev_keystore.jks"/>
                                     <arg value="-storepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-noprompt"/>
                                     <arg value="-trustcacerts"/>
                                     <arg value="-importcert"/>
@@ -316,7 +308,7 @@
                                     <arg value="-keyalg"/>
                                     <arg value="RSA"/>
                                     <arg value="-storepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-keystore"/>
                                     <arg value="${project.build.directory}/awsdev_keystore.jks"/>
                                     <arg value="-dname"/>
@@ -329,11 +321,11 @@
                                     <arg value="-srcstoretype"/>
                                     <arg value="JKS"/>
                                     <arg value="-srcstorepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-destkeystore"/>
                                     <arg value="${project.build.directory}/awsdev_keystore.bcfks"/>
                                     <arg value="-deststorepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-deststoretype"/>
                                     <arg value="BCFKS"/>
                                     <arg value="-providername"/>
@@ -347,7 +339,7 @@
                                     <arg value="-keystore"/>
                                     <arg value="${project.build.directory}/izgw_client_trust.jks"/>
                                     <arg value="-storepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-noprompt"/>
                                     <arg value="-trustcacerts"/>
                                     <arg value="-importcert"/>
@@ -363,11 +355,11 @@
                                     <arg value="-srcstoretype"/>
                                     <arg value="JKS"/>
                                     <arg value="-srcstorepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-destkeystore"/>
                                     <arg value="${project.build.directory}/izgw_client_trust.bcfks"/>
                                     <arg value="-deststorepass"/>
-                                    <arg value="password"/>
+                                    <arg value="${maven.build.timestamp}"/>
                                     <arg value="-deststoretype"/>
                                     <arg value="BCFKS"/>
                                     <arg value="-providername"/>
@@ -391,8 +383,42 @@
                 <configuration>
                     <environmentVariables>
                         <security.ssl-path>${project.build.directory}</security.ssl-path>
+                        <COMMON_PASS>${maven.build.timestamp}</COMMON_PASS>
                     </environmentVariables>
                 </configuration>
+            </plugin>
+            <plugin>
+                <!-- Since all libraries are deliverable, this should in fact be
+                            the only dependency check required.
+                         -->
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <!-- 9.0 line uses NVD API and requires a key, which has flakey response right now -->
+                <version>8.4.3</version>
+                <configuration>
+                    <!--nvdApiKey>${env.NVDAPIKEY}</nvdApiKey-->
+                    <formats>
+                        <format>html</format>
+                        <format>json</format>
+                    </formats>
+                    <!-- Disable .NET Analyzer -->
+                    <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+                    <nugetconfAnalyzerEnabled>false</nugetconfAnalyzerEnabled>
+                    <nuspecAnalyzerEnabled>false</nuspecAnalyzerEnabled>
+                    <!-- Fail builds where this is used to 7 High to Critical -->
+                    <failBuildOnCVSS>7</failBuildOnCVSS>
+                    <!-- Don't fail on error (for cases where CVE REPO is bad) -->
+                    <failOnError>false</failOnError>
+                    <skip>${skipDependencyCheck}</skip>
+                    <suppressionFile>${project.basedir}/dependency-suppression.xml</suppressionFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 
