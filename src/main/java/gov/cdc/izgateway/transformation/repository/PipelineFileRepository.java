@@ -52,6 +52,12 @@ public class PipelineFileRepository implements PipelineRepository {
         createPipeline(pipeline);
     }
 
+    @Override
+    public void deletePipeline(UUID id) {
+        pipelines.removeIf(p -> p.getId().equals(id));
+        writePipelinesToFile();
+    }
+
     private void writePipelinesToFile() {
         ObjectMapper mapper = new ObjectMapper();
         try {
