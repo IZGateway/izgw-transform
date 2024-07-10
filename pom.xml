@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
-	<groupId>gov.cdc.izgateway</groupId>
-	<artifactId>transformation</artifactId>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.3</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>gov.cdc.izgateway</groupId>
+    <artifactId>transformation</artifactId>
     <version>0.1.0-IZGWTS-SNAPSHOT</version>
-	<name>transformation</name>
-	<description>Demo project for Spring Boot</description>
+    <name>transformation</name>
+    <description>Demo project for Spring Boot</description>
     <properties>
-		<java.version>17</java.version>
+        <java.version>17</java.version>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
         <project.java.package>${project.groupId}</project.java.package>
@@ -22,7 +22,6 @@
         <project.build.finalName>${project.artifactId}-${project.version}-${timestamp}</project.build.finalName>
         <image.tag>${project.build.finalName}</image.tag>
         <buildno>${timestamp}</buildno>
-        <maven.build.timestamp.format>yyyyMMddHHmmssSSS</maven.build.timestamp.format>
     </properties>
     <repositories>
         <repository>
@@ -31,7 +30,9 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-            <releases><enabled>true</enabled></releases>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
         </repository>
     </repositories>
     <dependencies>
@@ -55,11 +56,11 @@
             <!-- spring-boot-starter-web pulls 6.2.2 which has CVE-2024-22257 -->
             <version>6.3.1</version>
         </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -132,8 +133,8 @@
             <version>[2.5.0,)</version>
         </dependency>
     </dependencies>
-	<build>
-		<plugins>
+    <build>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -170,9 +171,9 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>gov.cdc.izgateway.transformation.Application</mainClass>
                     <jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
@@ -192,33 +193,10 @@
                     </requiresUnpack>
                 </configuration>
             </plugin>
-            <!--
-            <plugin>
-                <groupId>com.spotify.fmt</groupId>
-                <artifactId>fmt-maven-plugin</artifactId>
-                <version>2.23</version>
-                <configuration>
-                    <sourceDirectory>src/main/java</sourceDirectory>
-                    <testSourceDirectory>src/test/java</testSourceDirectory>
-                    <verbose>true</verbose>
-                    <filesNamePattern>.*\.java</filesNamePattern>
-                    <skip>false</skip>
-                    <skipSortingImports>false</skipSortingImports>
-                    <style>google</style>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>1.4.6</version>
+                <version>1.4.7</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.github.jnr</groupId>
@@ -418,7 +396,41 @@
                     </environmentVariables>
                 </configuration>
             </plugin>
+            <plugin>
+                <!-- Since all libraries are deliverable, this should in fact be
+                            the only dependency check required.
+                         -->
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <!-- 9.0 line uses NVD API and requires a key, which has flakey response right now -->
+                <version>8.4.3</version>
+                <configuration>
+                    <!--nvdApiKey>${env.NVDAPIKEY}</nvdApiKey-->
+                    <formats>
+                        <format>html</format>
+                        <format>json</format>
+                    </formats>
+                    <!-- Disable .NET Analyzer -->
+                    <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+                    <nugetconfAnalyzerEnabled>false</nugetconfAnalyzerEnabled>
+                    <nuspecAnalyzerEnabled>false</nuspecAnalyzerEnabled>
+                    <!-- Fail builds where this is used to 7 High to Critical -->
+                    <failBuildOnCVSS>7</failBuildOnCVSS>
+                    <!-- Don't fail on error (for cases where CVE REPO is bad) -->
+                    <failOnError>false</failOnError>
+                    <skip>${skipDependencyCheck}</skip>
+                    <suppressionFile>${project.basedir}/dependency-suppression.xml</suppressionFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
-	</build>
+    </build>
+
 </project>
