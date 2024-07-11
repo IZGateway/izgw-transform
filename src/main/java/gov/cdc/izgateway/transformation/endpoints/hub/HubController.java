@@ -139,18 +139,7 @@ public class HubController extends SoapControllerBase {
     )
     @Override
     public ResponseEntity<?> submitSoapRequest(@RequestBody SoapMessage soapMessage, @Schema(description = "Throws the fault specified in the header parameter") @RequestHeader(value = "X-IIS-Hub-Dev-Action",required = false) String devAction) {
-        // TODO: Paul - this is temporary until I have a better understanding of this
-        // Need to understand what we need to log and any other cross-cutting concerns
-        // May be able to reuse the EventId class in core
-        // We may want a new "thing" other TransactionData
 
-        XformTransactionData t = new XformTransactionData("TODO: A Real EVENTID");
-        XformAdviceCollector.setTransactionData(t);
-        RequestContext.setTransactionData(t);
-
-        ResponseEntity<?> response = super.submitSoapRequest(soapMessage, devAction);
-        t.logIt();
-        XformAdviceCollector.clear();
-        return response;
+        return super.submitSoapRequest(soapMessage, devAction);
     }
 }
