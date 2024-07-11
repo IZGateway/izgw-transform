@@ -5,6 +5,7 @@ transformationservice:
     main: all_preconditions_all_operations.json
     organizations: src/main/resources/organizations.json
     pipelines: src/main/resources/pipelines.json
+    solutions: src/main/resources/solutions.json
 
 spring:
   autoconfigure:

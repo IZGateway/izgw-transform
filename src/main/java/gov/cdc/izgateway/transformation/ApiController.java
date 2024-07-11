@@ -3,8 +3,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.model.Pipeline;
+import gov.cdc.izgateway.transformation.model.Solution;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.services.PipelineService;
+import gov.cdc.izgateway.transformation.services.SolutionService;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +24,20 @@ import java.util.logging.Level;
 public class ApiController {
     private final OrganizationService organizationService;
     private final PipelineService pipelineService;
+    private final SolutionService solutionService;
 
     @Value("${transformationservice.allow-delete-via-api}")
     private Boolean allowDelete;
 
     @Autowired
-    public ApiController(OrganizationService organizationService, PipelineService pipelineService) {
+    public ApiController(
+            OrganizationService organizationService,
+            PipelineService pipelineService,
+            SolutionService solutionService
+    ) {
         this.organizationService = organizationService;
         this.pipelineService = pipelineService;
+        this.solutionService = solutionService;
     }
 
     @GetMapping("/api/v1/pipelines/{uuid}")
@@ -42,6 +50,11 @@ public class ApiController {
         updatedPipeline.setId(uuid);
         pipelineService.updatePipeline(updatedPipeline);
         return new ResponseEntity<>(updatedPipeline, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/v1/solutions/{uuid}")
+    public ResponseEntity<Solution> getSolutionByUUID(@PathVariable UUID uuid) {
+        return solutionService.getSolutionResponse(uuid);
     }
 
     @GetMapping("/api/v1/organizations/{uuid}")
