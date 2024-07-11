@@ -1,6 +1,5 @@
 package gov.cdc.izgateway.transformation.logging.advice;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import gov.cdc.izgateway.logging.event.TransactionData;
 import gov.cdc.izgateway.logging.markers.MarkerObjectFieldName;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 public class XformTransactionData extends TransactionData {
 
     // TODO Add @JsonIgnore as we don't with these to be wrriten to the log!!! PHI!
-    private ArrayList<XformAdvice> adviceList = new ArrayList<>();
+    private ArrayList<XformAdvice> xformAdviceList = new ArrayList<>();
 
     public XformTransactionData() {
         super();
@@ -28,7 +27,7 @@ public class XformTransactionData extends TransactionData {
     }
 
     public void addAdvice(XformAdvice advice) {
-        adviceList.add(advice);
+        xformAdviceList.add(advice);
     }
 
     @Override
