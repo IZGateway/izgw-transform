@@ -1,5 +1,7 @@
 package gov.cdc.izgateway.transformation.logging.advice;
 
+import gov.cdc.izgateway.logging.RequestContext;
+
 public class XformAdviceCollector {
 	private XformAdviceCollector() {}
 	private static final ThreadLocal<XformTransactionData> transactionDataVar = new ThreadLocal<>();
@@ -9,6 +11,7 @@ public class XformAdviceCollector {
 	}
 
 	public static void setTransactionData(XformTransactionData transactionData) {
+        RequestContext.setTransactionData(transactionData);
 		if (transactionData == null) {
 			clear();
 			return;
@@ -18,5 +21,6 @@ public class XformAdviceCollector {
 
 	public static void clear() {
 		transactionDataVar.remove();
+        RequestContext.clear();
 	}
 }
