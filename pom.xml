@@ -112,12 +112,12 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>1.9.21</version>
+            <version>1.9.22</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.9.21</version>
+            <version>1.9.22</version>
         </dependency>
     </dependencies>
     <build>
@@ -361,7 +361,6 @@
                     </environmentVariables>
                 </configuration>
             </plugin>
-            <!--
             <plugin>
                 <groupId>dev.aspectj</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
@@ -377,7 +376,6 @@
                     <complianceLevel>17</complianceLevel>
                 </configuration>
             </plugin>
-            -->
         </plugins>
 
     </build>
