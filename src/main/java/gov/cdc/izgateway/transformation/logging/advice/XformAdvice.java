@@ -1,5 +1,7 @@
 package gov.cdc.izgateway.transformation.logging.advice;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * This record represents a transformation advice.  Transformation advice is used to log the state of a transformation
  * as it is being processed.  This data will be used to create header records in the response messages.  The advice
@@ -14,6 +16,6 @@ package gov.cdc.izgateway.transformation.logging.advice;
  * @param responseMessage The response message being transformed.
  */
 public record XformAdvice(String className, String methodName, MethodDisposition methodDisposition, String descriptor,
-                          String requestMessage, String responseMessage) {
+                          /* TODO @JsonIgnore */ String requestMessage, /* TODO @JsonIgnore */ String responseMessage) {
 
 }
