@@ -14,6 +14,7 @@ import org.aspectj.lang.annotation.Aspect;
 @Aspect
 public class XformAdviceAspect {
 
+    // TODO - consider just doing before - not around
     @Around("execution(* *(..)) && @annotation(gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice)")
     public Object processXformAdviceAspect(ProceedingJoinPoint joinPoint) throws Throwable {
         addAdvice(joinPoint, MethodDisposition.PREEXECUTION);

@@ -39,7 +39,7 @@ public class Solution implements Advisable {
     }
 
     // TODO - make generic not HL7 specific
-    // @CaptureXformAdvice
+    @CaptureXformAdvice
     public void execute(ServiceContext context) throws HL7Exception {
         System.out.println("Executing Solution: " + configuration.getName());
         if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
