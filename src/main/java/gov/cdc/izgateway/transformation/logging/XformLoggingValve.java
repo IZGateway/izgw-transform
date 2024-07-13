@@ -52,20 +52,4 @@ public class XformLoggingValve extends LoggingValveBase {
     protected boolean isLogged(String requestURI) {
         return requestURI.startsWith("/IISHubService") || requestURI.startsWith("/dev/");
     }
-//    This method is now in the base class
-//    @Override
-//    protected SourceInfo setSourceInfoValues(Request req, TransactionData t) {
-//        SourceInfo source = t.getSource();
-//        source.setCipherSuite((String) req.getAttribute(Globals.CIPHER_SUITE_ATTR));
-//        source.setHost(req.getRemoteHost());
-//        source.setIpAddress(req.getRemoteAddr());
-//        source.setType("Unknown");
-//        source.setFacilityId("Unknown");
-//
-//        X509Certificate[] certs = (X509Certificate[])req.getAttribute(Globals.CERTIFICATES_ATTR);
-//        if (certs != null) {
-//            source.setCertificate(certs[0]);
-//        }
-//        return source;
-//    }
 }

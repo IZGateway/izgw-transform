@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.transformation.logging.advice;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 
 /**
  * This record represents a transformation advice.  Transformation advice is used to log the state of a transformation
@@ -16,6 +17,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @param responseMessage The response message being transformed.
  */
 public record XformAdvice(String className, String methodName, MethodDisposition methodDisposition, String descriptor,
-                          /* TODO @JsonIgnore */ String requestMessage, /* TODO @JsonIgnore */ String responseMessage) {
+                          String descriptorId, /* TODO @JsonIgnore */ String requestMessage, /* TODO @JsonIgnore */ String responseMessage, DataFlowDirection dataFlowDirection) {
 
 }

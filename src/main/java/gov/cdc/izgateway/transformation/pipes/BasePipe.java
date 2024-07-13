@@ -2,9 +2,11 @@ package gov.cdc.izgateway.transformation.pipes;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.configuration.PipeConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.preconditions.*;
 import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.AccessLevel;
@@ -17,7 +19,7 @@ import java.util.List;
 
 @Setter
 @Slf4j
-abstract class BasePipe implements Pipe {
+abstract class BasePipe implements Pipe, Advisable {
     @Setter(AccessLevel.NONE)
     private Pipe next;
 
@@ -58,6 +60,7 @@ abstract class BasePipe implements Pipe {
     }
 
     @Override
+    @CaptureXformAdvice
     public void execute(ServiceContext context) throws HL7Exception {
         executeCondition(context);
 
@@ -106,6 +109,16 @@ abstract class BasePipe implements Pipe {
     @Override
     public void addPrecondition(Precondition op) {
         preconditions.add(op);
+    }
+
+    @Override
+    public String getName() {
+        return config.getSolutionName();
+    }
+
+    @Override
+    public String getId() {
+        return config.getSolutionId().toString();
     }
 
     private void executeNextPipe(ServiceContext context) throws HL7Exception {
