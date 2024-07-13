@@ -41,7 +41,6 @@ public class Solution implements Advisable {
     // TODO - make generic not HL7 specific
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws HL7Exception {
-        System.out.println("Executing Solution: " + configuration.getName());
         if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
 
             for (SolutionOperation op : requestOperations) {
@@ -55,15 +54,15 @@ public class Solution implements Advisable {
             }
 
         }
-
-//        Message responseMessage = context.getResponseMessage();
-//        XformAdviceCollector.getTransactionData().addAdvice(
-//                new XformAdvice(Action.SOLUTION, "Executing Solution: " + configuration.getName(),
-//                        context.getRequestMessage().encode(), responseMessage == null ? null : responseMessage.encode()));
     }
 
     @Override
     public String getName() {
         return configuration.getName();
+    }
+
+    @Override
+    public String getId() {
+        return configuration.getId().toString();
     }
 }

@@ -33,5 +33,10 @@ abstract class BasePipeline implements Pipeline, Advisable {
         return configuration.getName();
     }
 
+    @Override
+    public String getId() {
+        return configuration.getId().toString();
+    }
+
     public abstract void executeThisPipeline(ServiceContext context) throws HL7Exception;
 }

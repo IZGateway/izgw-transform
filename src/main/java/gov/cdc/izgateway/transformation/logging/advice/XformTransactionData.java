@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Slf4j
 @Data
@@ -17,6 +19,10 @@ public class XformTransactionData extends TransactionData {
 
     // TODO Add @JsonIgnore as we don't with these to be wrriten to the log!!! PHI!
     private ArrayList<XformAdvice> xformAdviceList = new ArrayList<>();
+
+    // TODO - Paul to add logic to change addAdvice to create a structure that we documented in the PowerPoint template
+    private Map<String, XformAdvice> elements = new LinkedHashMap<>();
+
 
     public XformTransactionData() {
         super();
@@ -36,3 +42,26 @@ public class XformTransactionData extends TransactionData {
         log.info(Markers2.append("transactionData", this), "{}", getMessage());
     }
 }
+///////
+//import java.util.LinkedHashMap;
+//import java.util.Map;
+//
+//public class ElementManager {
+//    private Map<String, Element> elements = new LinkedHashMap<>();
+//
+//    public void addElement(Element element) {
+//        elements.put(element.getId(), element);
+//    }
+//
+//    public Element findElementById(String id) {
+//        return elements.get(id);
+//    }
+//
+//    public void updateElement(String id, Element newElement) {
+//        if (elements.containsKey(id)) {
+//            elements.put(id, newElement);
+//        }
+//    }
+//
+//    // Additional methods as needed
+//}

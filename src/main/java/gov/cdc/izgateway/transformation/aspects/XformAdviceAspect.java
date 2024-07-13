@@ -36,10 +36,12 @@ public class XformAdviceAspect {
     private XformAdvice createXformAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
         Message responseMessage = context.getResponseMessage();
         String descriptor = "Unknown";
+        String descriptorId = "Unknown";
 
         Object targetObject = joinPoint.getTarget();
         if ( targetObject instanceof Advisable advisable ) {
             descriptor = advisable.getName();
+            descriptorId = advisable.getId();
         }
 
         return new XformAdvice(
@@ -47,8 +49,10 @@ public class XformAdviceAspect {
                 joinPoint.getSignature().getName(),
                 methodDisposition,
                 descriptor,
+                descriptorId,
                 context.getRequestMessage().encode(),
-                responseMessage == null ? null : responseMessage.encode());
+                responseMessage == null ? null : responseMessage.encode(),
+                context.getCurrentDirection());
 
     }
 }
