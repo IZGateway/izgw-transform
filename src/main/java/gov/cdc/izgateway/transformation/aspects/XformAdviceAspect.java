@@ -5,7 +5,7 @@ import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.logging.advice.MethodDisposition;
-import gov.cdc.izgateway.transformation.logging.advice.XformAdvice;
+import gov.cdc.izgateway.transformation.logging.advice.XformAdviceRecord;
 import gov.cdc.izgateway.transformation.logging.advice.XformAdviceCollector;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -28,23 +28,26 @@ public class XformAdviceAspect {
         for (Object arg : joinPoint.getArgs()) {
             if (arg instanceof ServiceContext context) {
                 XformAdviceCollector.getTransactionData().addAdvice(createXformAdvice(joinPoint, context, methodDisposition));
+                // createXformAdvice(joinPoint, context, methodDisposition);
                 break;
             }
         }
     }
 
-    private XformAdvice createXformAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
+    private XformAdviceRecord createXformAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
         Message responseMessage = context.getResponseMessage();
         String descriptor = "Unknown";
         String descriptorId = "Unknown";
+        boolean hasTransformed = false;
 
         Object targetObject = joinPoint.getTarget();
         if ( targetObject instanceof Advisable advisable ) {
             descriptor = advisable.getName();
             descriptorId = advisable.getId();
+            hasTransformed = advisable.hasTransformed();
         }
 
-        return new XformAdvice(
+        return new XformAdviceRecord(
                 joinPoint.getTarget().getClass().getSimpleName(),
                 joinPoint.getSignature().getName(),
                 methodDisposition,
@@ -52,7 +55,8 @@ public class XformAdviceAspect {
                 descriptorId,
                 context.getRequestMessage().encode(),
                 responseMessage == null ? null : responseMessage.encode(),
-                context.getCurrentDirection());
+                context.getCurrentDirection(),
+                hasTransformed);
 
     }
 }

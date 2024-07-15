@@ -23,6 +23,7 @@ public class Solution implements Advisable {
     private final List<SolutionOperation> requestOperations;
     private final List<SolutionOperation> responseOperations;
     private SolutionConfig configuration;
+    private boolean hasTransformed = false;
 
     public Solution(SolutionConfig configuration, DataType dataType) {
         this.configuration = configuration;
@@ -44,12 +45,14 @@ public class Solution implements Advisable {
         if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
 
             for (SolutionOperation op : requestOperations) {
+                hasTransformed = true;
                 op.execute(context);
             }
 
         } else if (context.getCurrentDirection().equals(DataFlowDirection.RESPONSE)) {
 
             for (SolutionOperation op : responseOperations) {
+                hasTransformed = true;
                 op.execute(context);
             }
 
@@ -64,5 +67,10 @@ public class Solution implements Advisable {
     @Override
     public String getId() {
         return configuration.getId().toString();
+    }
+
+    @Override
+    public boolean hasTransformed() {
+        return hasTransformed;
     }
 }

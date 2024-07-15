@@ -80,6 +80,13 @@ public class HubController extends SoapControllerBase {
 
         producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
 
+        try {
+            context.getSubmitSingleMessageResponse().setHl7Message(serviceContext.getResponseMessage().encode());
+        }
+        catch (HL7Exception e) {
+            throw new HubControllerFault(e.getMessage());
+        }
+
         return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
     }
 
