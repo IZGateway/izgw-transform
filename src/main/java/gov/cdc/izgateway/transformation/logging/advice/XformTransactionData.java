@@ -24,6 +24,7 @@ public class XformTransactionData extends TransactionData {
     // TODO - Paul to add logic to change addAdvice to create a structure that we documented in the PowerPoint template
     private Map<String, XformAdvice> xformAdviceMap = new LinkedHashMap<>();
 
+    private PipelineAdvice pipelineAdvice;
 
     public XformTransactionData() {
         super();
@@ -43,6 +44,87 @@ public class XformTransactionData extends TransactionData {
 
     private void reduceAdviceList() {
         log.info("*** Reducing the advice list. ***");
+
+        XformAdvice rootTransformAdvice = null;
+        XformAdvice currentTransformAdvice = null;
+        PipelineAdvice pipelineAdvice = new PipelineAdvice();
+        SolutionAdvice currentSolutionAdvice = null;
+
+        for (XformAdviceRecord advice : xformAdviceList) {
+
+            if ( isPipelineAdvice(advice) ) {
+                if ( advice.dataFlowDirection() == DataFlowDirection.REQUEST ) {
+                    if ( advice.methodDisposition() == MethodDisposition.PREEXECUTION ) {
+                        pipelineAdvice = new PipelineAdvice(advice.className(), advice.descriptor());
+                        pipelineAdvice.setRequest(advice.requestMessage());
+                    }
+                    else
+                        pipelineAdvice.setTransformedRequest(advice.requestMessage());
+                } else {
+                    if ( advice.methodDisposition() == MethodDisposition.PREEXECUTION )
+                        pipelineAdvice.setResponse(advice.responseMessage());
+                    else
+                        pipelineAdvice.setTransformedResponse(advice.responseMessage());
+                }
+                continue;
+            }
+
+//            // Don't think we need this any longer
+//            if ( advice.className().endsWith("Pipe") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
+//                // get the solution by ID
+//                currentSolutionAdvice = pipelineAdvice.getSolutionAdvice(advice);
+//                continue;
+//            }
+
+            if ( isSolutionAdvice(advice) ) {
+                // get the solution by ID
+                currentSolutionAdvice = pipelineAdvice.getSolutionAdvice(advice);
+                // don't think we need this any more since we use the solution name in the pipe class... currentSolutionAdvice.setName(advice.descriptor());
+
+                if ( advice.methodDisposition() == MethodDisposition.POSTEXECUTION && advice.hasTransformed() ) {
+                    if ( advice.dataFlowDirection() == DataFlowDirection.REQUEST )
+                        currentSolutionAdvice.setTransformedRequest(advice.requestMessage());
+                    else
+                        currentSolutionAdvice.setTransformedResponse(advice.responseMessage());
+                }
+
+                continue;
+            }
+
+            if ( advice.className().contains("Operation") && advice.methodDisposition() == MethodDisposition.POSTEXECUTION) {
+                OperationAdvice operationTransformAdvice = new OperationAdvice(advice.className(), advice.descriptor());
+                assert currentSolutionAdvice != null;
+                if ( advice.dataFlowDirection() == DataFlowDirection.REQUEST ) {
+                    operationTransformAdvice.setTransformedRequest(advice.requestMessage());
+                    currentSolutionAdvice.addRequestOperationAdvice(operationTransformAdvice);
+                }
+                else {
+                    operationTransformAdvice.setTransformedResponse(advice.responseMessage());
+                    currentSolutionAdvice.addResponseOperationAdvice(operationTransformAdvice);
+                }
+                continue;
+            }
+        }
+
+        this.pipelineAdvice = pipelineAdvice;
+        log.info("*** Done reducing the advice list. ***");
+    }
+
+    private boolean isPipelineAdvice(XformAdviceRecord advice) {
+        return advice.className().equals("Hl7Pipeline");
+    }
+
+    private boolean isSolutionAdvice(XformAdviceRecord advice) {
+        return advice.className().contains("Solution") || advice.className().endsWith("Pipe");
+    }
+
+
+    private void reduceAdviceListOriginal() {
+        log.info("*** Reducing the advice list. ***");
+
+        XformAdvice rootTransformAdvice = null;
+        XformAdvice currentTransformAdvice = null;
+
         for (XformAdviceRecord advice : xformAdviceList) {
 //            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
 //                log.info("The original request: " + advice.requestMessage());
@@ -51,28 +133,28 @@ public class XformTransactionData extends TransactionData {
 //            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.POSTEXECUTION) {
 //                log.info("The transformed request: " + advice.requestMessage());
 //            }
+
             if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
-                log.info("The original request: " + advice.requestMessage());
+                rootTransformAdvice = new XformAdvice(advice.className(), advice.descriptor());
                 continue;
             }
 
-            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.RESPONSE && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
+            if ( advice.className().endsWith("Pipe") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
+                currentTransformAdvice = new XformAdvice(advice.className(), advice.descriptor());
+                rootTransformAdvice.addChild(currentTransformAdvice);
                 continue;
             }
 
-            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.POSTEXECUTION) {
-                log.info("The transformed request: " + advice.requestMessage());
+            if ( advice.className().contains("Solution") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.POSTEXECUTION) {
+                currentTransformAdvice.setName(advice.descriptor());
+
                 continue;
             }
 
-            log.info("ID: " + advice.descriptorId() + " name: " + advice.descriptor() + " className: " + advice.className());
-
-            if ( advice.hasTransformed() ) {
-                if ( advice.dataFlowDirection() == DataFlowDirection.REQUEST )
-                    log.info(advice.className() + " has transformed the request to: " + advice.requestMessage());
-                else if ( advice.dataFlowDirection() == DataFlowDirection.RESPONSE )
-                    log.info(advice.className() + " has transformed the response to: " + advice.responseMessage());
-
+            if ( advice.className().contains("Operation") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
+                XformAdvice operationTransformAdvice = new XformAdvice(advice.className(), advice.descriptor());
+                currentTransformAdvice.addChild(operationTransformAdvice);
+                continue;
             }
         }
         log.info("*** Done reducing the advice list. ***");
