@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.izgateway.transformation.model.ModelUtils;
 import gov.cdc.izgateway.transformation.model.Pipeline;
-import gov.cdc.izgateway.transformation.repository.PipelineRepository;
+import gov.cdc.izgateway.transformation.repository.TxFormRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,15 +17,15 @@ import java.util.*;
 
 @Service
 public class PipelineService {
-    private final PipelineRepository repo;
+    private final TxFormRepository<Pipeline> repo;
 
     @Autowired
-    public PipelineService(PipelineRepository repo) {
+    public PipelineService(TxFormRepository<Pipeline> repo) {
         this.repo = repo;
     }
 
     public ResponseEntity<Pipeline> getPipelineResponse(UUID id){
-        Pipeline pipeline = repo.getPipeline(id);
+        Pipeline pipeline = repo.getEntity(id);
         if ( pipeline == null ) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -38,7 +38,7 @@ public class PipelineService {
         int min = 0;
         int max = limit;
         String hasMore = "true";
-        List<Pipeline> allPipelineList = new ArrayList<>(repo.getPipelineSet());
+        List<Pipeline> allPipelineList = new ArrayList<>(repo.getEntitySet());
 
         List<Pipeline> filteredPipelineList = ModelUtils.filterList(includeInactive, allPipelineList);
 
@@ -72,31 +72,31 @@ public class PipelineService {
     }
 
     public void updatePipeline(Pipeline pipeline) {
-        Pipeline existingPipeline = repo.getPipeline(pipeline.getId());
+        Pipeline existingPipeline = repo.getEntity(pipeline.getId());
 
         if (existingPipeline == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pipeline not found");
         }
 
-        repo.updatePipeline(pipeline);
+        repo.updateEntity(pipeline);
     }
 
     public void createPipeline(Pipeline pipeline) {
-        Pipeline existingPipeline = repo.getPipeline(pipeline.getId());
+        Pipeline existingPipeline = repo.getEntity(pipeline.getId());
 
         if (existingPipeline != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Pipeline already exists");
         }
 
-        repo.createPipeline(pipeline);
+        repo.createEntity(pipeline);
     }
 
     public void deletePipeline(UUID id) {
-        Pipeline pipeline = repo.getPipeline(id);
+        Pipeline pipeline = repo.getEntity(id);
         if (pipeline == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pipeline not found");
         }
-        repo.deletePipeline(id);
+        repo.deleteEntity(id);
     }
 
 }
