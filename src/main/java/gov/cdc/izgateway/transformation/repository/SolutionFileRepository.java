@@ -15,20 +15,30 @@ import java.util.Set;
 import java.util.UUID;
 
 @Repository
-public class SolutionFileRepository implements SolutionRepository {
+public class SolutionFileRepository implements TxFormRepository<Solution> {
 
     private LinkedHashSet<Solution> solutions;
 
     @Value("${transformationservice.configurations.solutions}")
     private String solutionFilePath;
 
-    @Override
-    public Solution getSolution(UUID id) {
-        return getSolutionSet().stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
+    private void writeSolutionsToFile() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(solutions);
+            Files.write(Paths.get(solutionFilePath), json.getBytes());
+        } catch (IOException e) {
+            throw new RepositoryRuntimeException("Error writing solutions file.", e);
+        }
     }
 
     @Override
-    public Set<Solution> getSolutionSet() {
+    public Solution getEntity(UUID id) {
+        return getEntitySet().stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    @Override
+    public Set<Solution> getEntitySet() {
         if (solutions == null) {
             ObjectMapper mapper = new ObjectMapper();
             TypeReference<LinkedHashSet<Solution>> typeReference = new TypeReference<>() {};
@@ -39,20 +49,25 @@ public class SolutionFileRepository implements SolutionRepository {
             }
         }
         return solutions;
-    }
-
-    @Override
-    public void createSolution(Solution solution) {
 
     }
 
     @Override
-    public void updateSolution(Solution solution) {
+    public void createEntity(Solution obj) {
+        getEntitySet().add(obj);
+        writeSolutionsToFile();
 
     }
 
     @Override
-    public void deleteSolution(UUID id) {
+    public void updateEntity(Solution obj) {
+        solutions.removeIf(p -> p.getId().equals(obj.getId()));
+        createEntity(obj);
+    }
 
+    @Override
+    public void deleteEntity(UUID id) {
+        solutions.removeIf(p -> p.getId().equals(id));
+        writeSolutionsToFile();
     }
 }

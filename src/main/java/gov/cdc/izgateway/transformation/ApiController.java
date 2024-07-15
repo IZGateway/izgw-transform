@@ -57,6 +57,13 @@ public class ApiController {
         return solutionService.getSolutionResponse(uuid);
     }
 
+    @PutMapping("/api/v1/solutions/{uuid}")
+    public ResponseEntity<Solution> updateSolution(@PathVariable UUID uuid, @RequestBody Solution updatedSolution) {
+        updatedSolution.setId(uuid);
+        solutionService.update(updatedSolution);
+        return new ResponseEntity<>(updatedSolution, HttpStatus.OK);
+    }
+
     @GetMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> getOrganizationByUUID(@PathVariable UUID uuid) {
         return organizationService.getOrganizationResponse(uuid);
@@ -99,6 +106,21 @@ public class ApiController {
         }
     }
 
+    @GetMapping("/api/v1/solutions")
+    public ResponseEntity<String> getSolutionsList(
+        @RequestParam(required = false) String nextCursor,
+        @RequestParam(required = false) String prevCursor,
+        @RequestParam(defaultValue = "false") Boolean includeInactive,
+        @RequestParam(defaultValue = "10") int limit
+    ) {
+        try {
+            return solutionService.getSolutionList(nextCursor, prevCursor, includeInactive, limit);
+        } catch (JsonProcessingException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/api/v1/pipelines")
     public ResponseEntity<Pipeline> createPipeline(
             @Valid @RequestBody() Pipeline pipeline
@@ -114,6 +136,14 @@ public class ApiController {
             return new ResponseEntity<>(organizationService.createOrganization(orgName), HttpStatus.OK);
     }
 
+    @PostMapping("/api/v1/solutions")
+    public ResponseEntity<Solution> createSolution(
+            @Valid @RequestBody() Solution solution
+    ) {
+        solutionService.create(solution);
+        return new ResponseEntity<>(solution, HttpStatus.OK);
+    }
+
     @DeleteMapping("/api/v1/pipelines/{uuid}")
     public ResponseEntity<Pipeline> deletePipeline(
             @PathVariable UUID uuid
@@ -126,4 +156,18 @@ public class ApiController {
         pipelineService.deletePipeline(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @DeleteMapping("/api/v1/solutions/{uuid}")
+    public ResponseEntity<Solution> deleteSolution(
+            @PathVariable UUID uuid
+    ) {
+
+        if (Boolean.FALSE.equals(allowDelete)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        solutionService.delete(uuid);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
 }

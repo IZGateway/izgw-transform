@@ -1,9 +1,7 @@
-[
-  {
-    "id": "8abc8887-1cab-4a96-98ea-29f8f6c977d5",
-    "name": "AllOperations",
-    "description": "Calls all implemented Operations.  Sets MSH-23-1 to a value.  Then copies that value to MSH-23-2.  Then does a goofy regex on it to reverse the first two characters",
-    "version": "1.0",
-    "active": false
-  }
-]
+[ {
+  "id" : "8abc8887-1cab-4a96-98ea-29f8f6c977d5",
+  "name" : "AllOperations",
+  "description" : "Calls all implemented Operations.  Sets MSH-23-1 to a value.  Then copies that value to MSH-23-2.  Then does a goofy regex on it to reverse the first two characters",
+  "version" : "1.0",
+  "active" : false
+} ]
