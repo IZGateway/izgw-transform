@@ -18,7 +18,7 @@
                 {
                   "method": "equals",
                   "dataPath": "/MSH-9-1",
-                  "comparisonValue": "VXU"
+                  "comparisonValue": "RSP"
                 }
               ]
             },
@@ -31,6 +31,12 @@
                   "dataPath": "/MSH-9-1",
                   "comparisonValue": "QBP"
                 }
+              ]
+            },
+            {
+              "solutionId": "413f7881-7607-7220-a94b-fe0c7e81cbec",
+              "version": "1.0",
+              "preconditions": [
               ]
             }
           ]
@@ -168,65 +174,6 @@
       "description": "",
       "version": "1.0",
       "requestOperations": [
-        {
-          "preconditions": [],
-          "operationList": [
-            {
-              "method": "regex_replace",
-              "field": "/PID-11-5",
-              "regex": "^(\\d{5})(\\d{4})$",
-              "replacement": "$1-$2"
-            },
-            {
-              "method": "regex_replace",
-              "field": "/NK1-4-5",
-              "regex": "^(\\d{5})(\\d{4})$",
-              "replacement": "$1-$2"
-            },
-            {
-              "method": "regex_replace",
-              "field": "/NK1-32-5",
-              "regex": "^(\\d{5})(\\d{4})$",
-              "replacement": "$1-$2"
-            },
-            {
-              "method": "regex_replace",
-              "field": "/GT1-5-5",
-              "regex": "^(\\d{5})(\\d{4})$",
-              "replacement": "$1-$2"
-            },
-            {
-              "method": "regex_replace",
-              "field": "/GT1-17-5",
-              "regex": "^(\\d{5})(\\d{4})$",
-              "replacement": "$1-$2"
-            },
-            {
-              "method": "regex_replace",
-              "field": "/GT1-17-5",
-              "regex": "^(\\d{5})(\\d{4})$",
-              "replacement": "$1-$2"
-            },
-            {
-              "method": "regex_replace",
-              "field": "/INSURANCE/IN1-5-5",
-              "regex": "^(\\d{5})(\\d{4})$",
-              "replacement": "$1-$2"
-            },
-            {
-              "method": "regex_replace",
-              "field": "/ORDER(0)/ORC-22-5",
-              "regex": "^(\\d{5})(\\d{4})$",
-              "replacement": "$1-$2"
-            },
-            {
-              "method": "regex_replace",
-              "field": "/ORDER(1)/ORC-22-5",
-              "regex": "^(\\d{5})(\\d{4})$",
-              "replacement": "$1-$2"
-            }
-          ]
-        }
       ],
       "responseOperations": [
         {
@@ -310,6 +257,38 @@
         }
       ],
       "responseOperations": []
+    },
+    {
+      "id": "413f7881-7607-7220-a94b-fe0c7e81cbec",
+      "name": "PaulCustom1",
+      "description": "tbd...",
+      "version": "1.0",
+      "requestOperations": [
+        {
+          "preconditions": [
+          ],
+          "operationList": [
+            {
+              "method": "copy",
+              "sourceField": "/MSH-4-1",
+              "destinationField": "/MSH-22-1"
+            }
+          ]
+        }
+      ],
+      "responseOperations": [
+        {
+          "preconditions": [
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-7-1",
+              "setValue": "MSH 7 NEW VALUE"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
