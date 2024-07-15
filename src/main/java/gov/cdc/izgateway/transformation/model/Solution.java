@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class Solution {
+public class Solution implements BaseModel {
     @NotNull(message = "Solution ID is required")
     private UUID id;
 
@@ -20,4 +20,6 @@ public class Solution {
 
     @NotBlank(message = "Solution version is required")
     private String version;
+
+    private Boolean active;
 }
