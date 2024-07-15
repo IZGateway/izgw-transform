@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.transformation.operations;
 
 import ca.uhn.hl7v2.HL7Exception;
+import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 
 abstract class BaseOperation<T> implements Operation {
@@ -23,6 +24,7 @@ abstract class BaseOperation<T> implements Operation {
     }
 
     @Override
+    @CaptureXformAdvice
     public final void execute(ServiceContext context) throws HL7Exception {
         thisOperation(context);
         nextOperation(context);
