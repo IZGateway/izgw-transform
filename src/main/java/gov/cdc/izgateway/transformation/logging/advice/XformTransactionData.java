@@ -36,6 +36,46 @@ public class XformTransactionData extends TransactionData {
     public void addAdvice(XformAdviceRecord advice) {
         xformAdviceList.add(advice);
         updateSolutionAdvice(advice);
+        if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.RESPONSE && advice.methodDisposition() == MethodDisposition.POSTEXECUTION) {
+            reduceAdviceList();
+        }
+    }
+
+    private void reduceAdviceList() {
+        log.info("*** Reducing the advice list. ***");
+        for (XformAdviceRecord advice : xformAdviceList) {
+//            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
+//                log.info("The original request: " + advice.requestMessage());
+//            }
+//
+//            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.POSTEXECUTION) {
+//                log.info("The transformed request: " + advice.requestMessage());
+//            }
+            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
+                log.info("The original request: " + advice.requestMessage());
+                continue;
+            }
+
+            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.RESPONSE && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
+                continue;
+            }
+
+            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.POSTEXECUTION) {
+                log.info("The transformed request: " + advice.requestMessage());
+                continue;
+            }
+
+            log.info("ID: " + advice.descriptorId() + " name: " + advice.descriptor() + " className: " + advice.className());
+
+            if ( advice.hasTransformed() ) {
+                if ( advice.dataFlowDirection() == DataFlowDirection.REQUEST )
+                    log.info(advice.className() + " has transformed the request to: " + advice.requestMessage());
+                else if ( advice.dataFlowDirection() == DataFlowDirection.RESPONSE )
+                    log.info(advice.className() + " has transformed the response to: " + advice.responseMessage());
+
+            }
+        }
+        log.info("*** Done reducing the advice list. ***");
     }
 
     private void updateSolutionAdvice(XformAdviceRecord advice) {
