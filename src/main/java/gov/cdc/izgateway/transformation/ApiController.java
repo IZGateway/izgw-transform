@@ -54,7 +54,7 @@ public class ApiController {
 
     @GetMapping("/api/v1/solutions/{uuid}")
     public ResponseEntity<Solution> getSolutionByUUID(@PathVariable UUID uuid) {
-        return solutionService.getSolutionResponse(uuid);
+        return solutionService.getObject(uuid);
     }
 
     @PutMapping("/api/v1/solutions/{uuid}")
@@ -114,7 +114,7 @@ public class ApiController {
         @RequestParam(defaultValue = "10") int limit
     ) {
         try {
-            return solutionService.getSolutionList(nextCursor, prevCursor, includeInactive, limit);
+            return solutionService.getList(nextCursor, prevCursor, includeInactive, limit);
         } catch (JsonProcessingException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

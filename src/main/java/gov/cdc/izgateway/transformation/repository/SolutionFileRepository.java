@@ -22,16 +22,6 @@ public class SolutionFileRepository implements TxFormRepository<Solution> {
     @Value("${transformationservice.configurations.solutions}")
     private String solutionFilePath;
 
-    private void writeSolutionsToFile() {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(solutions);
-            Files.write(Paths.get(solutionFilePath), json.getBytes());
-        } catch (IOException e) {
-            throw new RepositoryRuntimeException("Error writing solutions file.", e);
-        }
-    }
-
     @Override
     public Solution getEntity(UUID id) {
         return getEntitySet().stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
@@ -55,8 +45,7 @@ public class SolutionFileRepository implements TxFormRepository<Solution> {
     @Override
     public void createEntity(Solution obj) {
         getEntitySet().add(obj);
-        writeSolutionsToFile();
-
+        TxFormRepositoryUtils.writeEntitiesToFile(solutionFilePath, getEntitySet());
     }
 
     @Override
@@ -68,6 +57,6 @@ public class SolutionFileRepository implements TxFormRepository<Solution> {
     @Override
     public void deleteEntity(UUID id) {
         solutions.removeIf(p -> p.getId().equals(id));
-        writeSolutionsToFile();
+        TxFormRepositoryUtils.writeEntitiesToFile(solutionFilePath, getEntitySet());
     }
 }
