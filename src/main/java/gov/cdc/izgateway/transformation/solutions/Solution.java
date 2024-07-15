@@ -73,4 +73,9 @@ public class Solution implements Advisable {
     public boolean hasTransformed() {
         return hasTransformed;
     }
+
+    @Override
+    public boolean preconditionPassed() {
+        return true;
+    }
 }

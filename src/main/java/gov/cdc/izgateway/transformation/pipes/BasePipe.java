@@ -113,7 +113,7 @@ abstract class BasePipe implements Pipe, Advisable {
 
     @Override
     public String getName() {
-        return config.getSolutionName();
+        return solution.getName();
     }
 
     @Override
@@ -124,6 +124,11 @@ abstract class BasePipe implements Pipe, Advisable {
     @Override
     public boolean hasTransformed() {
         return false;
+    }
+
+    @Override
+    public boolean preconditionPassed() {
+        return preconditionPassed;
     }
 
     private void executeNextPipe(ServiceContext context) throws HL7Exception {
