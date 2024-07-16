@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.transformation.logging.advice;
 
 import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.transformation.logging.XformTransactionData;
 
 public class XformAdviceCollector {
 	private XformAdviceCollector() {}

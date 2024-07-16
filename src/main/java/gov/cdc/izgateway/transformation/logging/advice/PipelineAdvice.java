@@ -9,20 +9,26 @@ import java.util.Map;
 @Data
 public class PipelineAdvice extends XformAdvice {
     private Map<String, SolutionAdvice> solutionAdviceMap = new LinkedHashMap<>();
+    private ArrayList<SolutionAdvice> solutionAdviceList = new ArrayList<>();
+    private String id;
 
-    public PipelineAdvice() {
-        super("", "");
-    }
+//    public PipelineAdvice() {
+//        super("", "", "");
+//    }
 
-    public PipelineAdvice(String className, String name) {
+    public PipelineAdvice(String id, String className, String name) {
         super(className, name);
+        this.id = id;
     }
 
     public SolutionAdvice getSolutionAdvice(XformAdviceRecord advice) {
-        SolutionAdvice solutionAdvice = solutionAdviceMap.containsKey(advice.descriptorId()) ?
-                solutionAdviceMap.get(advice.descriptorId()) : new SolutionAdvice(advice.className(), advice.descriptor());
+        SolutionAdvice solutionAdvice = new SolutionAdvice(advice.descriptorId(), advice.className(), advice.descriptor());
+        int adviceIndex = solutionAdviceList.indexOf(solutionAdvice);
+        if ( adviceIndex >= 0 ) {
+            return solutionAdviceList.get(adviceIndex);
+        }
 
-        solutionAdviceMap.put(advice.descriptorId(), solutionAdvice);
+        solutionAdviceList.add(solutionAdvice);
 
         return solutionAdvice;
     }

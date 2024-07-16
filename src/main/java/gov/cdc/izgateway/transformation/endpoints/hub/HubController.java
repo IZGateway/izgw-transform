@@ -1,7 +1,6 @@
 package gov.cdc.izgateway.transformation.endpoints.hub;
 
 import ca.uhn.hl7v2.HL7Exception;
-import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.security.AccessControlRegistry;
@@ -14,15 +13,12 @@ import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.soap.message.HasCredentials;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
-import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
-import gov.cdc.izgateway.transformation.logging.advice.XformAdviceCollector;
-import gov.cdc.izgateway.transformation.logging.advice.XformTransactionData;
 import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
