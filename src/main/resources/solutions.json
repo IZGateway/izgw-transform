@@ -1,7 +1,194 @@
 [ {
+  "id" : "acd0deac-05cc-45ba-b063-04d5c01b0927",
+  "name" : "ZipFixer (QBP)",
+  "description" : "Normalizes Zip Codes to 11111 or 11111-1111 format for QBP.",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "b0845fa6-e823-40c5-b3cb-d5d7bd432125",
+      "dataPath" : "/MSH-9-1",
+      "comparisonValue" : "QBP"
+    } ],
+    "operationList" : [ {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/QPD-8-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "1076ea9f-92ac-437a-b1e7-987a1326f02d",
+  "name" : "ZipFixer (VXU)",
+  "description" : "Normalizes Zip Codes to 11111 or 11111-1111 format for VXU.",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "5c9f5b26-855f-43fd-804f-a9afcd953ef3",
+      "dataPath" : "MSH-9-1",
+      "comparisonValue" : "VXU"
+    } ],
+    "operationList" : [ {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/QPD-8-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/PID-11-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/NK1-4-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/NK1-32-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/GT1-5-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/GT1-17-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/GT1-17-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/INSURANCE/IN1-5-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/ORDER(0)/ORC-22-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/ORDER(1)/ORC-22-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "018f7881-7607-7220-a94b-fe0c7e81cbec",
+  "name" : "EqualsPrecondition",
+  "description" : "Sets a field if Equals precondition is met",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "026ab6c8-84d1-4bc8-927f-0ee770c2506e",
+      "dataPath" : "/MSH-1-1",
+      "comparisonValue" : "|"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-22-1",
+      "setValue" : "EqualsPrecondition_Solution"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "64bc92f4-053c-4e55-85b5-5ff52f5ff47f",
+  "name" : "NotEqualsPrecondition",
+  "description" : "Sets a field if NotEquals precondition is met",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "not_equals",
+      "id" : "9201fa07-e7c9-407e-b715-a527a5caac18",
+      "dataPath" : "/MSH-1-1",
+      "comparisonValue" : "x"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-22-2",
+      "setValue" : "NotEqualsPrecondition_Solution"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "79def078-5953-4d31-b44a-79d4da9beef9",
+  "name" : "RegexMatchPrecondition",
+  "description" : "Sets a field if RegexMatch precondition is met",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "b1181da0-5b7d-4853-b39f-33596d94243a",
+      "dataPath" : "/MSH-1-1",
+      "regex" : "^\\|$"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-22-3",
+      "setValue" : "RegexMatchPrecondition_Solution"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
   "id" : "8abc8887-1cab-4a96-98ea-29f8f6c977d5",
   "name" : "AllOperations",
   "description" : "Calls all implemented Operations.  Sets MSH-23-1 to a value.  Then copies that value to MSH-23-2.  Then does a goofy regex on it to reverse the first two characters",
   "version" : "1.0",
-  "active" : false
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-23-1",
+      "setValue" : "HELLO THERE!"
+    }, {
+      "method" : "copy",
+      "order" : 0,
+      "sourceField" : "/MSH-23-1",
+      "destinationField" : "/MSH-23-2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/MSH-23-2",
+      "regex" : "([\\S]{1})([\\S]{1})(.+)",
+      "replacement" : "$2$1$3"
+    }, {
+      "method" : "save_state",
+      "order" : 0,
+      "field" : "/MSH-23-2",
+      "key" : "myKey"
+    } ]
+  } ],
+  "responseOperations" : [ ]
 } ]
