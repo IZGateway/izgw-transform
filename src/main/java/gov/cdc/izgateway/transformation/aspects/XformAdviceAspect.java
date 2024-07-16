@@ -3,10 +3,7 @@ package gov.cdc.izgateway.transformation.aspects;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
-import gov.cdc.izgateway.transformation.logging.advice.Advisable;
-import gov.cdc.izgateway.transformation.logging.advice.MethodDisposition;
-import gov.cdc.izgateway.transformation.logging.advice.XformAdviceRecord;
-import gov.cdc.izgateway.transformation.logging.advice.XformAdviceCollector;
+import gov.cdc.izgateway.transformation.logging.advice.*;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
@@ -15,7 +12,6 @@ import org.aspectj.lang.annotation.Aspect;
 @Aspect
 public class XformAdviceAspect {
 
-    // TODO - consider just doing before - not around
     @Around("execution(* *(..)) && @annotation(gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice)")
     public Object processXformAdviceAspect(ProceedingJoinPoint joinPoint) throws Throwable {
         addAdvice(joinPoint, MethodDisposition.PREEXECUTION);
@@ -29,7 +25,6 @@ public class XformAdviceAspect {
         for (Object arg : joinPoint.getArgs()) {
             if (arg instanceof ServiceContext context) {
                 XformAdviceCollector.getTransactionData().addAdvice(createXformAdvice(joinPoint, context, methodDisposition));
-                // createXformAdvice(joinPoint, context, methodDisposition);
                 break;
             }
         }
@@ -48,16 +43,46 @@ public class XformAdviceAspect {
             hasTransformed = advisable.hasTransformed();
         }
 
+        String request = getRequestMessage(joinPoint, context, methodDisposition, hasTransformed);
+        String response = getResponseMessage(joinPoint, context, methodDisposition, hasTransformed);
+
         return new XformAdviceRecord(
                 joinPoint.getTarget().getClass().getSimpleName(),
                 joinPoint.getSignature().getName(),
                 methodDisposition,
                 descriptor,
                 descriptorId,
-                context.getRequestMessage().encode(),
-                responseMessage == null ? null : responseMessage.encode(),
+                request,
+                response,
                 context.getCurrentDirection(),
                 hasTransformed);
 
     }
+
+    // Return the request message if it's the original message or it has been transformed
+    private String getRequestMessage(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed) throws HL7Exception {
+        if ( AdviceUtil.isPipelineAdvice(joinPoint.getTarget().getClass().getSimpleName()) &&
+                methodDisposition == MethodDisposition.PREEXECUTION ) {
+            return context.getRequestMessage().encode();
+        } else if ( methodDisposition == MethodDisposition.POSTEXECUTION && hasTransformed) {
+            return context.getRequestMessage().encode();
+        } else {
+            return null;
+        }
+    }
+
+    // Return the response message if it's the original message or it has been transformed
+    private String getResponseMessage(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed) throws HL7Exception {
+        Message responseMessage = context.getResponseMessage();
+
+        if ( AdviceUtil.isPipelineAdvice(joinPoint.getTarget().getClass().getSimpleName()) &&
+                methodDisposition == MethodDisposition.PREEXECUTION ) {
+            return responseMessage == null ? null : responseMessage.encode();
+        } else if ( methodDisposition == MethodDisposition.POSTEXECUTION && hasTransformed) {
+            return responseMessage == null ? null : responseMessage.encode();
+        } else {
+            return null;
+        }
+    }
+
 }
