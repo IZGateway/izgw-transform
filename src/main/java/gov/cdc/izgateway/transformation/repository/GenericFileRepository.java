@@ -40,7 +40,7 @@ public abstract class GenericFileRepository<T extends BaseModel> implements TxFo
     @Override
     public void createEntity(T obj) {
         getEntitySet().add(obj);
-        TxFormRepositoryUtils.writeEntitiesToFile(filePath, getEntitySet());
+        writeEntitiesToFile();
     }
 
     @Override
@@ -52,6 +52,16 @@ public abstract class GenericFileRepository<T extends BaseModel> implements TxFo
     @Override
     public void deleteEntity(UUID id) {
         entities.removeIf(p -> p.getId().equals(id));
-        TxFormRepositoryUtils.writeEntitiesToFile(filePath, getEntitySet());
+        writeEntitiesToFile();
+    }
+
+    private void writeEntitiesToFile() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(entities);
+            Files.write(Paths.get(filePath), json.getBytes());
+        } catch (IOException e) {
+            throw new RepositoryRuntimeException("Error writing file.", e);
+        }
     }
 }
