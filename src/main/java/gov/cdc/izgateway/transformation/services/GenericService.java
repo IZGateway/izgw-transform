@@ -3,7 +3,6 @@ package gov.cdc.izgateway.transformation.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.izgateway.transformation.model.BaseModel;
-import gov.cdc.izgateway.transformation.model.ModelUtils;
 import gov.cdc.izgateway.transformation.repository.TxFormRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class GenericService<T extends BaseModel> implements TxFormService<T> {
 
@@ -20,7 +20,6 @@ public abstract class GenericService<T extends BaseModel> implements TxFormServi
     protected GenericService(TxFormRepository<T> repo){
         this.repo = repo;
     }
-
 
     @Override
     public ResponseEntity<T> getObject(UUID id) {
@@ -41,7 +40,7 @@ public abstract class GenericService<T extends BaseModel> implements TxFormServi
         String hasMore = "true";
         List<T> allEntityList = new ArrayList<>(repo.getEntitySet());
 
-        List<T> filteredEntityList = ModelUtils.filterList(includeInactive, allEntityList);
+        List<T> filteredEntityList = filterList(includeInactive, allEntityList);
 
         for (int i = 0; i < filteredEntityList.size(); i++){
             T newEntity = filteredEntityList.get(i);
@@ -100,5 +99,15 @@ public abstract class GenericService<T extends BaseModel> implements TxFormServi
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found");
         }
         repo.deleteEntity(id);
+    }
+
+    private List<T> filterList(Boolean includeInactive, List<T> allList) {
+        if (Boolean.FALSE.equals(includeInactive)) {
+            return allList.stream()
+                    .filter(T::getActive)
+                    .collect(Collectors.toList());
+        } else {
+            return new ArrayList<>(allList);
+        }
     }
 }

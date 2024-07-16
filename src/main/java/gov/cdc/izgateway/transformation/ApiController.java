@@ -42,13 +42,13 @@ public class ApiController {
 
     @GetMapping("/api/v1/pipelines/{uuid}")
     public ResponseEntity<Pipeline> getPipelineByUUID(@PathVariable UUID uuid) {
-        return pipelineService.getPipelineResponse(uuid);
+        return pipelineService.getObject(uuid);
     }
 
     @PutMapping("/api/v1/pipelines/{uuid}")
     public ResponseEntity<Pipeline> updatePipeline(@PathVariable UUID uuid, @RequestBody Pipeline updatedPipeline) {
         updatedPipeline.setId(uuid);
-        pipelineService.updatePipeline(updatedPipeline);
+        pipelineService.update(updatedPipeline);
         return new ResponseEntity<>(updatedPipeline, HttpStatus.OK);
     }
 
@@ -84,7 +84,7 @@ public class ApiController {
             @RequestParam(defaultValue = "10") int limit
     ) {
         try {
-            return pipelineService.getPipelineList(nextCursor, prevCursor, includeInactive, limit);
+            return pipelineService.getList(nextCursor, prevCursor, includeInactive, limit);
         } catch (JsonProcessingException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -125,7 +125,7 @@ public class ApiController {
     public ResponseEntity<Pipeline> createPipeline(
             @Valid @RequestBody() Pipeline pipeline
     ) {
-        pipelineService.createPipeline(pipeline);
+        pipelineService.create(pipeline);
         return new ResponseEntity<>(pipeline, HttpStatus.OK);
     }
 
@@ -153,7 +153,7 @@ public class ApiController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        pipelineService.deletePipeline(uuid);
+        pipelineService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
