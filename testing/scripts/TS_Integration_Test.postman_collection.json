@@ -2482,6 +2482,1411 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "Solutions",
+					"item": [
+						{
+							"name": "Create Solution - Net New",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"created object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.description).to.equal(pm.collectionVariables.get(\"currentDescription\"));",
+											"    pm.expect(response.version).to.equal(pm.collectionVariables.get(\"currentVersion\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"name\" : \"{{currentName}}\",\n  \"description\" : \"{{currentDescription}}\",\n  \"version\" : \"{{currentVersion}}\",\n  \"active\" : {{currentActive}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Solution - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Fields should match object created in previous \"Create Pipeline - Net New\" step",
+											"let response = pm.response.json();",
+											"pm.test(\"gotten object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.description).to.equal(pm.collectionVariables.get(\"currentDescription\"));",
+											"    pm.expect(response.version).to.equal(pm.collectionVariables.get(\"currentVersion\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"}",
+											")"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Solution - Non Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 404 NOT FOUND code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(404);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"nonExistingId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{nonExistingId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions",
+										"{{nonExistingId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Solution - Existing",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 409 CONFLICT code\", function() {",
+											"    pm.expect(pm.response.code = 409);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"name\" : \"{{currentName}}\",\n  \"description\" : \"{{currentDescription}}\",\n  \"version\" : \"{{currentVersion}}\",\n  \"active\" : {{currentActive}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Solution - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdPipeline\", savedData);",
+											"",
+											"pm.test(\"created object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
+											"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
+											"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{createdEntity}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Solution - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Solution - Non Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 404 NOT FOUND code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(404);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"nonExistingId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{nonExistingId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions",
+										"{{nonExistingId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Solution - Non Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 404 NOT FOUND code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(404);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+											"pm.collectionVariables.set(\"currentOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentOutboundEndpoint}}\",\n    \"active\": {{currentActive}},\n    \"pipes\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Solution - New For List 0",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let entityNumber = 0;",
+											"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"description\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"version\" + entityNumber, pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"",
+											"pm.collectionVariables.unset(\"thisName\");",
+											"pm.collectionVariables.unset(\"thisId\");",
+											"pm.collectionVariables.unset(\"thisDescription\");",
+											"pm.collectionVariables.unset(\"thisVersion\");",
+											"",
+											"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisDescription\", pm.collectionVariables.get(\"description\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisVersion\", pm.collectionVariables.get(\"version\" + entityNumber));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"name\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Solution - New For List 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let entityNumber = 1;",
+											"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"description\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"version\" + entityNumber, pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"",
+											"pm.collectionVariables.unset(\"thisName\");",
+											"pm.collectionVariables.unset(\"thisId\");",
+											"pm.collectionVariables.unset(\"thisDescription\");",
+											"pm.collectionVariables.unset(\"thisVersion\");",
+											"",
+											"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisDescription\", pm.collectionVariables.get(\"description\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisVersion\", pm.collectionVariables.get(\"version\" + entityNumber));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"name\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Solution - New For List 2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let entityNumber = 2;",
+											"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"description\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"version\" + entityNumber, pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"",
+											"pm.collectionVariables.unset(\"thisName\");",
+											"pm.collectionVariables.unset(\"thisId\");",
+											"pm.collectionVariables.unset(\"thisDescription\");",
+											"pm.collectionVariables.unset(\"thisVersion\");",
+											"",
+											"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisDescription\", pm.collectionVariables.get(\"description\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisVersion\", pm.collectionVariables.get(\"version\" + entityNumber));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"name\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Solutions",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Check to see if the 2 active we added in 3 previous steps are in the response",
+											"let response = pm.response.json();",
+											"let found0 = false;",
+											"let found1 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"Found New 0\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"Found New 1\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Solutions - Include Inactive",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Check to see if the all 3 added previous are here now since one was set active = false",
+											"let response = pm.response.json();",
+											"let found0 = false;",
+											"let found1 = false;",
+											"let found2 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id2\")) {",
+											"        found2 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"Found New 0\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"Found New 1\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"Found New 2\", function() {",
+											"    pm.expect(found2).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions?includeInactive=true",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Solutions - Limit",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// After we added 3 we should be able to set limit = 2 and only get 2 pipelines back.  ",
+											"// Also the has_more should be true",
+											"let response = pm.response.json();",
+											"pm.test(\"Only 2 Returned\", function() {",
+											"    pm.expect(response[\"data\"].length).to.equal(2);",
+											"});",
+											"",
+											"console.log(response[\"has_more\"]);",
+											"pm.test(\"has_more is true\", function() {",
+											"    pm.expect(response[\"has_more\"]).to.equal(\"true\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions?limit=2",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Solutions - Extreme Limit",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Setting an extreme limit and then making sure has_more is false.",
+											"let response = pm.response.json();",
+											"pm.test(\"has_more is false\", function() {",
+											"    pm.expect(response[\"has_more\"]).to.equal(\"false\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions?limit=1000000",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "1000000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Solutions - Existing Cursor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Setting nextCursor to the last item that we added should mean that we do not see any of the 3 that we added.",
+											"// It also means that the has_more should be false",
+											"let response = pm.response.json();",
+											"",
+											"let found0 = false;",
+											"let found1 = false;",
+											"let found2 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id2\")) {",
+											"        found2 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"New 0 NOT FOUND\", function() {",
+											"    pm.expect(found0).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"New 1 NOT FOUND\", function() {",
+											"    pm.expect(found1).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"New 2 NOT FOUND\", function() {",
+											"    pm.expect(found2).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"has_more is false\", function() {",
+											"    pm.expect(response[\"has_more\"]).to.equal(\"false\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions?includeInactive=true&nextCursor={{id2}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										},
+										{
+											"key": "nextCursor",
+											"value": "{{id2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Solutions - Non Existing Cursor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Setting nextCursor to a random UUID should mean we just get back the same thing as requesting everything",
+											"// It also means that the has_more should be false",
+											"let response = pm.response.json();",
+											"",
+											"let found0 = false;",
+											"let found1 = false;",
+											"let found2 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id2\")) {",
+											"        found2 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"New 0 FOUND\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 1 FOUND\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 2 FOUND\", function() {",
+											"    pm.expect(found2).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions?includeInactive=true&nextCursor=5926368C-F578-4D62-BD3C-CE11AA0187E7",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										},
+										{
+											"key": "nextCursor",
+											"value": "5926368C-F578-4D62-BD3C-CE11AA0187E7"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Solutions - Existing Prev Cursor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Setting prevCursor to the last item that we added should mean that we get back the first two that we added",
+											"let response = pm.response.json();",
+											"",
+											"let found0 = false;",
+											"let found1 = false;",
+											"let found2 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id2\")) {",
+											"        found2 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"New 0 FOUND\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 1 FOUND\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 2 NOT FOUND\", function() {",
+											"    pm.expect(found2).to.be.false;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions?includeInactive=true&prevCursor={{id2}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										},
+										{
+											"key": "prevCursor",
+											"value": "{{id2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Solutions - Non Existing Prev Cursor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Setting prevCursor to a random UUID should mean we just get back the same thing as requesting everything",
+											"// It also means that the has_more should be false",
+											"let response = pm.response.json();",
+											"",
+											"let found0 = false;",
+											"let found1 = false;",
+											"let found2 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id2\")) {",
+											"        found2 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"New 0 FOUND\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 1 FOUND\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 2 FOUND\", function() {",
+											"    pm.expect(found2).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions?includeInactive=true&prevCursor=407A00CB-7B00-4682-AA4E-B2C0C0FFFBB6",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										},
+										{
+											"key": "prevCursor",
+											"value": "407A00CB-7B00-4682-AA4E-B2C0C0FFFBB6"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Solution - New 0",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{id0}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions",
+										"{{id0}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Solution - New 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{id1}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions",
+										"{{id1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Solution - New 2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});",
+											"",
+											"pm.collectionVariables.clear();"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{id2}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions",
+										"{{id2}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		}
@@ -3593,44 +4998,6 @@
 					""
 				]
 			}
-		}
-	],
-	"variable": [
-		{
-			"key": "GoodResponse",
-			"value": ""
-		},
-		{
-			"key": "GoodResponseLF",
-			"value": ""
-		},
-		{
-			"key": "GoodResponseCRLF",
-			"value": ""
-		},
-		{
-			"key": "GoodMessageLF",
-			"value": ""
-		},
-		{
-			"key": "GoodMessageCRLF",
-			"value": ""
-		},
-		{
-			"key": "TooLargeMessage",
-			"value": ""
-		},
-		{
-			"key": "IisTooLargeMessage",
-			"value": ""
-		},
-		{
-			"key": "hex0b",
-			"value": ""
-		},
-		{
-			"key": "hex1b",
-			"value": ""
 		}
 	]
 }
