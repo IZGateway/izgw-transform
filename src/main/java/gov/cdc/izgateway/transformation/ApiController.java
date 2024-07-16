@@ -66,13 +66,13 @@ public class ApiController {
 
     @GetMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> getOrganizationByUUID(@PathVariable UUID uuid) {
-        return organizationService.getOrganizationResponse(uuid);
+        return organizationService.getObject(uuid);
     }
 
     @PutMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> updateOrganization(@PathVariable UUID uuid, @RequestBody Organization updatedOrganization) {
-        updatedOrganization.setOrganizationId(uuid);
-        organizationService.updateOrganization(updatedOrganization);
+        updatedOrganization.setId(uuid);
+        organizationService.update(updatedOrganization);
         return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
     }
 
@@ -98,7 +98,7 @@ public class ApiController {
         @RequestParam(defaultValue = "false") Boolean includeInactive,
         @RequestParam(defaultValue = "10") int limit) {
         try {
-            return organizationService.getOrganizationList(nextCursor, prevCursor, includeInactive, limit);
+            return organizationService.getList(nextCursor, prevCursor, includeInactive, limit);
 
         } catch (JsonProcessingException e) { //need to keep this part of the logic because log.log is dependent on @Log
             log.log(Level.SEVERE, e.getMessage(), e);
@@ -131,9 +131,10 @@ public class ApiController {
 
     @PostMapping("/api/v1/organizations")
     public ResponseEntity<Organization> createOrganization(
-            @RequestBody() String orgName
+            @Valid @RequestBody() Organization organization
              ){
-            return new ResponseEntity<>(organizationService.createOrganization(orgName), HttpStatus.OK);
+        organizationService.create(organization);
+        return new ResponseEntity<>(organization, HttpStatus.OK);
     }
 
     @PostMapping("/api/v1/solutions")
@@ -167,6 +168,18 @@ public class ApiController {
         }
 
         solutionService.delete(uuid);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/api/v1/organizations/{uuid}")
+    public ResponseEntity<Organization> deleteOrganization(
+            @PathVariable UUID uuid
+    ) {
+        if (Boolean.FALSE.equals(allowDelete)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        organizationService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

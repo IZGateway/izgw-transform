@@ -31,7 +31,7 @@ public abstract class GenericFileRepository<T extends BaseModel> implements TxFo
             try (InputStream inputStream = Files.newInputStream(Paths.get(filePath))) {
                 entities = mapper.readValue(inputStream, getTypeReference());
             } catch (IOException e) {
-                throw new RepositoryRuntimeException("Error reading pipelines file.", e);
+                throw new RepositoryRuntimeException(String.format("Error reading file: %s", e.getMessage()), e);
             }
         }
         return entities;
