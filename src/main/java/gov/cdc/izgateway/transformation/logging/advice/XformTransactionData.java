@@ -34,6 +34,11 @@ public class XformTransactionData extends TransactionData {
         super(eventId);
     }
 
+    // TODO - Paul
+    // next thing to try is to simplify and not use a reducer concept.
+    // change addAdvice to do the logic I'm doing in the reducer'
+    // If I need to keep track of lastSolutionAdvice or currentSolutionAdivce, just get the last item in the list/array
+
     public void addAdvice(XformAdviceRecord advice) {
         xformAdviceList.add(advice);
         updateSolutionAdvice(advice);
@@ -52,7 +57,7 @@ public class XformTransactionData extends TransactionData {
 
         for (XformAdviceRecord advice : xformAdviceList) {
 
-            if ( isPipelineAdvice(advice) ) {
+            if ( AdviceUtil.isPipelineAdvice(advice.className()) ) {
                 if ( advice.dataFlowDirection() == DataFlowDirection.REQUEST ) {
                     if ( advice.methodDisposition() == MethodDisposition.PREEXECUTION ) {
                         pipelineAdvice = new PipelineAdvice(advice.className(), advice.descriptor());
@@ -76,7 +81,7 @@ public class XformTransactionData extends TransactionData {
 //                continue;
 //            }
 
-            if ( isSolutionAdvice(advice) ) {
+            if ( AdviceUtil.isSolutionAdvice(advice.className()) ) {
                 // get the solution by ID
                 currentSolutionAdvice = pipelineAdvice.getSolutionAdvice(advice);
                 // don't think we need this any more since we use the solution name in the pipe class... currentSolutionAdvice.setName(advice.descriptor());
@@ -110,55 +115,6 @@ public class XformTransactionData extends TransactionData {
         log.info("*** Done reducing the advice list. ***");
     }
 
-    private boolean isPipelineAdvice(XformAdviceRecord advice) {
-        return advice.className().equals("Hl7Pipeline");
-    }
-
-    private boolean isSolutionAdvice(XformAdviceRecord advice) {
-        return advice.className().contains("Solution") || advice.className().endsWith("Pipe");
-    }
-
-
-    private void reduceAdviceListOriginal() {
-        log.info("*** Reducing the advice list. ***");
-
-        XformAdvice rootTransformAdvice = null;
-        XformAdvice currentTransformAdvice = null;
-
-        for (XformAdviceRecord advice : xformAdviceList) {
-//            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
-//                log.info("The original request: " + advice.requestMessage());
-//            }
-//
-//            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.POSTEXECUTION) {
-//                log.info("The transformed request: " + advice.requestMessage());
-//            }
-
-            if ( advice.className().equals("Hl7Pipeline") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
-                rootTransformAdvice = new XformAdvice(advice.className(), advice.descriptor());
-                continue;
-            }
-
-            if ( advice.className().endsWith("Pipe") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
-                currentTransformAdvice = new XformAdvice(advice.className(), advice.descriptor());
-                rootTransformAdvice.addChild(currentTransformAdvice);
-                continue;
-            }
-
-            if ( advice.className().contains("Solution") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.POSTEXECUTION) {
-                currentTransformAdvice.setName(advice.descriptor());
-
-                continue;
-            }
-
-            if ( advice.className().contains("Operation") && advice.dataFlowDirection() == DataFlowDirection.REQUEST && advice.methodDisposition() == MethodDisposition.PREEXECUTION) {
-                XformAdvice operationTransformAdvice = new XformAdvice(advice.className(), advice.descriptor());
-                currentTransformAdvice.addChild(operationTransformAdvice);
-                continue;
-            }
-        }
-        log.info("*** Done reducing the advice list. ***");
-    }
 
     private void updateSolutionAdvice(XformAdviceRecord advice) {
 
