@@ -3,30 +3,41 @@
     {
       "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
       "organizationName": "Audacious Test Organziation",
+      "active": true,
       "pipelines": [
         {
           "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
           "name": "HL7v2 to IZ Gateway hub",
+          "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
           "inboundEndpoint": "TS IZGHub WSDL Listener",
           "outboundEndpoint": "IZG Hub",
           "description": "Pipeline to call all implemented Preconditions and Operations",
+          "active": true,
           "pipes": [
             {
+              "id": "ba5c2b8c-2196-419e-8e1d-7e9029982501",
               "solutionId": "018f7881-7607-7220-a94b-fe0c7e81cbec",
-              "version": "1.0",
+              "solutionVersion": "1.0",
               "preconditions": [
                 {
+                  "id" : "6786e55c-1da6-4cc4-9405-b586081630ac",
                   "method": "equals",
                   "dataPath": "/MSH-1-1",
                   "comparisonValue": "|"
+                },
+                {
+                  "id" : "D9E3806C-B252-414D-A357-8FE87C1F0BAD\n",
+                  "method": "exists",
+                  "dataPath": "/MSH-1-1"
                 }
               ]
             },
             {
               "solutionId": "64bc92f4-053c-4e55-85b5-5ff52f5ff47f",
-              "version": "1.0",
+              "solutionVersion": "1.0",
               "preconditions": [
                 {
+                  "id" : "43F884DD-60C9-4FC1-AAF7-479E4E0E02D6",
                   "method": "not_equals",
                   "dataPath": "/MSH-1-1",
                   "comparisonValue": "x"
@@ -35,9 +46,10 @@
             },
             {
               "solutionId": "79def078-5953-4d31-b44a-79d4da9beef9",
-              "version": "1.0",
+              "solutionVersion": "1.0",
               "preconditions": [
                 {
+                  "id" : "B1B2D555-31BF-4D63-8AFC-0CD0CF0B007C",
                   "method": "regex_match",
                   "dataPath": "/MSH-1-1",
                   "regex": "^\\|$"
@@ -47,7 +59,7 @@
             },
             {
               "solutionId": "8abc8887-1cab-4a96-98ea-29f8f6c977d5",
-              "version": "1.0",
+              "solutionVersion": "1.0",
               "preconditions": []
             }
           ]
@@ -65,6 +77,7 @@
         {
           "preconditions": [
             {
+              "id": "026AB6C8-84D1-4BC8-927F-0EE770C2506E",
               "method": "equals",
               "dataPath": "/MSH-1-1",
               "comparisonValue": "|"
@@ -90,6 +103,7 @@
         {
           "preconditions": [
             {
+              "id": "9201FA07-E7C9-407E-B715-A527A5CAAC18",
               "method": "not_equals",
               "dataPath": "/MSH-1-1",
               "comparisonValue": "x"
@@ -115,6 +129,7 @@
         {
           "preconditions": [
             {
+              "id": "B1181DA0-5B7D-4853-B39F-33596D94243A",
               "method": "regex_match",
               "dataPath": "/MSH-1-1",
               "regex": "^\\|$"
