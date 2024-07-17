@@ -1,13 +1,9 @@
-package gov.cdc.izgateway.transformation.aspects;
+package gov.cdc.izgateway.transformation.aspects.xformadvice;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.logging.advice.*;
-import gov.cdc.izgateway.transformation.logging.advice.record.OperationAdviceRecord;
-import gov.cdc.izgateway.transformation.logging.advice.record.PipelineAdviceRecord;
-import gov.cdc.izgateway.transformation.logging.advice.record.SolutionAdviceRecord;
-import gov.cdc.izgateway.transformation.logging.advice.record.XformAdviceRecord;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -33,7 +29,7 @@ public class XformAdviceAspect {
         }
     }
 
-    private XformAdviceRecord createXformAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
+    private XformAspectDetail createXformAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
         if (AdviceUtil.isPipelineAdvice(joinPoint.getTarget().getClass().getSimpleName())) {
             return createPipelineAdvice(joinPoint, context, methodDisposition);
         } else if (AdviceUtil.isSolutionAdvice(joinPoint.getTarget().getClass().getSimpleName())) {
@@ -45,8 +41,7 @@ public class XformAdviceAspect {
         }
     }
 
-    private SolutionAdviceRecord createSolutionAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
-        Message responseMessage = context.getResponseMessage();
+    private SolutionAspectDetail createSolutionAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
         String descriptor = "Unknown";
         String descriptorId = "Unknown";
         boolean hasTransformed = false;
@@ -61,7 +56,7 @@ public class XformAdviceAspect {
         String request = getRequestMessage(joinPoint, context, methodDisposition, hasTransformed);
         String response = getResponseMessage(joinPoint, context, methodDisposition, hasTransformed);
 
-        return new SolutionAdviceRecord(
+        return new SolutionAspectDetail(
                 descriptorId,
                 hasTransformed,
                 descriptor,
@@ -74,8 +69,7 @@ public class XformAdviceAspect {
 
     }
 
-    private OperationAdviceRecord createOperationAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
-        Message responseMessage = context.getResponseMessage();
+    private OperationAspectDetail createOperationAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
         String descriptor = "Unknown";
         String descriptorId = "Unknown";
         boolean hasTransformed = false;
@@ -90,7 +84,7 @@ public class XformAdviceAspect {
         String request = getRequestMessage(joinPoint, context, methodDisposition, hasTransformed);
         String response = getResponseMessage(joinPoint, context, methodDisposition, hasTransformed);
 
-        return new OperationAdviceRecord(
+        return new OperationAspectDetail(
                 hasTransformed,
                 descriptor,
                 joinPoint.getTarget().getClass().getSimpleName(),
@@ -102,8 +96,7 @@ public class XformAdviceAspect {
 
     }
 
-    private PipelineAdviceRecord createPipelineAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
-        Message responseMessage = context.getResponseMessage();
+    private PipelineAspectDetail createPipelineAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
         String descriptor = "Unknown";
         String descriptorId = "Unknown";
         boolean hasTransformed = false;
@@ -118,7 +111,7 @@ public class XformAdviceAspect {
         String request = getRequestMessage(joinPoint, context, methodDisposition, hasTransformed);
         String response = getResponseMessage(joinPoint, context, methodDisposition, hasTransformed);
 
-        return new PipelineAdviceRecord(
+        return new PipelineAspectDetail(
                 descriptorId,
                 descriptor,
                 joinPoint.getTarget().getClass().getSimpleName(),
@@ -130,34 +123,6 @@ public class XformAdviceAspect {
 
     }
 
-    private XformAdviceRecord createXformAdviceOriginal(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
-        Message responseMessage = context.getResponseMessage();
-        String descriptor = "Unknown";
-        String descriptorId = "Unknown";
-        boolean hasTransformed = false;
-
-        Object targetObject = joinPoint.getTarget();
-        if ( targetObject instanceof Advisable advisable ) {
-            descriptor = advisable.getName();
-            descriptorId = advisable.getId();
-            hasTransformed = advisable.hasTransformed();
-        }
-
-        String request = getRequestMessage(joinPoint, context, methodDisposition, hasTransformed);
-        String response = getResponseMessage(joinPoint, context, methodDisposition, hasTransformed);
-
-        return new XformAdviceRecord(
-                descriptor,
-                joinPoint.getTarget().getClass().getSimpleName(),
-                joinPoint.getSignature().getName(),
-                methodDisposition,
-                request,
-                response,
-                context.getCurrentDirection());
-
-    }
-
-    // Return the request message if it's the original message or it has been transformed
     private String getRequestMessage(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed) throws HL7Exception {
         if ( AdviceUtil.isPipelineAdvice(joinPoint.getTarget().getClass().getSimpleName()) &&
                 methodDisposition == MethodDisposition.PREEXECUTION ) {
@@ -169,7 +134,6 @@ public class XformAdviceAspect {
         }
     }
 
-    // Return the response message if it's the original message or it has been transformed
     private String getResponseMessage(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed) throws HL7Exception {
         Message responseMessage = context.getResponseMessage();
 
