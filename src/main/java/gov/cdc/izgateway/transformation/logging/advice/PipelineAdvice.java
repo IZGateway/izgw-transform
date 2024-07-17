@@ -1,7 +1,6 @@
 package gov.cdc.izgateway.transformation.logging.advice;
 
-import gov.cdc.izgateway.transformation.logging.advice.record.SolutionAdviceRecord;
-import gov.cdc.izgateway.transformation.logging.advice.record.XformAdviceRecord;
+import gov.cdc.izgateway.transformation.aspects.xformadvice.SolutionAspectDetail;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public class PipelineAdvice extends XformAdvice {
         this.id = id;
     }
 
-    public SolutionAdvice getSolutionAdvice(SolutionAdviceRecord advice) {
+    public SolutionAdvice getSolutionAdvice(SolutionAspectDetail advice) {
         SolutionAdvice solutionAdvice = new SolutionAdvice(advice.getId(), advice.getClassName(), advice.getName());
         int adviceIndex = solutionAdviceList.indexOf(solutionAdvice);
         if ( adviceIndex >= 0 ) {

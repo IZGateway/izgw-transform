@@ -6,6 +6,6 @@
     </weaver>
     <aspects>
         <!-- Specify your aspects here -->
-        <aspect name="gov.cdc.izgateway.transformation.aspects.XformAdviceAspect"/>
+        <aspect name="gov.cdc.izgateway.transformation.aspects.xformadvice.XformAdviceAspect"/>
     </aspects>
 </aspectj>

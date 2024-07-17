@@ -4,12 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import gov.cdc.izgateway.logging.event.TransactionData;
 import gov.cdc.izgateway.logging.markers.MarkerObjectFieldName;
 import gov.cdc.izgateway.logging.markers.Markers2;
+import gov.cdc.izgateway.transformation.aspects.xformadvice.*;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.logging.advice.*;
-import gov.cdc.izgateway.transformation.logging.advice.record.OperationAdviceRecord;
-import gov.cdc.izgateway.transformation.logging.advice.record.PipelineAdviceRecord;
-import gov.cdc.izgateway.transformation.logging.advice.record.SolutionAdviceRecord;
-import gov.cdc.izgateway.transformation.logging.advice.record.XformAdviceRecord;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +19,7 @@ import java.util.ArrayList;
 public class XformTransactionData extends TransactionData {
 
     // TODO Add @JsonIgnore as we don't with these to be wrriten to the log!!! PHI!
-    private ArrayList<XformAdviceRecord> xformAdviceList = new ArrayList<>();
+    private ArrayList<XformAspectDetail> xformAdviceList = new ArrayList<>();
 
     private PipelineAdvice pipelineAdvice = null;
     private SolutionAdvice currentSolutionAdvice = null;
@@ -35,21 +32,21 @@ public class XformTransactionData extends TransactionData {
         super(eventId);
     }
 
-    public void addAdvice(XformAdviceRecord advice) {
+    public void addAdvice(XformAspectDetail advice) {
         if ( advice == null )
             return;
 
-        if ( advice instanceof PipelineAdviceRecord pAdvice)
+        if ( advice instanceof PipelineAspectDetail pAdvice)
             addAdvice(pAdvice);
-        else if ( advice instanceof SolutionAdviceRecord sAdvice)
+        else if ( advice instanceof SolutionAspectDetail sAdvice)
             addAdvice(sAdvice);
-        else if ( advice instanceof OperationAdviceRecord oAdvice)
+        else if ( advice instanceof OperationAspectDetail oAdvice)
             addAdvice(oAdvice);
         else
             addAdviceOriginal(advice);
     }
 
-    public void addAdvice(PipelineAdviceRecord advice) {
+    public void addAdvice(PipelineAspectDetail advice) {
 
         if ( advice.getDataFlowDirection() == DataFlowDirection.REQUEST ) {
             if ( advice.getMethodDisposition() == MethodDisposition.PREEXECUTION ) {
@@ -66,7 +63,7 @@ public class XformTransactionData extends TransactionData {
         }
     }
 
-    public void addAdvice(SolutionAdviceRecord advice) {
+    public void addAdvice(SolutionAspectDetail advice) {
 
         currentSolutionAdvice = pipelineAdvice.getSolutionAdvice(advice);
 
@@ -78,7 +75,7 @@ public class XformTransactionData extends TransactionData {
         }
     }
 
-    public void addAdvice(OperationAdviceRecord advice) {
+    public void addAdvice(OperationAspectDetail advice) {
 
         if ( advice.getMethodDisposition() == MethodDisposition.POSTEXECUTION) {
             OperationAdvice operationTransformAdvice = new OperationAdvice(advice.getClassName(), advice.getName());
@@ -93,7 +90,7 @@ public class XformTransactionData extends TransactionData {
         }
     }
 
-    public void addAdviceOriginal(XformAdviceRecord advice) {
+    public void addAdviceOriginal(XformAspectDetail advice) {
 
 //        if ( AdviceUtil.isPipelineAdvice(advice.className()) ) {
 //            if ( advice.dataFlowDirection() == DataFlowDirection.REQUEST ) {

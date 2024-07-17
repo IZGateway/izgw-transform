@@ -1,7 +1,6 @@
-package gov.cdc.izgateway.transformation.logging.advice.record;
+package gov.cdc.izgateway.transformation.aspects.xformadvice;
 
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
-import gov.cdc.izgateway.transformation.logging.advice.MethodDisposition;
 import lombok.Data;
 
 /**
@@ -10,7 +9,7 @@ import lombok.Data;
  * shows the consumer the state of the transformation at the time of the advice.
  */
 @Data
-public class XformAdviceRecord {
+public abstract class XformAspectDetail {
     private String name;
     private String className;
     private String methodName;
@@ -19,10 +18,10 @@ public class XformAdviceRecord {
     private String responseMessage;
     private DataFlowDirection dataFlowDirection;
 
-    public XformAdviceRecord() {
+    public XformAspectDetail() {
     }
 
-    public XformAdviceRecord(String name, String className, String methodName, MethodDisposition methodDisposition, String requestMessage, String responseMessage, DataFlowDirection dataFlowDirection) {
+    public XformAspectDetail(String name, String className, String methodName, MethodDisposition methodDisposition, String requestMessage, String responseMessage, DataFlowDirection dataFlowDirection) {
         this.name = name;
         this.className = className;
         this.methodName = methodName;
