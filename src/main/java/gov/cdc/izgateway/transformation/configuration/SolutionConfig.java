@@ -15,6 +15,7 @@ public class SolutionConfig {
     private String name;
     private String description;
     private String version;
+    private Boolean active;
     private List<SolutionOperationsConfig> requestOperations;
     private List<SolutionOperationsConfig> responseOperations;
 }
