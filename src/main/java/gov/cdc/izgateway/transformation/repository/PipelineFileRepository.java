@@ -1,23 +1,23 @@
 package gov.cdc.izgateway.transformation.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import gov.cdc.izgateway.transformation.model.Organization;
+import gov.cdc.izgateway.transformation.model.Pipeline;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.LinkedHashSet;
 
-@Repository
-public class OrganizationFileRepository extends GenericFileRepository<Organization> {
 
-    @Value("${transformationservice.configurations.organizations}")
+@Repository
+public class PipelineFileRepository extends GenericFileRepository<Pipeline> {
+
+    @Value("${transformationservice.configurations.pipelines}")
     protected void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
-
     @Override
-    protected TypeReference<LinkedHashSet<Organization>> getTypeReference() {
+    protected TypeReference<LinkedHashSet<Pipeline>> getTypeReference() {
         return new TypeReference<>() {};
     }
 }

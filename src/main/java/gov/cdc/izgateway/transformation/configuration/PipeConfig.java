@@ -12,8 +12,9 @@ import java.util.UUID;
 @Getter
 @Setter
 public class PipeConfig {
+    private UUID id;
     private List<Precondition> preconditions;
     private UUID solutionId;
     private String solutionName;
-    private String version;
+    private String solutionVersion;
 }

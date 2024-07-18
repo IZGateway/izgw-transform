@@ -1,7 +1,11 @@
 transformationservice:
+  allow-delete-via-api: false
   destination: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
   configurations:
-    main: pipelines_test_preconditions.json
+    main: all_preconditions_all_operations.json
+    organizations: src/main/resources/organizations.json
+    pipelines: src/main/resources/pipelines.json
+    solutions: src/main/resources/solutions.json
 
 spring:
   autoconfigure:
@@ -49,8 +53,11 @@ springdoc:
     path: /swagger/ui.html
   api-docs:
     path: /swagger/api-docs
+  paths-to-match: /api/**
 
 server:
+  error:
+    include-message: always
   hostname: ${TS_SERVER_HOSTNAME:dev.izgateway.org}
   protocol: https
   port: ${TS_SERVER_PORT:444}
@@ -150,6 +157,3 @@ logging:
             net:
               NioChannel:
                 handshake: DEBUG
-transformation:
-  organization-file-path: /data/organizations.json
-
