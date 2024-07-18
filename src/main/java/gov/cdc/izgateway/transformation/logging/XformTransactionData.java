@@ -5,7 +5,6 @@ import gov.cdc.izgateway.logging.event.TransactionData;
 import gov.cdc.izgateway.logging.markers.MarkerObjectFieldName;
 import gov.cdc.izgateway.logging.markers.Markers2;
 import gov.cdc.izgateway.transformation.aspects.xformadvice.*;
-import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.logging.advice.*;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +20,8 @@ public class XformTransactionData extends TransactionData {
     // TODO Add @JsonIgnore as we don't with these to be wrriten to the log!!! PHI!
     private ArrayList<XformAspectDetail> xformAdviceList = new ArrayList<>();
 
-    private PipelineAdvice pipelineAdvice = null;
-    private SolutionAdvice currentSolutionAdvice = null;
+    private PipelineAdvicePlus pipelineAdvicePlus = null;
+    private SolutionAdvicePlus currentSolutionAdvice = null;
 
     public XformTransactionData() {
         super();
@@ -32,63 +31,77 @@ public class XformTransactionData extends TransactionData {
         super(eventId);
     }
 
-    public void addAdvice(XformAspectDetail advice) {
+    public void addAdvice(XformAdvice advice) {
         if ( advice == null )
             return;
 
-        if ( advice instanceof PipelineAspectDetail pAdvice)
+        if ( advice instanceof PipelineAdvice pAdvice)
             addAdvice(pAdvice);
-        else if ( advice instanceof SolutionAspectDetail sAdvice)
+        else if ( advice instanceof SolutionAdvice sAdvice)
             addAdvice(sAdvice);
-        else if ( advice instanceof OperationAspectDetail oAdvice)
+        else if ( advice instanceof OperationAdvice oAdvice)
             addAdvice(oAdvice);
-        else
-            addAdviceOriginal(advice);
     }
 
-    public void addAdvice(PipelineAspectDetail advice) {
+    public void addAdvice(PipelineAdvice advice) {
 
-        if ( advice.getDataFlowDirection() == DataFlowDirection.REQUEST ) {
-            if ( advice.getMethodDisposition() == MethodDisposition.PREEXECUTION ) {
-                pipelineAdvice = new PipelineAdvice(advice.getId(), advice.getClassName(), advice.getName());
-                pipelineAdvice.setRequest(advice.getRequestMessage());
-            }
-            else
-                pipelineAdvice.setTransformedRequest(advice.getRequestMessage());
+        if ( pipelineAdvicePlus == null ) {
+            pipelineAdvicePlus = new PipelineAdvicePlus();
+            pipelineAdvicePlus.setPipelineAdvice(advice);
         } else {
-            if ( advice.getMethodDisposition() == MethodDisposition.PREEXECUTION )
-                pipelineAdvice.setResponse(advice.getResponseMessage());
-            else
-                pipelineAdvice.setTransformedResponse(advice.getResponseMessage());
+            if ( advice.getTransformedRequest() != null)
+                pipelineAdvicePlus.getPipelineAdvice().setTransformedRequest(advice.getTransformedRequest());
+            if ( advice.getResponse() != null )
+                pipelineAdvicePlus.getPipelineAdvice().setResponse(advice.getResponse());
+            if ( advice.getTransformedResponse() != null )
+                pipelineAdvicePlus.getPipelineAdvice().setTransformedResponse(advice.getTransformedResponse());
         }
+
     }
 
-    public void addAdvice(SolutionAspectDetail advice) {
+    public void addAdvice(SolutionAdvice advice) {
 
-        currentSolutionAdvice = pipelineAdvice.getSolutionAdvice(advice);
+        currentSolutionAdvice = pipelineAdvicePlus.getSolutionAdvice(advice);
 
-        if ( advice.getMethodDisposition() == MethodDisposition.POSTEXECUTION && advice.isHasTransformed() ) {
-            if ( advice.getDataFlowDirection() == DataFlowDirection.REQUEST )
-                currentSolutionAdvice.setTransformedRequest(advice.getRequestMessage());
-            else
-                currentSolutionAdvice.setTransformedResponse(advice.getResponseMessage());
-        }
+        if ( advice.getTransformedRequest() != null )
+            currentSolutionAdvice.setTransformedRequest(advice.getTransformedRequest());
+        if ( advice.getTransformedResponse() != null )
+            currentSolutionAdvice.setTransformedResponse(advice.getTransformedResponse());
     }
 
-    public void addAdvice(OperationAspectDetail advice) {
+    public void addAdvice(OperationAdvice advice) {
+        if ( advice.getTransformedRequest() != null )
+            currentSolutionAdvice.addRequestOperationAdvice(advice);
+        if ( advice.getTransformedResponse() != null )
+            currentSolutionAdvice.addResponseOperationAdvice(advice);
 
-        if ( advice.getMethodDisposition() == MethodDisposition.POSTEXECUTION) {
-            OperationAdvice operationTransformAdvice = new OperationAdvice(advice.getClassName(), advice.getName());
-            if ( advice.getDataFlowDirection() == DataFlowDirection.REQUEST ) {
-                operationTransformAdvice.setTransformedRequest(advice.getRequestMessage());
-                currentSolutionAdvice.addRequestOperationAdvice(operationTransformAdvice);
-            }
-            else {
-                operationTransformAdvice.setTransformedResponse(advice.getResponseMessage());
-                currentSolutionAdvice.addResponseOperationAdvice(operationTransformAdvice);
-            }
-        }
+//        if ( advice.getMethodDisposition() == MethodDisposition.POSTEXECUTION) {
+//            OperationAdvice operationTransformAdvice = new OperationAdvice(advice.getClassName(), advice.getName());
+//            if ( advice.getDataFlowDirection() == DataFlowDirection.REQUEST ) {
+//                operationTransformAdvice.setTransformedRequest(advice.getRequestMessage());
+//                currentSolutionAdvice.addRequestOperationAdvice(operationTransformAdvice);
+//            }
+//            else {
+//                operationTransformAdvice.setTransformedResponse(advice.getResponseMessage());
+//                currentSolutionAdvice.addResponseOperationAdvice(operationTransformAdvice);
+//            }
+//        }
     }
+
+//    public void addAdviceOriginal(OperationAspectDetail advice) {
+//
+//        if ( advice.getMethodDisposition() == MethodDisposition.POSTEXECUTION) {
+//            OperationAdvice operationTransformAdvice = new OperationAdvice(advice.getClassName(), advice.getName());
+//            if ( advice.getDataFlowDirection() == DataFlowDirection.REQUEST ) {
+//                operationTransformAdvice.setTransformedRequest(advice.getRequestMessage());
+//                currentSolutionAdvice.addRequestOperationAdvice(operationTransformAdvice);
+//            }
+//            else {
+//                operationTransformAdvice.setTransformedResponse(advice.getResponseMessage());
+//                currentSolutionAdvice.addResponseOperationAdvice(operationTransformAdvice);
+//            }
+//        }
+//    }
 
     public void addAdviceOriginal(XformAspectDetail advice) {
 

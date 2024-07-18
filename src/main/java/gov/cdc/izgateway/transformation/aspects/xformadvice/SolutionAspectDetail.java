@@ -9,7 +9,7 @@ public class SolutionAspectDetail extends XformAspectDetail {
     private final boolean hasTransformed;
 
     public SolutionAspectDetail(String id, boolean hasTransformed, String name, String className, String methodName, MethodDisposition methodDisposition, String requestMessage, String responseMessage, DataFlowDirection dataFlowDirection) {
-        super(name, className, methodName, methodDisposition, requestMessage, responseMessage, dataFlowDirection);
+        //super(name, className, methodName, methodDisposition, requestMessage, responseMessage, dataFlowDirection);
         this.id = id;
         this.hasTransformed = hasTransformed;
     }
