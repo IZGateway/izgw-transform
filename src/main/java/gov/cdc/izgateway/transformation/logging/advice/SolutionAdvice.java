@@ -5,17 +5,21 @@ import lombok.Data;
 import java.util.ArrayList;
 
 @Data
-public class SolutionAdvice extends XformAdvice {
-    private String id;
-
-    public SolutionAdvice() {
-    }
+public class SolutionAdvice extends SolutionAdviceDTO {
+    private final ArrayList<OperationAdviceDTO> requestOperationAdviceList = new ArrayList<>();
+    private final ArrayList<OperationAdviceDTO> responseOperationAdviceList = new ArrayList<>();
 
     public SolutionAdvice(String id, String className, String name) {
-        super(className, name);
-        this.id = id;
+        super(id, className, name);
     }
 
+    public void addRequestOperationAdvice(OperationAdviceDTO operationAdvice) {
+        requestOperationAdviceList.add(operationAdvice);
+    }
+
+    public void addResponseOperationAdvice(OperationAdviceDTO operationAdvice) {
+        responseOperationAdviceList.add(operationAdvice);
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -24,11 +28,6 @@ public class SolutionAdvice extends XformAdvice {
         }
 
         return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.getId().hashCode();
     }
 
 }

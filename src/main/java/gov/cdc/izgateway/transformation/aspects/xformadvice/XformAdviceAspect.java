@@ -73,29 +73,29 @@ public class XformAdviceAspect {
 //
 //    }
 
-    private PipelineAdvice createPipelineAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
-        PipelineAdvice pipelineAdvice = new PipelineAdvice();
+    private PipelineAdviceDTO createPipelineAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
+        PipelineAdviceDTO pipelineAdvice = new PipelineAdviceDTO();
 
         extractCommonAttributes(pipelineAdvice, joinPoint, context, methodDisposition);
 
         return pipelineAdvice;
     }
 
-    private SolutionAdvice createSolutionAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
-        SolutionAdvice solutionAdvice = new SolutionAdvice();
+    private SolutionAdviceDTO createSolutionAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
+        SolutionAdviceDTO solutionAdvice = new SolutionAdviceDTO();
 
         extractCommonAttributes(solutionAdvice, joinPoint, context, methodDisposition);
 
         return solutionAdvice;
     }
 
-    private OperationAdvice createOperationAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
+    private OperationAdviceDTO createOperationAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
         // We only care about post execution for OperationAdvice
         if ( methodDisposition != MethodDisposition.POSTEXECUTION ) {
             return null;
         }
 
-        OperationAdvice operationAdvice = new OperationAdvice();
+        OperationAdviceDTO operationAdvice = new OperationAdviceDTO();
 
         extractCommonAttributes(operationAdvice, joinPoint, context, methodDisposition);
 
@@ -122,9 +122,9 @@ public class XformAdviceAspect {
             updateResponseMessage(joinPoint, context, methodDisposition, hasTransformed, xformAdvice);
         }
 
-        if ( xformAdvice instanceof PipelineAdvice pipelineAdvice ) {
+        if ( xformAdvice instanceof PipelineAdviceDTO pipelineAdvice ) {
             pipelineAdvice.setId(descriptorId);
-        } else if ( xformAdvice instanceof SolutionAdvice solutionAdvice ) {
+        } else if ( xformAdvice instanceof SolutionAdviceDTO solutionAdvice ) {
             solutionAdvice.setId(descriptorId);
         }
     }
@@ -251,44 +251,3 @@ public class XformAdviceAspect {
     }
 
 }
-/*
-private XformAspectDetail createSolutionAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
-    AdviceAttributes attributes = extractCommonAttributes(joinPoint, context, methodDisposition);
-    return new SolutionAspectDetail(
-            attributes.getDescriptorId(),
-            attributes.isHasTransformed(),
-            attributes.getDescriptor(),
-            joinPoint.getTarget().getClass().getSimpleName(),
-            joinPoint.getSignature().getName(),
-            methodDisposition,
-            attributes.getRequest(),
-            attributes.getResponse(),
-            context.getCurrentDirection());
-}
-
-private OperationAspectDetail createOperationAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
-    AdviceAttributes attributes = extractCommonAttributes(joinPoint, context, methodDisposition);
-    return new OperationAspectDetail(
-            attributes.isHasTransformed(),
-            attributes.getDescriptor(),
-            joinPoint.getTarget().getClass().getSimpleName(),
-            joinPoint.getSignature().getName(),
-            methodDisposition,
-            attributes.getRequest(),
-            attributes.getResponse(),
-            context.getCurrentDirection());
-}
-
-private PipelineAspectDetail createPipelineAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
-    AdviceAttributes attributes = extractCommonAttributes(joinPoint, context, methodDisposition);
-    return new PipelineAspectDetail(
-            attributes.getDescriptorId(),
-            attributes.getDescriptor(),
-            joinPoint.getTarget().getClass().getSimpleName(),
-            joinPoint.getSignature().getName(),
-            methodDisposition,
-            attributes.getRequest(),
-            attributes.getResponse(),
-            context.getCurrentDirection());
-}
- */

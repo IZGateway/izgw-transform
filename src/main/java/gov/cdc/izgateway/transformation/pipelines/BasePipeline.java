@@ -43,10 +43,5 @@ abstract class BasePipeline implements Pipeline, Advisable {
         return true;
     }
 
-    @Override
-    public boolean preconditionPassed() {
-        return true;
-    }
-
     public abstract void executeThisPipeline(ServiceContext context) throws HL7Exception;
 }
