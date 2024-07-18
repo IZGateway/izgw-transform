@@ -6,6 +6,7 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.logging.advice.*;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
@@ -49,35 +50,36 @@ public class XformAdviceAspect {
     }
 
     private void populateAdvice(XformAdviceDTO xformAdvice, ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
-        String descriptor = "Unknown";
-        String descriptorId = "Unknown";
+        String name = "Unknown";
+        String id = "Unknown";
         boolean hasTransformed = false;
 
         Object targetObject = joinPoint.getTarget();
         if (targetObject instanceof Advisable advisable) {
-            descriptor = advisable.getName();
-            descriptorId = advisable.getId();
+            name = advisable.getName();
+            id = advisable.getId();
             hasTransformed = advisable.hasTransformed();
         }
 
         xformAdvice.setClassName(joinPoint.getTarget().getClass().getSimpleName());
-        xformAdvice.setName(descriptor);
+        xformAdvice.setName(name);
         if ( context.getCurrentDirection() == DataFlowDirection.REQUEST ) {
             updateRequestMessage(joinPoint, context, methodDisposition, hasTransformed, xformAdvice);
         } else {
             updateResponseMessage(joinPoint, context, methodDisposition, hasTransformed, xformAdvice);
         }
 
+        // TODO There may be some refactoring Austin and Paul are working on that may include an "Id" for an Operation which means
+        // we could get away with a single XformAdvice object with no class needed to extend it.
         if ( xformAdvice instanceof PipelineAdviceDTO pipelineAdvice ) {
-            pipelineAdvice.setId(descriptorId);
+            pipelineAdvice.setId(id);
         } else if ( xformAdvice instanceof SolutionAdviceDTO solutionAdvice ) {
-            solutionAdvice.setId(descriptorId);
+            solutionAdvice.setId(id);
         }
     }
 
     private void updateRequestMessage(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
-        if ( AdviceUtil.isPipelineAdvice(joinPoint.getTarget().getClass().getSimpleName()) &&
-                methodDisposition == MethodDisposition.PREEXECUTION ) {
+        if ( advice instanceof PipelineAdviceDTO && methodDisposition == MethodDisposition.PREEXECUTION) {
             advice.setRequest(context.getRequestMessage().encode());
         } else if ( methodDisposition == MethodDisposition.POSTEXECUTION && hasTransformed) {
             advice.setTransformedRequest(context.getRequestMessage().encode());
@@ -87,8 +89,7 @@ public class XformAdviceAspect {
     private void updateResponseMessage(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
         Message responseMessage = context.getResponseMessage();
 
-        if ( AdviceUtil.isPipelineAdvice(joinPoint.getTarget().getClass().getSimpleName()) &&
-                methodDisposition == MethodDisposition.PREEXECUTION ) {
+        if ( advice instanceof PipelineAdviceDTO && methodDisposition == MethodDisposition.PREEXECUTION ) {
             advice.setResponse(responseMessage == null ? null : responseMessage.encode());
         } else if ( methodDisposition == MethodDisposition.POSTEXECUTION && hasTransformed) {
             advice.setTransformedResponse(responseMessage == null ? null : responseMessage.encode());
