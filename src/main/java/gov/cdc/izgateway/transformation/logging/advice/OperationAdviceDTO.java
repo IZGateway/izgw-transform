@@ -3,7 +3,7 @@ package gov.cdc.izgateway.transformation.logging.advice;
 import lombok.Data;
 
 @Data
-public class OperationAdviceDTO extends XformAdvice {
+public class OperationAdviceDTO extends XformAdviceDTO {
     public OperationAdviceDTO() {
     }
 
