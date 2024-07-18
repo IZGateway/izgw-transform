@@ -5,10 +5,13 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 public class Exists implements Precondition {
 
+    private UUID id;
     private String dataPath;
 
     protected Exists() {}

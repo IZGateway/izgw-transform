@@ -1,15 +1,15 @@
 package gov.cdc.izgateway.transformation.services;
 
-import gov.cdc.izgateway.transformation.model.Organization;
+import gov.cdc.izgateway.transformation.model.Solution;
 import gov.cdc.izgateway.transformation.repository.TxFormRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrganizationService  extends GenericService<Organization> {
+public class SolutionService extends GenericService<Solution> {
     @Autowired
-    public OrganizationService(TxFormRepository<Organization> repo) {
+    public SolutionService(TxFormRepository<Solution> repo) {
         super(repo);
     }
-}
 
+}
