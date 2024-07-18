@@ -126,11 +126,6 @@ abstract class BasePipe implements Pipe, Advisable {
         return false;
     }
 
-    @Override
-    public boolean preconditionPassed() {
-        return preconditionPassed;
-    }
-
     private void executeNextPipe(ServiceContext context) throws HL7Exception {
         if (next != null) {
             next.execute(context);

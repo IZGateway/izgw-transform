@@ -53,9 +53,4 @@ abstract class BaseOperation<T> implements Operation, Advisable {
     public boolean hasTransformed() {
         return true;
     }
-
-    @Override
-    public boolean preconditionPassed() {
-        return true;
-    }
 }
