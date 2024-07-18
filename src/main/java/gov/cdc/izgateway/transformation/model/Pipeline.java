@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class Pipeline {
+public class Pipeline implements BaseModel {
 
     @NotBlank(message = "Pipeline name is required")
     private String name;

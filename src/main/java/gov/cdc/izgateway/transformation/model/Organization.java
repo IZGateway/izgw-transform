@@ -1,24 +1,19 @@
 package gov.cdc.izgateway.transformation.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.UUID;
 
 @Getter
 @Setter
-public class Organization {
-    private String organizationName;
-    private UUID organizationId;
+public class Organization implements BaseModel {
+    @NotBlank(message = "Organization name is required")
+    private String name;
+    @NotNull(message = "Organization ID is required")
+    private UUID id;
+    @NotNull(message = "Organization active status is required")
     private Boolean active;
-
-    public Organization(){
-
-    }
-    public Organization(UUID id, String name, Boolean active){
-        this.organizationId = id;
-        this.organizationName = name;
-        this.active = active;
-    }
-
 }
 
