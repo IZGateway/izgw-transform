@@ -2,15 +2,13 @@ package gov.cdc.izgateway.transformation.logging.advice;
 
 import lombok.Data;
 
-import java.util.ArrayList;
-
 @Data
-public class XformAdvice {
+public class XformAdviceDTO {
 
-    public XformAdvice() {
+    public XformAdviceDTO() {
     }
 
-    public XformAdvice(String className, String name) {
+    public XformAdviceDTO(String className, String name) {
         this.className = className;
         this.name = name;
     }

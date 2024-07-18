@@ -26,7 +26,7 @@ public class XformTransactionData extends TransactionData {
         super(eventId);
     }
 
-    public void addAdvice(XformAdvice advice) {
+    public void addAdvice(XformAdviceDTO advice) {
         if ( advice == null )
             return;
 
