@@ -1,9 +1,11 @@
 package gov.cdc.izgateway.transformation.operations;
 
 import ca.uhn.hl7v2.HL7Exception;
+import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 
-abstract class BaseOperation<T> implements Operation {
+abstract class BaseOperation<T> implements Operation, Advisable {
 
     Operation nextOperation;
     T operationConfig;
@@ -23,6 +25,7 @@ abstract class BaseOperation<T> implements Operation {
     }
 
     @Override
+    @CaptureXformAdvice
     public final void execute(ServiceContext context) throws HL7Exception {
         thisOperation(context);
         nextOperation(context);
@@ -36,4 +39,18 @@ abstract class BaseOperation<T> implements Operation {
         }
     }
 
+    @Override
+    public String getName() {
+        return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public String getId() {
+        return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean hasTransformed() {
+        return true;
+    }
 }

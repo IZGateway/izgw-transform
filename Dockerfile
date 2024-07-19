@@ -31,6 +31,7 @@ RUN echo 'cache-size=10000' > /etc/dnsmasq.conf
 
 # Set working directory
 WORKDIR /usr/share/izg-transform
+COPY docker/data/lib/*.jar lib/
 
 # Add izgw-transform jar file
 ADD target/$JAR_FILENAME app.jar

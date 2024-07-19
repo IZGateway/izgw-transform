@@ -1,8 +1,6 @@
 package gov.cdc.izgateway.transformation.endpoints.hub;
 
 import ca.uhn.hl7v2.HL7Exception;
-import gov.cdc.izgateway.logging.RequestContext;
-import gov.cdc.izgateway.logging.event.TransactionData;
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.security.AccessControlRegistry;
@@ -78,6 +76,13 @@ public class HubController extends SoapControllerBase {
 
         producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
 
+        try {
+            context.getSubmitSingleMessageResponse().setHl7Message(serviceContext.getResponseMessage().encode());
+        }
+        catch (HL7Exception e) {
+            throw new HubControllerFault(e.getMessage());
+        }
+
         return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
     }
 
@@ -137,13 +142,6 @@ public class HubController extends SoapControllerBase {
     )
     @Override
     public ResponseEntity<?> submitSoapRequest(@RequestBody SoapMessage soapMessage, @Schema(description = "Throws the fault specified in the header parameter") @RequestHeader(value = "X-IIS-Hub-Dev-Action",required = false) String devAction) {
-        // TODO: Paul - this is temporary until I have a better understanding of this
-        // Need to understand what we need to log and any other cross-cutting concerns
-        // May be able to reuse the EventId class in core
-        // We may want a new "thing" other TransactionData
-
-        TransactionData t = new TransactionData("TODO: A Real EVENTID");
-        RequestContext.setTransactionData(t);
 
         return super.submitSoapRequest(soapMessage, devAction);
     }
