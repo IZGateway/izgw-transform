@@ -34,7 +34,7 @@ cat /tmp/newresolv.conf > /etc/resolv.conf
 #Start dnsmasq as root
 dnsmasq  --use-stale-cache=0 --log-queries=extra --user=root --log-facility=/var/log/dnsmasq.log
 
-java $JAVA_OPTS $JAVA_TOOL_OPTS \
+java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar \
    -Xms4g \
    -Xmx8g \
    -Djava.library.path=lib \

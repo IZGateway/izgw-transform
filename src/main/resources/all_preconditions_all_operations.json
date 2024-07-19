@@ -9,8 +9,8 @@
           "id": "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
           "name": "HL7v2 to IZ Gateway hub",
           "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
-          "inboundEndpoint": "TS IZGHub WSDL Listener",
-          "outboundEndpoint": "IZG Hub",
+          "inboundEndpoint": "izgts:IISHubService",
+          "outboundEndpoint": "izghub:IISHubService",
           "description": "Pipeline to call all implemented Preconditions and Operations",
           "active": true,
           "pipes": [
@@ -144,7 +144,19 @@
           ]
         }
       ],
-      "responseOperations": []
+      "responseOperations": [
+        {
+          "preconditions": [
+          ],
+          "operationList": [
+            {
+              "method": "set",
+              "destinationField": "/MSH-7-1",
+              "setValue": "MSH 7 NEW VALUE"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "8abc8887-1cab-4a96-98ea-29f8f6c977d5",
