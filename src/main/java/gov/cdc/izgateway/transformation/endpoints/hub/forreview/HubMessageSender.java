@@ -58,6 +58,7 @@ public class HubMessageSender extends MessageSender {
                 retryCount++;
                 // TODO Paul checkRetries(dest, status, retryCount, f);
                 // Log the fault and try again.
+                throw f;
             }
         }
 
