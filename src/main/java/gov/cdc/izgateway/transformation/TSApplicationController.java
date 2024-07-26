@@ -3,6 +3,7 @@ package gov.cdc.izgateway.transformation;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.pipelines.DataPipeline;
 import gov.cdc.izgateway.transformation.pipelines.PipelineBuilder;
 import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
@@ -22,10 +23,13 @@ public class TSApplicationController {
 
     private final PipelineBuilder pipelineBuilder;
     private final ServiceConfig serviceConfig;
+    private final DataPipeline dataPipeline;
+
     @Autowired
-    public TSApplicationController(ServiceConfig serviceConfig, PipelineBuilder pipelineBuilder) {
+    public TSApplicationController(ServiceConfig serviceConfig, PipelineBuilder pipelineBuilder, DataPipeline dataPipeline) {
         this.serviceConfig = serviceConfig;
         this.pipelineBuilder = pipelineBuilder;
+        this.dataPipeline = dataPipeline;
     }
 
     @GetMapping("/hello")
@@ -50,6 +54,10 @@ public class TSApplicationController {
 
             Hl7Pipeline pipeline = pipelineBuilder.build(context);
             pipeline.execute(context);
+
+            // NEW STUFF
+            dataPipeline.execute(context);
+            // END NEW STUFF
 
             // At this point request message has been transformed, we need to send it and deal with the response
             Message responseMessage = MllpSender.send("localhost", 21110, context.getRequestMessage());

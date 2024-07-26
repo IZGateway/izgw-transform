@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public abstract class GenericService<T extends BaseModel> implements TxFormService<T> {
 
-    private final TxFormRepository<T> repo;
+    protected final TxFormRepository<T> repo;
 
     protected GenericService(TxFormRepository<T> repo){
         this.repo = repo;
