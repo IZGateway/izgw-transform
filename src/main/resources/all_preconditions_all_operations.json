@@ -151,8 +151,8 @@
           "operationList": [
             {
               "method": "set",
-              "destinationField": "/MSH-7-1",
-              "setValue": "MSH 7 NEW VALUE"
+              "destinationField": "/MSH-8",
+              "setValue": "MSH 8 NEW VALUE"
             }
           ]
         }

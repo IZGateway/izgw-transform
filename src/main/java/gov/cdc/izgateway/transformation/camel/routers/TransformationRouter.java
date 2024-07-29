@@ -53,9 +53,9 @@ public class TransformationRouter extends RouteBuilder {
         .to("izghub:IISHubService")
         .bean(hl7TransformerService);
 
-    from("file:/Users/cahilp/temp/hl7?noop=true")
+    from("file:" + System.getProperty("user.home") + "/temp/hl7?noop=true")
       .to("direct:izghubTransformerPipeline")
-      .to("file:/Users/cahilp/temp/hl7/processed?fileName=${date:now:yyyyMMddHHmmssSSS}.txt");
+      .to("file:" + System.getProperty("user.home") + "/temp/hl7/processed?fileName=${date:now:yyyyMMddHHmmssSSS}.txt");
 
     /* This would be cool */
     /*

@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,7 +20,7 @@ public class ServiceConfig {
     public OrganizationConfig getOrganizationConfig(ServiceContext context) {
         return getOrganizations()
                 .stream()
-                .filter(org -> org.getOrganizationId().equals(context.getOrganizationId()))
+                .filter(org -> Objects.equals(org.getOrganizationId(), context.getOrganizationId()))
                 .reduce((a, b) -> {
                     throw new IllegalStateException("More than one OrganizationConfig found for id " + context.getOrganizationId());
                 }).orElse(null);
@@ -29,8 +30,8 @@ public class ServiceConfig {
         return getOrganizationConfig(context).getPipelines()
                 .stream()
                 .filter(
-                        pl -> pl.getInboundEndpoint().equals(context.getInboundEndpoint()) &&
-                                pl.getOutboundEndpoint().equals(context.getOutboundEndpoint())
+                        pl -> Objects.equals(pl.getInboundEndpoint(), context.getInboundEndpoint()) &&
+                        	  Objects.equals(pl.getOutboundEndpoint(),context.getOutboundEndpoint())
                 )
                 .reduce((a, b) -> {
                     throw new IllegalStateException(String.format("More than one PipelineConfig found for Organization ID '%s', Inbound Endpoint '%s', and Outbound Endpoint '%s'",
@@ -42,7 +43,7 @@ public class ServiceConfig {
 
     public Optional<SolutionConfig> getSolutionConfigById(UUID solutionId) {
         return getSolutions().stream()
-                .filter(sc -> sc.getId().equals(solutionId))
+                .filter(sc -> Objects.equals(sc.getId(), solutionId))
                 .findFirst();
     }
 }

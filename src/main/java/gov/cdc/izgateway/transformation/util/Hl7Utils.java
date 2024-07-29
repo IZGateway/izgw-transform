@@ -20,8 +20,6 @@ public class Hl7Utils {
             rawHl7Message = rawHl7Message.replace("\n", "\r");
             context.setValidationContext(new NoValidation());
             parser = context.getPipeParser();
-        } catch (IOException e) {
-            throw new HL7Exception(e);
         }
 
         return parser.parse(rawHl7Message);

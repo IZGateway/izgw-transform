@@ -21,6 +21,11 @@ public class Hl7v2Equals extends Equals implements Precondition {
     public boolean evaluate(ServiceContext context) {
 
         Message message = context.getCurrentMessage();
+        // TODO: If IZGW returns a fault message, message will be null.
+        // We need to figure out how to handle that
+        if (message == null) {
+        	return false;
+        }
         Terser terser = new Terser(message);
 
         String sourceValue;

@@ -10,6 +10,7 @@ import gov.cdc.izgateway.soap.SoapControllerBase;
 import gov.cdc.izgateway.soap.fault.Fault;
 import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
+import gov.cdc.izgateway.soap.message.FaultMessage;
 import gov.cdc.izgateway.soap.message.HasCredentials;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
@@ -74,10 +75,24 @@ public class HubController extends SoapControllerBase {
 
         HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
 
-        producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
-
+    	producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
+    	
         try {
-            context.getSubmitSingleMessageResponse().setHl7Message(serviceContext.getResponseMessage().encode());
+        	if (context.hasFault()) {
+        		FaultMessage faultMessage = context.getFaultMessage();
+        		Throwable t = faultMessage.getFault();
+        		if (t instanceof Fault fault) {
+        			return new ResponseEntity<>(
+        				faultMessage,
+        				fault.getRetry().getStatus());
+        		} else {
+        			return new ResponseEntity<>(
+            				faultMessage,
+            				HttpStatus.INTERNAL_SERVER_ERROR);
+        		}
+        	} else {
+        		context.getSubmitSingleMessageResponse().setHl7Message(serviceContext.getResponseMessage().encode());
+        	}
         }
         catch (HL7Exception e) {
             throw new HubControllerFault(e.getMessage());
