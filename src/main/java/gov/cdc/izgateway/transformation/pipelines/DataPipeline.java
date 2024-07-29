@@ -6,6 +6,7 @@ import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.model.Pipe;
 import gov.cdc.izgateway.transformation.model.Pipeline;
 import gov.cdc.izgateway.transformation.model.Solution;
+import gov.cdc.izgateway.transformation.solutions.SolutionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,11 +34,13 @@ public class DataPipeline implements Advisable {
             log.trace(String.format("Executing Pipe: %s", pipe.getId()));
 
             // Create Solution
-            Solution sln = txServiceConfig.getSolution(pipe.getSolutionId());
+            Solution solutionModel = txServiceConfig.getSolution(pipe.getSolutionId());
+
+            SolutionService solutionService = new SolutionService(solutionModel, context.getDataType());
 
             // Create SolutionService (or somethign) similar to gov.cdc.izgateway.transformation.solutions.Solution?
 
-            log.trace(String.format("Solution Name: %s", sln.getSolutionName()));
+            log.trace(String.format("Solution Name: %s", solutionModel.getSolutionName()));
 
         }
     }

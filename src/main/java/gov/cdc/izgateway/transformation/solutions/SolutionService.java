@@ -1,8 +1,12 @@
 package gov.cdc.izgateway.transformation.solutions;
 
 // To repalce Solution as we refactor to pull from different files.
+// TODO - rename this ugh
 
-import gov.cdc.izgateway.transformation.configuration.SolutionOperationsConfig;
+import ca.uhn.hl7v2.HL7Exception;
+import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
+import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.model.Solution;
 import gov.cdc.izgateway.transformation.model.SolutionOperation;
 
@@ -11,16 +15,25 @@ import java.util.List;
 
 public class SolutionService {
 
-    private final Solution configuration;
-    private final List<SolutionOperation> requestOperations;
+    private final List<SolutionOperationService> requestOperations;
 
-    public SolutionService(Solution configuration) {
-        this.configuration = configuration;
+    public SolutionService(Solution configuration, DataType dataType) {
         requestOperations = new ArrayList<>();
 
         for (SolutionOperation so : configuration.getRequestOperations()) {
-            // TODO going to have to build a new SolutionOperation object for refactor.
+            requestOperations.add(new SolutionOperationService(so, dataType));
         }
 
+    }
+
+    // TODO finish implementation by looking at Solution.java
+    // TODO - add Advice logging
+
+    public void execute(ServiceContext context) throws HL7Exception {
+        if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
+            for (SolutionOperationService so : requestOperations) {
+                //so.execute(context);
+            }
+        }
     }
 }
