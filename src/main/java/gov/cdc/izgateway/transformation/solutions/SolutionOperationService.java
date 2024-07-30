@@ -10,14 +10,34 @@ import gov.cdc.izgateway.transformation.operations.Hl7v2CopyOperation;
 import gov.cdc.izgateway.transformation.operations.Hl7v2RegexReplaceOperation;
 import gov.cdc.izgateway.transformation.operations.Hl7v2SaveStateOperation;
 import gov.cdc.izgateway.transformation.operations.Hl7v2SetOperation;
+import gov.cdc.izgateway.transformation.preconditions.*;
 
-// TODO - need to finish implementation (preconditions)
+import java.util.ArrayList;
+import java.util.List;
+
+// TODO - Rename?  Not sure this is a "service"
 
 public class SolutionOperationService {
     private final Hl7v2OperationChain operations;
+    private final List<Precondition> preconditions;
 
     public SolutionOperationService(SolutionOperation solutionOperation, DataType dataType) {
         operations = new Hl7v2OperationChain();
+        preconditions = new ArrayList<>();
+
+        for (Precondition precondition : solutionOperation.getPreconditions()) {
+            if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(Equals.class)) {
+                preconditions.add(new Hl7v2Equals((Equals) precondition));
+            } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(NotEquals.class)) {
+                preconditions.add(new Hl7v2NotEquals((NotEquals) precondition));
+            } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(Exists.class)) {
+                preconditions.add(new Hl7v2Exists((Exists) precondition));
+            } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(NotExists.class)) {
+                preconditions.add(new Hl7v2NotExists((NotExists) precondition));
+            } else if (dataType.equals(DataType.HL7V2) && precondition.getClass().equals(RegexMatch.class)) {
+                preconditions.add(new Hl7v2RegexMatch((RegexMatch) precondition));
+            }
+        }
 
         for (OperationConfig operationConfig : solutionOperation.getOperationList()) {
             // I hate this so much there has to be a better way
@@ -34,8 +54,17 @@ public class SolutionOperationService {
 
     }
 
+    private boolean passedPreconditions(ServiceContext context) {
+        boolean passed = true;
+
+        for (Precondition op : preconditions) {
+            passed = passed && op.evaluate(context);
+        }
+
+        return passed;
+    }
+
     public void execute(ServiceContext context) throws HL7Exception {
-        // TODO - add precondition check
-        operations.execute(context);
+        if (passedPreconditions(context)) operations.execute(context);
     }
 }

@@ -52,21 +52,16 @@ public class TSApplicationController {
                     DataType.HL7V2,
                     incomingMessage);
 
-            // TODO - remove this when refactor is done
-//            Hl7Pipeline pipeline = pipelineBuilder.build(context);
-//            pipeline.execute(context);
-
-            // NEW STUFF
+            // Execute data pipeline on Request
             dataPipeline.execute(context);
-            // END NEW STUFF
 
             // At this point request message has been transformed, we need to send it and deal with the response
             Message responseMessage = MllpSender.send("localhost", 21110, context.getRequestMessage());
             context.setCurrentDirection(DataFlowDirection.RESPONSE);
             context.setResponseMessage(responseMessage);
 
-            // TODO - remove this when refactor is done
-            //pipeline.execute(context);
+            // Execute data pipeline on Response
+            dataPipeline.execute(context);
 
             assert responseMessage != null;
             return responseMessage.encode();

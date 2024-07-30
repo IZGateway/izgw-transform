@@ -11,11 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+// TODO - rename to PipelneRunner?  Something else.
+
 @Service
 @Slf4j
 public class DataPipeline implements Advisable {
     private final TxServiceConfig txServiceConfig;
-
+    private Pipeline pipeline;
 
     @Autowired
     public DataPipeline(TxServiceConfig txServiceConfig) {
@@ -23,11 +25,12 @@ public class DataPipeline implements Advisable {
     }
 
     public void execute(ServiceContext context) throws Exception {
-        Pipeline pipeline = txServiceConfig.findPipelineByContext(context);
+        pipeline = txServiceConfig.findPipelineByContext(context);
 
-        if (pipeline == null) {
-            // TODO - Fail or log?
-            throw new Exception(String.format("Pipeline not found for Organization ID %s", context.getOrganizationId()));
+        if (pipeline != null) {
+            log.trace(String.format("Executing Pipeline (%s) '%s'", pipeline.getId(), pipeline.getPipelineName()));
+        } else {
+            log.trace("No Pipeline Found");
         }
 
         for (Pipe pipe : pipeline.getPipes()) {
@@ -47,19 +50,24 @@ public class DataPipeline implements Advisable {
 
     @Override
     public String getName() {
-        //return configuration.getPipelineName();
-        return "NAME - FIXME";
+        if (pipeline != null) {
+            return pipeline.getPipelineName();
+        } else {
+            return "No Pipeline";
+        }
     }
 
     @Override
     public String getId() {
-        //return configuration.getId().toString();
-        return "ID - FIXME";
-    }
+        if (pipeline != null) {
+            return pipeline.getId().toString();
+        } else {
+            return "No Pipeline";
+        }    }
 
     @Override
     public boolean hasTransformed() {
-        // TODO - think about this after getting more familiar w/ Advisable
+        // We won't know until we execute the pipeline.
         return false;
     }
 }
