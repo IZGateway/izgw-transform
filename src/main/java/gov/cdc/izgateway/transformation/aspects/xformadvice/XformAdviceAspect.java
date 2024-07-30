@@ -6,7 +6,6 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.logging.advice.*;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
@@ -72,9 +71,9 @@ public class XformAdviceAspect {
         xformAdvice.setName(name);
 
         if ( context.getCurrentDirection() == DataFlowDirection.REQUEST ) {
-            updateRequestMessage(joinPoint, context, methodDisposition, hasTransformed, xformAdvice);
+            updateRequestMessage(context, methodDisposition, hasTransformed, xformAdvice);
         } else {
-            updateResponseMessage(joinPoint, context, methodDisposition, hasTransformed, xformAdvice);
+            updateResponseMessage(context, methodDisposition, hasTransformed, xformAdvice);
         }
 
         // TODO There may be some refactoring Austin and Paul are working on that may include an "Id" for an Operation which means
@@ -86,7 +85,7 @@ public class XformAdviceAspect {
         }
     }
 
-    private void updateRequestMessage(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
+    private void updateRequestMessage(ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
         if ( advice instanceof PipelineAdviceDTO && methodDisposition == MethodDisposition.PREEXECUTION) {
             advice.setRequest(context.getRequestMessage().encode());
         } else if ( methodDisposition == MethodDisposition.POSTEXECUTION && hasTransformed) {
@@ -94,7 +93,7 @@ public class XformAdviceAspect {
         }
     }
 
-    private void updateResponseMessage(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
+    private void updateResponseMessage(ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
         Message responseMessage = context.getResponseMessage();
 
         if ( advice instanceof PipelineAdviceDTO && methodDisposition == MethodDisposition.PREEXECUTION ) {

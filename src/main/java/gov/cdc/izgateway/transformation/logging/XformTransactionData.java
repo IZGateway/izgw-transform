@@ -17,7 +17,8 @@ public class XformTransactionData extends TransactionData {
 
     // TODO @JsonIgnore
     private PipelineAdvice pipelineAdvice = null;
-    // TODO @JsonIgnore
+
+    @JsonIgnore
     private SolutionAdvice currentSolutionAdvice = null;
 
     public XformTransactionData() {
