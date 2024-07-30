@@ -52,8 +52,9 @@ public class TSApplicationController {
                     DataType.HL7V2,
                     incomingMessage);
 
-            Hl7Pipeline pipeline = pipelineBuilder.build(context);
-            pipeline.execute(context);
+            // TODO - remove this when refactor is done
+//            Hl7Pipeline pipeline = pipelineBuilder.build(context);
+//            pipeline.execute(context);
 
             // NEW STUFF
             dataPipeline.execute(context);
@@ -64,7 +65,8 @@ public class TSApplicationController {
             context.setCurrentDirection(DataFlowDirection.RESPONSE);
             context.setResponseMessage(responseMessage);
 
-            pipeline.execute(context);
+            // TODO - remove this when refactor is done
+            //pipeline.execute(context);
 
             assert responseMessage != null;
             return responseMessage.encode();

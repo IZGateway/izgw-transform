@@ -16,23 +16,31 @@ import java.util.List;
 public class SolutionService {
 
     private final List<SolutionOperationService> requestOperations;
+    private final List<SolutionOperationService> responseOperations;
 
     public SolutionService(Solution configuration, DataType dataType) {
         requestOperations = new ArrayList<>();
+        responseOperations = new ArrayList<>();
 
         for (SolutionOperation so : configuration.getRequestOperations()) {
             requestOperations.add(new SolutionOperationService(so, dataType));
         }
 
+        for (SolutionOperation so : configuration.getResponseOperations()) {
+            responseOperations.add(new SolutionOperationService(so, dataType));
+        }
     }
 
-    // TODO finish implementation by looking at Solution.java
     // TODO - add Advice logging
 
     public void execute(ServiceContext context) throws HL7Exception {
         if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
             for (SolutionOperationService so : requestOperations) {
-                //so.execute(context);
+                so.execute(context);
+            }
+        } else if (context.getCurrentDirection().equals(DataFlowDirection.RESPONSE)) {
+            for (SolutionOperationService so : responseOperations) {
+                so.execute(context);
             }
         }
     }

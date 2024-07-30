@@ -38,7 +38,7 @@ public class DataPipeline implements Advisable {
 
             SolutionService solutionService = new SolutionService(solutionModel, context.getDataType());
 
-            // Create SolutionService (or somethign) similar to gov.cdc.izgateway.transformation.solutions.Solution?
+            solutionService.execute(context);
 
             log.trace(String.format("Solution Name: %s", solutionModel.getSolutionName()));
 
