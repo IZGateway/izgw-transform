@@ -25,10 +25,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransformationRouter extends RouteBuilder {
 
-  //@Autowired SampleTransform3 sampleTransform;
-//  @Autowired
-//  Hl7TransformerService hl7TransformerService;
-
   @Autowired
   DataTransformerService dataTransformerService;
 
@@ -56,9 +52,9 @@ public class TransformationRouter extends RouteBuilder {
         .to("izghub:IISHubService")
         .bean(dataTransformerService);
 
-    from("file:/Users/cahilp/temp/hl7?noop=true")
-      .to("direct:izghubTransformerPipeline")
-      .to("file:/Users/cahilp/temp/hl7/processed?fileName=${date:now:yyyyMMddHHmmssSSS}.txt");
+//    from("file:/Users/cahilp/temp/hl7?noop=true")
+//      .to("direct:izghubTransformerPipeline")
+//      .to("file:/Users/cahilp/temp/hl7/processed?fileName=${date:now:yyyyMMddHHmmssSSS}.txt");
 
     /* This would be cool */
     /*

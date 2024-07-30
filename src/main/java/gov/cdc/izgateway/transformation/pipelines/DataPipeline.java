@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.transformation.pipelines;
 
+import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.configuration.TxServiceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
@@ -24,6 +25,7 @@ public class DataPipeline implements Advisable {
         this.txServiceConfig = txServiceConfig;
     }
 
+    @CaptureXformAdvice
     public void execute(ServiceContext context) throws Exception {
         pipeline = txServiceConfig.findPipelineByContext(context);
 

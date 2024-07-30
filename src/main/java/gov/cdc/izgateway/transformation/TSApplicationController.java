@@ -4,11 +4,9 @@ import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.pipelines.DataPipeline;
-import gov.cdc.izgateway.transformation.pipelines.PipelineBuilder;
 import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.mllp.MllpSender;
-import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -21,14 +19,12 @@ import java.util.logging.Level;
 @RestController
 public class TSApplicationController {
 
-    private final PipelineBuilder pipelineBuilder;
     private final ServiceConfig serviceConfig;
     private final DataPipeline dataPipeline;
 
     @Autowired
-    public TSApplicationController(ServiceConfig serviceConfig, PipelineBuilder pipelineBuilder, DataPipeline dataPipeline) {
+    public TSApplicationController(ServiceConfig serviceConfig, DataPipeline dataPipeline) {
         this.serviceConfig = serviceConfig;
-        this.pipelineBuilder = pipelineBuilder;
         this.dataPipeline = dataPipeline;
     }
 
