@@ -58,11 +58,19 @@ public class XformAdviceAspect {
         if (targetObject instanceof Advisable advisable) {
             name = advisable.getName();
             id = advisable.getId();
-            hasTransformed = advisable.hasTransformed();
+        }
+
+        if (targetObject instanceof Transformable transformable) {
+            hasTransformed = transformable.hasTransformed();
+        } else if (methodDisposition == MethodDisposition.POSTEXECUTION && xformAdvice instanceof PipelineAdviceDTO) {
+            hasTransformed = context.getCurrentDirection() == DataFlowDirection.REQUEST
+                    ? XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed()
+                    : XformAdviceCollector.getTransactionData().getPipelineAdvice().isResponseTransformed();
         }
 
         xformAdvice.setClassName(joinPoint.getTarget().getClass().getSimpleName());
         xformAdvice.setName(name);
+
         if ( context.getCurrentDirection() == DataFlowDirection.REQUEST ) {
             updateRequestMessage(joinPoint, context, methodDisposition, hasTransformed, xformAdvice);
         } else {

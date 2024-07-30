@@ -121,11 +121,6 @@ abstract class BasePipe implements Pipe, Advisable {
         return config.getSolutionId().toString();
     }
 
-    @Override
-    public boolean hasTransformed() {
-        return false;
-    }
-
     private void executeNextPipe(ServiceContext context) throws HL7Exception {
         if (next != null) {
             next.execute(context);

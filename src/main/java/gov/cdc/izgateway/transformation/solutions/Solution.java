@@ -8,6 +8,7 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
+import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.java.Log;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @Log
 @Getter
-public class Solution implements Advisable {
+public class Solution implements Advisable, Transformable {
 
     // TODO - Create SolutionOperationChain instead of list?
     private final List<SolutionOperation> requestOperations;
