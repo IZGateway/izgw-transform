@@ -19,11 +19,10 @@ public class Hl7TransformerService {
     this.pipelineBuilder = pipelineBuilder;
   }
 
-  // TODO PCAHILL ... left off where we were getting an HL7 PID not exist error - because the message we are sending has no PID
   public HubWsdlTransformationContext transform(HubWsdlTransformationContext context) throws Exception {
       try {
           String msg = context.getServiceContext().getRequestMessage().encode().replace("\r", "\n");
-          log.info("Message pre-transformation:\n\n{}", msg);
+          log.trace("Message pre-transformation:\n\n{}", msg);
       }
       catch (HL7Exception e) {
           throw new HubControllerFault(e.getMessage());
@@ -34,7 +33,7 @@ public class Hl7TransformerService {
 
       try {
           String msg = context.getServiceContext().getRequestMessage().encode().replace("\r", "\n");
-          log.info("Message post-transformation:\n\n{}", msg);
+          log.trace("Message post-transformation:\n\n{}", msg);
       }
       catch (HL7Exception e) {
           throw new HubControllerFault(e.getMessage());
@@ -42,11 +41,5 @@ public class Hl7TransformerService {
 
       return context;
   }
-
-//    // This method is just for discovery and should never be needed.
-//    public String transform(String context) throws Exception {
-//        log.info("In the second transform!!");
-//        return context + " - transformed";
-//    }
 
 }

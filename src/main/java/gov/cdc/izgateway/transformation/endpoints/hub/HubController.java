@@ -99,10 +99,6 @@ public class HubController extends SoapControllerBase {
         }
     }
 
-    // TODO implement logging
-    private void logDestination(IDestination dest) {
-    }
-
     @Override
     protected IDestination getDestination(String destinationId) throws UnknownDestinationFault {
         IDestinationId destinationIdObject = new DestinationId();
