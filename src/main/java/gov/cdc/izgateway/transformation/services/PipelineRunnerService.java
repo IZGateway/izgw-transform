@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.transformation.pipelines;
+package gov.cdc.izgateway.transformation.services;
 
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.configuration.TxServiceConfig;
@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class DataPipeline implements Advisable {
+public class PipelineRunnerService implements Advisable {
     private final TxServiceConfig txServiceConfig;
     private Pipeline pipeline;
 
     @Autowired
-    public DataPipeline(TxServiceConfig txServiceConfig) {
+    public PipelineRunnerService(TxServiceConfig txServiceConfig) {
         this.txServiceConfig = txServiceConfig;
     }
 

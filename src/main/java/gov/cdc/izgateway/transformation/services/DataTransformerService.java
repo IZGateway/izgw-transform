@@ -3,7 +3,6 @@ package gov.cdc.izgateway.transformation.services;
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubControllerFault;
-import gov.cdc.izgateway.transformation.pipelines.DataPipeline;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,11 +10,11 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class DataTransformerService {
-    private final DataPipeline dataPipeline;
+    private final PipelineRunnerService pipelineRunnerService;
 
     @Autowired
-    public DataTransformerService(DataPipeline dataPipeline) {
-        this.dataPipeline = dataPipeline;
+    public DataTransformerService(PipelineRunnerService pipelineRunnerService) {
+        this.pipelineRunnerService = pipelineRunnerService;
     }
 
     public HubWsdlTransformationContext transform(HubWsdlTransformationContext context) throws Exception {
@@ -27,7 +26,7 @@ public class DataTransformerService {
             throw new HubControllerFault(e.getMessage());
         }
 
-        dataPipeline.execute(context.getServiceContext());
+        pipelineRunnerService.execute(context.getServiceContext());
 
         try {
             String msg = context.getServiceContext().getRequestMessage().encode().replace("\r", "\n");

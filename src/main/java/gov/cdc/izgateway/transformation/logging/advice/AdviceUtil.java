@@ -2,7 +2,7 @@ package gov.cdc.izgateway.transformation.logging.advice;
 
 public class AdviceUtil {
     public static boolean isPipelineAdvice(String className) {
-        return className.equals("DataPipeline");
+        return className.equals("PipelineRunnerService");
     }
 
     public static boolean isSolutionAdvice(String className) {

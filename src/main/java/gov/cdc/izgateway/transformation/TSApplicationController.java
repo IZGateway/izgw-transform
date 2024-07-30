@@ -3,7 +3,7 @@ package gov.cdc.izgateway.transformation;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
-import gov.cdc.izgateway.transformation.pipelines.DataPipeline;
+import gov.cdc.izgateway.transformation.services.PipelineRunnerService;
 import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.mllp.MllpSender;
@@ -20,12 +20,12 @@ import java.util.logging.Level;
 public class TSApplicationController {
 
     private final ServiceConfig serviceConfig;
-    private final DataPipeline dataPipeline;
+    private final PipelineRunnerService pipelineRunnerService;
 
     @Autowired
-    public TSApplicationController(ServiceConfig serviceConfig, DataPipeline dataPipeline) {
+    public TSApplicationController(ServiceConfig serviceConfig, PipelineRunnerService pipelineRunnerService) {
         this.serviceConfig = serviceConfig;
-        this.dataPipeline = dataPipeline;
+        this.pipelineRunnerService = pipelineRunnerService;
     }
 
     @GetMapping("/hello")
@@ -49,7 +49,7 @@ public class TSApplicationController {
                     incomingMessage);
 
             // Execute data pipeline on Request
-            dataPipeline.execute(context);
+            pipelineRunnerService.execute(context);
 
             // At this point request message has been transformed, we need to send it and deal with the response
             Message responseMessage = MllpSender.send("localhost", 21110, context.getRequestMessage());
@@ -57,7 +57,7 @@ public class TSApplicationController {
             context.setResponseMessage(responseMessage);
 
             // Execute data pipeline on Response
-            dataPipeline.execute(context);
+            pipelineRunnerService.execute(context);
 
             assert responseMessage != null;
             return responseMessage.encode();
