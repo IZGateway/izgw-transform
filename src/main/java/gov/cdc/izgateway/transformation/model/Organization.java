@@ -10,7 +10,7 @@ import java.util.UUID;
 @Setter
 public class Organization implements BaseModel {
     @NotBlank(message = "Organization name is required")
-    private String name;
+    private String organizationName;
     @NotNull(message = "Organization ID is required")
     private UUID id;
     @NotNull(message = "Organization active status is required")

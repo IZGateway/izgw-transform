@@ -15,7 +15,7 @@ public class Solution implements BaseModel {
     private UUID id;
 
     @NotBlank(message = "Solution name is required")
-    private String name;
+    private String solutionName;
 
     private String description;
 

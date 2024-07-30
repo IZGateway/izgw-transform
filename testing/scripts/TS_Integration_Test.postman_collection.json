@@ -114,7 +114,7 @@
 											"",
 											"pm.test(\"created object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.pipelineName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
 											"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 											"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
@@ -147,7 +147,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentOutboundEndpoint}}\",\n    \"active\": {{currentActive}},\n    \"pipes\": []\n}",
+									"raw": "{\n    \"pipelineName\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentOutboundEndpoint}}\",\n    \"active\": {{currentActive}},\n    \"pipes\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -185,7 +185,7 @@
 											"let response = pm.response.json();",
 											"pm.test(\"gotten object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.pipelineName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
 											"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 											"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
@@ -335,7 +335,7 @@
 											"",
 											"pm.test(\"created object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.pipelineName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
 											"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 											"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
@@ -514,7 +514,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentOutboundEndpoint}}\",\n    \"active\": {{currentActive}},\n    \"pipes\": []\n}",
+									"raw": "{\n    \"pipelineName\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentOutboundEndpoint}}\",\n    \"active\": {{currentActive}},\n    \"pipes\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -587,7 +587,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"{{thisName}}\",\n    \"id\": \"{{thisId}}\",\n    \"organizationId\": \"{{thisOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{thisInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{thisOutboundEndpoint}}\",\n    \"active\": true,\n    \"pipes\": []\n}",
+									"raw": "{\n    \"pipelineName\": \"{{thisName}}\",\n    \"id\": \"{{thisId}}\",\n    \"organizationId\": \"{{thisOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{thisInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{thisOutboundEndpoint}}\",\n    \"active\": true,\n    \"pipes\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -659,7 +659,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"{{thisName}}\",\n    \"id\": \"{{thisId}}\",\n    \"organizationId\": \"{{thisOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{thisInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{thisOutboundEndpoint}}\",\n    \"active\": true,\n    \"pipes\": []\n}",
+									"raw": "{\n    \"pipelineName\": \"{{thisName}}\",\n    \"id\": \"{{thisId}}\",\n    \"organizationId\": \"{{thisOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{thisInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{thisOutboundEndpoint}}\",\n    \"active\": true,\n    \"pipes\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -731,7 +731,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"{{thisName}}\",\n    \"id\": \"{{thisId}}\",\n    \"organizationId\": \"{{thisOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{thisInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{thisOutboundEndpoint}}\",\n    \"active\": false,\n    \"pipes\": []\n}",
+									"raw": "{\n    \"pipelineName\": \"{{thisName}}\",\n    \"id\": \"{{thisId}}\",\n    \"organizationId\": \"{{thisOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{thisInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{thisOutboundEndpoint}}\",\n    \"active\": false,\n    \"pipes\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1534,7 +1534,7 @@
 											"",
 											"pm.test(\"created object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.solutionName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.description).to.equal(pm.collectionVariables.get(\"currentDescription\"));",
 											"    pm.expect(response.version).to.equal(pm.collectionVariables.get(\"currentVersion\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
@@ -1551,7 +1551,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"name\" : \"{{currentName}}\",\n  \"description\" : \"{{currentDescription}}\",\n  \"version\" : \"{{currentVersion}}\",\n  \"active\" : {{currentActive}}\n}",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"solutionName\" : \"{{currentName}}\",\n  \"description\" : \"{{currentDescription}}\",\n  \"version\" : \"{{currentVersion}}\",\n  \"active\" : {{currentActive}}\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1589,7 +1589,7 @@
 											"let response = pm.response.json();",
 											"pm.test(\"gotten object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.solutionName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.description).to.equal(pm.collectionVariables.get(\"currentDescription\"));",
 											"    pm.expect(response.version).to.equal(pm.collectionVariables.get(\"currentVersion\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
@@ -1708,7 +1708,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"name\" : \"{{currentName}}\",\n  \"description\" : \"{{currentDescription}}\",\n  \"version\" : \"{{currentVersion}}\",\n  \"active\" : {{currentActive}}\n}",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"solutionName\" : \"{{currentName}}\",\n  \"description\" : \"{{currentDescription}}\",\n  \"version\" : \"{{currentVersion}}\",\n  \"active\" : {{currentActive}}\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1749,7 +1749,7 @@
 											"",
 											"pm.test(\"created object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.solutionName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
 											"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 											"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
@@ -1928,7 +1928,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentOutboundEndpoint}}\",\n    \"active\": {{currentActive}},\n    \"pipes\": []\n}",
+									"raw": "{\n    \"solutionName\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentOutboundEndpoint}}\",\n    \"active\": {{currentActive}},\n    \"pipes\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1998,7 +1998,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"name\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"solutionName\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2067,7 +2067,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"name\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"solutionName\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2136,7 +2136,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"name\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"solutionName\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2937,7 +2937,7 @@
 											"",
 											"pm.test(\"created object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 											"})",
 											""
@@ -2952,7 +2952,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"name\" : \"{{currentName}}\",\n  \"active\" : {{currentActive}}\n}",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"organizationName\" : \"{{currentName}}\",\n  \"active\" : {{currentActive}}\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2990,7 +2990,7 @@
 											"let response = pm.response.json();",
 											"pm.test(\"gotten object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 											"}",
 											")"
@@ -3107,7 +3107,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"name\" : \"{{currentName}}\",\n  \"active\" : {{currentActive}}\n}",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"organizationName\" : \"{{currentName}}\",\n  \"active\" : {{currentActive}}\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3148,7 +3148,7 @@
 											"",
 											"pm.test(\"created object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.name).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 											"})"
 										],
@@ -3321,7 +3321,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"active\": {{currentActive}}\n}",
+									"raw": "{\n    \"organizationName\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"active\": {{currentActive}}\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3385,7 +3385,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"name\" : \"{{thisName}}\",\n  \"active\": true\n}",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"active\": true\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3449,7 +3449,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"name\" : \"{{thisName}}\",\n  \"active\": true\n}",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"active\": true\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3512,7 +3512,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"name\" : \"{{thisName}}\",\n  \"active\": false\n}",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"active\": false\n}",
 									"options": {
 										"raw": {
 											"language": "json"

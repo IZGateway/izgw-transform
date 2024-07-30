@@ -13,7 +13,7 @@ import java.util.UUID;
 public class Pipeline implements BaseModel {
 
     @NotBlank(message = "Pipeline name is required")
-    private String name;
+    private String pipelineName;
 
     @NotNull(message = "Pipeline ID is required")
     private UUID id;
