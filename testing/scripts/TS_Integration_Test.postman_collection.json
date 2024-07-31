@@ -1551,7 +1551,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"solutionName\" : \"{{currentName}}\",\n  \"description\" : \"{{currentDescription}}\",\n  \"version\" : \"{{currentVersion}}\",\n  \"active\" : {{currentActive}}\n}",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1708,7 +1708,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"solutionName\" : \"{{currentName}}\",\n  \"description\" : \"{{currentDescription}}\",\n  \"version\" : \"{{currentVersion}}\",\n  \"active\" : {{currentActive}}\n}",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1928,7 +1928,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"solutionName\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentOutboundEndpoint}}\",\n    \"active\": {{currentActive}},\n    \"pipes\": []\n}",
+									"raw": "{\n    \"solutionName\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentOutboundEndpoint}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1998,7 +1998,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"solutionName\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
+									"raw": "{\n    \"id\": \"{{thisId}}\",\n    \"solutionName\": \"{{thisName}}\",\n    \"description\": \"{{thisDescription}}\",\n    \"version\": \"{{thisVersion}}\",\n    \"active\": true,\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2067,7 +2067,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"solutionName\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
+									"raw": "{\n    \"id\": \"{{thisId}}\",\n    \"solutionName\": \"{{thisName}}\",\n    \"description\": \"{{thisDescription}}\",\n    \"version\": \"{{thisVersion}}\",\n    \"active\": true,\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -2136,7 +2136,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"solutionName\" : \"{{thisName}}\",\n  \"description\" : \"{{thisDescription}}\",\n  \"version\" : \"{{thisVersion}}\",\n  \"active\": true\n}",
+									"raw": "{\n    \"id\": \"{{thisId}}\",\n    \"solutionName\": \"{{thisName}}\",\n    \"description\": \"{{thisDescription}}\",\n    \"version\": \"{{thisVersion}}\",\n    \"active\": true,\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
