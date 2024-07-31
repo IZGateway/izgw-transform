@@ -4,7 +4,6 @@ import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.services.PipelineRunnerService;
-import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.mllp.MllpSender;
 import lombok.extern.java.Log;
@@ -19,12 +18,10 @@ import java.util.logging.Level;
 @RestController
 public class TSApplicationController {
 
-    private final ServiceConfig serviceConfig;
     private final PipelineRunnerService pipelineRunnerService;
 
     @Autowired
-    public TSApplicationController(ServiceConfig serviceConfig, PipelineRunnerService pipelineRunnerService) {
-        this.serviceConfig = serviceConfig;
+    public TSApplicationController(PipelineRunnerService pipelineRunnerService) {
         this.pipelineRunnerService = pipelineRunnerService;
     }
 

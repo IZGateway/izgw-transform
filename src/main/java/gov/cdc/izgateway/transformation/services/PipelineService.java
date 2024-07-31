@@ -5,8 +5,6 @@ import gov.cdc.izgateway.transformation.repository.TxFormRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -16,7 +14,6 @@ public class PipelineService extends GenericService<Pipeline>{
         super(repo);
     }
 
-    // TODO - Should this be here?
     public Pipeline getPipelineByOrganizationAndEndpoints(UUID organizationId, String inboundEndpoint, String outboundEndpoint) {
         return repo.getEntitySet()
                 .stream()

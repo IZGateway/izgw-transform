@@ -22,10 +22,12 @@ public class Solution implements BaseModel {
     @NotBlank(message = "Solution version is required")
     private String version;
 
+    @NotNull(message = "Organization active status is required")
     private Boolean active;
 
-
+    @NotNull(message = "Request Operations List is required (can be empty)")
     private List<SolutionOperation> requestOperations;
+    @NotNull(message = "Response Operations List is required (can be empty)")
     private List<SolutionOperation> responseOperations;
 
 }

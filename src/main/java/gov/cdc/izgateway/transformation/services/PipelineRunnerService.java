@@ -6,13 +6,10 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.model.Pipe;
 import gov.cdc.izgateway.transformation.model.Pipeline;
-import gov.cdc.izgateway.transformation.model.Solution;
-import gov.cdc.izgateway.transformation.solutions.SolutionService;
+import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-// TODO - rename to PipelneRunner?  Something else.
 
 @Service
 @Slf4j
@@ -39,11 +36,11 @@ public class PipelineRunnerService implements Advisable {
             log.trace(String.format("Executing Pipe: %s", pipe.getId()));
 
             // Create Solution
-            Solution solutionModel = txServiceConfig.getSolution(pipe.getSolutionId());
+            gov.cdc.izgateway.transformation.model.Solution solutionModel = txServiceConfig.getSolution(pipe.getSolutionId());
 
-            SolutionService solutionService = new SolutionService(solutionModel, context.getDataType());
+            Solution solution = new Solution(solutionModel, context.getDataType());
 
-            solutionService.execute(context);
+            solution.execute(context);
 
             log.trace(String.format("Solution Name: %s", solutionModel.getSolutionName()));
 
