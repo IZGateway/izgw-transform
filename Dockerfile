@@ -11,7 +11,6 @@ EXPOSE 9082
 # Remote debugging
 EXPOSE 8000
 
-COPY src/main/resources/organizations.json /data/organizations.json
 COPY docker/data/filebeat.yml /usr/share/izg-transform/
 
 # Install logrotate
