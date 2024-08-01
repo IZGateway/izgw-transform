@@ -13,6 +13,7 @@
 				{
 					"name": "TS_TC_01 QBP RESPONSE MSH-7",
 					"event": [
+
 						{
 							"listen": "test",
 							"script": {
@@ -74,6 +75,7 @@
 								"packages": {}
 							}
 						},
+
 						{
 							"listen": "prerequest",
 							"script": {
@@ -5469,6 +5471,25 @@
 					"        });",
 					"        return count;",
 					"    }",
+                    "},",
+                    "    searchStringInObject: function (obj, regex) {",
+                    "        if (typeof obj === 'string') {",
+                    "            return regex.test(obj);",
+                    "        }",
+                    "        if (typeof obj === 'object') {",
+                    "            for (var key in obj) {",
+                    "                if (obj.hasOwnProperty(key) && this.searchStringInObject(obj[key], regex)) {",
+                    "                    return true;",
+                    "                }",
+                    "            }",
+                    "        }",
+                    "        return false;",
+                    "},",
+                    "    mayContainPHI: function (jsonObj) {",
+                    "        // Regex to use to determine if logs have PHI",
+                    "        var regex = /PID\\||OBX\\||QPD\\||PV1\\||AL1\\||DG1\\||IN1\\||NK1\\||GT1\\||ORC\\||RXA\\|/;",
+                    "        ",
+                    "        return this.searchStringInObject(jsonObj, regex);",
 					"}",
 					"}",
 					"",
