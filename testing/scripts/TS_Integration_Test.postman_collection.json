@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "9dacec95-4930-4c6b-b8c4-d6093385d98c",
+		"_postman_id": "c6aa0ec9-9e10-4b7a-9af8-b47656efe80b",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/THSALink~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-9dacec95-4930-4c6b-b8c4-d6093385d98c?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/THSALink~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-c6aa0ec9-9e10-4b7a-9af8-b47656efe80b?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -13,7 +13,6 @@
 				{
 					"name": "TS_TC_01 QBP RESPONSE MSH-7",
 					"event": [
-
 						{
 							"listen": "test",
 							"script": {
@@ -75,7 +74,6 @@
 								"packages": {}
 							}
 						},
-
 						{
 							"listen": "prerequest",
 							"script": {
@@ -1982,7 +1980,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"solutionName\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentOutboundEndpoint}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": null,\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5471,25 +5469,25 @@
 					"        });",
 					"        return count;",
 					"    }",
-                    "},",
-                    "    searchStringInObject: function (obj, regex) {",
-                    "        if (typeof obj === 'string') {",
-                    "            return regex.test(obj);",
-                    "        }",
-                    "        if (typeof obj === 'object') {",
-                    "            for (var key in obj) {",
-                    "                if (obj.hasOwnProperty(key) && this.searchStringInObject(obj[key], regex)) {",
-                    "                    return true;",
-                    "                }",
-                    "            }",
-                    "        }",
-                    "        return false;",
-                    "},",
-                    "    mayContainPHI: function (jsonObj) {",
-                    "        // Regex to use to determine if logs have PHI",
-                    "        var regex = /PID\\||OBX\\||QPD\\||PV1\\||AL1\\||DG1\\||IN1\\||NK1\\||GT1\\||ORC\\||RXA\\|/;",
-                    "        ",
-                    "        return this.searchStringInObject(jsonObj, regex);",
+					"},",
+					"    searchStringInObject: function (obj, regex) {",
+					"        if (typeof obj === 'string') {",
+					"            return regex.test(obj);",
+					"        }",
+					"        if (typeof obj === 'object') {",
+					"            for (var key in obj) {",
+					"                if (obj.hasOwnProperty(key) && this.searchStringInObject(obj[key], regex)) {",
+					"                    return true;",
+					"                }",
+					"            }",
+					"        }",
+					"        return false;",
+					"},",
+					"    mayContainPHI: function (jsonObj) {",
+					"        // Regex to use to determine if logs have PHI",
+					"        var regex = /PID\\||OBX\\||QPD\\||PV1\\||AL1\\||DG1\\||IN1\\||NK1\\||GT1\\||ORC\\||RXA\\|/;",
+					"        ",
+					"        return this.searchStringInObject(jsonObj, regex);",
 					"}",
 					"}",
 					"",
