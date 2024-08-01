@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.transformation.logging.advice;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 @Data
@@ -15,9 +16,13 @@ public class XformAdviceDTO {
 
     private String className;
     private String name;
+    @JsonIgnore
     private String request;
+    @JsonIgnore
     private String transformedRequest;
+    @JsonIgnore
     private String response;
+    @JsonIgnore
     private String transformedResponse;
 
 }

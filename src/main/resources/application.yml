@@ -139,7 +139,7 @@ logging:
     gov:
       cdc:
         izgateway:
-          transformation: TRACE
+          transformation: ${LOGGING_LEVEL:INFO}
           security:
             AccessControlRegistry: INFO
             AccessControlInterceptor: INFO

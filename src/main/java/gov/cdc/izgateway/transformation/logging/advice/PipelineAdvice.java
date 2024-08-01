@@ -8,6 +8,8 @@ import java.util.ArrayList;
 public class PipelineAdvice extends PipelineAdviceDTO {
     private ArrayList<SolutionAdvice> solutionAdviceList = new ArrayList<>();
     private String id;
+    private boolean requestTransformed = false;
+    private boolean responseTransformed = false;
 
     public PipelineAdvice(PipelineAdviceDTO advice) {
         this.setClassName(advice.getClassName());

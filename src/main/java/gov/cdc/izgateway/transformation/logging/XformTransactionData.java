@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.transformation.logging;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import gov.cdc.izgateway.logging.event.TransactionData;
 import gov.cdc.izgateway.logging.markers.MarkerObjectFieldName;
@@ -14,8 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class XformTransactionData extends TransactionData {
 
-    // TODO Add @JsonIgnore as we don't with these to be wrriten to the log!!! PHI!
+    // TODO @JsonIgnore
     private PipelineAdvice pipelineAdvice = null;
+
+    @JsonIgnore
     private SolutionAdvice currentSolutionAdvice = null;
 
     public XformTransactionData() {
@@ -57,10 +60,14 @@ public class XformTransactionData extends TransactionData {
 
         currentSolutionAdvice = pipelineAdvice.getSolutionAdvice(advice);
 
-        if ( advice.getTransformedRequest() != null )
+        if ( advice.getTransformedRequest() != null ) {
             currentSolutionAdvice.setTransformedRequest(advice.getTransformedRequest());
-        if ( advice.getTransformedResponse() != null )
+            pipelineAdvice.setRequestTransformed(true);
+        }
+        if ( advice.getTransformedResponse() != null ) {
             currentSolutionAdvice.setTransformedResponse(advice.getTransformedResponse());
+            pipelineAdvice.setResponseTransformed(true);
+        }
     }
 
     public void addAdvice(OperationAdviceDTO advice) {
