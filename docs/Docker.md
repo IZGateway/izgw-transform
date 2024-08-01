@@ -62,11 +62,23 @@ When the Transformation Service makes a connection to the IZ Gateway, it will ne
 
 The Client Trust Store needs to be named _izgw_client_trust.bcfks_ (again the specific naming will be addressed in a future release)
 
-### Configuration File
+### Configuration Files
 
-At this time, the changes to a message as it travels through the Transformation Service are setup in a JSON configuration file.  You may download the example configuration from the repository ([link here](/src/main/resources/all_preconditions_all_operations.json)) as a starting point.
+The Transformation Service relies on three configuration files at this time: Organization, Pipelines, Solutions.  These ultimately determine the changes that will happen to data as it travels through the Transformation Service.
 
-You'll need to have this file located in a place that can be accessed by the running Docker container.  For our example let's say we put this in a /izgw-xform/configuration directory.  This local directory will be mapped into the running container to /configuration, that directory name and the name of the configuration file will be used to set the transformationservice.configurations.main environment variable when running the image.
+You may download example configurations from the repository as described here:
+
+* Organizations &rarr; [organizations.json](/testing/configuration/organizations.json)
+* Pipelines &rarr; [pipelines.json](/testing/configuration/pipelines.json)
+* Solutions &rarr; [solutions.json](/testing/configuration/solutions.json)
+
+You'll need to have these files located in a place that can be accessed by the running Docker container.  For our example let's say we put these in a /izgw-xform/configuration directory.  This local directory will be mapped into the running container to /configuration.  That directory name (/configuration) and the name of the three files will be used to set environment variables when running the image.
+
+The three environment variables:
+
+* transformationservice.configurations.organizations
+* transformationservice.configurations.pipelines
+* transformationservice.configurations.solutions
 
 ## Running Transformation Service Locally via Docker
 
@@ -92,8 +104,12 @@ At this point you can move to the Run Image instructions.  The first time you ru
 
 To run the image we need to set a few environment variables used by the running container.  Those are:
 
-* transformationservice.configurations.main
-    * This specifies the name and location on the running container of the configuration file.  For our example we will look for the configuration file in /configuration/all_preconditions_all_operations.json
+* transformationservice.configurations.organizations
+  * This specifies the name and location on the running container of the configuration for Organizations.  For our example we will look for the organizations.json in the /configuration folder.  So we would set this to /configuration/organizations.json. 
+* transformationservice.configurations.pipelines
+  * This specifies the name and location on the running container of the configuration for Pipelines.  For our example we will look for the pipelines.json in the /configuration folder.  So we would set this to /configuration/pipelines.json. 
+* transformationservice.configurations.solutions
+  * This specifies the name and location on the running container of the configuration for Solutions.  For our example we will look for the solutions.json in the /configuration folder.  So we would set this to /configuration/solutions.json.
 * SSL_SHARE
     * This specifies the directory on the running container where the Server Key Store and Client Trust Store are located.  For our example we will look for these files in /ssl
 * COMMON_PASS
@@ -111,7 +127,9 @@ docker run \
 --env=SSL_SHARE=/ssl \
 --env=transformationservice.destination=https://dev.izgateway.org/IISHubService \
 --env=TS_SERVER_PORT=444 \
---env=transformationservice.configurations.main=/configuration/all_preconditions_all_operations.json \
+--env=transformationservice.configurations.organizations=/configuration/organizations.json \
+--env=transformationservice.configurations.pipelines=/configuration/pipelines.json \
+--env=transformationservice.configurations.solutions=/configuration/solutions.json \
 --volume=/Users/moodya/Dev/Fed/izg/izgw-transform/src/main/resources:/configuration \
 --volume=/Users/moodya/Dev/Fed/izg/dev.izgateway.org_stores/conf/ssl:/ssl \
 -p 444:444 \
