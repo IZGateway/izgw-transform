@@ -6,11 +6,12 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
+import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Solution implements Advisable {
+public class Solution implements Advisable, Transformable {
 
     private final gov.cdc.izgateway.transformation.model.Solution configuration;
     private final List<SolutionOperation> requestOperations;

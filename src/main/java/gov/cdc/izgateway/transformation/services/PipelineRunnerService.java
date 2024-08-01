@@ -4,6 +4,7 @@ import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.configuration.TxServiceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
+import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 import gov.cdc.izgateway.transformation.model.Pipe;
 import gov.cdc.izgateway.transformation.model.Pipeline;
 import gov.cdc.izgateway.transformation.solutions.Solution;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class PipelineRunnerService implements Advisable {
+public class PipelineRunnerService implements Advisable, Transformable {
     private final TxServiceConfig txServiceConfig;
     private Pipeline pipeline;
 
