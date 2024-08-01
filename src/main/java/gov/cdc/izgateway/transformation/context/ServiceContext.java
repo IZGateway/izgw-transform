@@ -1,16 +1,12 @@
 package gov.cdc.izgateway.transformation.context;
 
-import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.parser.PipeParser;
-import ca.uhn.hl7v2.validation.impl.NoValidation;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import lombok.Data;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 

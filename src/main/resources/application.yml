@@ -2,10 +2,9 @@ transformationservice:
   allow-delete-via-api: false
   destination: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
   configurations:
-    main: all_preconditions_all_operations.json
-    organizations: src/main/resources/organizations.json
-    pipelines: src/main/resources/pipelines.json
-    solutions: src/main/resources/solutions.json
+    organizations: testing/configuration/organizations.json
+    pipelines: testing/configuration/pipelines.json
+    solutions: testing/configuration/solutions.json
 
 spring:
   autoconfigure:

@@ -16,7 +16,7 @@
  */
 package gov.cdc.izgateway.transformation.camel.routers;
 
-import gov.cdc.izgateway.transformation.services.Hl7TransformerService;
+import gov.cdc.izgateway.transformation.services.DataTransformerService;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +25,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TransformationRouter extends RouteBuilder {
 
-  //@Autowired SampleTransform3 sampleTransform;
   @Autowired
-  Hl7TransformerService hl7TransformerService;
+  DataTransformerService dataTransformerService;
 
   @Override
   public void configure() throws Exception {
@@ -49,13 +48,13 @@ public class TransformationRouter extends RouteBuilder {
      * hl7TransformerService.
      */
     from("direct:izghubTransformerPipeline")
-        .bean(hl7TransformerService)
+        .bean(dataTransformerService)
         .to("izghub:IISHubService")
-        .bean(hl7TransformerService);
+        .bean(dataTransformerService);
 
-    from("file:/Users/cahilp/temp/hl7?noop=true")
-      .to("direct:izghubTransformerPipeline")
-      .to("file:/Users/cahilp/temp/hl7/processed?fileName=${date:now:yyyyMMddHHmmssSSS}.txt");
+//    from("file:/Users/cahilp/temp/hl7?noop=true")
+//      .to("direct:izghubTransformerPipeline")
+//      .to("file:/Users/cahilp/temp/hl7/processed?fileName=${date:now:yyyyMMddHHmmssSSS}.txt");
 
     /* This would be cool */
     /*

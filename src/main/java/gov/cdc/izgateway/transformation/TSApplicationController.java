@@ -3,11 +3,9 @@ package gov.cdc.izgateway.transformation;
 import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
-import gov.cdc.izgateway.transformation.pipelines.PipelineBuilder;
-import gov.cdc.izgateway.transformation.configuration.ServiceConfig;
+import gov.cdc.izgateway.transformation.services.PipelineRunnerService;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.mllp.MllpSender;
-import gov.cdc.izgateway.transformation.pipelines.Hl7Pipeline;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,12 +18,11 @@ import java.util.logging.Level;
 @RestController
 public class TSApplicationController {
 
-    private final PipelineBuilder pipelineBuilder;
-    private final ServiceConfig serviceConfig;
+    private final PipelineRunnerService pipelineRunnerService;
+
     @Autowired
-    public TSApplicationController(ServiceConfig serviceConfig, PipelineBuilder pipelineBuilder) {
-        this.serviceConfig = serviceConfig;
-        this.pipelineBuilder = pipelineBuilder;
+    public TSApplicationController(PipelineRunnerService pipelineRunnerService) {
+        this.pipelineRunnerService = pipelineRunnerService;
     }
 
     @GetMapping("/hello")
@@ -48,15 +45,16 @@ public class TSApplicationController {
                     DataType.HL7V2,
                     incomingMessage);
 
-            Hl7Pipeline pipeline = pipelineBuilder.build(context);
-            pipeline.execute(context);
+            // Execute data pipeline on Request
+            pipelineRunnerService.execute(context);
 
             // At this point request message has been transformed, we need to send it and deal with the response
             Message responseMessage = MllpSender.send("localhost", 21110, context.getRequestMessage());
             context.setCurrentDirection(DataFlowDirection.RESPONSE);
             context.setResponseMessage(responseMessage);
 
-            pipeline.execute(context);
+            // Execute data pipeline on Response
+            pipelineRunnerService.execute(context);
 
             assert responseMessage != null;
             return responseMessage.encode();
