@@ -5,6 +5,7 @@ transformationservice:
     organizations: testing/configuration/organizations.json
     pipelines: testing/configuration/pipelines.json
     solutions: testing/configuration/solutions.json
+    users: testing/configuration/users.json
 
 spring:
   autoconfigure:
