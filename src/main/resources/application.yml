@@ -6,6 +6,7 @@ transformationservice:
     pipelines: testing/configuration/pipelines.json
     solutions: testing/configuration/solutions.json
     users: testing/configuration/users.json
+  access-control-enabled: ${TS_ACCESS_CONTROL_ENABLED:false}
 
 spring:
   autoconfigure:

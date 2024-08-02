@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class XformAccessControlService extends GenericService<User> {
+public class UserService extends GenericService<User> {
     @Autowired
-    public XformAccessControlService(TxFormRepository<User> repo) {
+    public UserService(TxFormRepository<User> repo) {
         super(repo);
     }
 

@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.model.Pipeline;
 import gov.cdc.izgateway.transformation.model.Solution;
+import gov.cdc.izgateway.transformation.model.User;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.services.PipelineService;
 import gov.cdc.izgateway.transformation.services.SolutionService;
+import gov.cdc.izgateway.transformation.services.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ public class ApiController {
     private final OrganizationService organizationService;
     private final PipelineService pipelineService;
     private final SolutionService solutionService;
+    private final UserService userService;
 
     @Value("${transformationservice.allow-delete-via-api}")
     private Boolean allowDelete;
@@ -33,11 +36,13 @@ public class ApiController {
     public ApiController(
             OrganizationService organizationService,
             PipelineService pipelineService,
-            SolutionService solutionService
+            SolutionService solutionService,
+            UserService userService
     ) {
         this.organizationService = organizationService;
         this.pipelineService = pipelineService;
         this.solutionService = solutionService;
+        this.userService = userService;
     }
 
     @GetMapping("/api/v1/pipelines/{uuid}")
@@ -121,6 +126,26 @@ public class ApiController {
         }
     }
 
+    @GetMapping("/api/v1/users")
+    public ResponseEntity<String> getUserList(
+        @RequestParam(required = false) String nextCursor,
+        @RequestParam(required = false) String prevCursor,
+        @RequestParam(defaultValue = "false") Boolean includeInactive,
+        @RequestParam(defaultValue = "10") int limit
+    ) {
+        try {
+            return userService.getList(nextCursor, prevCursor, includeInactive, limit);
+        } catch (JsonProcessingException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/api/v1/users/{uuid}")
+    public ResponseEntity<User> getUserByUUID(@PathVariable UUID uuid) {
+        return userService.getObject(uuid);
+    }
+
     @PostMapping("/api/v1/pipelines")
     public ResponseEntity<Pipeline> createPipeline(
             @Valid @RequestBody() Pipeline pipeline
@@ -143,6 +168,14 @@ public class ApiController {
     ) {
         solutionService.create(solution);
         return new ResponseEntity<>(solution, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/v1/users")
+    public ResponseEntity<User> createUser(
+            @Valid @RequestBody() User user
+    ) {
+        userService.create(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @DeleteMapping("/api/v1/pipelines/{uuid}")

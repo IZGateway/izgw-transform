@@ -1,6 +1,6 @@
 package gov.cdc.izgateway.transformation.security;
 
-import gov.cdc.izgateway.transformation.services.XformAccessControlService;
+import gov.cdc.izgateway.transformation.services.UserService;
 import gov.cdc.izgateway.utils.X500Utils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +11,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -25,12 +26,14 @@ import java.security.cert.X509Certificate;
 @Component("xformValveAccessControl")
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class AccessControlValve extends ValveBase {
+    private final UserService userService;
 
-    XformAccessControlService accessControlService;
+    @Value("${transformationservice.access-control-enabled}")
+    private boolean accessControlEnabled;
 
     @Autowired
-    public AccessControlValve(XformAccessControlService accessControlService) {
-        this.accessControlService = accessControlService;
+    public AccessControlValve(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
@@ -42,11 +45,15 @@ public class AccessControlValve extends ValveBase {
     
     public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
 
+        if (!accessControlEnabled) {
+            return true;
+        }
+
         X509Certificate[] certs = (X509Certificate[]) req.getAttribute(Globals.CERTIFICATES_ATTR);
 
         String user = X500Utils.getCommonName(certs[0].getSubjectX500Principal());
 
-        if ( accessControlService.userExists(user)) {
+        if ( userService.userExists(user)) {
             return true;
         } else {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
