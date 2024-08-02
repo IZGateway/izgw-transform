@@ -47,7 +47,11 @@ public class ApiController {
 
     @GetMapping("/api/v1/pipelines/{uuid}")
     public ResponseEntity<Pipeline> getPipelineByUUID(@PathVariable UUID uuid) {
-        return pipelineService.getObject(uuid);
+        Pipeline entity = pipelineService.getObject(uuid);
+        if (entity == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
     @PutMapping("/api/v1/pipelines/{uuid}")
@@ -59,7 +63,11 @@ public class ApiController {
 
     @GetMapping("/api/v1/solutions/{uuid}")
     public ResponseEntity<Solution> getSolutionByUUID(@PathVariable UUID uuid) {
-        return solutionService.getObject(uuid);
+        Solution entity = solutionService.getObject(uuid);
+        if (entity == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
     @PutMapping("/api/v1/solutions/{uuid}")
@@ -71,7 +79,11 @@ public class ApiController {
 
     @GetMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> getOrganizationByUUID(@PathVariable UUID uuid) {
-        return organizationService.getObject(uuid);
+        Organization entity = organizationService.getObject(uuid);
+        if (entity == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
     @PutMapping("/api/v1/organizations/{uuid}")
@@ -143,7 +155,11 @@ public class ApiController {
 
     @GetMapping("/api/v1/users/{uuid}")
     public ResponseEntity<User> getUserByUUID(@PathVariable UUID uuid) {
-        return userService.getObject(uuid);
+        User entity = userService.getObject(uuid);
+        if (entity == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
     @PostMapping("/api/v1/pipelines")

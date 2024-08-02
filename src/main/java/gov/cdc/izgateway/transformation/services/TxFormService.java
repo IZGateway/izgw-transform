@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.UUID;
 
 public interface TxFormService<T> {
-    ResponseEntity<T> getObject(UUID id);
+    T getObject(UUID id);
     ResponseEntity<String> getList(String nextCursor, String prevCursor, Boolean includeInactive, int limit) throws JsonProcessingException;
     void update(T obj);
     void create(T obj);

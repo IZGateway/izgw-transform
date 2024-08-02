@@ -8,7 +8,6 @@ import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.services.PipelineService;
 import gov.cdc.izgateway.transformation.services.SolutionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -27,13 +26,11 @@ public class TxServiceConfig {
     }
 
     public Organization getOrganization(UUID organizationId) {
-        ResponseEntity<Organization> organization = organizationService.getObject(organizationId);
-        return organization.getBody();
+        return organizationService.getObject(organizationId);
     }
 
     public Pipeline getPipeline(UUID pipelineId) {
-        ResponseEntity<Pipeline> pipeline = pipelineService.getObject(pipelineId);
-        return pipeline.getBody();
+        return pipelineService.getObject(pipelineId);
     }
 
     public Pipeline findPipelineByContext(ServiceContext context) {
@@ -41,7 +38,6 @@ public class TxServiceConfig {
     }
 
     public Solution getSolution(UUID solutionId) {
-        ResponseEntity<Solution> solution = solutionService.getObject(solutionId);
-        return solution.getBody();
+        return solutionService.getObject(solutionId);
     }
 }

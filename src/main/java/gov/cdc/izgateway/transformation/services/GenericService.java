@@ -22,13 +22,8 @@ public abstract class GenericService<T extends BaseModel> implements TxFormServi
     }
 
     @Override
-    public ResponseEntity<T> getObject(UUID id) {
-        T entity = repo.getEntity(id);
-        if ( entity == null ) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(entity, HttpStatus.OK);
-
+    public T getObject(UUID id) {
+        return repo.getEntity(id);
     }
 
     public List<T> getList()  {
