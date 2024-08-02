@@ -31,6 +31,10 @@ public abstract class GenericService<T extends BaseModel> implements TxFormServi
 
     }
 
+    public List<T> getList()  {
+        return new ArrayList<>(repo.getEntitySet());
+    }
+
     @Override
     public ResponseEntity<String> getList(String nextCursor, String prevCursor, Boolean includeInactive, int limit) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
