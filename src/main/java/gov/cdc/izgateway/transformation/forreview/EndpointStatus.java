@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.transformation.endpoints.hub.forreview;
+package gov.cdc.izgateway.transformation.forreview;
 
 import gov.cdc.izgateway.model.IEndpointStatus;
 

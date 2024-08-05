@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.transformation.endpoints.hub.forreview;
+package gov.cdc.izgateway.transformation.endpoints.hub;
 
 import gov.cdc.izgateway.configuration.AppProperties;
 import gov.cdc.izgateway.configuration.ClientConfiguration;

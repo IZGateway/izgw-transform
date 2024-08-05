@@ -5,7 +5,7 @@ import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubControllerFault;
-import gov.cdc.izgateway.transformation.endpoints.hub.forreview.HubMessageSender;
+import gov.cdc.izgateway.transformation.endpoints.hub.HubMessageSender;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import lombok.extern.slf4j.Slf4j;
