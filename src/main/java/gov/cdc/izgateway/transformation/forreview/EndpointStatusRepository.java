@@ -6,6 +6,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+// TODO IGDD-1656: Do we need an EndpointStatusRepository in the transformation service?
+
 @Repository
 public class EndpointStatusRepository implements gov.cdc.izgateway.repository.EndpointStatusRepository {
     // TODO Paul - implement this the right way

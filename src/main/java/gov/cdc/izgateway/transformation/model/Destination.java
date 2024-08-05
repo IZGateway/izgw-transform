@@ -29,7 +29,7 @@ public class Destination implements IDestination {
     private String maintenanceDetail;
     private boolean is2011;
     private boolean is2014;
-    private boolean isHub;
+    private boolean isHub = true;
     private boolean isDex;
     private String destinationUri;
     private String destinationId;

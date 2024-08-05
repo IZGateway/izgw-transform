@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// TODO: IGDD-1656: Do we need a MessageHeaderService in the transformation service?  It uses a DB table.
+// There are some fields for username, password, etc that we may not need.
 @Service
 public class MessageHeaderService implements IMessageHeaderService {
     @Override
