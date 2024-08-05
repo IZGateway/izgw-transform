@@ -1,7 +1,13 @@
-[
-  {
-    "id": "018f7881-7607-7220-a94b-fe0c7e81cbec",
-    "userName": "pcahill.testing.izgateway.org",
-    "active": true
-  }
-]
+[ {
+  "id" : "018f7881-7607-7220-a94b-fe0c7e81cbec",
+  "userName" : "pcahill.testing.izgateway.org",
+  "active" : true
+}, {
+  "id" : "152b0d6b-647d-4d09-bc1e-608ffe87acce",
+  "userName" : "Enterprise-wide full-range moratorium",
+  "active" : false
+}, {
+  "id" : "a1597a54-a321-46de-9ff5-dec98584ee1c",
+  "userName" : "Pre-emptive non-volatile support",
+  "active" : false
+} ]

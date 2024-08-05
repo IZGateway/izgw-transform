@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "c6aa0ec9-9e10-4b7a-9af8-b47656efe80b",
+		"_postman_id": "44afbe35-8faf-432e-a0b6-7192065e3658",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/THSALink~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-c6aa0ec9-9e10-4b7a-9af8-b47656efe80b?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/THSALink~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-44afbe35-8faf-432e-a0b6-7192065e3658?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -4374,195 +4374,201 @@
 						}
 					]
 				},
-                {
-                  "name": "Users",
-                  "item": [
-                    {
-                      "name": "Create User - Net New",
-                      "event": [
-                        {
-                          "listen": "prerequest",
-                          "script": {
-                            "exec": [
-                              "pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-                              "pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-                              "pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
-                            ],
-                            "type": "text/javascript",
-                            "packages": {}
-                          }
-                        },
-                        {
-                          "listen": "test",
-                          "script": {
-                            "exec": [
-                              "pm.test(\"returns success code\", function() {",
-                              "    pm.expect(pm.response.code).to.equal(200);",
-                              "});",
-                              "",
-                              "let response = pm.response.json();",
-                              "let savedData = JSON.stringify(response);",
-                              "",
-                              "pm.collectionVariables.set(\"createdEntity\", savedData);",
-                              "",
-                              "pm.test(\"created object fields match\", function() {",
-                              "    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-                              "    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"currentName\"));",
-                              "    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-                              "})",
-                              ""
-                            ],
-                            "type": "text/javascript",
-                            "packages": {}
-                          }
-                        }
-                      ],
-                      "request": {
-                        "method": "POST",
-                        "header": [],
-                        "body": {
-                          "mode": "raw",
-                          "raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"userName\" : \"{{currentName}}\",\n  \"active\" : {{currentActive}}\n}",
-                          "options": {
-                            "raw": {
-                              "language": "json"
-                            }
-                          }
-                        },
-                        "url": {
-                          "raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users",
-                          "protocol": "{{protocol}}",
-                          "host": [
-                            "{{host}}"
-                          ],
-                          "port": "{{port}}",
-                          "path": [
-                            "api",
-                            "v1",
-                            "users"
-                          ]
-                        }
-                      },
-                      "response": []
-                    },
-                    {
-                      "name": "Get User - Existing",
-                      "event": [
-                        {
-                          "listen": "test",
-                          "script": {
-                            "exec": [
-                              "pm.test(\"returns 200 OK code\", function() {",
-                              "    pm.expect(pm.response.code).to.equal(200);",
-                              "});",
-                              "",
-                              "// Fields should match object created in previous \"Create Pipeline - Net New\" step",
-                              "let response = pm.response.json();",
-                              "pm.test(\"gotten object fields match\", function() {",
-                              "    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-                              "    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"currentName\"));",
-                              "    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-                              "}",
-                              ")"
-                            ],
-                            "type": "text/javascript",
-                            "packages": {}
-                          }
-                        },
-                        {
-                          "listen": "prerequest",
-                          "script": {
-                            "exec": [
-                              ""
-                            ],
-                            "type": "text/javascript",
-                            "packages": {}
-                          }
-                        }
-                      ],
-                      "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                          "raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users/{{currentId}}",
-                          "protocol": "{{protocol}}",
-                          "host": [
-                            "{{host}}"
-                          ],
-                          "port": "{{port}}",
-                          "path": [
-                            "api",
-                            "v1",
-                            "users",
-                            "{{currentId}}"
-                          ]
-                        }
-                      },
-                      "response": []
-                    },
-                    {
-                      "name": "Get Users",
-                      "event": [
-                        {
-                          "listen": "test",
-                          "script": {
-                            "exec": [
-                              "pm.test(\"returns 200 OK code\", function() {",
-                              "    pm.expect(pm.response.code).to.equal(200);",
-                              "});",
-                              "",
-                              "// Check to see if the 2 active we added in 3 previous steps are in the response",
-                              "let response = pm.response.json();",
-                              "let found = false;",
-                              "for (var i = 0; i < response[\"data\"].length; i++) {",
-                              "    if (response[\"data\"][i].id == pm.collectionVariables.get(\"currentId\")) {",
-                              "        found = true;",
-                              "        break",
-                              "    }",
-                              "}",
-                              "",
-                              "pm.test(\"Found user\", function() {",
-                              "    pm.expect(found).to.be.true;",
-                              "});",
-                              "",
-                              ""
-                            ],
-                            "type": "text/javascript",
-                            "packages": {}
-                          }
-                        },
-                        {
-                          "listen": "prerequest",
-                          "script": {
-                            "exec": [
-                              ""
-                            ],
-                            "type": "text/javascript",
-                            "packages": {}
-                          }
-                        }
-                      ],
-                      "request": {
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                          "raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users",
-                          "protocol": "{{protocol}}",
-                          "host": [
-                            "{{host}}"
-                          ],
-                          "port": "{{port}}",
-                          "path": [
-                            "api",
-                            "v1",
-                            "users"
-                          ]
-                        }
-                      },
-                      "response": []
-                    }
-                  ]
-                }
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "Create User - Net New",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"created object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"userName\" : \"{{currentName}}\",\n  \"active\" : {{currentActive}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get User - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Fields should match object created in previous \"Create Pipeline - Net New\" step",
+											"let response = pm.response.json();",
+											"pm.test(\"gotten object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"}",
+											")"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Users",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Check to see if the 2 active we added in 3 previous steps are in the response",
+											"let response = pm.response.json();",
+											"let found = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"currentId\")) {",
+											"        found = true;",
+											"        break",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"Found user\", function() {",
+											"    pm.expect(found).to.be.true;",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users?includeInactive=true",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"users"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
 			]
 		}
 	],
@@ -5692,6 +5698,60 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "GoodResponse",
+			"value": ""
+		},
+		{
+			"key": "GoodResponseLF",
+			"value": ""
+		},
+		{
+			"key": "GoodResponseCRLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageCRLF",
+			"value": ""
+		},
+		{
+			"key": "TooLargeMessage",
+			"value": ""
+		},
+		{
+			"key": "IisTooLargeMessage",
+			"value": ""
+		},
+		{
+			"key": "hex0b",
+			"value": ""
+		},
+		{
+			"key": "hex1b",
+			"value": ""
+		},
+		{
+			"key": "currentName",
+			"value": ""
+		},
+		{
+			"key": "currentId",
+			"value": ""
+		},
+		{
+			"key": "currentActive",
+			"value": ""
+		},
+		{
+			"key": "createdEntity",
+			"value": ""
 		}
 	]
 }
