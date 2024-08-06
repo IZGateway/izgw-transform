@@ -16,7 +16,6 @@ import java.util.List;
 public class MessageHeaderService implements IMessageHeaderService {
     @Override
     public void refresh() {
-        System.out.println("MessageHeaderService.refresh");
     }
 
     @Override

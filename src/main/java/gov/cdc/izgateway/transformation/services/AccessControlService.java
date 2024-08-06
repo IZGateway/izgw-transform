@@ -25,7 +25,6 @@ public class AccessControlService implements IAccessControlService {
 
     @Override
     public void refresh() {
-        System.out.println("AccessControlService.refresh");
     }
 
     @Override
@@ -70,7 +69,6 @@ public class AccessControlService implements IAccessControlService {
 
     @Override
     public void setServerName(String serverName) {
-        System.out.println("AccessControlService.setServerName");
     }
 
     @Override
