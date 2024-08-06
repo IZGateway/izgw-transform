@@ -110,7 +110,6 @@ public class EndpointStatus implements IEndpointStatus {
         return false;
     }
 
-    // Paul: this is called
     @Override
     public boolean isCircuitBreakerThrown() {
         return false;
@@ -126,7 +125,6 @@ public class EndpointStatus implements IEndpointStatus {
 
     }
 
-    // Paul: this is called
     @Override
     public String connected() {
         return "";

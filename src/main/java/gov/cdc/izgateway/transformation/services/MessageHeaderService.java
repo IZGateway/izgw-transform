@@ -34,7 +34,6 @@ public class MessageHeaderService implements IMessageHeaderService {
         return List.of();
     }
 
-    // Paul: this is called
     @Override
     public String getSourceType(String... idList) {
         return "";
