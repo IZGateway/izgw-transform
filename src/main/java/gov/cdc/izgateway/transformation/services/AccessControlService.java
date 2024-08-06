@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.transformation.forreview;
+package gov.cdc.izgateway.transformation.services;
 
 import gov.cdc.izgateway.model.IAccessControl;
 import gov.cdc.izgateway.service.IAccessControlService;
@@ -10,7 +10,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-// TODO: IGDD-1656: Do we need an AccessControlService in the transformation service?  This may be dependent on some DB tables.
+/**
+ * The AccessControlService is a placeholder for the IAccessControlService interface.  We will be implementing
+ * a simpler repository than the existing DB repository.
+ * This class contains no-ops for all methods.
+ * Ticket to track this: https://support.izgateway.org/browse/IGDD-1664
+ */
 @Service
 public class AccessControlService implements IAccessControlService {
     @Override
@@ -20,7 +25,7 @@ public class AccessControlService implements IAccessControlService {
 
     @Override
     public void refresh() {
-
+        System.out.println("AccessControlService.refresh");
     }
 
     @Override
@@ -65,7 +70,7 @@ public class AccessControlService implements IAccessControlService {
 
     @Override
     public void setServerName(String serverName) {
-
+        System.out.println("AccessControlService.setServerName");
     }
 
     @Override

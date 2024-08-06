@@ -1,17 +1,19 @@
-package gov.cdc.izgateway.transformation.forreview;
+package gov.cdc.izgateway.transformation.repository;
 
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IEndpointStatus;
+import gov.cdc.izgateway.transformation.model.EndpointStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-// TODO IGDD-1656: Do we need an EndpointStatusRepository in the transformation service?
-
+/**
+ * A ticket has been added to address this class in the future.  It is not needed for Transformation Servivce.
+ * This class contains no-ops for all methods.
+ * Ticket to track this: https://support.izgateway.org/browse/IGDD-1665
+ */
 @Repository
 public class EndpointStatusRepository implements gov.cdc.izgateway.repository.EndpointStatusRepository {
-    // TODO Paul - implement this the right way
-    // Do we need an EndpointStatusRepository in the transformation service?
     private IEndpointStatus status = new EndpointStatus();
 
     @Override
