@@ -18,6 +18,12 @@ import java.util.Map;
 @Component("izghub")
 @Getter
 public class IZGHubComponent extends DefaultComponent {
+    // The IZ Gateway Hub Destination ID will always be 0.
+    private static final String HUB_DESTINATION_ID = "0";
+
+    // The IZ Gateway Hub Destination Type will always be 0.
+    private static final int HUB_DESTINATION_TYPE = 0;
+
     @Value("${transformationservice.destination}")
     private String destinationUri;
 
@@ -40,8 +46,8 @@ public class IZGHubComponent extends DefaultComponent {
      */
     IDestination getDestination() throws UnknownDestinationFault {
         IDestinationId destinationIdObject = new DestinationId();
-        destinationIdObject.setDestId("0");
-        destinationIdObject.setDestType(0);
+        destinationIdObject.setDestId(HUB_DESTINATION_ID);
+        destinationIdObject.setDestType(HUB_DESTINATION_TYPE);
 
         IDestination hubDestination = new Destination();
         hubDestination.setId(destinationIdObject);
