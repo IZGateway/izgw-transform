@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document aims to describe the different Preconditions available in the the Transformation Service and how to configure them in JSON.  
+This document aims to describe the different Preconditions available in the Transformation Service and how to configure them in JSON.  
 
 A UI will ultimately be made available for configuring Preconditions.  This document, however, will detail how to configure the Preconditions in the underlying JSON configuration which can be used with the API.
 
@@ -12,7 +12,7 @@ A UI will ultimately be made available for configuring Preconditions.  This docu
 
 This Precondition allows you to configure a path to a piece of data and then a value that it needs to match or _not_ match.
 
-There are four fields requred in the JSON:
+There are four fields required in the JSON:
 
 * method &rarr; equals or not_equals
 * id &rarr; Unique UUID for this configured Precondition 
@@ -46,7 +46,7 @@ This Precondition allows you to configure a path and let you know if that path e
 
 This is useful, for example, in HL7v2 to know if a specific field exists in the processed message.  You could also specify the first field in a segment to understand if the segment exists in the message.
 
-There are three fields requred in the JSON:
+There are three fields required in the JSON:
 
 * method &rarr; exists or not_exists
 * id &rarr; Unique UUID for this configured Precondition
@@ -75,7 +75,7 @@ Examples:
 
 This Precondition allows you to configure a path and then a Regular Expression.  If the Regular Expression results in a match then the Precondition passes.
 
-There are four fields requred in the JSON:
+There are four fields required in the JSON:
 
 * method &rarr; regex_match
 * id &rarr; Unique UUID for this configured Precondition
