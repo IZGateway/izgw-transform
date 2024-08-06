@@ -1,10 +1,10 @@
-package gov.cdc.izgateway.transformation.endpoints.hub.forreview;
+package gov.cdc.izgateway.transformation.forreview;
 
 import gov.cdc.izgateway.model.IEndpointStatus;
 
 import java.util.Date;
 
-// TODO Paul: Do we need an EndpointStatus in the transformation service?
+// TODO IGDD-1656: Do we need an EndpointStatus in the transformation service?
 // If not, what do we need to refactor?
 
 public class EndpointStatus implements IEndpointStatus {

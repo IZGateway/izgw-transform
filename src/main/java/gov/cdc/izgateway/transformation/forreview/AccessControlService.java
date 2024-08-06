@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.transformation.endpoints.hub.forreview;
+package gov.cdc.izgateway.transformation.forreview;
 
 import gov.cdc.izgateway.model.IAccessControl;
 import gov.cdc.izgateway.service.IAccessControlService;
@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+// TODO: IGDD-1656: Do we need an AccessControlService in the transformation service?  This may be dependent on some DB tables.
 @Service
 public class AccessControlService implements IAccessControlService {
     @Override

@@ -1,10 +1,12 @@
-package gov.cdc.izgateway.transformation.endpoints.hub.forreview;
+package gov.cdc.izgateway.transformation.forreview;
 
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IEndpointStatus;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+
+// TODO IGDD-1656: Do we need an EndpointStatusRepository in the transformation service?
 
 @Repository
 public class EndpointStatusRepository implements gov.cdc.izgateway.repository.EndpointStatusRepository {
