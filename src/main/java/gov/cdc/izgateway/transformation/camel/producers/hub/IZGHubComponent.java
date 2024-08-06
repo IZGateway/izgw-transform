@@ -21,7 +21,7 @@ public class IZGHubComponent extends DefaultComponent {
     @Value("${transformationservice.destination}")
     private String destinationUri;
 
-    private HubMessageSender messageSender;
+    private final HubMessageSender messageSender;
 
     @Autowired
     public IZGHubComponent(HubMessageSender messageSender) {
@@ -33,9 +33,14 @@ public class IZGHubComponent extends DefaultComponent {
         return new IZGHubEndpoint(uri, this);
     }
 
-    IDestination getDestination(String destinationId) throws UnknownDestinationFault {
+    /**
+     * The Transformation Service has only one IZ Gateway Destination.  This destination is the IZ Gateway Hub.
+     * @return
+     * @throws UnknownDestinationFault
+     */
+    IDestination getDestination() throws UnknownDestinationFault {
         IDestinationId destinationIdObject = new DestinationId();
-        destinationIdObject.setDestId(destinationId);
+        destinationIdObject.setDestId("0");
         destinationIdObject.setDestType(0);
 
         IDestination hubDestination = new Destination();

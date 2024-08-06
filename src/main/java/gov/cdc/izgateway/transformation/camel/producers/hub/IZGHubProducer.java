@@ -33,10 +33,8 @@ public class IZGHubProducer extends DefaultProducer {
             throw new HubControllerFault(e.getMessage());
         }
 
-        // TODO: Paul - discussed with Keith and this destination will be a fixed thing - not a destination IIS... think about this more.
-        IDestination dest = hubComponent.getDestination("0");
-
-        SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(dest, context.getSubmitSingleMessageRequest());
+        SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(hubComponent.getDestination(),
+                context.getSubmitSingleMessageRequest());
         context.getServiceContext().setCurrentDirection(DataFlowDirection.RESPONSE);
         context.getServiceContext().setResponseMessage(Hl7Utils.parseHl7v2Message(response.getHl7Message()));
         context.setSubmitSingleMessageResponse(response);
