@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.transformation.forreview;
+package gov.cdc.izgateway.transformation.services;
 
 import gov.cdc.izgateway.model.IMessageHeader;
 import gov.cdc.izgateway.service.IMessageHeaderService;
@@ -6,13 +6,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-// TODO: IGDD-1656: Do we need a MessageHeaderService in the transformation service?  It uses a DB table.
-// There are some fields for username, password, etc that we may not need.
+/**
+ * A ticket has been added to address this class in the future.  It is not needed for Transformation Servivce,
+ * but it is required as of now because the IZG Core library requires it.
+ * This class contains no-ops for all methods.
+ * Ticket to track this: https://support.izgateway.org/browse/IGDD-1663
+ */
 @Service
 public class MessageHeaderService implements IMessageHeaderService {
     @Override
     public void refresh() {
-
     }
 
     @Override

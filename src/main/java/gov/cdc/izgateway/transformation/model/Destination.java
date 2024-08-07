@@ -5,7 +5,6 @@ import gov.cdc.izgateway.model.IDestinationId;
 
 import java.util.Date;
 
-// TODO: Paul - created this because Destination is defined in the hub jar in the db package.
 @lombok.Data
 public class Destination implements IDestination {
     private String facilityId;

@@ -2,7 +2,6 @@ package gov.cdc.izgateway.transformation.model;
 
 import gov.cdc.izgateway.model.IDestinationId;
 
-// TODO: Paul - created this because DestinationId is defined in the hub jar in the db package.
 public class DestinationId implements IDestinationId {
     private String destId;
     private int destType;

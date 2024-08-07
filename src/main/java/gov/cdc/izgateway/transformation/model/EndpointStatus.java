@@ -1,12 +1,14 @@
-package gov.cdc.izgateway.transformation.forreview;
+package gov.cdc.izgateway.transformation.model;
 
 import gov.cdc.izgateway.model.IEndpointStatus;
 
 import java.util.Date;
 
-// TODO IGDD-1656: Do we need an EndpointStatus in the transformation service?
-// If not, what do we need to refactor?
-
+/**
+ * A ticket has been added to address this class in the future.  It is not needed for Transformation Servivce.
+ * This class contains no-ops for all methods.
+ * Ticket to track this: https://support.izgateway.org/browse/IGDD-1665
+ */
 public class EndpointStatus implements IEndpointStatus {
     @Override
     public String getDetail() {
