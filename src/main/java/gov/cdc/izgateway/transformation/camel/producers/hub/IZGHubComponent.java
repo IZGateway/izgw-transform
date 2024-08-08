@@ -6,6 +6,7 @@ import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.transformation.model.Destination;
 import gov.cdc.izgateway.transformation.model.DestinationId;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubMessageSender;
+import gov.cdc.izgateway.utils.SystemUtils;
 import lombok.Getter;
 import org.apache.camel.Endpoint;
 import org.apache.camel.support.DefaultComponent;
@@ -50,6 +51,8 @@ public class IZGHubComponent extends DefaultComponent {
         destinationIdObject.setDestType(HUB_DESTINATION_TYPE);
 
         IDestination hubDestination = new Destination();
+        ((Destination) hubDestination).setDestId(HUB_DESTINATION_ID);
+        ((Destination) hubDestination).setDestTypeId(SystemUtils.getDestType());
         hubDestination.setId(destinationIdObject);
         hubDestination.setDestUri(destinationUri);
 

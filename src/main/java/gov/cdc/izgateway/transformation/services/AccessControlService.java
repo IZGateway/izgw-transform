@@ -87,12 +87,13 @@ public class AccessControlService implements IAccessControlService {
     }
 
     @Override
-    public IAccessControl removeUserFromGroup(String user, String group) {
+    public IAccessControl removeUserFromBlacklist(String user) {
         return null;
     }
 
     @Override
-    public IAccessControl addUserToGroup(String user, String group) {
+    public IAccessControl addUserToBlacklist(String user) {
         return null;
     }
+
 }
