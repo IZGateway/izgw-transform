@@ -12,9 +12,16 @@ services:
       TS_HUB_DESTINATION: "${TS_HUB_DESTINATION}"
       ELASTIC_API_KEY: "${ELASTIC_API_KEY}"
       LOGGING_LEVEL: "${LOGGING_LEVEL}"
+      transformationservice.configurations.users: "${CONFIG_USERS}"
+      transformationservice.configurations.organizations: "${CONFIG_ORGANIZATIONS}"
+      transformationservice.configurations.solutions: "${CONFIG_SOLUTIONS}"
+      transformationservice.configurations.pipelines: "${CONFIG_PIPELINES}"
     volumes:
       - type: bind
         source: "${SSL_SOURCE}"
         target: /ssl
+      - type: bind
+        source: "${CONFIG_SOURCE}"
+        target: /configuration
     networks:
       - izgw-network

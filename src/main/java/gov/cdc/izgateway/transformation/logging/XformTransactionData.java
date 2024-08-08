@@ -46,6 +46,8 @@ public class XformTransactionData extends TransactionData {
         if ( pipelineAdvice == null ) {
             pipelineAdvice = new PipelineAdvice(advice);
         } else {
+            pipelineAdvice.setName(advice.getName());
+            pipelineAdvice.setId(advice.getId());
             if ( advice.getTransformedRequest() != null)
                 pipelineAdvice.setTransformedRequest(advice.getTransformedRequest());
             if ( advice.getResponse() != null )

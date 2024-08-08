@@ -33,6 +33,8 @@ public class Hl7Utils {
         switch (organization) {
             case "IZG":
                 return UUID.fromString("0d15449b-fb08-4013-8985-20c148b353fe");
+            case "MDF":
+                return UUID.fromString("b9bdedc5-cb33-4772-be37-b78dc7bf3786");
         }
 
         return null;

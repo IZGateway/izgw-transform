@@ -1,0 +1,14 @@
+[
+  {
+    "sourceCodeSystem": "MYCODESYSTEM",
+    "sourceCode": "UNKNOWN",
+    "targetCodeSystem": "CDCREC",
+    "targetCode": "NEWCODE"
+  },
+  {
+    "sourceCodeSystem": "MYCODESYSTEM2",
+    "sourceCode": "UNKNOWN",
+    "targetCodeSystem": "CDCREC",
+    "targetCode": "NEWCODE2"
+  }
+]
