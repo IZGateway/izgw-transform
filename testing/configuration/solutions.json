@@ -67,11 +67,6 @@
       "order" : 0,
       "destinationField" : "/MSH-7-1",
       "setValue" : "MSH 7 NEW VALUE"
-    }, {
-      "method" : "mapper",
-      "order" : 0,
-      "fieldName" : "/MSH-10-1",
-      "mappingTable" : "TBD"
     } ]
   } ]
 }, {
