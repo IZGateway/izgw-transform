@@ -26,7 +26,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelExecutionException;
@@ -131,24 +130,24 @@ public class HubController extends SoapControllerBase {
 
     @Override
     protected void checkCredentials(HasCredentials s) throws SecurityFault {
-
     }
 
     @Operation(
             summary = "Post a message to the SOAP Interface",
             description = "Send a request to the SOAP Interface for IZ Gateway"
     )
-    @ApiResponses({@ApiResponse(
+    @ApiResponse(
             responseCode = "200",
             description = "The request completed normally",
             content = {@Content(
                     mediaType = "application/xml"
             )}
-    ), @ApiResponse(
+    )
+    @ApiResponse(
             responseCode = "500",
             description = "A fault occured while processing the request",
             content = {@Content}
-    )})
+    )
     @PostMapping(
             produces = {"application/soap+xml", "application/soap", "application/xml", "text/xml", "text/plain", "text/html"}
     )
