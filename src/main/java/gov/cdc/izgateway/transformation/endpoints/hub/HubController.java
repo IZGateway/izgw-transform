@@ -22,7 +22,6 @@ import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
-import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,25 +72,14 @@ public class HubController extends SoapControllerBase {
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
-
-        // TODO Potentially refactor to not extract single pieces
-        ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
-        serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
-
-        HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
+        HubWsdlTransformationContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
 
         try {
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
+            context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
         }
-        catch (CamelExecutionException e) {
+        catch (CamelExecutionException | HL7Exception e) {
             throw new HubControllerFault(e.getCause().getMessage());
-        }
-
-        try {
-            context.getSubmitSingleMessageResponse().setHl7Message(serviceContext.getResponseMessage().encode());
-        }
-        catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
         }
 
         return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
@@ -107,7 +95,14 @@ public class HubController extends SoapControllerBase {
         return organization;
     }
 
-    private ServiceContext getServiceContext(UUID organization, String incomingMessage) throws Fault {
+    private HubWsdlTransformationContext createHubWsdlTransformationContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+        ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage.getHl7Message());
+        serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
+
+        return new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
+    }
+
+    private ServiceContext createServiceContext(UUID organization, String incomingMessage) throws Fault {
         try {
             return new ServiceContext(organization,
                     "izgts:IISHubService",
