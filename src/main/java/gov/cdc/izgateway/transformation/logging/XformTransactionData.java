@@ -45,22 +45,26 @@ public class XformTransactionData extends TransactionData {
 
         if ( pipelineAdvice == null ) {
             pipelineAdvice = new PipelineAdvice(advice);
-        } else {
-            pipelineAdvice.setName(advice.getName());
-            pipelineAdvice.setId(advice.getId());
-            if ( advice.getTransformedRequest() != null)
-                pipelineAdvice.setTransformedRequest(advice.getTransformedRequest());
-            if ( advice.getResponse() != null )
-                pipelineAdvice.setResponse(advice.getResponse());
-            if ( advice.getTransformedResponse() != null )
-                pipelineAdvice.setTransformedResponse(advice.getTransformedResponse());
         }
 
+        pipelineAdvice.setName(advice.getName());
+        pipelineAdvice.setId(advice.getId());
+        pipelineAdvice.setProcessError(advice.isProcessError());
+        if ( advice.getTransformedRequest() != null)
+            pipelineAdvice.setTransformedRequest(advice.getTransformedRequest());
+        if ( advice.getResponse() != null )
+            pipelineAdvice.setResponse(advice.getResponse());
+        if ( advice.getTransformedResponse() != null )
+            pipelineAdvice.setTransformedResponse(advice.getTransformedResponse());
     }
 
     public void addAdvice(SolutionAdviceDTO advice) {
 
         currentSolutionAdvice = pipelineAdvice.getSolutionAdvice(advice);
+
+        if ( advice.isProcessError() ) {
+            currentSolutionAdvice.setProcessError(true);
+        }
 
         if ( advice.getTransformedRequest() != null ) {
             currentSolutionAdvice.setTransformedRequest(advice.getTransformedRequest());
@@ -86,5 +90,40 @@ public class XformTransactionData extends TransactionData {
     public void logIt() {
         computeTransactionTimes();
         log.info(Markers2.append("transactionData", this), "{}", getMessage());
+        logPipelineDetail();
+        logSolutionDetail();
+    }
+
+    public void logPipelineDetail() {
+        XformLogDetail logDetail = new XformLogDetail();
+
+        logDetail.setEventId(this.getEventId());
+        logDetail.setConcept("pipeline");
+        logDetail.setName(pipelineAdvice.getName());
+        logDetail.setProcessError(this.getHasProcessError());
+
+        log.info(Markers2.append("pipelineDetail", logDetail), "{}", "");
+    }
+
+    public void logSolutionDetail() {
+
+        pipelineAdvice.getSolutionAdviceList().forEach(s -> {
+            XformSolutionLogDetail logDetail = new XformSolutionLogDetail();
+
+            logDetail.setEventId(this.getEventId());
+            logDetail.setConcept("solution");
+            logDetail.setName(s.getName());
+            logDetail.setProcessError(s.isProcessError());
+
+            if (!s.getRequestOperationAdviceList().isEmpty()) {
+                logDetail.setDirection("request");
+                log.info(Markers2.append("solutionDetail", logDetail), "{}", "");
+            }
+
+            if (!s.getResponseOperationAdviceList().isEmpty()) {
+                logDetail.setDirection("response");
+                log.info(Markers2.append("solutionDetail", logDetail), "{}", "");
+            }
+        });
     }
 }

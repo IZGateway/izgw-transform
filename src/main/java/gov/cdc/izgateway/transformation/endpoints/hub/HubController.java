@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.transformation.endpoints.hub;
 
 import ca.uhn.hl7v2.HL7Exception;
+import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.security.AccessControlRegistry;
@@ -19,6 +20,7 @@ import gov.cdc.izgateway.transformation.model.Destination;
 import gov.cdc.izgateway.transformation.model.DestinationId;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,6 +29,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +48,7 @@ import java.util.UUID;
 @Slf4j
 public class HubController extends SoapControllerBase {
     private final ProducerTemplate producerTemplate;
+    private final OrganizationService organizationService;
 
     @Value("${transformationservice.destination}")
     private String destinationUri;
@@ -53,11 +57,13 @@ public class HubController extends SoapControllerBase {
     public HubController(
             IMessageHeaderService mshService,
             AccessControlRegistry registry,
-            ProducerTemplate producerTemplate
+            ProducerTemplate producerTemplate,
+            OrganizationService organizationService
     ) {
         // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
         super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));
         this.producerTemplate = producerTemplate;
+        this.organizationService = organizationService;
 
         registry.register(this);
 
@@ -65,8 +71,7 @@ public class HubController extends SoapControllerBase {
 
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
-        // TODO Discuss the organizationId - should we just use a simple string
-        UUID organization = Hl7Utils.getOrganizationId(submitSingleMessage.getFacilityID());
+        UUID organization = organizationService.getOrganizationByCommonName(RequestContext.getSourceInfo().getCommonName()).getId();
 
         // TODO Potentially refactor to not extract single pieces
         ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
@@ -74,7 +79,12 @@ public class HubController extends SoapControllerBase {
 
         HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
 
-        producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
+        try {
+            producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
+        }
+        catch (CamelExecutionException e) {
+            throw new HubControllerFault(e.getCause().getMessage());
+        }
 
         try {
             context.getSubmitSingleMessageResponse().setHl7Message(serviceContext.getResponseMessage().encode());

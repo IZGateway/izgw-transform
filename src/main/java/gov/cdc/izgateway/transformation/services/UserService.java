@@ -5,6 +5,8 @@ import gov.cdc.izgateway.transformation.repository.TxFormRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+// TODO: The UserService and Repository classes may be redundant depending on how we implement Organizations
+// Remove these classes if they are not needed
 @Service
 public class UserService extends GenericService<User> {
     @Autowired

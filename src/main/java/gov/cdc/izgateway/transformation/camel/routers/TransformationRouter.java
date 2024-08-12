@@ -35,9 +35,8 @@ public class TransformationRouter extends RouteBuilder {
               .process(exchange -> {
                   Exception exception = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
                   log.error("Exception caught during processing: ", exception);
-                  // You can add more custom handling logic here
               })
-              .handled(true); // This will prevent the exception from being propagated further
+              .handled(false);
 
     /*
      * This route will take the incoming message (the IZGHub wsdl

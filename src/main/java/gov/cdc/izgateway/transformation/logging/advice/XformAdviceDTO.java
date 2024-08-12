@@ -14,6 +14,7 @@ public class XformAdviceDTO {
         this.name = name;
     }
 
+    private boolean processError;
     private String className;
     private String name;
     @JsonIgnore

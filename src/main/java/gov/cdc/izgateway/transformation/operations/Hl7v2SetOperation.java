@@ -5,6 +5,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.transformation.configuration.OperationSetConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
