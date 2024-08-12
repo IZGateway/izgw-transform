@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - Release*
+      - IGDD-1671*
 
   pull_request:
     branches:
