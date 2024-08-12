@@ -68,6 +68,8 @@ public class HubController extends SoapControllerBase {
         // TODO Discuss the organizationId - should we just use a simple string
         UUID organization = Hl7Utils.getOrganizationId(submitSingleMessage.getFacilityID());
 
+        UUID organizationId = Hl7Utils.getOrganizationId(submitSingleMessage.getFacilityID());
+
         // TODO Potentially refactor to not extract single pieces
         ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);

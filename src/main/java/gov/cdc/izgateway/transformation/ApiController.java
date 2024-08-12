@@ -3,10 +3,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.izgateway.transformation.model.*;
-import gov.cdc.izgateway.transformation.services.OrganizationService;
-import gov.cdc.izgateway.transformation.services.PipelineService;
-import gov.cdc.izgateway.transformation.services.SolutionService;
-import gov.cdc.izgateway.transformation.services.UserService;
+import gov.cdc.izgateway.transformation.services.*;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,7 @@ public class ApiController {
     private final PipelineService pipelineService;
     private final SolutionService solutionService;
     private final UserService userService;
+    private final FacilityService facilityService;
 
     @Value("${transformationservice.allow-delete-via-api}")
     private Boolean allowDelete;
@@ -38,12 +36,14 @@ public class ApiController {
             OrganizationService organizationService,
             PipelineService pipelineService,
             SolutionService solutionService,
-            UserService userService
+            UserService userService,
+            FacilityService facilityService
     ) {
         this.organizationService = organizationService;
         this.pipelineService = pipelineService;
         this.solutionService = solutionService;
         this.userService = userService;
+        this.facilityService = facilityService;
     }
 
     @GetMapping("/api/v1/pipelines/{uuid}")
@@ -231,6 +231,45 @@ public class ApiController {
 
         organizationService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/api/v1/facilities/{uuid}")
+    public ResponseEntity<Facility> getFacilityByUUID(@PathVariable UUID uuid) {
+        Facility entity = facilityService.getObject(uuid);
+        if (entity == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(entity, HttpStatus.OK);
+    }
+
+    @PostMapping("/api/v1/facilities")
+    public ResponseEntity<Facility> createFacility(
+            @Valid @RequestBody() Facility facility
+    ){
+        facilityService.create(facility);
+        return new ResponseEntity<>(facility, HttpStatus.OK);
+    }
+
+    @PutMapping("/api/v1/facilities/{uuid}")
+    public ResponseEntity<Facility> updateFacility(@PathVariable UUID uuid, @RequestBody Facility updatedFacility) {
+        updatedFacility.setId(uuid);
+        facilityService.update(updatedFacility);
+        return new ResponseEntity<>(updatedFacility, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/v1/facilities")
+    public ResponseEntity<String> getFacilitiesList(
+            @RequestParam(required = false) String nextCursor,
+            @RequestParam(required = false) String prevCursor,
+            @RequestParam(defaultValue = "false") Boolean includeInactive,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        try {
+            return processList(facilityService.getList(), nextCursor, prevCursor, includeInactive, limit);
+        } catch (JsonProcessingException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private <T extends BaseModel> ResponseEntity<String> processList(List<T> allEntityList, String nextCursor, String prevCursor, Boolean includeInactive, int limit) throws JsonProcessingException {

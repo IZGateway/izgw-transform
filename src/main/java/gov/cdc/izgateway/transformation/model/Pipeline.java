@@ -33,4 +33,6 @@ public class Pipeline implements BaseModel {
     private Boolean active;
 
     private List<Pipe> pipes;
+
+    private List<UUID> facilityIds;
 }
