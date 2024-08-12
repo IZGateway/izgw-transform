@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.transformation.logging;
 
 import gov.cdc.izgateway.logging.LoggingValveBase;
+import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.info.SourceInfo;
 import gov.cdc.izgateway.logging.markers.Markers2;
 import gov.cdc.izgateway.transformation.logging.advice.XformAdviceCollector;
@@ -26,13 +27,18 @@ public class XformLoggingValve extends LoggingValveBase {
         try {
             XformAdviceCollector.setTransactionData(t);
             setSourceInfoValues(req, t);
+            if (!isLogged(req.getRequestURI())) {
+                RequestContext.disableTransactionDataLogging();
+            }
             handleSpecificInvoke(req, resp, t.getSource());
         } catch (Exception e) {
             log.error(Markers2.append(e), "Uncaught Exception during invocation");
         } catch (Error err) {  // NOSONAR OK to Catch Error here
             log.error(Markers2.append(err), "Error during invocation");
         } finally {
-            t.logIt();
+            if (XformAdviceCollector.getTransactionData() != null && !RequestContext.isLoggingDisabled()) {
+                t.logIt();
+            }
             XformAdviceCollector.clear();
         }
     }
