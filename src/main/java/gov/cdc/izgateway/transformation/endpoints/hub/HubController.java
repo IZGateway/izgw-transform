@@ -20,6 +20,7 @@ import gov.cdc.izgateway.transformation.model.Destination;
 import gov.cdc.izgateway.transformation.model.DestinationId;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -71,7 +72,7 @@ public class HubController extends SoapControllerBase {
 
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
-        UUID organization = organizationService.getOrganizationByCommonName(RequestContext.getSourceInfo().getCommonName()).getId();
+        UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
 
         // TODO Potentially refactor to not extract single pieces
         ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
@@ -94,6 +95,16 @@ public class HubController extends SoapControllerBase {
         }
 
         return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
+    }
+
+    private Organization getOrganization(String commonName) throws Fault {
+        Organization organization = organizationService.getOrganizationByCommonName(commonName);
+
+        if (organization == null) {
+            throw new HubControllerFault("Organization not found for common name: " + commonName);
+        }
+
+        return organization;
     }
 
     private ServiceContext getServiceContext(UUID organization, String incomingMessage) throws Fault {
