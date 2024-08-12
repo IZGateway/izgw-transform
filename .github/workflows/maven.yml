@@ -156,7 +156,7 @@ jobs:
           startTime=$(date +%s);
           # Just Running the Smoke Test ONCE should be enough to warm up
           newman run ./scripts/TS_Integration_Test.postman_collection.json -n 1 --folder "Integration Tests" --folder "API Tests" \
-            "--environment" ./scripts/TxForm - dev.izgateway.org.postman_environment.json \
+            "--environment" ./scripts/dev.izgateway.org.postman_environment.json \
             "--ssl-extra-ca-certs" ./certs/izgwroot.pem \ 
             "--ssl-client-cert" ./newman.pem \ 
             "--ssl-client-key" ./newman.key \ 
