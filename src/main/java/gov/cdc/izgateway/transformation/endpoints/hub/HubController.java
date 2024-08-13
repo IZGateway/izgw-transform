@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.transformation.endpoints.hub;
 
 import ca.uhn.hl7v2.HL7Exception;
+import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.security.AccessControlRegistry;
@@ -19,17 +20,18 @@ import gov.cdc.izgateway.transformation.model.Destination;
 import gov.cdc.izgateway.transformation.model.DestinationId;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
-import gov.cdc.izgateway.transformation.util.Hl7Utils;
+import gov.cdc.izgateway.transformation.model.Organization;
+import gov.cdc.izgateway.transformation.services.OrganizationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +47,7 @@ import java.util.UUID;
 @Slf4j
 public class HubController extends SoapControllerBase {
     private final ProducerTemplate producerTemplate;
+    private final OrganizationService organizationService;
 
     @Value("${transformationservice.destination}")
     private String destinationUri;
@@ -53,11 +56,13 @@ public class HubController extends SoapControllerBase {
     public HubController(
             IMessageHeaderService mshService,
             AccessControlRegistry registry,
-            ProducerTemplate producerTemplate
+            ProducerTemplate producerTemplate,
+            OrganizationService organizationService
     ) {
         // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
         super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));
         this.producerTemplate = producerTemplate;
+        this.organizationService = organizationService;
 
         registry.register(this);
 
@@ -65,28 +70,38 @@ public class HubController extends SoapControllerBase {
 
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
-        // TODO Discuss the organizationId - should we just use a simple string
-        UUID organization = Hl7Utils.getOrganizationId(submitSingleMessage.getFacilityID());
-
-        // TODO Potentially refactor to not extract single pieces
-        ServiceContext serviceContext = getServiceContext(organization, submitSingleMessage.getHl7Message());
-        serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
-
-        HubWsdlTransformationContext context = new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
-
-        producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
+        UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
+        HubWsdlTransformationContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
 
         try {
-            context.getSubmitSingleMessageResponse().setHl7Message(serviceContext.getResponseMessage().encode());
+            producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
+            context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
         }
-        catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
+        catch (CamelExecutionException | HL7Exception e) {
+            throw new HubControllerFault(e.getCause().getMessage());
         }
 
         return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
     }
 
-    private ServiceContext getServiceContext(UUID organization, String incomingMessage) throws Fault {
+    private Organization getOrganization(String commonName) throws Fault {
+        Organization organization = organizationService.getOrganizationByCommonName(commonName);
+
+        if (organization == null) {
+            throw new HubControllerFault("Organization not found for common name: " + commonName);
+        }
+
+        return organization;
+    }
+
+    private HubWsdlTransformationContext createHubWsdlTransformationContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+        ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage.getHl7Message());
+        serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
+
+        return new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
+    }
+
+    private ServiceContext createServiceContext(UUID organization, String incomingMessage) throws Fault {
         try {
             return new ServiceContext(organization,
                     "izgts:IISHubService",
@@ -115,24 +130,24 @@ public class HubController extends SoapControllerBase {
 
     @Override
     protected void checkCredentials(HasCredentials s) throws SecurityFault {
-
     }
 
     @Operation(
             summary = "Post a message to the SOAP Interface",
             description = "Send a request to the SOAP Interface for IZ Gateway"
     )
-    @ApiResponses({@ApiResponse(
+    @ApiResponse(
             responseCode = "200",
             description = "The request completed normally",
             content = {@Content(
                     mediaType = "application/xml"
             )}
-    ), @ApiResponse(
+    )
+    @ApiResponse(
             responseCode = "500",
             description = "A fault occured while processing the request",
             content = {@Content}
-    )})
+    )
     @PostMapping(
             produces = {"application/soap+xml", "application/soap", "application/xml", "text/xml", "text/plain", "text/html"}
     )

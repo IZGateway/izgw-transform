@@ -1,13 +1,21 @@
 [ {
   "organizationName" : "Oklahoma FAKE TEST",
   "id" : "19c3dd20-31f4-4508-87ee-705fca9603b3",
-  "active" : true
+  "active" : true,
+  "commonName": "OK"
 }, {
   "organizationName" : "Audacious Test Organziation",
   "id" : "0d15449b-fb08-4013-8985-20c148b353fe",
-  "active" : true
+  "active" : true,
+  "commonName": "pcahill.testing.izgateway.org"
 }, {
   "organizationName" : "Maryland FAKE TEST",
   "id" : "b9bdedc5-cb33-4772-be37-b78dc7bf3786",
-  "active" : true
+  "active" : true,
+  "commonName": "xpcahill.testing.izgateway.org"
+}, {
+  "organizationName" : "Faulty Organization",
+  "id" : "8fbcad81-dc40-4da5-a696-962bf919e5fe",
+  "active" : true,
+  "commonName": "xpcahill.testing.izgateway.org"
 } ]

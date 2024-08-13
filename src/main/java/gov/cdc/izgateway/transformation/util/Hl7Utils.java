@@ -26,16 +26,4 @@ public class Hl7Utils {
 
         return parser.parse(rawHl7Message);
     }
-
-    // TODO: This is temporary until we discuss this.
-    public static UUID getOrganizationId(String organization) {
-
-        switch (organization) {
-            case "IZG":
-                return UUID.fromString("0d15449b-fb08-4013-8985-20c148b353fe");
-        }
-
-        return null;
-    }
-
 }

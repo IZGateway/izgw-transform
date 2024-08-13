@@ -11,5 +11,13 @@ public class OrganizationService  extends GenericService<Organization> {
     public OrganizationService(TxFormRepository<Organization> repo) {
         super(repo);
     }
+
+    public Organization getOrganizationByCommonName(String commonName) {
+        return repo.getEntitySet().stream().filter(o -> o.getCommonName().equals(commonName) && Boolean.TRUE.equals(o.getActive())).findFirst().orElse(null);
+    }
+
+    public boolean organizationExists(String commonName) {
+        return repo.getEntitySet().stream().anyMatch(o -> o.getCommonName().equals(commonName) && Boolean.TRUE.equals(o.getActive()));
+    }
 }
 

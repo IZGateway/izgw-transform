@@ -1,12 +1,14 @@
-[ {
-  "pipelineName" : "HL7v2 to IZ Gateway Hub - NAME CHANGE TEST",
+[
+  {
+  "pipelineName" : "Massachusetts to VA Pipeline",
   "id" : "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
   "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
   "description" : "Pipeline to call all implemented Preconditions and Operations",
   "inboundEndpoint" : "izgts:IISHubService",
   "outboundEndpoint" : "izghub:IISHubService",
   "active" : true,
-  "pipes" : [ {
+  "pipes" : [
+    {
     "id" : "ba5c2b8c-2196-419e-8e1d-7e9029982501",
     "solutionId" : "018f7881-7607-7220-a94b-fe0c7e81cbec",
     "solutionVersion" : "1.0",
@@ -46,4 +48,55 @@
     "solutionVersion" : "1.0",
     "preconditions" : [ ]
   } ]
-} ]
+},
+  {
+    "pipelineName" : "Maryland to VA Pipeline",
+    "id" : "e7022ef7-4f43-473f-a7f1-01d4ae81da6f",
+    "organizationId" : "b9bdedc5-cb33-4772-be37-b78dc7bf3786",
+    "description" : "Pipeline to call all implemented Preconditions and Operations",
+    "inboundEndpoint" : "izgts:IISHubService",
+    "outboundEndpoint" : "izghub:IISHubService",
+    "active" : true,
+    "pipes" : [
+      {
+        "id" : "ba5c2b8c-2196-419e-8e1d-7e9029982501",
+        "solutionId" : "018f7881-7607-7220-a94b-fe0c7e81cbec",
+        "solutionVersion" : "1.0",
+        "preconditions" : [ {
+          "method" : "equals",
+          "id" : "6786e55c-1da6-4cc4-9405-b586081630ac",
+          "dataPath" : "/MSH-1-1",
+          "comparisonValue" : "|"
+        }, {
+          "method" : "exists",
+          "id" : "d9e3806c-b252-414d-a357-8fe87c1f0bad",
+          "dataPath" : "/MSH-1-1"
+        } ]
+      } ]
+  },
+  {
+    "pipelineName" : "Pipeline that causes a fault",
+    "id" : "ef034c0d-1d64-4971-8068-7ab1567b11ea",
+    "organizationId" : "8fbcad81-dc40-4da5-a696-962bf919e5fe",
+    "description" : "Pipeline used to test fault handling",
+    "inboundEndpoint" : "izgts:IISHubService",
+    "outboundEndpoint" : "izghub:IISHubService",
+    "active" : true,
+    "pipes" : [
+      {
+        "id" : "4e864354-c4b2-4a03-a122-90a215e90c61",
+        "solutionId" : "40ac2845-d026-47ea-ad0b-d3ade3915a82",
+        "solutionVersion" : "1.0",
+        "preconditions" : [ {
+          "method" : "equals",
+          "id" : "04efbba8-9333-43bc-9fb7-d2bca583199e",
+          "dataPath" : "/MSH-1-1",
+          "comparisonValue" : "|"
+        }, {
+          "method" : "exists",
+          "id" : "f935d66c-b26d-4174-9b1d-d2b98d07b7a9",
+          "dataPath" : "/MSH-1-1"
+        } ]
+      } ]
+  }
+]

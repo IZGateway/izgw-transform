@@ -117,4 +117,38 @@
     } ]
   } ],
   "responseOperations" : [ ]
+}, {
+  "id" : "40ac2845-d026-47ea-ad0b-d3ade3915a82",
+  "solutionName" : "CauseErrorOnSet",
+  "description" : "Causes an error when setting a field",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "b1181da0-5b7d-4853-b39f-33596d94243a",
+      "dataPath" : "/MSH-1-1",
+      "regex" : "^\\|$"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-22-3",
+      "setValue" : "RegexMatchPrecondition_Solution"
+    } ]
+  } ],
+  "responseOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSX-7-1",
+      "setValue" : "MSH 7 NEW VALUE"
+    }, {
+      "method" : "mapper",
+      "order" : 0,
+      "fieldName" : "/MSH-10-1",
+      "mappingTable" : "TBD"
+    } ]
+  } ]
 } ]

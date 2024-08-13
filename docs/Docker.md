@@ -88,7 +88,7 @@ future release)
 
 ### Configuration Files
 
-The Transformation Service relies on three configuration files at this time: Organization, Pipelines, Solutions and Users. These
+The Transformation Service relies on three configuration files at this time: Organization, Pipelines, and Solutions. These
 ultimately determine the changes that will happen to data as it travels through the Transformation Service.
 
 You may download example configurations from the repository as described here:
@@ -96,7 +96,6 @@ You may download example configurations from the repository as described here:
 * Organizations &rarr; [organizations.json](/testing/configuration/organizations.json)
 * Pipelines &rarr; [pipelines.json](/testing/configuration/pipelines.json)
 * Solutions &rarr; [solutions.json](/testing/configuration/solutions.json)
-* Users &rarr; [users.json](/testing/configuration/users.json)
 
 You'll need to have these files located in a place that can be accessed by the running Docker container. For our example
 let's say we put these in a /izgw-xform/configuration directory. This local directory will be mapped into the running
@@ -108,7 +107,6 @@ The three environment variables:
 * transformationservice.configurations.organizations
 * transformationservice.configurations.pipelines
 * transformationservice.configurations.solutions
-* transformationservice.configurations.users
 
 ## Running Transformation Service Locally via Docker
 
@@ -146,10 +144,6 @@ To run the image we need to set a few environment variables used by the running 
     * This specifies the name and location on the running container of the configuration for Solutions. For our example
       we will look for the solutions.json in the /configuration folder. So we would set this to
       /configuration/solutions.json.
-* transformationservice.configurations.users
-    * This specifies the name and location on the running container of the configuration for Users. For our example
-      we will look for the users.json in the /configuration folder. So we would set this to
-      /configuration/users.json.
 * SSL_SHARE
     * This specifies the directory on the running container where the Server Key Store and Client Trust Store are
       located. For our example we will look for these files in /ssl
@@ -172,7 +166,6 @@ docker run \
 --env=transformationservice.configurations.organizations=/configuration/organizations.json \
 --env=transformationservice.configurations.pipelines=/configuration/pipelines.json \
 --env=transformationservice.configurations.solutions=/configuration/solutions.json \
---env=transformationservice.configurations.users=/configuration/users.json \
 --volume=/Users/moodya/Dev/Fed/izg/izgw-transform/src/main/resources:/configuration \
 --volume=/Users/moodya/Dev/Fed/izg/dev.izgateway.org_stores/conf/ssl:/ssl \
 -p 444:444 \

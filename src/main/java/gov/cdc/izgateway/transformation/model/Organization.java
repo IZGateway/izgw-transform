@@ -15,5 +15,7 @@ public class Organization implements BaseModel {
     private UUID id;
     @NotNull(message = "Organization active status is required")
     private Boolean active;
+    @NotNull(message = "Organization common name is required")
+    private String commonName;
 }
 

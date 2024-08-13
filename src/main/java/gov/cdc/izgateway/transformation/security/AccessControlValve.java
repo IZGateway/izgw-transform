@@ -1,6 +1,6 @@
 package gov.cdc.izgateway.transformation.security;
 
-import gov.cdc.izgateway.transformation.services.UserService;
+import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.utils.X500Utils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,14 +26,14 @@ import java.security.cert.X509Certificate;
 @Component("xformValveAccessControl")
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class AccessControlValve extends ValveBase {
-    private final UserService userService;
+    private final OrganizationService organizationService;
 
     @Value("${transformationservice.access-control-enabled}")
     private boolean accessControlEnabled;
 
     @Autowired
-    public AccessControlValve(UserService userService) {
-        this.userService = userService;
+    public AccessControlValve(OrganizationService organizationService) {
+        this.organizationService = organizationService;
     }
 
     @Override
@@ -50,10 +50,9 @@ public class AccessControlValve extends ValveBase {
         }
 
         X509Certificate[] certs = (X509Certificate[]) req.getAttribute(Globals.CERTIFICATES_ATTR);
+        String commonName = X500Utils.getCommonName(certs[0].getSubjectX500Principal());
 
-        String user = X500Utils.getCommonName(certs[0].getSubjectX500Principal());
-
-        if ( userService.userExists(user)) {
+        if ( organizationService.organizationExists(commonName)) {
             return true;
         } else {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
