@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "44afbe35-8faf-432e-a0b6-7192065e3658",
+		"_postman_id": "3bf9b46b-bd50-4166-9dac-fbf83e29b20a",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/THSALink~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-44afbe35-8faf-432e-a0b6-7192065e3658?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/THSALink~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-3bf9b46b-bd50-4166-9dac-fbf83e29b20a?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -2987,6 +2987,7 @@
 											"pm.collectionVariables.clear();",
 											"",
 											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
 										],
@@ -3011,6 +3012,7 @@
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
 											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentCommonName\"));",
 											"})",
 											""
 										],
@@ -3024,7 +3026,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"organizationName\" : \"{{currentName}}\",\n  \"active\" : {{currentActive}}\n}",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"organizationName\" : \"{{currentName}}\",\n  \"commonName\": \"{{currentCommonName}}\",\n  \"active\" : {{currentActive}}\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3064,6 +3066,7 @@
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
 											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentCommonName\"));",
 											"}",
 											")"
 										],
@@ -3179,7 +3182,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"organizationName\" : \"{{currentName}}\",\n  \"active\" : {{currentActive}}\n}",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"organizationName\" : \"{{currentName}}\",\n  \"commonName\": \"{{currentCommonName}}\",\n  \"active\" : {{currentActive}}\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3222,6 +3225,7 @@
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
 											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentCommonName\"));",
 											"})"
 										],
 										"type": "text/javascript",
@@ -3393,7 +3397,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"organizationName\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"active\": {{currentActive}}\n}",
+									"raw": "{\n    \"organizationName\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"active\": {{currentActive}},\n    \"commonName\": \"{{currentCommonName}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3440,12 +3444,16 @@
 											"let entityNumber = 0;",
 											"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"commonName\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"",
 											"pm.collectionVariables.unset(\"thisName\");",
 											"pm.collectionVariables.unset(\"thisId\");",
+											"pm.collectionVariables.unset(\"thisCommonName\");",
 											"",
 											"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
-											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));"
+											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"commonName\" + entityNumber));",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -3457,7 +3465,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"active\": true\n}",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": true\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3503,12 +3511,15 @@
 											"let entityNumber = 1;",
 											"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"commonName\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"",
 											"pm.collectionVariables.unset(\"thisName\");",
 											"pm.collectionVariables.unset(\"thisId\");",
+											"pm.collectionVariables.unset(\"thisCommonName\");",
 											"",
 											"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
 											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"commonName\" + entityNumber));",
 											""
 										],
 										"type": "text/javascript",
@@ -3521,7 +3532,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"active\": true\n}",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": true\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -3567,12 +3578,16 @@
 											"let entityNumber = 2;",
 											"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"commonName\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"",
 											"pm.collectionVariables.unset(\"thisName\");",
 											"pm.collectionVariables.unset(\"thisId\");",
+											"pm.collectionVariables.unset(\"thisCommonName\");",
 											"",
 											"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
-											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));"
+											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"commonName\" + entityNumber));",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -3584,7 +3599,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"active\": false\n}",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": false\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5503,60 +5518,6 @@
 					""
 				]
 			}
-		}
-	],
-	"variable": [
-		{
-			"key": "GoodResponse",
-			"value": ""
-		},
-		{
-			"key": "GoodResponseLF",
-			"value": ""
-		},
-		{
-			"key": "GoodResponseCRLF",
-			"value": ""
-		},
-		{
-			"key": "GoodMessageLF",
-			"value": ""
-		},
-		{
-			"key": "GoodMessageCRLF",
-			"value": ""
-		},
-		{
-			"key": "TooLargeMessage",
-			"value": ""
-		},
-		{
-			"key": "IisTooLargeMessage",
-			"value": ""
-		},
-		{
-			"key": "hex0b",
-			"value": ""
-		},
-		{
-			"key": "hex1b",
-			"value": ""
-		},
-		{
-			"key": "currentName",
-			"value": ""
-		},
-		{
-			"key": "currentId",
-			"value": ""
-		},
-		{
-			"key": "currentActive",
-			"value": ""
-		},
-		{
-			"key": "createdEntity",
-			"value": ""
 		}
 	]
 }
