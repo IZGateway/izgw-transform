@@ -16,5 +16,8 @@ public class OrganizationService  extends GenericService<Organization> {
         return repo.getEntitySet().stream().filter(o -> o.getCommonName().equals(commonName) && Boolean.TRUE.equals(o.getActive())).findFirst().orElse(null);
     }
 
+    public boolean organizationExists(String commonName) {
+        return repo.getEntitySet().stream().anyMatch(o -> o.getCommonName().equals(commonName) && Boolean.TRUE.equals(o.getActive()));
+    }
 }
 
