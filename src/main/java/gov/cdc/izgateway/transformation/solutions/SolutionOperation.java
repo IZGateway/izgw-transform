@@ -5,10 +5,7 @@ import gov.cdc.izgateway.transformation.chains.Hl7v2OperationChain;
 import gov.cdc.izgateway.transformation.configuration.*;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
-import gov.cdc.izgateway.transformation.operations.Hl7v2CopyOperation;
-import gov.cdc.izgateway.transformation.operations.Hl7v2RegexReplaceOperation;
-import gov.cdc.izgateway.transformation.operations.Hl7v2SaveStateOperation;
-import gov.cdc.izgateway.transformation.operations.Hl7v2SetOperation;
+import gov.cdc.izgateway.transformation.operations.*;
 import gov.cdc.izgateway.transformation.preconditions.*;
 
 import java.util.ArrayList;
@@ -46,6 +43,8 @@ public class SolutionOperation {
                 operations.addOperation(new Hl7v2RegexReplaceOperation(operationRegexReplaceConfig));
             } else if (operationConfig instanceof OperationSaveStateConfig operationSaveStateConfig) {
                 operations.addOperation(new Hl7v2SaveStateOperation(operationSaveStateConfig));
+            }  else if (operationConfig instanceof OperationMapperConfig operationMapperConfig) {
+                operations.addOperation(new Hl7v2MapOperation(operationMapperConfig));
             }
         }
 
