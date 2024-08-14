@@ -1,7 +1,8 @@
 package gov.cdc.izgateway.transformation.endpoints.fhir;
 
-import gov.cdc.izgw.v2tofhir.converter.DatatypeConverter;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
+import gov.cdc.izgw.v2tofhir.datatype.HumanNameParser;
+import gov.cdc.izgw.v2tofhir.segment.PIDParser;
 import gov.cdc.izgw.v2tofhir.utils.QBPUtils;
 import gov.cdc.izgw.v2tofhir.utils.FhirIdCodec;
 import gov.cdc.izgw.v2tofhir.utils.IzQuery;
@@ -10,29 +11,39 @@ import gov.cdc.izgw.v2tofhir.utils.ParserUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.IllegalFormatCodePointException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Bundle.SearchEntryMode;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Extension;
+import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.IdType;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.ImmunizationRecommendation;
+import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.OperationOutcome.IssueSeverity;
 import org.hl7.fhir.r4.model.OperationOutcome.IssueType;
 import org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent;
+import org.hl7.fhir.r4.model.Parameters;
+import org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.PrimitiveType;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.StringType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -40,11 +51,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.uhn.fhir.model.api.Include;
+import ca.uhn.fhir.rest.param.DateParam;
+import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v251.message.QBP_Q11;
 import gov.cdc.izgateway.common.HasDestinationUri;
@@ -69,6 +83,36 @@ import lombok.extern.slf4j.Slf4j;
  * The FHIR Controller implements methods enabling users to query an IIS via FHIR instead of
  * V2 Messaging.
  * 
+ * The base capability of this component is to convert a FHIR query into a Z34 or Z44 query
+ * depending on the resource requested.
+ * 
+ * This is the special sauce of the V2 to FHIR Converter for Immunization Registries
+ * 
+ * Each Patient known to an IIS has a "chart", that is reflected by their immunization history.
+ * The operating assumption is that the Patient/id of the FHIR resource can be converted back to the parameters necessary
+ * to query the IIS when necessary to collect the patient chart. Given a patient id, the chart can be reconstructed, and 
+ * requested resources can be read back from the chart.  So long as the IIS retains the data, the resource should be able
+ * to be "found" again.
+ * 
+ * The resources supported are listed below.  Values between () indicate source
+ * of the resource data.  Values between [] indicate how it is uniquely identified in the chart.
+ * 
+ * - Patient (PID+PD1) [name,gender,dob,first identifier]
+ * - Immunization (ORC/RXA/RXR+OBX)  [ServiceRequest.identifer from ORC-3]
+ * - ImmunizationRecommendation* (ORC/RXA/RXR+OBX) [ServiceRequest.identifer from ORC-3]  
+ * - ServiceRequest (ORC) [ORC-3]
+ * - Organization (MSH, ORC-23, PD1-4)	[name, identifier]
+ * - Endpoint (MSH) [name]
+ * - Practitioner (EVN-5, OBX-15,16,25, ORC-12,21, PD1-4, PV1-7,8,9,17,52, RXA-10) [name, identifier]
+ * - PractitionerRole (OBX-15,16,25, ORC-12,21,23) [org unique value + practitioner unique value]
+ * - Location (EVN-7, ORC-29, PV1-3,6,11,37,40,42,43, RXA-11,27,28) [name computed from location]
+ * - RelatedPerson (NK1) [name]
+ * - Encounter (PV1) [first identifier]
+ * - Account (PID-18) [identifier]
+ * 
+ * * ImmunizationRecommendation resources are notable "transient" in nature and change over time, and so may not be retrievable
+ *   at a future point in time.
+ * 
  * @author Audacious Inquiry 
  */
 @RestController
@@ -89,7 +133,8 @@ public class FhirController {
 	}
 	
     /**
-     * Send a Z34 Request Immunization History request to an IIS.
+     * Send a Z34 Request Immunization History or Z44 Request Evaluated History and Recommendation 
+     * request to an IIS and return the requested resources.
      * 
      * @param destinationId	The destination for the FHIR Request.  This takes the place of the
      * destinationId element shown below in Soap Messages.
@@ -108,15 +153,15 @@ public class FhirController {
      * @throws UnexpectedException When something goes wrong that shouldn't have
      */
     @Operation(
-    	summary = "Request an Immunization History via FHIR",
+    	summary = "Request an Immunization History or Immunization Recommendation via FHIR",
         description = "Send a request to the FHIR Interface for IZ Gateway Transformation Service"
     )
     @ApiResponse(
-            responseCode = "200",
-            description = "The request completed normally",
-            content = {@Content(
-                    mediaType = "application/xml"
-            )}
+        responseCode = "200",
+        description = "The request completed normally",
+        content = {@Content(
+                mediaType = "application/xml"
+        )}
     )
     @ApiResponse(
     	responseCode = "400",
@@ -128,7 +173,11 @@ public class FhirController {
         description = "An internal error occured while processing the request",
         content = {@Content}
     )
-    @RequestMapping(value="/{destinationId}/Immunization",
+    @RequestMapping(value = { 
+    		"/{destinationId}/Immunization", 
+    		"/{destinationId}/ImmunizationRecommendation",
+    		"/{destinationId}/Patient"
+    	},
     	method = { 
     		RequestMethod.GET,	// Typical web based query 
     		RequestMethod.POST, // Safer because POST parameters don't wind up in access logs
@@ -144,27 +193,28 @@ public class FhirController {
         	"text/xml"
     	}
     )
-	public ResponseEntity<Bundle> immunizationQuery(
+	public ResponseEntity<Bundle> iisQuery(
 		@PathVariable String destinationId,
 		HttpServletRequest req
 	) throws FaultException, HL7Exception, UnexpectedException {
-		return processQuery(req, IzQuery.HISTORY, destinationId);
+		return processQuery(req, destinationId);
 	}
 
     /**
-     * Send a Z44 Request Evaluated History and Recommendation request to an IIS.
+     * Read an Immunization, ImmunizationRecommendation or Patient resource.  This just does a query by _id on patient,
+     * and then selects the appropriate result.
      * 
-     * @param destinationId	The destination for the FHIR Request.
-     * @param req	The HttpServletRequest to get the request parameters from.
-     * @return	A FHIR Bundle containing the search results, or an OperationOutcome resource if there
-     * was an exception, fault or error processing the message.
-     * @throws HL7Exception When an HL7 parsing error occurs
-     * @throws FaultException When a SoapFault is reported.
-     * @throws UnexpectedException When something goes wrong in the code that shouldn't have
+     * @param destinationId	The identifier of the destination IIS
+     * @param id The identifier of the immunization resource.
+     * @param req	The HttpServletRequest so we can process parameters.
+     * @return	The requested Resource
+     * @throws FaultException	When a fault occurs.
+     * @throws HL7Exception	When an HL7 Message exception occurs
+     * @throws UnexpectedException When some other exception occurs
      */
-	@Operation(
-        	summary = "Request an Immunization Evaluated History Forecast via FHIR",
-            description = "Send a request to the FHIR Interface for IZ Gateway Transformation Service"
+    @Operation(
+        	summary = "Read an Immunization, ImmunizationRecommendation or Patient resource via FHIR",
+            description = "Translate the read into a query and return the requested resource"
         )
     @ApiResponse(
             responseCode = "200",
@@ -174,16 +224,24 @@ public class FhirController {
             )}
     )
     @ApiResponse(
-    	responseCode = "500",
-        description = "An internal error occured while processing the request (e.g., a SoapFault)",
+    	responseCode = "404",
+        description = "The requested resource could not be found",
         content = {@Content}
     )
     @ApiResponse(
-        	responseCode = "400",
-            description = "An error occured while processing the request (e.g., invalid request)",
-            content = {@Content}
+    	responseCode = "500",
+        description = "An internal error occured while processing the request",
+        content = {@Content}
     )
-    @RequestMapping(value="{destinationId}/ImmunizationRecommendation",
+    @RequestMapping(value= { 
+    		"/{destinationId}/Immunization/{id}", 
+    		"/{destinationId}/ImmunizationRecommendation/{id}", 
+    		"/{destinationId}/Patient/{id}", 
+    	},
+    	method = { 
+    		RequestMethod.GET,	// Typical web based query 
+    		RequestMethod.HEAD	// Used with SMART and other auth mechanisms.
+    	},
         produces = {
         	"application/fhir+xml", 
         	"application/fhir+json", 
@@ -192,60 +250,267 @@ public class FhirController {
         	"application/json", 
         	"application/yaml",
         	"text/xml"
-        	},
-    	method = { 
-    		RequestMethod.GET,	// Typical web based query 
-    		RequestMethod.POST, // Safer because POST parameters don't wind up in access logs
-    		RequestMethod.HEAD	// Used with SMART and other auth mechanisms.
     	}
     )
-	public ResponseEntity<Bundle> immunizationRecommendationQuery(
-		@PathVariable String destinationId,
-		HttpServletRequest req
-	) throws HL7Exception, FaultException, UnexpectedException {
-		return processQuery(req, IzQuery.RECOMMENDATION, destinationId);
+
+    public ResponseEntity<Resource> iisRead(
+    	@PathVariable String destinationId,
+    	@PathVariable String id,
+    	HttpServletRequest req
+    ) throws FaultException, HL7Exception, UnexpectedException {
+    	String decodedId = null;
+    	try {
+    		decodedId = FhirIdCodec.decode(id);
+    	} catch (IllegalFormatCodePointException ex) {
+    		return notFound(id);
+    	}
+    	String resourceType = StringUtils.substringBetween(req.getRequestURI(), destinationId + "/", "/" + id); 
+    	
+    	String[] idParts = decodedId.split("\\|");
+    	boolean isPatient = "Patient".equals(resourceType);
+    	if (idParts.length < (isPatient ? 2 : 4)) {
+    		return notFound(id);
+    	}
+    	Identifier ident = new Identifier().setSystem(idParts[isPatient ? 0 : 2]).setValue(idParts[isPatient ? 1 : 3]);
+		
+		RequestWithModifiableParameters wrapper = new RequestWithModifiableParameters(req);
+    	wrapper.addParameter(IzQuery.PATIENT_LIST, idParts[0] + "|" + idParts[1]);
+		Bundle b = processQuery(wrapper, destinationId).getBody();
+
+		Resource res = b.getEntry().stream()
+			.map(e -> e.getResource())
+			.filter(r -> resourceType.equals(r.fhirType()) && ident.equalsShallow(getIdentifier(r)))
+			.findFirst()
+			.orElse(null);
+		
+		if (res == null) {
+			return notFound(id);
+		}
+		return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+    
+    /**
+     * Perform the patient match operation. This performs a query on patient, and then selects 
+     * the appropriate result.
+     * 
+     * @param destinationId	The identifier of the destination IIS
+     * @param body	The operation parameters, as a Parameters resource, or a Patient resource
+     * @param req	The HttpServletRequest so we can process parameters.
+     * @return	A bundle of Patient Resources
+     * @throws FaultException	When a fault occurs.
+     * @throws HL7Exception	When an HL7 Message exception occurs
+     * @throws UnexpectedException When some other exception occurs
+     */
+    @Operation(
+        	summary = "Perform the Patient/$match operation",
+            description = "Translate the operation into a query and return the requested resources"
+        )
+    @ApiResponse(
+            responseCode = "200",
+            description = "The request completed normally",
+            content = {@Content(
+                    mediaType = "application/xml"
+            )}
+    )
+    @ApiResponse(
+    	responseCode = "400",
+        description = "The request was invalid",
+        content = {@Content}
+    )
+    @ApiResponse(
+    	responseCode = "500",
+        description = "An internal error occured while processing the request",
+        content = {@Content}
+    )
+    @RequestMapping(value= "/{destinationId}/Patient/$match", 
+    	method = { 
+    		RequestMethod.POST,	// Typical web based query 
+    		RequestMethod.HEAD	// Used with SMART and other auth mechanisms.
+    	},
+        produces = {
+        	"application/fhir+xml", 
+        	"application/fhir+json", 
+        	"application/fhir+yaml",
+        	"application/xml",
+        	"application/json", 
+        	"application/yaml",
+        	"text/xml"
+    	}
+    )
+
+    public ResponseEntity<Resource> iisPatientMatch(
+    	@PathVariable String destinationId,
+    	@RequestBody Resource body,
+    	HttpServletRequest req
+    ) throws FaultException, HL7Exception, UnexpectedException {
+    	Patient searchPatient;
+    	int count = 5;
+    	boolean onlySingleMatch = false;
+    	boolean onlyCertainMatches = false;
+    	
+    	if ("Parameters".equals(body.fhirType())) {
+    		Parameters params = (Parameters)body;
+			String message = null; 
+    		try {
+    			message = "Parameters.resource must contain a Patient resource";
+    			searchPatient = (Patient)params.getParameter("resource").getResource();
+    			
+    			message = "Parameters.onlySingleMatch must contain a Boolean value";
+    			ParametersParameterComponent param = params.getParameter("onlySingleMatch");
+    			if (param != null) {
+    				onlySingleMatch = ((BooleanType)param.getValue()).booleanValue();
+    			}
+
+    			message = "Parameters.onlyCertainMatches must contain a Boolean value";
+    			param = params.getParameter("onlyCertainMatches");
+    			if (param != null) {
+    				onlyCertainMatches = ((BooleanType)param.getValue()).booleanValue();
+    			}
+
+    			message = "Parameters.count must contain an Integer value between 1 and 10";
+    			param = params.getParameter("count");
+    			if (param != null) { 
+    				count = ((IntegerType)param.getValue()).getValue();
+    				if (count < 1 || count > 10) {
+    					return illegalArguments(message);
+    				}
+    			}
+    		} catch (ClassCastException ex) {
+    			return illegalArguments(message);
+    		}
+    	} else if ("Patient".equals(body.fhirType())) {
+    		searchPatient = (Patient) body;
+    	} else {
+    		return illegalArguments("Body invalid, expected Patient or Parameters");
+    	}
+    	
+    	
+    	RequestWithModifiableParameters wrapper = new RequestWithModifiableParameters(req);
+    	wrapper.resetParameters();
+    	wrapper.addParameter(IzQuery.COUNT, Integer.toString(count));
+    	setParameters(wrapper, searchPatient);
+    	
+    	Bundle b = this.processQuery(wrapper, destinationId).getBody();
+    	
+    	IDIMatch.score(b, searchPatient, onlySingleMatch, onlyCertainMatches);
+    	
+		return new ResponseEntity<>(b, HttpStatus.OK);
+    }
+    
+    /**
+     * Set the search parameters for the patient using the input searchPatient
+     * as an example.
+     * 
+     * @param wrapper	The request to set the parameters for 
+     * @param patient	The patient to be searched for.
+     */
+    private static void setParameters(RequestWithModifiableParameters wrapper, Patient patient) {
+    	if (patient.hasIdentifier()) {
+    		for (Identifier identifier: patient.getIdentifier()) {
+	    		TokenParam t = new TokenParam();
+	    		t.setSystem(identifier.getSystem());
+	    		t.setValue(identifier.getValue());
+	    		wrapper.addParameter(Patient.SP_IDENTIFIER, t.getValueAsQueryToken(null));
+    		}
+    	}
+		setNameParameters(wrapper, patient);
+		setBirthDateParameters(wrapper, patient);
+		if (patient.hasGender()) {
+			wrapper.addParameter(Patient.SP_GENDER, patient.getGender().toString());
+		}
+		setAddressParameters(wrapper, patient);
 	}
 
-	/* 
-	 * TODO: Enable QTF Compliance 
-	 * 
-	 * For QTF, we need to be able to handle Patient/$match, Patient/id and Immunization?patient=Patient/id, and possibly Immunization/id
-	 * along with use of Patient?id= and Immunization?id=
-	 * 
-	 * The id for a PID returned by this system should be translatable into a Patient identifier that populates LIST_PATIENT of the Z34 or 
-	 * Z44 response. That is typically in the form of an CX with a 36 character string for id, and 20 character string for namespace. 
-	 * ST (CX-1) and IS (CX-3-1 = namespace part of HD) are drawn from the ASCII range 32-126.
-	 * 
-	 * Convert CX to data as follows:  
-	 * 
-	 * 
-	 * Each immunization has a required Filler order id, which may be 9999 in the case of a refused immunization.  We may be unable to find 
-	 * refused immunizations because of the overlap here.  In the case where 9999 is the filler id, the necessary data should be 
-	 * date, cvx code, and ?
-	 * 
-	 * We can convert the CX used to record the Patient Id so long as it contains only allowed identifier characters in a FHIR id type, but there 
-	 * is a length limit to deal with.
-	 *  
-	 * Patient/id
-	 * The id is base 64 encoding using the FHIR id character set of the first CX in PatientList
-	 * To retrieve a patient, convert the id back into the CX, do a Z34 query, and then get the patient from the result.
-	 * 
-	 * Immunization/id
-	 * The id is an encoding of the first EI in PatientList plus a . plus a hash of the Immunization data needed to match the immunization. 
-	 * To retrieve an immunization, convert the id back into the CX, do a Z34 query, and then iterating over each Immunization found
-	 * and hashing it to find the matching one.
-	 * 
-	 * ImmunizationRecommendation/id
-	 * The id is an encoding of the first EI in PatientList plus a . plus a hash of the ImmunizationRecommendation data needed to match the immunization. 
-	 * To retrieve an immunization, convert the id back into the CX, do a Z44 query, and then iterating over each ImmunizationRecommendation found
-	 * and hashing it to find the matching one.
-	 * 
+	private static void setNameParameters(RequestWithModifiableParameters wrapper, Patient patient) {
+		if (patient.hasName()) {
+			HumanName name = patient.getNameFirstRep();
+			if (name.hasText() && !name.hasFamily() && !name.hasGiven()) {
+				name = HumanNameParser.computeFromString(name.getText());
+			}
+			if (name.hasFamily()) {
+				wrapper.addParameter(Patient.SP_FAMILY, name.getFamily());
+			}
+			if (name.hasGiven()) {
+				for (StringType given: name.getGiven()) {
+					wrapper.addParameter(Patient.SP_GIVEN, given.asStringValue());
+				}
+			}
+			if (name.hasSuffix()) {
+				wrapper.addParameter("suffix", name.getSuffixAsSingleString());
+			}
+		}
+		if (patient.hasExtension(PIDParser.MOTHERS_MAIDEN_NAME)) {
+			Extension maidenName = patient.getExtensionByUrl(PIDParser.MOTHERS_MAIDEN_NAME);
+			wrapper.addParameter("mothers-maiden-name", maidenName.getValueAsPrimitive().getValueAsString());
+		}
+	}
+
+	private static void setBirthDateParameters(RequestWithModifiableParameters wrapper, Patient patient) {
+		if (patient.hasBirthDate()) {
+			DateParam birthDate = new DateParam();
+			birthDate.setValue(patient.getBirthDate());
+			wrapper.addParameter(Patient.SP_BIRTHDATE, birthDate.getValueAsQueryToken(null));
+		}
+		if (patient.hasMultipleBirth()) {
+			PrimitiveType<?> pt = (PrimitiveType<?>) patient.getMultipleBirth();
+			if (pt instanceof BooleanType) {
+				wrapper.addParameter("multipleBirth-indicator", pt.asStringValue());
+			} else if (pt instanceof IntegerType) {
+				wrapper.addParameter("multipleBirth-order", pt.asStringValue());
+			}
+		}
+	}
+
+	private static void setAddressParameters(RequestWithModifiableParameters wrapper, Patient patient) {
+		if (patient.hasAddress()) {
+			Address address = patient.getAddressFirstRep();
+			if (address.hasLine()) {
+				for (StringType line : address.getLine()) {
+					wrapper.addParameter(Patient.SP_ADDRESS, line.asStringValue());
+				}
+			}
+			if (address.hasCity()) {
+				wrapper.addParameter(Patient.SP_ADDRESS_CITY, address.getCity());
+			}
+			if (address.hasState()) {
+				wrapper.addParameter(Patient.SP_ADDRESS_STATE, address.getState());
+			}
+			if (address.hasPostalCode()) {
+				wrapper.addParameter(Patient.SP_ADDRESS_POSTALCODE, address.getPostalCode());
+			}
+			if (address.hasCountry()) {
+				wrapper.addParameter(Patient.SP_ADDRESS_COUNTRY, address.getCountry());
+			}
+		}
+	}
+    
+    private ResponseEntity<Resource> notFound(String id) {
+		OperationOutcome oo = new OperationOutcome();
+		OperationOutcomeIssueComponent issue = oo.addIssue();
+		issue.setCode(IssueType.NOTFOUND);
+		issue.setSeverity(IssueSeverity.ERROR);
+		issue.setDiagnostics("Resource not found " + id);
+		return new ResponseEntity<>(oo, HttpStatus.NOT_FOUND);
+    }
+    
+    private ResponseEntity<Resource> illegalArguments(String message) {
+		OperationOutcome oo = new OperationOutcome();
+		OperationOutcomeIssueComponent issue = oo.addIssue();
+		issue.setCode(IssueType.INVALID);
+		issue.setSeverity(IssueSeverity.ERROR);
+		issue.setDiagnostics(message);
+		return new ResponseEntity<>(oo, HttpStatus.BAD_REQUEST);
+    }
+    
+	/**
+	 * Generate an Immunization query to an IIS and convert the result to FHIR, returning
+	 * the requested information.
 	 */
 	private ResponseEntity<Bundle> processQuery(
 		HttpServletRequest req, 
-		String queryType,
 		String destinationId
 	) throws FaultException, HL7Exception, UnexpectedException {
+		String queryType = StringUtils.contains(req.getRequestURI(), "ImmunizationRecommendation") ? IzQuery.RECOMMENDATION : IzQuery.HISTORY;
 		
 		// Create the request and set the destination
 		SubmitSingleMessageRequest request = new SubmitSingleMessageRequest();
@@ -262,8 +527,16 @@ public class FhirController {
 			QBPUtils.setReceivingApplication(qbp, "TEST");
 			QBPUtils.setReceivingFacility(qbp, "MOCK");
 			
+			boolean isPatient = StringUtils.contains(req.getRequestURI(), "/Patient");
+
+			@SuppressWarnings("unused")
+			IzQuery query;
 			// Add request parameters to the QPD Segment
-			QBPUtils.addRequestToQPD(qbp, req.getParameterMap());
+			if (req instanceof RequestWithModifiableParameters reqp) {
+				query = QBPUtils.addParamsToQPD(qbp, reqp.getParameters(), isPatient);  // NOSONAR query is for debugging
+			} else {
+				query = QBPUtils.addRequestParamsToQPD(qbp, req.getParameterMap(), isPatient); // NOSONAR query is for debugging
+			}
 			
 			// Set the message content
 			request.setHl7Message(qbp.encode());
@@ -279,7 +552,7 @@ public class FhirController {
 			
 			if (entity.getBody() instanceof SubmitSingleMessageResponse response) {
 				resp = response;
-				Bundle b = convertResponseToFHIR(req, response);
+				Bundle b = convertResponseToFHIR(response);
 				adjustIdentifiers(b);
 				filter(b, req);
 				return new ResponseEntity<>(b, getHeader(req), HttpStatus.OK);
@@ -310,7 +583,7 @@ public class FhirController {
      * @throws HL7Exception	If any errors occurred while parsing the HL7 Message.
      * 
      */
-    private Bundle convertResponseToFHIR(HttpServletRequest req, SubmitSingleMessageResponse response) throws HL7Exception {
+    private Bundle convertResponseToFHIR(SubmitSingleMessageResponse response) throws HL7Exception {
     	String hl7Message = response.getHl7Message();
     	MessageParser mp = new MessageParser();
     	return mp.convert(hl7Message);
@@ -334,7 +607,6 @@ public class FhirController {
 		String requested = StringUtils.substringAfterLast(req.getRequestURI(), "/");
 		
 		List<Resource> resources = new ArrayList<>();
-		
 		preFilter(bundle, includes, revIncludes, requested, resources);
 		
 		markIncludedResources(includes, revIncludes, resources);
@@ -367,7 +639,7 @@ public class FhirController {
 	
 	private void removeInfrastructureCreatedResources(List<Resource> resources, List<Include> includes, List<Include> revIncludes,
 			Iterator<BundleEntryComponent> it, Resource r) {
-		if (r != null && r.getUserData("source") != null) {
+		if (r != null && r.getUserData(MessageParser.SOURCE) != null) {
 			// Some DatatypeConverter and MessageParser created resources have limited utility.  
 			// What we should we do with those depends on what resources the
 			// user asks to include.  These infrastructure crafted resources can be white-listed
@@ -376,11 +648,11 @@ public class FhirController {
 			// Users can white-list these resources with the following _include parameters:
 			// All:
 			// _include=Resource:source:*
-			// DatatypeConverter created Organization/Practitionr/RelatedPerson/Location
+			// DatatypeConverter created Organization/Practitioner/RelatedPerson/Location
 			// _include=Resource:source:Organization
 			// MessageParser created DocumentReference/Provenance
 			// _include=Resource:source:DocumentReference
-			String source = r.getUserData("source").toString();
+			String source = r.getUserData(MessageParser.SOURCE).toString();
 			if (
 				// ANY Source requested
 				// DatatypeConverter created resources including Organization, Practitioner, RelatedPerson, and Location
@@ -408,7 +680,7 @@ public class FhirController {
 	private boolean matchesSource(List<Include> includes, String target) {
 		for (Include include: includes) {
 			if ("Resource".equals(include.getParamType()) && 
-				"source".equals(include.getParamName()) &&
+				MessageParser.SOURCE.equals(include.getParamName()) &&
 				Arrays.asList("*", target, null).contains(include.getParamTargetType())
 			) {
 				return true;
@@ -498,57 +770,85 @@ public class FhirController {
 		}
 		List<Include> l = new ArrayList<>();
 		for (String i: inc) {
-			l.add(new Include(i));
+			i = normalizeInclude(i);
+			Include include = new Include(i);
+			l.add(include);
 		}
 		return l;
 	}
 
+	private static String normalizeInclude(String i) {
+		// normalize missing include values *
+		switch (StringUtils.countMatches(i, ':')) {
+		case 0:
+			i += ":*:*";
+			break;
+		case 1:
+			i += ":*";
+			break;
+		default:
+			break;
+		}
+		if (i.contains("::")) {
+			i = i.replace("::", ":*");
+		}
+		return i;
+	}
+
+	/**
+	 * Adjust the identifers of the resources returned in the bundle.
+	 * 
+	 * @param b	The bundle
+	 * @return	The bundle
+	 */
 	private Bundle adjustIdentifiers(Bundle b) {
 		String lastPatientValue = null;
 		for (BundleEntryComponent entry : b.getEntry()) {
 			Resource r = entry.getResource();
-			Identifier ident = null;
-			boolean isPatient = false;
-			if (r instanceof Patient p) {
-				// Immunization messages must have at least ONE patient identifier.
-				ident = p.getIdentifierFirstRep();
-				isPatient = true;
-			} else if (r instanceof Immunization iz) {
-				ident = iz.getIdentifierFirstRep();
-			} else if (r instanceof ImmunizationRecommendation izr) {
-				ident = izr.getIdentifierFirstRep();
-			}
+			Identifier ident = getIdentifier(r);
 			if (ident == null) {
 				continue;
 			}
 			String value = ident.getSystem() + "|" + ident.getValue();
-			if (isPatient) {
-				lastPatientValue = value;
+			if (r instanceof Patient) {
+				lastPatientValue = value;	// NOSONAR, lastPatientValue will be used on next iteration
 			} else {
 				value = lastPatientValue + "|" + value;
 			}
-			if (StringUtils.isAsciiPrintable(value)) {
-				// TODO: What do we do in the else case?  This is highly unlikely in HL7 messages because the character set
-				// is likely to be constrained to ASCII.
-				
-				// Mark it as an encoded identifier with an initial "."
-				// The V2 converter uses ULID internally, which won't start with a "."
-				// Which means we can always identify a Fhir encoded id with an initial .
-				String encoded = "." + FhirIdCodec.encode(value);
-				
-				if (encoded.length() > 64) {
-					// TODO: What do we do in this case?
-					// Technically, FHIR ids have to be shorter than 64 characters.  We'll ignore that, but log the issue.
-					log.warn("Id too long");
-				}
-				IdType x = r.getIdElement();
-				x.setParts(x.getBaseUrl(), x.getResourceType(), encoded, x.getVersionIdPart());
+			String encoded = FhirIdCodec.encode(value);
+			
+			if (encoded.length() > 64) {
+				// Technically, FHIR ids have to be shorter than 64 characters.  We'll ignore that, but log the issue.
+				log.warn("Id too long");
 			}
+			IdType x = r.getIdElement();
+			x.setParts(x.getBaseUrl(), x.getResourceType(), encoded, x.getVersionIdPart());
+			// Correct the singular reference to this resource used in all places where
+			// a reference is needed to it.
+			Reference ref = (Reference) r.getUserData("Reference");
+			if (ref != null) {
+				x = (IdType) ref.getReferenceElement();
+				x.setParts(x.getBaseUrl(), x.getResourceType(), encoded, x.getVersionIdPart());
+				ref.setReferenceElement(x);
+			}
+			
 			lastPatientValue = value;
 		}
 		return b;
 	}
 
+	private Identifier getIdentifier(Resource r) {
+		Identifier ident = null;
+		if (r instanceof Patient p) {
+			// Immunization messages must have at least ONE patient identifier.
+			ident = p.getIdentifierFirstRep();
+		} else if (r instanceof Immunization iz) {
+			ident = iz.getIdentifierFirstRep();
+		} else if (r instanceof ImmunizationRecommendation izr) {
+			ident = izr.getIdentifierFirstRep();
+		}
+		return ident;
+	}
 
 	private void setWsaHeaders(SubmitSingleMessageRequest request, QBP_Q11 qbp) {
 		// Set a message ID for the message we are crafting.

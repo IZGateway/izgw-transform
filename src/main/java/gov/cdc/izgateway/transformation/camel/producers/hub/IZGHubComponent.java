@@ -6,6 +6,7 @@ import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.Destination;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.DestinationId;
 import gov.cdc.izgateway.transformation.endpoints.hub.forreview.HubMessageSender;
+import gov.cdc.izgateway.utils.SystemUtils;
 import lombok.Getter;
 import org.apache.camel.Endpoint;
 import org.apache.camel.support.DefaultComponent;
@@ -34,14 +35,16 @@ public class IZGHubComponent extends DefaultComponent {
     }
 
     IDestination getDestination(String destinationId) throws UnknownDestinationFault {
-        IDestinationId destinationIdObject = new DestinationId();
+        DestinationId destinationIdObject = new DestinationId();
         destinationIdObject.setDestId(destinationId);
-        destinationIdObject.setDestType(0);
+        destinationIdObject.setDestType(SystemUtils.getDestType());
 
-        IDestination hubDestination = new Destination();
+        Destination hubDestination = new Destination();
         hubDestination.setId(destinationIdObject);
+        hubDestination.setDestinationId(destinationId);
         hubDestination.setDestUri(destinationUri);
-
+        hubDestination.setDestType(SystemUtils.getDestTypeAsString());
+        hubDestination.setDestTypeId(SystemUtils.getDestType());
         return hubDestination;
     }
 
