@@ -6,6 +6,7 @@ transformationservice:
     pipelines: testing/configuration/pipelines.json
     solutions: testing/configuration/solutions.json
     mappings: testing/configuration/mappings.json
+    access-control: testing/configuration/access-control.json
   access-control-enabled: ${TS_ACCESS_CONTROL_ENABLED:false}
 
 spring:

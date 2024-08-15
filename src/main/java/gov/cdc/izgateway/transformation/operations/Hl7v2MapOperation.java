@@ -33,21 +33,17 @@ public class Hl7v2MapOperation extends BaseOperation<OperationMapperConfig> impl
                 this.operationConfig.getCodeSystemField()));
 
         Message message = context.getCurrentMessage();
-
         Terser terser = new Terser(message);
-
-        Code code = getCode(terser);
-
-        Mapping mapping = mappingService.getMapping(context.getOrganizationId(), code);
+        Code codeToMap = getCode(terser);
+        Mapping mapping = mappingService.getMapping(context.getOrganizationId(), codeToMap);
 
         if (mapping == null) {
-            log.debug(String.format("Mapping not found for %s / %s", code.codeSystem(), code.code()));
+            log.debug(String.format("Mapping not found for %s / %s", codeToMap.codeSystem(), codeToMap.code()));
             return;
         }
 
         terser.set(operationConfig.getCodeField(), mapping.getTargetCode());
         terser.set(operationConfig.getCodeSystemField(), mapping.getTargetCodeSystem());
-
         context.setCurrentMessage(message);
     }
 
