@@ -4388,8 +4388,72 @@
 							"response": []
 						}
 					]
-				}
-			]
+				},
+              {
+                "name": "Mappings",
+                "item": [
+                  {
+                    "name": "Get Mappings",
+                    "event": [
+                      {
+                        "listen": "test",
+                        "script": {
+                          "exec": [
+                            "pm.test(\"returns 200 OK code\", function() {",
+                            "    pm.expect(pm.response.code).to.equal(200);",
+                            "});",
+                            "",
+                            "// Check to see if the 2 active we added in 3 previous steps are in the response",
+                            "let response = pm.response.json();",
+                            "",
+                            "pm.test(\"At least one result returned\", function() {",
+                            "    pm.expect(response[\"data\"].length).to.be.gt(0);",
+                            "});",
+                            ""
+                          ],
+                          "type": "text/javascript",
+                          "packages": {}
+                        }
+                      },
+                      {
+                        "listen": "prerequest",
+                        "script": {
+                          "exec": [
+                            ""
+                          ],
+                          "type": "text/javascript",
+                          "packages": {}
+                        }
+                      }
+                    ],
+                    "request": {
+                      "method": "GET",
+                      "header": [],
+                      "url": {
+                        "raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings?limit=100000",
+                        "protocol": "{{protocol}}",
+                        "host": [
+                          "{{host}}"
+                        ],
+                        "port": "{{port}}",
+                        "path": [
+                          "api",
+                          "v1",
+                          "mappings"
+                        ],
+                        "query": [
+                          {
+                            "key": "limit",
+                            "value": "100000"
+                          }
+                        ]
+                      }
+                    },
+                    "response": []
+                  }
+                ]
+              }
+            ]
 		}
 	],
 	"event": [
