@@ -14,8 +14,10 @@ import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.soap.message.HasCredentials;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.context.XformContext;
 import gov.cdc.izgateway.transformation.model.Destination;
 import gov.cdc.izgateway.transformation.model.DestinationId;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
@@ -70,12 +72,29 @@ public class HubController extends SoapControllerBase {
 
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
-        UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
-        HubWsdlTransformationContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
+        Organization organization = getOrganization(RequestContext.getSourceInfo().getCommonName());
+        HubWsdlTransformationContext context = createHubWsdlTransformationContext(organization.getId(), submitSingleMessage);
+
+        XformContext<SubmitSingleMessageRequest, SubmitSingleMessageResponse> xformContext = new XformContext<>();
+        xformContext.setOrganizationId(organization.getId());
+        xformContext.setInboundEndpoint("");
+        xformContext.setOutboundEndpoint("");
+        xformContext.setDataType(DataType.HL7V2);
+        xformContext.setCurrentDirection(DataFlowDirection.REQUEST);
+        xformContext.setSourceInfo(RequestContext.getSourceInfo());
+        xformContext.setDestinationInfo(RequestContext.getDestinationInfo());
+        xformContext.setRequestMessage(submitSingleMessage);
+        // TODO - when/where does response message get set?
+
 
         try {
+
+            //producerTemplate.sendBody("direct:austinTest", xformContext);
+
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
             context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
+
+            producerTemplate.sendBody("direct:austinTest", xformContext);
         }
         catch (CamelExecutionException | HL7Exception e) {
             throw new HubControllerFault(e.getCause().getMessage());

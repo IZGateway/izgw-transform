@@ -1,6 +1,9 @@
 package gov.cdc.izgateway.transformation.configuration;
 
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.context.XformContext;
 import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.model.Pipeline;
 import gov.cdc.izgateway.transformation.model.Solution;
@@ -33,6 +36,9 @@ public class TxServiceConfig {
         return pipelineService.getObject(pipelineId);
     }
 
+    public Pipeline findPipelineByContext(XformContext<SubmitSingleMessageRequest, SubmitSingleMessageResponse> context) {
+        return pipelineService.getPipelineByOrganizationAndEndpoints(context.getOrganizationId(), context.getInboundEndpoint(), context.getOutboundEndpoint());
+    }
     public Pipeline findPipelineByContext(ServiceContext context) {
         return pipelineService.getPipelineByOrganizationAndEndpoints(context.getOrganizationId(), context.getInboundEndpoint(), context.getOutboundEndpoint());
     }

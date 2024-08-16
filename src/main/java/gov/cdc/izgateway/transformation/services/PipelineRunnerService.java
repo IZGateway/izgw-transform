@@ -1,8 +1,11 @@
 package gov.cdc.izgateway.transformation.services;
 
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.configuration.TxServiceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.context.XformContext;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 import gov.cdc.izgateway.transformation.model.Pipe;
@@ -21,6 +24,32 @@ public class PipelineRunnerService implements Advisable, Transformable {
     @Autowired
     public PipelineRunnerService(TxServiceConfig txServiceConfig) {
         this.txServiceConfig = txServiceConfig;
+    }
+
+    @CaptureXformAdvice
+    public void execute(XformContext<SubmitSingleMessageRequest, SubmitSingleMessageResponse> context) {
+        // TODO - refactor this if we use it... same code basically as other execute method
+        pipeline = txServiceConfig.findPipelineByContext(context);
+
+        if (pipeline != null) {
+            log.trace(String.format("Executing Pipeline (%s) '%s'", pipeline.getId(), pipeline.getPipelineName()));
+        } else {
+            log.trace("No Pipeline Found");
+        }
+
+        for (Pipe pipe : pipeline.getPipes()) {
+            log.trace(String.format("Executing Pipe: %s", pipe.getId()));
+
+            // Create Solution
+            gov.cdc.izgateway.transformation.model.Solution solutionModel = txServiceConfig.getSolution(pipe.getSolutionId());
+
+            Solution solution = new Solution(solutionModel, context.getDataType());
+
+            //solution.execute(context);
+
+            log.trace(String.format("Solution Name: %s", solutionModel.getSolutionName()));
+
+        }
     }
 
     @CaptureXformAdvice
