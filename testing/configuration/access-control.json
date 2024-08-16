@@ -1,0 +1,29 @@
+[
+  {
+    "id": "d50994c7-5c6d-441b-aa08-12be7509923e",
+    "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
+    "active": true,
+    "roles": [
+      "admin",
+      "user"
+    ]
+  },
+  {
+    "id": "d50994c7-5c6d-441b-aa08-12be7509923e",
+    "organizationId": "0d15449b-fb08-4013-8985-20c148b353aa",
+    "active": true,
+    "roles": [
+      "admin",
+      "user"
+    ]
+  },
+  {
+    "id": "a046ed85-9094-48f2-a2d0-8eb94592d230",
+    "organizationId": "c2b5d669-3e8b-4585-9610-195c1238381d",
+    "active": true,
+    "roles": [
+      "admin",
+      "user"
+    ]
+  }
+]

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 public class OperationMapperConfig extends OperationConfig {
-    private String fieldName;
-    private String mappingTable;
+    private String codeField;
+    private String codeSystemField;
+    private String codeSystemDefault;
 }

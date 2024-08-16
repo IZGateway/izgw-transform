@@ -3,6 +3,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.izgateway.transformation.model.*;
+import gov.cdc.izgateway.transformation.services.MappingService;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.services.PipelineService;
 import gov.cdc.izgateway.transformation.services.SolutionService;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Role;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +29,7 @@ public class ApiController {
     private final OrganizationService organizationService;
     private final PipelineService pipelineService;
     private final SolutionService solutionService;
+    private final MappingService mappingService;
 
     @Value("${transformationservice.allow-delete-via-api}")
     private Boolean allowDelete;
@@ -35,11 +38,13 @@ public class ApiController {
     public ApiController(
             OrganizationService organizationService,
             PipelineService pipelineService,
-            SolutionService solutionService
+            SolutionService solutionService,
+            MappingService mappingService
     ) {
         this.organizationService = organizationService;
         this.pipelineService = pipelineService;
         this.solutionService = solutionService;
+        this.mappingService = mappingService;
     }
 
     @GetMapping("/api/v1/pipelines/{uuid}")
@@ -129,6 +134,21 @@ public class ApiController {
     ) {
         try {
             return processList(solutionService.getList(), nextCursor, prevCursor, includeInactive, limit);
+        } catch (JsonProcessingException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/api/v1/mappings")
+    public ResponseEntity<String> getMappingsList(
+            @RequestParam(required = false) String nextCursor,
+            @RequestParam(required = false) String prevCursor,
+            @RequestParam(defaultValue = "false") Boolean includeInactive,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        try {
+            return processList(mappingService.getList(), nextCursor, prevCursor, includeInactive, limit);
         } catch (JsonProcessingException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

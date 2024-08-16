@@ -27,6 +27,7 @@ public class XformLoggingValve extends LoggingValveBase {
         try {
             XformAdviceCollector.setTransactionData(t);
             setSourceInfoValues(req, t);
+            RequestContext.setHttpHeaders(getHeaders(req));
             if (!isLogged(req.getRequestURI())) {
                 RequestContext.disableTransactionDataLogging();
             }

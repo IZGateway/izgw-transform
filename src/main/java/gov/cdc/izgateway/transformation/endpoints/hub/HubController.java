@@ -22,6 +22,7 @@ import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
+import gov.cdc.izgateway.transformation.services.XformAccessControlService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,6 +39,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -48,6 +51,7 @@ import java.util.UUID;
 public class HubController extends SoapControllerBase {
     private final ProducerTemplate producerTemplate;
     private final OrganizationService organizationService;
+    private final XformAccessControlService accessControlService;
 
     @Value("${transformationservice.destination}")
     private String destinationUri;
@@ -57,12 +61,14 @@ public class HubController extends SoapControllerBase {
             IMessageHeaderService mshService,
             AccessControlRegistry registry,
             ProducerTemplate producerTemplate,
-            OrganizationService organizationService
+            OrganizationService organizationService,
+            XformAccessControlService accessControlService
     ) {
         // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
         super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));
         this.producerTemplate = producerTemplate;
         this.organizationService = organizationService;
+        this.accessControlService = accessControlService;
 
         registry.register(this);
 
@@ -89,6 +95,33 @@ public class HubController extends SoapControllerBase {
 
         if (organization == null) {
             throw new HubControllerFault("Organization not found for common name: " + commonName);
+        }
+
+        return checkOrganizationOverride(organization);
+    }
+
+    /**
+     * In some scenarios such as testing, it is desirable that the incoming request use a different Organization
+     * than the one related to the client-side certificate.  If the Organization is an admin, then the incoming
+     * request is checked for an x-xform-organization header.  If the header is present, the organization is set to
+     * this header value.
+     *
+     * @param organization
+     * @return
+     * @throws Fault
+     */
+    private Organization checkOrganizationOverride(Organization organization) throws Fault {
+        if (RequestContext.getHttpHeaders() != null &&
+            RequestContext.getHttpHeaders().containsKey("x-xform-organization") &&
+            accessControlService.isUserInRole(organization.getId(), XformAccessControlService.ADMIN_ROLE)) {
+
+            Map<String, List<String>> headers = RequestContext.getHttpHeaders();
+            String orgId = headers.get("x-xform-organization").get(0);
+            Organization organizationOverride = organizationService.getObject(UUID.fromString(orgId));
+            if (organizationOverride == null) {
+                throw new HubControllerFault("Organization not found for organizationId: " + orgId);
+            }
+            return organizationOverride;
         }
 
         return organization;
@@ -130,6 +163,7 @@ public class HubController extends SoapControllerBase {
 
     @Override
     protected void checkCredentials(HasCredentials s) throws SecurityFault {
+        // This is not used for Xform Service yet
     }
 
     @Operation(

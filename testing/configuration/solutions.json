@@ -67,6 +67,12 @@
       "order" : 0,
       "destinationField" : "/MSH-7-1",
       "setValue" : "MSH 7 NEW VALUE"
+    }, {
+      "method" : "mapper",
+      "order" : 0,
+      "codeField" : "/PID-10-1",
+      "codeSystemField" : "/PID-10-3",
+      "codeSystemDefault": "CDCREC"
     } ]
   } ]
 }, {
@@ -109,12 +115,7 @@
   "active" : true,
   "requestOperations" : [ {
     "preconditions" : null,
-    "operationList" : [ {
-      "method" : "mapper",
-      "order" : 0,
-      "fieldName" : "/PID-10-1",
-      "mappingTable" : "99EDAC86-7839-4076-A6B1-BE35C5E8CF3A"
-    } ]
+    "operationList" : []
   } ],
   "responseOperations" : [ ]
 }, {
@@ -144,11 +145,6 @@
       "order" : 0,
       "destinationField" : "/MSX-7-1",
       "setValue" : "MSH 7 NEW VALUE"
-    }, {
-      "method" : "mapper",
-      "order" : 0,
-      "fieldName" : "/MSH-10-1",
-      "mappingTable" : "TBD"
     } ]
   } ]
 } ]
