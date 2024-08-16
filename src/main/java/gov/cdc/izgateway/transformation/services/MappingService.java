@@ -22,9 +22,5 @@ public class MappingService extends GenericService<Mapping> {
                 .findFirst()
                 .orElse(null);
     }
-
-//    public boolean organizationExists(String commonName) {
-//        return repo.getEntitySet().stream().anyMatch(o -> o.getCommonName().equals(commonName) && Boolean.TRUE.equals(o.getActive()));
-//    }
 }
 
