@@ -831,8 +831,6 @@ public class FhirController {
 				x.setParts(x.getBaseUrl(), x.getResourceType(), encoded, x.getVersionIdPart());
 				ref.setReferenceElement(x);
 			}
-			
-			lastPatientValue = value;
 		}
 		return b;
 	}

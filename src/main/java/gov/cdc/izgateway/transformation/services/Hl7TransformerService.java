@@ -23,7 +23,7 @@ public class Hl7TransformerService {
   public HubWsdlTransformationContext transform(HubWsdlTransformationContext context) throws Exception {
       try {
           String msg = context.getServiceContext().getRequestMessage().encode().replace("\r", "\n");
-          log.info("Message pre-transformation:\n\n{}", msg);
+          log.trace("Message pre-transformation:\n\n{}", msg);
       }
       catch (HL7Exception e) {
           throw new HubControllerFault(e.getMessage());
@@ -34,7 +34,7 @@ public class Hl7TransformerService {
 
       try {
           String msg = context.getServiceContext().getRequestMessage().encode().replace("\r", "\n");
-          log.info("Message post-transformation:\n\n{}", msg);
+          log.trace("Message post-transformation:\n\n{}", msg);
       }
       catch (HL7Exception e) {
           throw new HubControllerFault(e.getMessage());
