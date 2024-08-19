@@ -59,6 +59,20 @@
       "destinationField" : "/MSH-22-3",
       "setValue" : "RegexMatchPrecondition_Solution"
     } ]
+  },{
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "2e6048c8-630a-449f-a3b4-f63425a60442",
+      "dataPath" : "/MSH-9-1",
+      "regex" : "^VXU$"
+    } ],
+    "operationList" : [ {
+      "method" : "mapper",
+      "order" : 0,
+      "codeField" : "/PID-10-1",
+      "codeSystemField" : "/PID-10-3",
+      "codeSystemDefault": "CDCREC"
+    } ]
   } ],
   "responseOperations" : [ {
     "preconditions" : [ ],
@@ -67,12 +81,6 @@
       "order" : 0,
       "destinationField" : "/MSH-7-1",
       "setValue" : "MSH 7 NEW VALUE"
-    }, {
-      "method" : "mapper",
-      "order" : 0,
-      "codeField" : "/PID-10-1",
-      "codeSystemField" : "/PID-10-3",
-      "codeSystemDefault": "CDCREC"
     } ]
   } ]
 }, {
@@ -147,4 +155,26 @@
       "setValue" : "MSH 7 NEW VALUE"
     } ]
   } ]
+}, {
+  "id" : "7e9ab0bf-e174-4073-a63f-75e2fabdb3a3",
+  "solutionName" : "MapperExampleForVXU",
+  "description" : "Translates a code for an HL7 field based on the mapping settings for a VXU message",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "2e6048c8-630a-449f-a3b4-f63425a60442",
+      "dataPath" : "/MSH-9-1",
+      "comparisonValue" : "VXU"
+    } ],
+    "operationList" : [ {
+      "method" : "mapper",
+      "order" : 0,
+      "codeField" : "/PID-10-1",
+      "codeSystemField" : "/PID-10-3",
+      "codeSystemDefault": "CDCREC"
+    } ]
+  } ],
+  "responseOperations" : []
 } ]

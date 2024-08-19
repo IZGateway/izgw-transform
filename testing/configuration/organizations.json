@@ -18,4 +18,9 @@
   "id" : "8fbcad81-dc40-4da5-a696-962bf919e5fe",
   "active" : true,
   "commonName": "xpcahill.testing.izgateway.org"
+}, {
+  "organizationName" : "Organization to use for Postman tests",
+  "id" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
+  "active" : true,
+  "commonName": "use override"
 } ]
