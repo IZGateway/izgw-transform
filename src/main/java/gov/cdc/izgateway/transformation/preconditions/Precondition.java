@@ -2,7 +2,10 @@ package gov.cdc.izgateway.transformation.preconditions;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.context.XformContext;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "method")
 @JsonSubTypes({
@@ -14,4 +17,5 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 })
 public interface Precondition {
     boolean evaluate(ServiceContext context);
+    boolean evaluate(XformContext<SubmitSingleMessageRequest, SubmitSingleMessageResponse> context);
 }

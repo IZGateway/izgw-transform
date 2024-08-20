@@ -3,8 +3,11 @@ package gov.cdc.izgateway.transformation.operations;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.transformation.configuration.OperationSaveStateConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.context.XformContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -26,5 +29,10 @@ public class Hl7v2SaveStateOperation extends BaseOperation<OperationSaveStateCon
 
         String sourceValue = terser.get(operationConfig.getField());
         context.getState().put(operationConfig.getKey(), sourceValue);
+    }
+
+    @Override
+    public void execute(XformContext<SubmitSingleMessageRequest, SubmitSingleMessageResponse> context) throws HL7Exception {
+
     }
 }

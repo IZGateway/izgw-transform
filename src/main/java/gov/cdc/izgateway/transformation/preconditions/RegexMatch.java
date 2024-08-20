@@ -1,6 +1,9 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.context.XformContext;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,6 +30,11 @@ public class RegexMatch implements Precondition {
 
     @Override
     public boolean evaluate(ServiceContext context) {
+        return false;
+    }
+
+    @Override
+    public boolean evaluate(XformContext<SubmitSingleMessageRequest, SubmitSingleMessageResponse> context) {
         return false;
     }
 }

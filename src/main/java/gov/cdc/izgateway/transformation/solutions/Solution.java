@@ -1,8 +1,11 @@
 package gov.cdc.izgateway.transformation.solutions;
 
 import ca.uhn.hl7v2.HL7Exception;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.context.XformContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
@@ -29,6 +32,21 @@ public class Solution implements Advisable, Transformable {
 
         for (gov.cdc.izgateway.transformation.model.SolutionOperation so : configuration.getResponseOperations()) {
             responseOperations.add(new SolutionOperation(so, dataType));
+        }
+    }
+
+    @CaptureXformAdvice
+    public void execute(XformContext<SubmitSingleMessageRequest, SubmitSingleMessageResponse> context) throws Exception {
+        if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
+            for (SolutionOperation so : requestOperations) {
+                hasTransformed = true;
+                so.execute(context);
+            }
+        } else if (context.getCurrentDirection().equals(DataFlowDirection.RESPONSE)) {
+            for (SolutionOperation so : responseOperations) {
+                hasTransformed = true;
+                so.execute(context);
+            }
         }
     }
 

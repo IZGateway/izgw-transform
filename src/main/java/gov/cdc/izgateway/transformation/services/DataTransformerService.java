@@ -29,7 +29,7 @@ public class DataTransformerService {
             throw new HubControllerFault(e.getMessage());
         }
 
-        //pipelineRunnerService.execute(context.getServiceContext());
+        pipelineRunnerService.execute(context);
 
         try {
             String msg = context.getRequestMessage().getHl7Message();

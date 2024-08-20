@@ -37,7 +37,9 @@ public class TxServiceConfig {
     }
 
     public Pipeline findPipelineByContext(XformContext<SubmitSingleMessageRequest, SubmitSingleMessageResponse> context) {
-        return pipelineService.getPipelineByOrganizationAndEndpoints(context.getOrganizationId(), context.getInboundEndpoint(), context.getOutboundEndpoint());
+        Pipeline returnPipeline = pipelineService.getPipelineByOrganizationAndEndpoints(context.getOrganizationId(), context.getInboundEndpoint(), context.getOutboundEndpoint());
+        return returnPipeline;
+        //return pipelineService.getPipelineByOrganizationAndEndpoints(context.getOrganizationId(), context.getInboundEndpoint(), context.getOutboundEndpoint());
     }
     public Pipeline findPipelineByContext(ServiceContext context) {
         return pipelineService.getPipelineByOrganizationAndEndpoints(context.getOrganizationId(), context.getInboundEndpoint(), context.getOutboundEndpoint());

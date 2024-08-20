@@ -77,8 +77,8 @@ public class HubController extends SoapControllerBase {
 
         XformContext<SubmitSingleMessageRequest, SubmitSingleMessageResponse> xformContext = new XformContext<>();
         xformContext.setOrganizationId(organization.getId());
-        xformContext.setInboundEndpoint("");
-        xformContext.setOutboundEndpoint("");
+        xformContext.setInboundEndpoint("izgts:IISHubService");
+        xformContext.setOutboundEndpoint("izghub:IISHubService");
         xformContext.setDataType(DataType.HL7V2);
         xformContext.setCurrentDirection(DataFlowDirection.REQUEST);
         xformContext.setSourceInfo(RequestContext.getSourceInfo());
@@ -89,12 +89,12 @@ public class HubController extends SoapControllerBase {
 
         try {
 
-            //producerTemplate.sendBody("direct:austinTest", xformContext);
+            producerTemplate.sendBody("direct:austinTest", xformContext);
 
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
             context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
 
-            producerTemplate.sendBody("direct:austinTest", xformContext);
+            //producerTemplate.sendBody("direct:austinTest", xformContext);
         }
         catch (CamelExecutionException | HL7Exception e) {
             throw new HubControllerFault(e.getCause().getMessage());
