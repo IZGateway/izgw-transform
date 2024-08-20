@@ -98,5 +98,26 @@
           "dataPath" : "/MSH-1-1"
         } ]
       } ]
+  },
+  {
+    "pipelineName" : "Pipeline for Postman Tests",
+    "id" : "4dd6a3bb-6813-4357-ab63-3efd2765a8e6",
+    "organizationId" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
+    "description" : "Pipeline used to test: mappings, ...",
+    "inboundEndpoint" : "izgts:IISHubService",
+    "outboundEndpoint" : "izghub:IISHubService",
+    "active" : true,
+    "pipes" : [
+      {
+        "id" : "5de30369-9deb-4fd0-854e-2bf87e9ab67f",
+        "solutionId" : "7e9ab0bf-e174-4073-a63f-75e2fabdb3a3",
+        "solutionVersion" : "1.0",
+        "preconditions" : [ {
+          "method" : "equals",
+          "id" : "04efbba8-9333-43bc-9fb7-d2bca583199e",
+          "dataPath" : "/MSH-9-1",
+          "comparisonValue" : "VXU"
+        }]
+      } ]
   }
 ]
