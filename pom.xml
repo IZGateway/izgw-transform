@@ -54,7 +54,7 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
             <!-- spring-boot-starter-web pulls 6.2.2 which has CVE-2024-22257 -->
-            <version>6.3.1</version>
+            <version>6.3.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
