@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "3bf9b46b-bd50-4166-9dac-fbf83e29b20a",
-		"name": "TS Integration Test",
+		"_postman_id": "05df6dcf-e8c9-48a1-a782-b54629bb4fff",
+		"name": "TS Integration Test - 2024-08-21 2:30pm",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/THSALink~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-3bf9b46b-bd50-4166-9dac-fbf83e29b20a?action=share&source=collection_link&creator=2729094"
+		"_exporter_id": "28864196"
 	},
 	"item": [
 		{
@@ -122,90 +121,201 @@
 					},
 					"response": []
 				},
-              {
-                "name": "TS_TC_2 VXU Mapping",
-                "event": [
-                  {
-                    "listen": "test",
-                    "script": {
-                      "exec": [
-                        "const xml2js = require('xml2js');\r",
-                        "\r",
-                        "pm.test(\"Status code is 200\", function () {\r",
-                        "    pm.response.to.have.status(200);\r",
-                        "});\r",
-                        "\r",
-                        "pm.test(\"Response is As Expected\", function () {\r",
-                        "    var response = utils.removeNS(xml2Json(responseBody));\r",
-                        "    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-                        "    pm.expect(utils.hl7Terser(hl7Message, 'PID', 10, 1)).to.eql('NEWCODE!');\r",
-                        "\r",
-                        "\r",
-                        "});\r",
-                        "\r",
-                        "utils.testSLA(pm, LONG_SLA);\r",
-                        "\r",
-                        "\r",
-                        ""
-                      ],
-                      "type": "text/javascript",
-                      "packages": {}
-                    }
-                  },
-                  {
-                    "listen": "prerequest",
-                    "script": {
-                      "exec": [
-                        "utils.setup(pm);"
-                      ],
-                      "type": "text/javascript",
-                      "packages": {}
-                    }
-                  }
-                ],
-                "protocolProfileBehavior": {
-                  "disabledSystemHeaders": {
-                    "host": true
-                  }
-                },
-                "request": {
-                  "method": "POST",
-                  "header": [
-                    {
-                      "key": "Host",
-                      "value": "{{hostHeader}}",
-                      "type": "text"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/xml",
-                      "type": "text"
-                    },
-                    {
-                      "key": "x-xform-organization",
-                      "value": "0d15449b-fb08-4013-8985-20c148b353fe",
-                      "type": "text"
-                    }
-                  ],
-                  "body": {
-                    "mode": "raw",
-                    "raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-                  },
-                  "url": {
-                    "raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
-                    "protocol": "{{protocol}}",
-                    "host": [
-                      "{{host}}"
-                    ],
-                    "port": "{{port}}",
-                    "path": [
-                      "IISHubService"
-                    ]
-                  }
-                },
-                "response": []
-              }
-            ]
+				{
+					"name": "TS_TC_2 VXU Mapping",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const xml2js = require('xml2js');\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is As Expected\", function () {\r",
+									"    var response = utils.removeNS(xml2Json(responseBody));\r",
+									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+									"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 10, 1)).to.eql('NEWCODE!');\r",
+									"\r",
+									"\r",
+									"});\r",
+									"\r",
+									"utils.testSLA(pm, LONG_SLA);\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"utils.setup(pm);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"host": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Host",
+								"value": "{{hostHeader}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "x-xform-organization",
+								"value": "0d15449b-fb08-4013-8985-20c148b353fe",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"IISHubService"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TS_TC_03 QBP Causes Fault",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const xml2js = require('xml2js');\r",
+									"\r",
+									"pm.test(\"Status code is 500\", function () {\r",
+									"    pm.response.to.have.status(500);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is As Expected\", function () {\r",
+									"    var response = utils.removeNS(xml2Json(responseBody));\r",
+									"    var errorMessage = response['Envelope']['Body']['Fault']['Detail']['Detail'];\r",
+									"    pm.expect(errorMessage).to.eql('Can\\'t find MSX as a direct child');\r",
+									"\r",
+									"\r",
+									"});\r",
+									"\r",
+									"pm.sendRequest({\r",
+									"    url: 'https://' + pm.environment.get('host') + ':' + pm.environment.get('port') + '/rest/logs', \r",
+									"    method: 'GET'\r",
+									"}, function (err, res) {\r",
+									"    if (err) {\r",
+									"        console.error(err);\r",
+									"        pm.test(\"Error has occurred.\", function () {\r",
+									"            pm.expect(err.errno).to.equal('0');\r",
+									"        });\r",
+									"        return;\r",
+									"    }\r",
+									"\r",
+									"    var jsonResponse = res.json();\r",
+									"\r",
+									"    pm.test(\"Log status is OK\", function () {\r",
+									"        pm.expect(res.status).to.equal('OK');\r",
+									"    });\r",
+									"\r",
+									"    var mayContainPHI = utils.mayContainPHI(jsonResponse);\r",
+									"\r",
+									"    pm.test('Check logs for PHI.  May contain PHI should equal false.', function () {\r",
+									"        pm.expect(mayContainPHI).to.be.false;\r",
+									"    });\r",
+									"\r",
+									"\r",
+									"});\r",
+									"\r",
+									"\r",
+									"utils.testSLA(pm, LONG_SLA);\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"utils.setup(pm);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"host": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Host",
+								"value": "{{hostHeader}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "x-xform-organization",
+								"value": "8fbcad81-dc40-4da5-a696-962bf919e5fe",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>MSH|^~\\&amp;|DE0000|DE0000|TEST|TC_04|TEST||QBP^Q11^QBP_Q11|DE000020231031303563|P|2.5.1|||||||||Z34^CDCPHINVS\r\nQPD|Z34^Request Immunization History^CDCPHINVS|20210330093013MD231|112258-9^^^MD^MR|JohnsonIZG^JamesIZG^AlbertIZG^^^^L|PearsonIZG^SarahIZG^^^^^M|20160414|M|Main Street&amp;&amp;123^^Baltimore^MD^212021234^^L|^PRN^PH^^^555^5551111|Y|1\r\nRCP|I|10^RD&amp;Records&amp;HL70126</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"IISHubService"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		},
 		{
 			"name": "API Tests",
@@ -4472,124 +4582,123 @@
 						}
 					]
 				},
-              {
-                "name": "Mappings",
-                "item": [
-                  {
-                    "name": "Get Mappings",
-                    "event": [
-                      {
-                        "listen": "test",
-                        "script": {
-                          "exec": [
-                            "pm.test(\"returns 200 OK code\", function() {",
-                            "    pm.expect(pm.response.code).to.equal(200);",
-                            "});",
-                            "",
-                            "// Check to see if the 2 active we added in 3 previous steps are in the response",
-                            "let response = pm.response.json();",
-                            "",
-                            "pm.test(\"At least one result returned\", function() {",
-                            "    pm.expect(response[\"data\"].length).to.be.gt(0);",
-                            "});",
-                            ""
-                          ],
-                          "type": "text/javascript",
-                          "packages": {}
-                        }
-                      },
-                      {
-                        "listen": "prerequest",
-                        "script": {
-                          "exec": [
-                            ""
-                          ],
-                          "type": "text/javascript",
-                          "packages": {}
-                        }
-                      }
-                    ],
-                    "request": {
-                      "method": "GET",
-                      "header": [],
-                      "url": {
-                        "raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings?limit=100000",
-                        "protocol": "{{protocol}}",
-                        "host": [
-                          "{{host}}"
-                        ],
-                        "port": "{{port}}",
-                        "path": [
-                          "api",
-                          "v1",
-                          "mappings"
-                        ],
-                        "query": [
-                          {
-                            "key": "limit",
-                            "value": "100000"
-                          }
-                        ]
-                      }
-                    },
-                    "response": []
-                  }
-                ]
-              },
-              {
-                "name": "Check Build ID",
-                "event": [
-                  {
-                    "listen": "test",
-                    "script": {
-                      "exec": [
-                        "// Set build and timestamp in global variables to check the build version\r",
-                        "var build = new RegExp(pm.globals.get(\"build\") || \".*\");\r",
-                        "var timestamp = new RegExp(pm.globals.get(\"timestamp\") || \".*\");\r",
-                        "pm.test(\"Must be a 2.x build\", function() {\r",
-                        "    var theBuild = responseBody.match(/^\\s*Build: izgateway-2\\.$/m);\r",
-                        "});\r",
-                        "pm.test(\"Build ID to match \" + build, function() {\r",
-                        "    var theBuild = responseBody.match(/^\\s*Build: (.*)$/m);\r",
-                        "    pm.expect(theBuild[1]).matches(build);\r",
-                        "});\r",
-                        "\r",
-                        "pm.test(\"Timestamp to match \" + timestamp, function() {\r",
-                        "    var theTimestamp = responseBody.match(/^\\s*Timestamp: (.*)$/m);\r",
-                        "    pm.expect(theTimestamp[1]).matches(timestamp);\r",
-                        "});"
-                      ],
-                      "type": "text/javascript",
-                      "packages": {}
-                    }
-                  }
-                ],
-                "request": {
-                  "method": "GET",
-                  "header": [
-                    {
-                      "key": "X-Not-Admin",
-                      "value": "true",
-                      "description": "Leave it this way to verify access control functionality."
-                    }
-                  ],
-                  "url": {
-                    "raw": "{{protocol}}://{{host}}:{{port}}/build.txt",
-                    "protocol": "{{protocol}}",
-                    "host": [
-                      "{{host}}"
-                    ],
-                    "port": "{{port}}",
-                    "path": [
-                      "build.txt"
-                    ]
-                  },
-                  "description": "Retrieve the build information using\n\nGET /rest/build.txt\n\nVerify the build name and timestamp match the expected values in global variables."
-                },
-                "response": []
-              }
-
-            ]
+				{
+					"name": "Mappings",
+					"item": [
+						{
+							"name": "Get Mappings",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Check to see if the 2 active we added in 3 previous steps are in the response",
+											"let response = pm.response.json();",
+											"",
+											"pm.test(\"At least one result returned\", function() {",
+											"    pm.expect(response[\"data\"].length).to.be.gt(0);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings?limit=100000",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"mappings"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "100000"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Check Build ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Set build and timestamp in global variables to check the build version\r",
+									"var build = new RegExp(pm.globals.get(\"build\") || \".*\");\r",
+									"var timestamp = new RegExp(pm.globals.get(\"timestamp\") || \".*\");\r",
+									"pm.test(\"Must be a 2.x build\", function() {\r",
+									"    var theBuild = responseBody.match(/^\\s*Build: izgateway-2\\.$/m);\r",
+									"});\r",
+									"pm.test(\"Build ID to match \" + build, function() {\r",
+									"    var theBuild = responseBody.match(/^\\s*Build: (.*)$/m);\r",
+									"    pm.expect(theBuild[1]).matches(build);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Timestamp to match \" + timestamp, function() {\r",
+									"    var theTimestamp = responseBody.match(/^\\s*Timestamp: (.*)$/m);\r",
+									"    pm.expect(theTimestamp[1]).matches(timestamp);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Not-Admin",
+								"value": "true",
+								"description": "Leave it this way to verify access control functionality."
+							}
+						],
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/build.txt",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"build.txt"
+							]
+						},
+						"description": "Retrieve the build information using\n\nGET /rest/build.txt\n\nVerify the build name and timestamp match the expected values in global variables."
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -4607,13 +4716,13 @@
 					"var goodRequest = \"MSH|^~\\\\&amp;|IRIS IIS|IRIS|TEST|TC_04|20210402091512.000-0100||QBP^Q11^QBP_Q11|20210330093013AZQ231|P|2.5.1|||ER|AL|||||Z34^CDCPHINVS|SIISCLIENT28374|\\nQPD|Z34^Request Immunization History^CDCPHINVS|20210330093013LA231|LAMASM77BF4BA6^^^IZGATEWAYTEST&amp;2.16.840.1.113883.40.1&amp;ISO^MR|Johnson^James^Andrew^^^^L|Leung^Jen^^^^^M|20160414|M|Main Street&amp;&amp;123^^New Orleans^LA^70115^^L|^PRN^PH^^^555^5551111|Y|1\"; //pm.collectionVariables.get(\"GoodMessage\");",
 					"pm.collectionVariables.set(\"GoodMessageLF\", goodRequest.replace(\"\\r\", \"\\n\"))",
 					"pm.collectionVariables.set(\"GoodMessageCRLF\", goodRequest.replace(\"\\r\", \"\\r\\n\"))",
-                  "",
-                  "var goodRequestVXU = \"MSH|^~\\\\&amp;|IZGATEWAY|FLHOSP1|FLSHOTS|FLSHOTS|20230809110858-0500||VXU^V04^VXU_V04|IZGIIS-IIS-PreTestVXU-IISA|X|2.5.1|||ER|AL|\\nPID|1||DC1ADMIN^IZG-TEST^MR||BABY^BABY^AmeliaIZG^^L|BrunoIZG^EllaIZG^TeresaIZG^^M|20170723|F||2106-3^White^CDCREC~2054-5^Black or African American^CDCREC|123 Main Street^^TAMPA^FL^376041234^USA||(423) 364-3003^PRN^CP^1^215^5551213||eng^English^ISO639|||||||2135-2^Hispanic or Latino^CDCREC|||\\nPD1|||||||||||02^Reminder/Recall - any method^HL70215|||||A|20150901|20150901|\\nNK1|1|WinchesterIZG^EllaIZG^TeresaIZG^^^L|MTH^Mother^HL70063|5255 Loughboro Rd NW^^Tampa^FL^33601^USA^P|^PRN^PH^1^555^5551212NETizgatewaytesting@gmail.com|||||||||||||||||||||||||||^^^^43040-1234\\nORC|RE||197028^SP|||||||1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN||2223334445^Jones^Casey^^^^L^^NPI^^^^^^MD|||||DMC53427^IZ Gateway Clinic^HL70362|||||^^^^08540\\nRXA|0|1|20200815|20200815|03^measles, mumps, rubella virus vaccine^CVX^00006-4681-01^MMR II^NDC|0.5|mLUCUM||02^Historical information - from other provider^NIP001|1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN|^DMC53427^^^4 First Street^PO Box^Tampa^FL^33601||||0934GG|20211231|MSD^Merck Sharp \\T\\ Dohme Corp^MVX|||CP|A|\\nRXR|C38299^Subcutaneous^NCIT^SC^Subcutaneous^HL70162|RA^Right Arm^HL70163|\\nOBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|2|V02^VFC eligible-Medicaid/Medicaid Managed Care^HL70064||||||F|||20201031||||||||\\nOBX|2|CE|30963-3^Vaccine funding source^LN|2|VXC50^Public^CDCPHINVS||||||F|||20201031|\\nORC|RE||197028^SP|||||||1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN||2223334445^Jonesizg^Caseyizg^^^^L^^NPI^^^^^^MD|||||DMC53427^IZ Gateway Clinic^HL70362|||||^^^^129011234\\nRXA|0|1|20211020||21^Varicella^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001|1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN|^DMC53427^^^4 First Street^PO Box^Tampa^FL^33601||||U6329BP|20211231|MSD^Merck and Co^MVX|||CP|A|\\nRXR|C38299NCIT|RA^HL70163|\\nOBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V01^Not VFC elig^HL70064||||||F|||20210723|\\nOBX|2|CE|30963-3^Vaccine funding source^LN|1|VXC50^Public^HL70064||||||F|||20220406|\";",
-                  "",
-                  "pm.collectionVariables.set(\"GoodMessageVXULF\", goodRequestVXU.replace(\"\\r\", \"\\n\"))",
-                  "pm.collectionVariables.set(\"GoodMessageVXUCRLF\", goodRequestVXU.replace(\"\\r\", \"\\r\\n\"))",
-                  "",
-                  "var tooLarge = goodResponse.replace('&|', \"&amp;|\");",
+					"",
+					"var goodRequestVXU = \"MSH|^~\\\\&amp;|IZGATEWAY|FLHOSP1|FLSHOTS|FLSHOTS|20230809110858-0500||VXU^V04^VXU_V04|IZGIIS-IIS-PreTestVXU-IISA|X|2.5.1|||ER|AL|\\nPID|1||DC1ADMIN^IZG-TEST^MR||BABY^BABY^AmeliaIZG^^L|BrunoIZG^EllaIZG^TeresaIZG^^M|20170723|F||2106-3^White^CDCREC~2054-5^Black or African American^CDCREC|123 Main Street^^TAMPA^FL^376041234^USA||(423) 364-3003^PRN^CP^1^215^5551213||eng^English^ISO639|||||||2135-2^Hispanic or Latino^CDCREC|||\\nPD1|||||||||||02^Reminder/Recall - any method^HL70215|||||A|20150901|20150901|\\nNK1|1|WinchesterIZG^EllaIZG^TeresaIZG^^^L|MTH^Mother^HL70063|5255 Loughboro Rd NW^^Tampa^FL^33601^USA^P|^PRN^PH^1^555^5551212NETizgatewaytesting@gmail.com|||||||||||||||||||||||||||^^^^43040-1234\\nORC|RE||197028^SP|||||||1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN||2223334445^Jones^Casey^^^^L^^NPI^^^^^^MD|||||DMC53427^IZ Gateway Clinic^HL70362|||||^^^^08540\\nRXA|0|1|20200815|20200815|03^measles, mumps, rubella virus vaccine^CVX^00006-4681-01^MMR II^NDC|0.5|mLUCUM||02^Historical information - from other provider^NIP001|1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN|^DMC53427^^^4 First Street^PO Box^Tampa^FL^33601||||0934GG|20211231|MSD^Merck Sharp \\T\\ Dohme Corp^MVX|||CP|A|\\nRXR|C38299^Subcutaneous^NCIT^SC^Subcutaneous^HL70162|RA^Right Arm^HL70163|\\nOBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|2|V02^VFC eligible-Medicaid/Medicaid Managed Care^HL70064||||||F|||20201031||||||||\\nOBX|2|CE|30963-3^Vaccine funding source^LN|2|VXC50^Public^CDCPHINVS||||||F|||20201031|\\nORC|RE||197028^SP|||||||1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN||2223334445^Jonesizg^Caseyizg^^^^L^^NPI^^^^^^MD|||||DMC53427^IZ Gateway Clinic^HL70362|||||^^^^129011234\\nRXA|0|1|20211020||21^Varicella^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001|1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN|^DMC53427^^^4 First Street^PO Box^Tampa^FL^33601||||U6329BP|20211231|MSD^Merck and Co^MVX|||CP|A|\\nRXR|C38299NCIT|RA^HL70163|\\nOBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V01^Not VFC elig^HL70064||||||F|||20210723|\\nOBX|2|CE|30963-3^Vaccine funding source^LN|1|VXC50^Public^HL70064||||||F|||20220406|\";",
+					"",
+					"pm.collectionVariables.set(\"GoodMessageVXULF\", goodRequestVXU.replace(\"\\r\", \"\\n\"))",
+					"pm.collectionVariables.set(\"GoodMessageVXUCRLF\", goodRequestVXU.replace(\"\\r\", \"\\r\\n\"))",
+					"",
+					"var tooLarge = goodResponse.replace('&|', \"&amp;|\");",
 					"var last;",
 					"var maxLength = 65536;",
 					"",
@@ -5697,6 +5806,7 @@
 					"        if (typeof obj === 'object') {",
 					"            for (var key in obj) {",
 					"                if (obj.hasOwnProperty(key) && this.searchStringInObject(obj[key], regex)) {",
+					"                    console.log(\"Found \" + obj[key] + \" regex: \" + regex);",
 					"                    return true;",
 					"                }",
 					"            }",
@@ -5723,6 +5833,52 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "GoodResponse",
+			"value": ""
+		},
+		{
+			"key": "GoodResponseLF",
+			"value": ""
+		},
+		{
+			"key": "GoodResponseCRLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageCRLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageVXULF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageVXUCRLF",
+			"value": ""
+		},
+		{
+			"key": "TooLargeMessage",
+			"value": ""
+		},
+		{
+			"key": "IisTooLargeMessage",
+			"value": ""
+		},
+		{
+			"key": "hex0b",
+			"value": ""
+		},
+		{
+			"key": "hex1b",
+			"value": ""
 		}
 	]
 }
