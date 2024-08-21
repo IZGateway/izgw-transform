@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @MarkerObjectFieldName("transactionData")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class XformTransactionData extends TransactionData {
+    private static final String XFORM_TRANSACTION_DATA = "XformTransactionData";
 
     // TODO @JsonIgnore
     private PipelineAdvice pipelineAdvice = null;
@@ -77,14 +78,12 @@ public class XformTransactionData extends TransactionData {
     }
 
     public void addAdvice(OperationAdviceDTO advice) {
-        if ( advice.getTransformedRequest() != null )
+        if (advice.getTransformedRequest() != null)
             currentSolutionAdvice.addRequestOperationAdvice(advice);
-        if ( advice.getTransformedResponse() != null )
+        if (advice.getTransformedResponse() != null)
             currentSolutionAdvice.addResponseOperationAdvice(advice);
 
     }
-
-
 
     @Override
     public void logIt() {
@@ -94,36 +93,57 @@ public class XformTransactionData extends TransactionData {
         logSolutionDetail();
     }
 
-    public void logPipelineDetail() {
-        XformLogDetail logDetail = new XformLogDetail();
+    private void logPipelineDetail() {
+        XformLogDetail logDetail = createLogDetail("pipeline", pipelineAdvice.getName());
 
-        logDetail.setEventId(this.getEventId());
-        logDetail.setConcept("pipeline");
-        logDetail.setName(pipelineAdvice.getName());
-        logDetail.setProcessError(this.getHasProcessError());
-
-        log.info(Markers2.append("pipelineDetail", logDetail), "{}", "");
+        log.info(Markers2.append(XFORM_TRANSACTION_DATA, logDetail), "{}", "");
     }
 
-    public void logSolutionDetail() {
-
+    private void logSolutionDetail() {
         pipelineAdvice.getSolutionAdviceList().forEach(s -> {
-            XformSolutionLogDetail logDetail = new XformSolutionLogDetail();
+            XformSolutionLogDetail logDetail = createSolutionLogDetail("solution", s.getName());
 
-            logDetail.setEventId(this.getEventId());
-            logDetail.setConcept("solution");
-            logDetail.setName(s.getName());
             logDetail.setProcessError(s.isProcessError());
+            logDetail.setPipelineName(pipelineAdvice.getName());
 
             if (!s.getRequestOperationAdviceList().isEmpty()) {
                 logDetail.setDirection("request");
-                log.info(Markers2.append("solutionDetail", logDetail), "{}", "");
+                log.info(Markers2.append(XFORM_TRANSACTION_DATA, logDetail), "{}", "");
             }
 
             if (!s.getResponseOperationAdviceList().isEmpty()) {
                 logDetail.setDirection("response");
-                log.info(Markers2.append("solutionDetail", logDetail), "{}", "");
+                log.info(Markers2.append(XFORM_TRANSACTION_DATA, logDetail), "{}", "");
             }
         });
+    }
+
+    private XformLogDetail createLogDetail(String concept, String name) {
+        XformLogDetail logDetail = new XformLogDetail();
+        return initializeLogDetail(logDetail, concept, name);
+    }
+
+    private XformSolutionLogDetail createSolutionLogDetail(String concept, String name) {
+        XformSolutionLogDetail logDetail = new XformSolutionLogDetail();
+        initializeLogDetail(logDetail, concept, name);
+        return logDetail;
+    }
+
+    private XformLogDetail initializeLogDetail(XformLogDetail logDetail, String concept, String name) {
+        logDetail.setEventId(this.getEventId());
+        logDetail.setConcept(concept);
+        logDetail.setName(name);
+        logDetail.setProcessError(this.getHasProcessError());
+        logDetail.setRequestMessageType(this.getRequestPayloadType().toString());
+        logDetail.setRequestSendingApplication(this.getRequestMsh3());
+        logDetail.setRequestSendingFacility(this.getRequestMsh4());
+        logDetail.setRequestReceivingApplication(this.getRequestMsh5());
+        logDetail.setRequestReceivingFacility(this.getRequestMsh6());
+        logDetail.setResponseSendingApplication(this.getResponseMsh3());
+        logDetail.setResponseSendingFacility(this.getResponseMsh4());
+        logDetail.setResponseReceivingApplication(this.getResponseMsh5());
+        logDetail.setResponseReceivingFacility(this.getResponseMsh6());
+
+        return logDetail;
     }
 }
