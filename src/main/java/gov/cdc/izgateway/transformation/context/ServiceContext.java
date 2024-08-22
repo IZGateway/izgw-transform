@@ -20,12 +20,14 @@ public class ServiceContext {
     private DataFlowDirection currentDirection;
     private DataType dataType;
     private HashMap<String, String> state;
+    public String facilityId;
 
-    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, DataType dataType, String rawMessage) throws HL7Exception {
+    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, DataType dataType, String facilityId, String rawMessage) throws HL7Exception {
         this.organizationId = organizationId;
         this.inboundEndpoint = inboundEndpoint;
         this.outboundEndpoint = outboundEndpoint;
         this.dataType = dataType;
+        this.facilityId = facilityId;
 
         if (dataType.equals(DataType.HL7V2)) {
             this.requestMessage = Hl7Utils.parseHl7v2Message(rawMessage);

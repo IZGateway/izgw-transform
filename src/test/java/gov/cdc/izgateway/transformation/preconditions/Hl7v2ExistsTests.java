@@ -22,7 +22,7 @@ class Hl7v2ExistsTests {
             "/ORDER/OBSERVATION(1)/OBX-3-2"
     })
     void testTrue(String dataPath) throws HL7Exception {
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
 
         Hl7v2Exists exists = new Hl7v2Exists();
         exists.setDataPath(dataPath);
@@ -40,7 +40,7 @@ class Hl7v2ExistsTests {
             "/ORDER/OBSERVATION(2)/OBX-3-2"
     })
     void testFalse(String dataPath) throws HL7Exception {
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
 
         Hl7v2Exists exists = new Hl7v2Exists();
         exists.setDataPath(dataPath);

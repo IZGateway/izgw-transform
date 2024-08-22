@@ -77,7 +77,7 @@ public class HubController extends SoapControllerBase {
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
-        HubWsdlTransformationContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
+        HubWsdlTransformationContext context = createHubWsdlTransformationContext(organization, RequestContext.getSourceInfo().getFacilityId(), submitSingleMessage);
 
         try {
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
@@ -127,19 +127,20 @@ public class HubController extends SoapControllerBase {
         return organization;
     }
 
-    private HubWsdlTransformationContext createHubWsdlTransformationContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
-        ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage.getHl7Message());
+    private HubWsdlTransformationContext createHubWsdlTransformationContext(UUID organization, String facilityId, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+        ServiceContext serviceContext = createServiceContext(organization, facilityId, submitSingleMessage.getHl7Message());
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
         return new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
     }
 
-    private ServiceContext createServiceContext(UUID organization, String incomingMessage) throws Fault {
+    private ServiceContext createServiceContext(UUID organization, String facilityId, String incomingMessage) throws Fault {
         try {
             return new ServiceContext(organization,
                     "izgts:IISHubService",
                     "izghub:IISHubService",
                     DataType.HL7V2,
+                    facilityId,
                     incomingMessage);
         }
         catch (HL7Exception e) {
