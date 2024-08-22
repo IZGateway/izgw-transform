@@ -118,6 +118,16 @@
           "dataPath" : "/MSH-9-1",
           "comparisonValue" : "VXU"
         }]
+      }, {
+        "id" : "f90d99d4-0406-4500-a15d-5a60752482ce",
+        "solutionId" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
+        "solutionVersion" : "1.0",
+        "preconditions" : [ {
+          "method" : "equals",
+          "id" : "e55248e0-156c-45b7-b03b-56bd207a3c93",
+          "dataPath" : "/MSH-9-1",
+          "comparisonValue" : "VXU"
+        }]
       } ]
   }
 ]
