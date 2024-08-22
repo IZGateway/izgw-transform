@@ -147,6 +147,35 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-build-label</id>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/docker/webapp/static</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>build.txt</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <delimiters>
+                                <delimiter>%{*}</delimiter>
+                            </delimiters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.4.0</version>
                 <executions>

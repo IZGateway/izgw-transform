@@ -4535,7 +4535,60 @@
                     "response": []
                   }
                 ]
+              },
+              {
+                "name": "Check Build ID",
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "exec": [
+                        "// Set build and timestamp in global variables to check the build version\r",
+                        "var build = new RegExp(pm.globals.get(\"build\") || \".*\");\r",
+                        "var timestamp = new RegExp(pm.globals.get(\"timestamp\") || \".*\");\r",
+                        "pm.test(\"Must be a 2.x build\", function() {\r",
+                        "    var theBuild = responseBody.match(/^\\s*Build: izgateway-2\\.$/m);\r",
+                        "});\r",
+                        "pm.test(\"Build ID to match \" + build, function() {\r",
+                        "    var theBuild = responseBody.match(/^\\s*Build: (.*)$/m);\r",
+                        "    pm.expect(theBuild[1]).matches(build);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"Timestamp to match \" + timestamp, function() {\r",
+                        "    var theTimestamp = responseBody.match(/^\\s*Timestamp: (.*)$/m);\r",
+                        "    pm.expect(theTimestamp[1]).matches(timestamp);\r",
+                        "});"
+                      ],
+                      "type": "text/javascript",
+                      "packages": {}
+                    }
+                  }
+                ],
+                "request": {
+                  "method": "GET",
+                  "header": [
+                    {
+                      "key": "X-Not-Admin",
+                      "value": "true",
+                      "description": "Leave it this way to verify access control functionality."
+                    }
+                  ],
+                  "url": {
+                    "raw": "{{protocol}}://{{host}}:{{port}}/build.txt",
+                    "protocol": "{{protocol}}",
+                    "host": [
+                      "{{host}}"
+                    ],
+                    "port": "{{port}}",
+                    "path": [
+                      "build.txt"
+                    ]
+                  },
+                  "description": "Retrieve the build information using\n\nGET /rest/build.txt\n\nVerify the build name and timestamp match the expected values in global variables."
+                },
+                "response": []
               }
+
             ]
 		}
 	],
