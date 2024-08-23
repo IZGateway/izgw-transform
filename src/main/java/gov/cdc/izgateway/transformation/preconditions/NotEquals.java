@@ -5,6 +5,7 @@ import gov.cdc.izgateway.transformation.enums.DataType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import gov.cdc.izgateway.transformation.constants.XformConstants;
 
 @Getter
 @Setter
@@ -26,7 +27,7 @@ public class NotEquals extends Equals implements Precondition {
                 this.getDataPath(),
                 this.getComparisonValue()));
 
-        if (getDataPath().equals("context.FacilityID")) {
+        if (getDataPath().equals(XformConstants.CONTEXT_FACILITY_ID_PATH)) {
             return !context.getFacilityId().equals(getComparisonValue());
         } else if (context.getDataType().equals(DataType.HL7V2)) {
             return new Hl7v2NotEquals(this).evaluate(context);
