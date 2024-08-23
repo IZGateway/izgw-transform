@@ -4,7 +4,6 @@ import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
-import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 
@@ -18,17 +17,17 @@ public class Solution implements Advisable, Transformable {
     private final List<SolutionOperation> responseOperations;
     private boolean hasTransformed = false;
 
-    public Solution(gov.cdc.izgateway.transformation.model.Solution configuration, DataType dataType) {
+    public Solution(gov.cdc.izgateway.transformation.model.Solution configuration) {
         this.configuration = configuration;
         requestOperations = new ArrayList<>();
         responseOperations = new ArrayList<>();
 
         for (gov.cdc.izgateway.transformation.model.SolutionOperation so : configuration.getRequestOperations()) {
-            requestOperations.add(new SolutionOperation(so, dataType));
+            requestOperations.add(new SolutionOperation(so));
         }
 
         for (gov.cdc.izgateway.transformation.model.SolutionOperation so : configuration.getResponseOperations()) {
-            responseOperations.add(new SolutionOperation(so, dataType));
+            responseOperations.add(new SolutionOperation(so));
         }
     }
 

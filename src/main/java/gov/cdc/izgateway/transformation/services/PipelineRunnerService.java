@@ -7,6 +7,7 @@ import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 import gov.cdc.izgateway.transformation.model.Pipe;
 import gov.cdc.izgateway.transformation.model.Pipeline;
+import gov.cdc.izgateway.transformation.preconditions.*;
 import gov.cdc.izgateway.transformation.solutions.Solution;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class PipelineRunnerService implements Advisable, Transformable {
     private final TxServiceConfig txServiceConfig;
+    private ServiceContext context;
     private Pipeline pipeline;
 
     @Autowired
@@ -26,6 +28,7 @@ public class PipelineRunnerService implements Advisable, Transformable {
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws Exception {
         pipeline = txServiceConfig.findPipelineByContext(context);
+        this.context = context;
 
         if (pipeline != null) {
             log.trace(String.format("Executing Pipeline (%s) '%s'", pipeline.getId(), pipeline.getPipelineName()));
@@ -36,16 +39,27 @@ public class PipelineRunnerService implements Advisable, Transformable {
         for (Pipe pipe : pipeline.getPipes()) {
             log.trace(String.format("Executing Pipe: %s", pipe.getId()));
 
-            // Create Solution
-            gov.cdc.izgateway.transformation.model.Solution solutionModel = txServiceConfig.getSolution(pipe.getSolutionId());
-
-            Solution solution = new Solution(solutionModel, context.getDataType());
-
-            solution.execute(context);
-
-            log.trace(String.format("Solution Name: %s", solutionModel.getSolutionName()));
+            if (Boolean.TRUE.equals(preconditionsPassed(pipe))) {
+                // Create & Execute Solution
+                gov.cdc.izgateway.transformation.model.Solution solutionModel = txServiceConfig.getSolution(pipe.getSolutionId());
+                log.trace(String.format("Solution Name: %s", solutionModel.getSolutionName()));
+                Solution solution = new Solution(solutionModel);
+                solution.execute(context);
+            }
 
         }
+
+    }
+
+    private Boolean preconditionsPassed(Pipe pipe) {
+        boolean passed = true;
+
+        for (Precondition op : pipe.getPreconditions()) {
+            passed = passed && op.evaluate(context);
+        }
+
+        return passed;
+
     }
 
     @Override
