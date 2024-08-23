@@ -16,6 +16,7 @@ import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
 import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.logging.advice.XformAdviceCollector;
 import gov.cdc.izgateway.transformation.model.Destination;
 import gov.cdc.izgateway.transformation.model.DestinationId;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
@@ -81,6 +82,12 @@ public class HubController extends SoapControllerBase {
 
         try {
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
+
+            if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed())
+                context.getSubmitSingleMessageResponse().getHubHeader().setTransformedRequest(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());
+            if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isResponseTransformed())
+                context.getSubmitSingleMessageResponse().getHubHeader().setOriginalResponse(XformAdviceCollector.getTransactionData().getPipelineAdvice().getResponse());
+
             context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
         }
         catch (CamelExecutionException | HL7Exception e) {

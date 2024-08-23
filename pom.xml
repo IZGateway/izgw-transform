@@ -109,7 +109,7 @@
         <dependency>
             <groupId>gov.cdc.izgw</groupId>
             <artifactId>izgw-core</artifactId>
-            <version>2.1.0-izgw-core-SNAPSHOT</version>
+            <version>2.1.0-IGDD-1637_add_hub_header_from_xform-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
