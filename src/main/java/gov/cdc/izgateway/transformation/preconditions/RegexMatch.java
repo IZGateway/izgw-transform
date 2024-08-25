@@ -7,6 +7,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Getter
 @Setter
@@ -38,10 +40,20 @@ public class RegexMatch implements Precondition {
                 this.getDataPath(),
                 this.getRegex()));
 
-        if (context.getDataType().equals(DataType.HL7V2)) {
+        if (this.dataPath.startsWith("state.")) {
+            String stateKey = this.dataPath.split("\\.")[1];
+            String stateValue = context.getState().get(stateKey);
+            Matcher matcher = getMatcher(stateValue);
+            return matcher.matches();
+        } else if (context.getDataType().equals(DataType.HL7V2)) {
             return new Hl7v2RegexMatch(this).evaluate(context);
         }
 
         return false;
+    }
+
+    protected Matcher getMatcher(String sourceValue) {
+        Pattern pattern = Pattern.compile(this.getRegex());
+        return pattern.matcher(sourceValue);
     }
 }
