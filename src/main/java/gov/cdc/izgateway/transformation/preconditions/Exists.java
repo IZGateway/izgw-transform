@@ -33,7 +33,10 @@ public class Exists implements Precondition {
                 this.getClass().getSimpleName(),
                 this.getDataPath()));
 
-        if (context.getDataType().equals(DataType.HL7V2)) {
+        if (this.dataPath.startsWith("state.")) {
+            String stateKey = this.dataPath.split("\\.")[1];
+            return context.getState().containsKey(stateKey);
+        } else if (context.getDataType().equals(DataType.HL7V2)) {
             return new Hl7v2Exists(this).evaluate(context);
         }
 

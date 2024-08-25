@@ -10,12 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @Slf4j
 public class NotExists extends Exists implements Precondition {
+
+    protected NotExists() {}
+
     protected NotExists(NotExists notExists) {
         super(notExists);
-    }
-
-    protected NotExists(String dataPath) {
-        super(dataPath);
     }
 
     @Override
@@ -24,7 +23,10 @@ public class NotExists extends Exists implements Precondition {
                 this.getClass().getSimpleName(),
                 this.getDataPath()));
 
-        if (context.getDataType().equals(DataType.HL7V2)) {
+        if (this.getDataPath().startsWith("state.")) {
+            String stateKey = this.getDataPath().split("\\.")[1];
+            return !context.getState().containsKey(stateKey);
+        } else if (context.getDataType().equals(DataType.HL7V2)) {
             return new Hl7v2NotExists(this).evaluate(context);
         }
 

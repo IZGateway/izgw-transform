@@ -23,7 +23,8 @@ class Hl7v2NotExistsTests {
     void testWhereNotExists(String dataPath) throws HL7Exception {
 
         ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
-        Hl7v2NotExists notExists = new Hl7v2NotExists(dataPath);
+        Hl7v2NotExists notExists = new Hl7v2NotExists();
+        notExists.setDataPath(dataPath);
 
         assertTrue(
             notExists.evaluate(context)
@@ -42,7 +43,8 @@ class Hl7v2NotExistsTests {
     void testWhereExists(String dataPath) throws HL7Exception {
 
         ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
-        Hl7v2NotExists notExists = new Hl7v2NotExists(dataPath);
+        Hl7v2NotExists notExists = new Hl7v2NotExists();
+        notExists.setDataPath(dataPath);
 
         assertFalse(
                 notExists.evaluate(context)
