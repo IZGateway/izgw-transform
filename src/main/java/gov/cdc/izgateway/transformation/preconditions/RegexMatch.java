@@ -26,7 +26,8 @@ public class RegexMatch implements Precondition {
         this.regex = regexMatch.regex;
     }
 
-    protected RegexMatch(String dataPath, String regex) {
+    protected RegexMatch(UUID id, String dataPath, String regex) {
+        this.id = id;
         this.dataPath = dataPath;
         this.regex = regex;
     }

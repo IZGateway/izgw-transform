@@ -9,9 +9,9 @@ import java.util.regex.Matcher;
 
 public class Hl7v2RegexMatch extends RegexMatch implements Precondition {
 
-    public Hl7v2RegexMatch(String dataPath, String regex) {
-        super(dataPath, regex);
-    }
+//    public Hl7v2RegexMatch(String dataPath, String regex) {
+//        super(dataPath, regex);
+//    }
 
     public Hl7v2RegexMatch(RegexMatch regexMatch) {
         super(regexMatch);

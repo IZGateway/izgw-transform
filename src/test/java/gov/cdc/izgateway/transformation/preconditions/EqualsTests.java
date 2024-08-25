@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class Hl7v2EqualsTests {
+class EqualsTests {
 
     @ParameterizedTest
     @CsvSource({
@@ -20,14 +20,63 @@ class Hl7v2EqualsTests {
             "/ORDER/OBSERVATION(0)/OBX-3-2,OBX.3.2.FIRST_REPETITION",
             "/ORDER/OBSERVATION(1)/OBX-3-2,OBX.3.2.SECOND_REPETITION"
     })
-    void testTrue(String dataPath, String comparisonValue) throws HL7Exception {
+    void testHl7True(String dataPath, String comparisonValue) throws HL7Exception {
         ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
 
         Hl7v2Equals eq = new Hl7v2Equals();
+        eq.setId(UUID.randomUUID());
         eq.setDataPath(dataPath);
         eq.setComparisonValue(comparisonValue);
 
         assertTrue(
+                eq.evaluate(context)
+        );
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiterString = "~", value = {
+            "MSH.3.1~MSH.3.1",
+            "(123) 456-7890~(123) 456-7890",
+            "info@example.com~info@example.com",
+            "apple,banana,cherry~apple,banana,cherry",
+            "Hello, World!~Hello, World!",
+            "111-23-4455~111-23-4455",
+            "192.168.0.1~192.168.0.1"
+    })
+    void testStateTrue(String contextValue, String valueToTest) throws HL7Exception {
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
+        context.getState().put("CONTEXT_KEY", contextValue);
+
+        Equals eq = new Equals();
+        eq.setId(UUID.randomUUID());
+        eq.setDataPath("state.CONTEXT_KEY");
+        eq.setComparisonValue(valueToTest);
+
+        assertTrue(
+                eq.evaluate(context)
+        );
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiterString = "~", value = {
+            "MSH.3.1~1.3.HSM",
+            "(123) 456-7890~0987-654 )321(",
+            "info@example.com~moc.elpmaxe@ofni",
+            "apple,banana,cherry~yrrehc,ananab,elppa",
+            "Hello, World!~!dlroW ,olleH",
+            "111-23-4455~5544-32-111",
+            "192.168.0.1~1.0.861.291"
+    })
+    void testStateFalse(String contextValue, String valueToTest) throws HL7Exception {
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
+        context.getState().put("CONTEXT_KEY", contextValue);
+
+        Equals eq = new Equals();
+        eq.setId(UUID.randomUUID());
+        eq.setDataPath("state.CONTEXT_KEY");
+        eq.setComparisonValue(valueToTest);
+
+        assertFalse(
                 eq.evaluate(context)
         );
     }
