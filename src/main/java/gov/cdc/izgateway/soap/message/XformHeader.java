@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+// TODO: Refactor this with IZG Core
+
 @Data 
 @Schema(description="The Hub Request header in the SOAP message")
 @JsonInclude(JsonInclude.Include.NON_NULL)

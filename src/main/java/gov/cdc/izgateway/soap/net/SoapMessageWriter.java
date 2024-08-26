@@ -13,6 +13,8 @@ import javax.xml.stream.XMLStreamWriter;
 import java.util.List;
 import java.util.function.Function;
 
+// TODO: Refactor this with IZG Core
+
 public class SoapMessageWriter {
 	public static final String HIDDEN = "[Hidden]";
 	private static boolean fixNewlines = true;
