@@ -177,4 +177,26 @@
     } ]
   } ],
   "responseOperations" : []
+}, {
+  "id" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
+  "solutionName" : "ZipFixer",
+  "description" : "Standardizes the zip for PID-11-5",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "d21c3430-39cc-41e2-9f66-33f7b52e1f56",
+      "dataPath" : "/MSH-9-1",
+      "comparisonValue" : "VXU"
+    }],
+    "operationList" : [ {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/PID-11-5",
+      "regex": "^(\\d{5})(\\d{4})$",
+      "replacement": "$1-$2"
+    } ]
+  } ],
+  "responseOperations" : [ ]
 } ]
