@@ -10,6 +10,7 @@ import gov.cdc.izgateway.transformation.constants.XformConstants;
 import java.util.Objects;
 
 @Getter
+
 @Setter
 @Slf4j
 public class NotEquals extends Equals implements Precondition {
