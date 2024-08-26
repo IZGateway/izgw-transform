@@ -3,6 +3,7 @@ package gov.cdc.izgateway.transformation.preconditions;
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class Hl7v2NotExistsTests {
+class NotExistsTests {
 
     @ParameterizedTest
     @CsvSource({
@@ -20,16 +21,19 @@ class Hl7v2NotExistsTests {
             "/PID-3-4-4",
             "/ORDER/OBSERVATION(2)/OBX-3-2"
     })
-    void testWhereNotExists(String dataPath) throws HL7Exception {
-
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
-        Hl7v2NotExists notExists = new Hl7v2NotExists();
-        notExists.setDataPath(dataPath);
-
+    void hl7TestWhereNotExists(String dataPath) throws HL7Exception {
         assertTrue(
-            notExists.evaluate(context)
+                runHl7NotExists(dataPath)
         );
 
+    }
+
+    @Test
+    void stateTestWhereNotExists() throws HL7Exception {
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
+        assertTrue(
+                runStateNotExists(context, "KEY")
+        );
     }
 
     @ParameterizedTest
@@ -40,14 +44,18 @@ class Hl7v2NotExistsTests {
             "/ORDER/OBSERVATION(0)/OBX-3-2",
             "/ORDER/OBSERVATION(1)/OBX-3-2"
     })
-    void testWhereExists(String dataPath) throws HL7Exception {
-
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
-        Hl7v2NotExists notExists = new Hl7v2NotExists();
-        notExists.setDataPath(dataPath);
-
+    void hl7TestWhereExists(String dataPath) throws HL7Exception {
         assertFalse(
-                notExists.evaluate(context)
+                runHl7NotExists(dataPath)
+        );
+    }
+
+    @Test
+    void stateTestWhereExists() throws HL7Exception {
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
+        context.getState().put("KEY", "VALUE");
+        assertFalse(
+                runStateNotExists(context, "state.KEY")
         );
     }
 
@@ -58,5 +66,19 @@ class Hl7v2NotExistsTests {
                 "RXA|1|1|20240521111910|20240521111916|03^RXA.5.2^CVX|0.5\r" +
                 "OBX|1||64994-7^OBX.3.2.FIRST_REPETITION^LN||||||||F\r" +
                 "OBX|2||30963-3^OBX.3.2.SECOND_REPETITION^LN||||||||F";
+    }
+
+    private Boolean runHl7NotExists(String dataPath) throws HL7Exception {
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
+        Hl7v2NotExists notExists = new Hl7v2NotExists();
+        notExists.setDataPath(dataPath);
+        return notExists.evaluate(context);
+    }
+
+    private Boolean runStateNotExists(ServiceContext context, String dataPath) {
+        NotExists ne = new NotExists();
+        ne.setId(UUID.randomUUID());
+        ne.setDataPath(dataPath);
+        return ne.evaluate(context);
     }
 }
