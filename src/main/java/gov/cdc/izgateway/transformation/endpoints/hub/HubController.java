@@ -87,10 +87,12 @@ public class HubController extends SoapControllerBase {
         try {
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
 
-            if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed())
-                context.getSubmitSingleMessageResponse().getHubHeader().setTransformedRequest(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());
+            if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed()) {
+                log.info(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());
+                context.getSubmitSingleMessageResponse().getXformHeader().setTransformedRequest(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());
+            }
             if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isResponseTransformed())
-                context.getSubmitSingleMessageResponse().getHubHeader().setOriginalResponse(XformAdviceCollector.getTransactionData().getPipelineAdvice().getResponse());
+                context.getSubmitSingleMessageResponse().getXformHeader().setOriginalResponse(XformAdviceCollector.getTransactionData().getPipelineAdvice().getResponse());
 
             context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
         } catch (CamelExecutionException | HL7Exception e) {
