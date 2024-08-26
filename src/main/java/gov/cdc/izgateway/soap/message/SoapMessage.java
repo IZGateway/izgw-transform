@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// TODO: Refactor this with IZG Core
+
 @Schema(description="A generic SOAP Request message for IZ Gateway")
 @Data
 @NoArgsConstructor
