@@ -88,7 +88,6 @@ public class HubController extends SoapControllerBase {
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
 
             if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed()) {
-                log.info(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());
                 context.getSubmitSingleMessageResponse().getXformHeader().setTransformedRequest(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());
             }
             if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isResponseTransformed())
