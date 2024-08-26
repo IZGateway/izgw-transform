@@ -31,7 +31,7 @@ public class NotEquals extends Equals implements Precondition {
 
         if (this.getDataPath().startsWith("state.")) {
             String stateKey = this.getDataPath().split("\\.")[1];
-            return !Objects.equals(this.getDataPath(), context.getState().get(stateKey));
+            return !Objects.equals(this.getComparisonValue(), context.getState().get(stateKey));
         } else if (getDataPath().equals(XformConstants.CONTEXT_FACILITY_ID_PATH)) {
             return !context.getFacilityId().equals(getComparisonValue());
         } else if (context.getDataType().equals(DataType.HL7V2)) {
