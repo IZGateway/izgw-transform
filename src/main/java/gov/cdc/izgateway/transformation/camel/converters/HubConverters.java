@@ -44,6 +44,7 @@ public class HubConverters implements TypeConverters {
                     "izgts:IISHubService",
                     "izghub:IISHubService",
                     DataType.HL7V2,
+                    "", // This isn't used so blanking FacilityID for now
                     body);
         } catch (Exception e) {
             log.error("Error creating ServiceContext: " + e.getMessage());

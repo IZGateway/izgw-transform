@@ -26,7 +26,7 @@ class Hl7v2RegexMatchTests {
                     "/PID-13-9~^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
             })
     void testTrueRegexes(String dataPath, String regex) throws HL7Exception {
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
         Hl7v2RegexMatch regexMatch = new Hl7v2RegexMatch(dataPath, regex);
 
         assertTrue(

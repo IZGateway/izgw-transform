@@ -36,7 +36,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.Arrays;
 import java.util.List;
@@ -77,13 +81,12 @@ public class HubController extends SoapControllerBase {
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
-        HubWsdlTransformationContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
+        HubWsdlTransformationContext context = createHubWsdlTransformationContext(organization, RequestContext.getSourceInfo().getFacilityId(), submitSingleMessage);
 
         try {
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
             context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
-        }
-        catch (CamelExecutionException | HL7Exception e) {
+        } catch (CamelExecutionException | HL7Exception e) {
             throw new HubControllerFault(e.getCause().getMessage());
         }
 
@@ -111,9 +114,9 @@ public class HubController extends SoapControllerBase {
      * @throws Fault
      */
     private Organization checkOrganizationOverride(Organization organization) throws Fault {
-        if (RequestContext.getHttpHeaders() != null &&
-            RequestContext.getHttpHeaders().containsKey("x-xform-organization") &&
-            accessControlService.isUserInRole(organization.getId(), XformAccessControlService.ADMIN_ROLE)) {
+        if (RequestContext.getHttpHeaders() != null
+                && RequestContext.getHttpHeaders().containsKey("x-xform-organization")
+                && accessControlService.isUserInRole(organization.getId(), XformAccessControlService.ADMIN_ROLE)) {
 
             Map<String, List<String>> headers = RequestContext.getHttpHeaders();
             String orgId = headers.get("x-xform-organization").get(0);
@@ -127,22 +130,22 @@ public class HubController extends SoapControllerBase {
         return organization;
     }
 
-    private HubWsdlTransformationContext createHubWsdlTransformationContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
-        ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage.getHl7Message());
+    private HubWsdlTransformationContext createHubWsdlTransformationContext(UUID organization, String facilityId, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+        ServiceContext serviceContext = createServiceContext(organization, facilityId, submitSingleMessage.getHl7Message());
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
         return new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
     }
 
-    private ServiceContext createServiceContext(UUID organization, String incomingMessage) throws Fault {
+    private ServiceContext createServiceContext(UUID organization, String facilityId, String incomingMessage) throws Fault {
         try {
             return new ServiceContext(organization,
                     "izgts:IISHubService",
                     "izghub:IISHubService",
                     DataType.HL7V2,
+                    facilityId,
                     incomingMessage);
-        }
-        catch (HL7Exception e) {
+        } catch (HL7Exception e) {
             throw new HubControllerFault(e.getMessage());
         }
     }
@@ -171,11 +174,11 @@ public class HubController extends SoapControllerBase {
             description = "Send a request to the SOAP Interface for IZ Gateway"
     )
     @ApiResponse(
-            responseCode = "200",
-            description = "The request completed normally",
-            content = {@Content(
-                    mediaType = "application/xml"
-            )}
+        responseCode = "200",
+        description = "The request completed normally",
+        content = {
+            @Content(mediaType = "application/xml")
+        }
     )
     @ApiResponse(
             responseCode = "500",
