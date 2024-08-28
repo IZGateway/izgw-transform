@@ -143,7 +143,8 @@ public class SoapMessageWriter {
 		);
 		// Force write of namespace prefix for hub header in case it isn't otherwise written.
 		w.writeNamespace(SoapMessage.XFORM_PREFIX, SoapMessage.XFORM_NS);
-        // Xform headers alway have HL7 content that needs to be protected if isFiltering is true
+
+		// Xform headers always have HL7 content that needs to be protected if isFiltering is true
 		writeKeyValueSuppliers(XformHeader.getKeyValueSuppliers(), SoapMessage.XFORM_PREFIX, SoapMessage.XFORM_NS, true);
 		w.writeEndElement();
 	}
@@ -159,12 +160,12 @@ public class SoapMessageWriter {
         writeKeyValueSuppliers(pairs, prefix, ns, false);
 	}
 
-    private void writeKeyValueSuppliers(List<Pair<String, Function<SoapMessage, String>>> pairs, String prefix, String ns, boolean isHl7) throws XMLStreamException {
+    private void writeKeyValueSuppliers(List<Pair<String, Function<SoapMessage, String>>> pairs, String prefix, String ns, boolean hasHl7Content) throws XMLStreamException {
         for (Pair<String, Function<SoapMessage, String>> pair: pairs) {
             String value = pair.getValue().apply(m);
             if (!StringUtils.isEmpty(value)) {
                 w.writeStartElement(prefix, pair.getKey(), ns);
-                if ( isHl7 && isFiltering() ) {
+                if ( hasHl7Content && isFiltering() ) {
                     w.writeCharacters(HL7Utils.protectHL7Message(value));
                 } else {
                     w.writeCharacters(value);
