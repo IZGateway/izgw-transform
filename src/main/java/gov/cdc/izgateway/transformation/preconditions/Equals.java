@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import gov.cdc.izgateway.transformation.constants.XformConstants;
@@ -41,7 +42,10 @@ public class Equals implements Precondition {
                 this.getDataPath(),
                 this.getComparisonValue()));
 
-        if (getDataPath().equals(XformConstants.CONTEXT_FACILITY_ID_PATH)) {
+        if (this.dataPath.startsWith("state.")) {
+            String stateKey = this.dataPath.split("\\.")[1];
+            return Objects.equals(this.comparisonValue, context.getState().get(stateKey));
+        } else if (getDataPath().equals(XformConstants.CONTEXT_FACILITY_ID_PATH)) {
             return context.getFacilityId().equals(getComparisonValue());
         } else if (context.getDataType().equals(DataType.HL7V2)) {
             return new Hl7v2Equals(this).evaluate(context);

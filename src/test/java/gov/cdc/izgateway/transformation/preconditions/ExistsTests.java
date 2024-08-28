@@ -3,6 +3,7 @@ package gov.cdc.izgateway.transformation.preconditions;
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class Hl7v2ExistsTests {
+class ExistsTests {
 
     @ParameterizedTest
     @CsvSource({
@@ -21,11 +22,25 @@ class Hl7v2ExistsTests {
             "/ORDER/OBSERVATION(0)/OBX-3-2",
             "/ORDER/OBSERVATION(1)/OBX-3-2"
     })
-    void testTrue(String dataPath) throws HL7Exception {
+    void testHl7True(String dataPath) throws HL7Exception {
         ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
 
         Hl7v2Exists exists = new Hl7v2Exists();
         exists.setDataPath(dataPath);
+
+        assertTrue(
+                exists.evaluate(context)
+        );
+    }
+
+    @Test
+    void testStateTrue() throws HL7Exception {
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
+        context.getState().put("CONTEXT_KEY", "CONTEXT_VALUE");
+
+        Exists exists = new Exists();
+        exists.setId(UUID.randomUUID());
+        exists.setDataPath("state.CONTEXT_KEY");
 
         assertTrue(
                 exists.evaluate(context)
@@ -39,11 +54,25 @@ class Hl7v2ExistsTests {
             "/PID-3-4-4",
             "/ORDER/OBSERVATION(2)/OBX-3-2"
     })
-    void testFalse(String dataPath) throws HL7Exception {
+    void testHl7False(String dataPath) throws HL7Exception {
         ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
 
         Hl7v2Exists exists = new Hl7v2Exists();
         exists.setDataPath(dataPath);
+
+        assertFalse(
+                exists.evaluate(context)
+        );
+    }
+
+    @Test
+    void testStateFalse() throws HL7Exception {
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
+        context.getState().put("CONTEXT_KEY", "CONTEXT_VALUE");
+
+        Exists exists = new Exists();
+        exists.setId(UUID.randomUUID());
+        exists.setDataPath("state.CONTEXT_KEY_2");
 
         assertFalse(
                 exists.evaluate(context)
