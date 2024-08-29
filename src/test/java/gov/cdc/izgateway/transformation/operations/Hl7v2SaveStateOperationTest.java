@@ -22,7 +22,7 @@ class Hl7v2SaveStateOperationTest {
             "/ORDER/OBSERVATION(1)/OBX-3-2,OBX.3.2.SECOND_REPETITION,OBX.3.2.SECOND_REPETITION"
     })
     void testSaveState(String field, String key, String expected) throws HL7Exception {
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
 
         OperationSaveStateConfig config = new OperationSaveStateConfig();
         config.setField(field);

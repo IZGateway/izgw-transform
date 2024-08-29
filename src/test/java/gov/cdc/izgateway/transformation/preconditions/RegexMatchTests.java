@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class Hl7v2RegexMatchTests {
+class RegexMatchTests {
 
     @ParameterizedTest
     @CsvSource(delimiterString = "~",
@@ -26,8 +26,32 @@ class Hl7v2RegexMatchTests {
                     "/PID-13-9~^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
             })
     void testTrueRegexes(String dataPath, String regex) throws HL7Exception {
-        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, TestMessage1());
-        Hl7v2RegexMatch regexMatch = new Hl7v2RegexMatch(dataPath, regex);
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
+
+        RegexMatch regexMatch = new RegexMatch(UUID.randomUUID(), dataPath, regex);
+
+        assertTrue(
+                regexMatch.evaluate(context)
+        );
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiterString = "~",
+            value = {
+                    "MSH.3.1~MSH.3.1",
+                    "MSH.4.1~^([A-Z]{3})\\.([0-9]{1,})\\.([0-9]{1,})$",
+                    "(123) 456-7890~\\((\\d{3})\\) (\\d{3})-(\\d{4})",
+                    "info@example.com~(\\w+)@(\\w+)\\.(com|org|net)?",
+                    "info@example.com~^[A-Za-z0-9+_.-]+@(.+)$",
+                    "apple,banana,cherry~\\w+(?:,\\w+)*",
+                    "Hello, World!~^(?!.*[0-9]).*$",
+                    "111-23-4455~^\\d{3}-?\\d{2}-?\\d{4}$",
+                    "192.168.0.1~^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
+            })
+    void testStateRegexes(String valueToTest, String regex) throws HL7Exception {
+        ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
+        context.getState().put("CONTEXT_KEY", valueToTest);
+        RegexMatch regexMatch = new RegexMatch(UUID.randomUUID(), "state.CONTEXT_KEY", regex);
 
         assertTrue(
                 regexMatch.evaluate(context)

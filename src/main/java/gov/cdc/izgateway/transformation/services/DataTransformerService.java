@@ -18,24 +18,7 @@ public class DataTransformerService {
     }
 
     public HubWsdlTransformationContext transform(HubWsdlTransformationContext context) throws Exception {
-        try {
-            String msg = context.getServiceContext().getRequestMessage().encode().replace("\r", "\n");
-            log.trace("Message pre-transformation:\n\n{}", msg);
-        }
-        catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
-        }
-
         pipelineRunnerService.execute(context.getServiceContext());
-
-        try {
-            String msg = context.getServiceContext().getRequestMessage().encode().replace("\r", "\n");
-            log.trace("Message post-transformation:\n\n{}", msg);
-        }
-        catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
-        }
-
         return context;
     }
 }

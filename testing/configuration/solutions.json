@@ -59,7 +59,7 @@
       "destinationField" : "/MSH-22-3",
       "setValue" : "RegexMatchPrecondition_Solution"
     } ]
-  },{
+  }, {
     "preconditions" : [ {
       "method" : "regex_match",
       "id" : "2e6048c8-630a-449f-a3b4-f63425a60442",
@@ -71,7 +71,7 @@
       "order" : 0,
       "codeField" : "/PID-10-1",
       "codeSystemField" : "/PID-10-3",
-      "codeSystemDefault": "CDCREC"
+      "codeSystemDefault" : "CDCREC"
     } ]
   } ],
   "responseOperations" : [ {
@@ -123,7 +123,7 @@
   "active" : true,
   "requestOperations" : [ {
     "preconditions" : null,
-    "operationList" : []
+    "operationList" : [ ]
   } ],
   "responseOperations" : [ ]
 }, {
@@ -173,8 +173,78 @@
       "order" : 0,
       "codeField" : "/PID-10-1",
       "codeSystemField" : "/PID-10-3",
-      "codeSystemDefault": "CDCREC"
+      "codeSystemDefault" : "CDCREC"
     } ]
   } ],
-  "responseOperations" : []
+  "responseOperations" : [ ]
+}, {
+  "id" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
+  "solutionName" : "ZipFixer",
+  "description" : "Standardizes the zip for PID-11-5",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "d21c3430-39cc-41e2-9f66-33f7b52e1f56",
+      "dataPath" : "/MSH-9-1",
+      "comparisonValue" : "VXU"
+    } ],
+    "operationList" : [ {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/PID-11-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "bf3326fe-ab52-4d6c-b37f-7db5f1769c4c",
+  "solutionName" : "POSTMAN MSH-7-1 Response Transformer - DO NOT DELETE",
+  "description" : "Used in Postman Tests",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ ]
+  } ],
+  "responseOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-7-1",
+      "setValue" : "MSH 7 NEW VALUE"
+    } ]
+  } ]
+}, {
+  "id" : "0f150b3d-44ca-464e-99cb-8757c150f9a0",
+  "solutionName" : "Postman Test For State Precondition",
+  "description" : "",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "save_state",
+      "order" : 0,
+      "field" : "/MSH-9-1",
+      "key" : "POSTMAN"
+    } ]
+  } ],
+  "responseOperations" : [ {
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "6f0d9f5f-f41e-432b-8dd1-82db0e13e840",
+      "dataPath" : "state.POSTMAN",
+      "regex" : "^(VXU|QBP)$"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-22-1",
+      "setValue" : "STATE_CHECKS"
+    } ]
+  } ]
 } ]

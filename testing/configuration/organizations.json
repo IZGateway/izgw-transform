@@ -2,25 +2,35 @@
   "organizationName" : "Oklahoma FAKE TEST",
   "id" : "19c3dd20-31f4-4508-87ee-705fca9603b3",
   "active" : true,
-  "commonName": "OK"
+  "commonName" : "OK"
 }, {
   "organizationName" : "Audacious Test Organziation",
   "id" : "0d15449b-fb08-4013-8985-20c148b353fe",
   "active" : true,
-  "commonName": "pcahill.testing.izgateway.org"
+  "commonName" : "pcahill.testing.izgateway.org"
 }, {
   "organizationName" : "Maryland FAKE TEST",
   "id" : "b9bdedc5-cb33-4772-be37-b78dc7bf3786",
   "active" : true,
-  "commonName": "xpcahill.testing.izgateway.org"
+  "commonName" : "xpcahill.testing.izgateway.org"
 }, {
   "organizationName" : "Faulty Organization",
   "id" : "8fbcad81-dc40-4da5-a696-962bf919e5fe",
   "active" : true,
-  "commonName": "xpcahill.testing.izgateway.org"
+  "commonName" : "xpcahill.testing.izgateway.org"
 }, {
   "organizationName" : "Organization to use for Postman tests",
   "id" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
   "active" : true,
-  "commonName": "use override"
+  "commonName" : "use override"
+}, {
+  "organizationName" : "Audacious Test Organziation (Austin)",
+  "id" : "6d531709-6911-463f-9ee8-5fd704f22b24",
+  "active" : true,
+  "commonName" : "amoody.testing.izgateway.org"
+}, {
+  "organizationName" : "Audacious Test Organziation (Brian)",
+  "id" : "a9bc153a-d400-42e7-8e74-2e7d8b2e1481",
+  "active" : true,
+  "commonName" : "bharris.testing.izgateway.org"
 } ]

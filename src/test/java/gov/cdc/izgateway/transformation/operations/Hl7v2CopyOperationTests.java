@@ -323,7 +323,7 @@ GT1|||Doe""";
     }
 
     private void runCopyTrueTest(String testHL7, String expectedHL7, String sourceField, String destinationField) throws HL7Exception {
-        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, testHL7);
+        ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", testHL7);
 
         Hl7v2CopyOperation testClass = getCopyOperation(sourceField, destinationField);
 
