@@ -33,4 +33,29 @@
   "id" : "a9bc153a-d400-42e7-8e74-2e7d8b2e1481",
   "active" : true,
   "commonName" : "bharris.testing.izgateway.org"
-} ]
+}, {
+  "organizationName" : "California State Health Monitoring Agency",
+  "id" : "eb369b0e-38db-4eb2-bf8d-b327b1a5cdc5",
+  "active" : true,
+  "commonName" : "tbd"
+}, {
+  "organizationName" : "Texas Community Wellness Initiative",
+  "id" : "5872d93d-8f22-4772-b9c0-b26943c74708",
+  "active" : true,
+  "commonName" : "tbd"
+}, {
+  "organizationName" : "Florida Statewide Disease Prevention Program",
+  "id" : "55dbc8c9-ca16-402d-b16b-e56cc805de90",
+  "active" : true,
+  "commonName" : "tbd"
+},{
+  "organizationName" : "New York Public Health Data Exchange",
+  "id" : "6388c0c6-8c58-4c8c-aa31-4ccbb81068c6",
+  "active" : true,
+  "commonName" : "tbd"
+}, {
+  "organizationName" : "Illinois State Health Improvement Coalition",
+  "id" : "8c905096-c79c-4351-86a7-1d6b7da5ec44",
+  "active" : true,
+  "commonName" : "tbd"
+}]
