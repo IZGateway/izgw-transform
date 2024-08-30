@@ -4,8 +4,17 @@ import lombok.Data;
 
 @Data
 public class XformLogDetail {
-    public String eventId;
-    public String concept;
-    public boolean processError;
-    public String name;
+    private String eventId;
+    private String concept;
+    private boolean processError;
+    private String name;
+    private String requestMessageType;
+    private String requestSendingApplication;
+    private String requestSendingFacility;
+    private String requestReceivingApplication;
+    private String requestReceivingFacility;
+    private String responseSendingApplication;
+    private String responseSendingFacility;
+    private String responseReceivingApplication;
+    private String responseReceivingFacility;
 }

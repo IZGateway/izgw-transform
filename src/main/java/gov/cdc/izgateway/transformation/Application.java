@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import gov.cdc.izgateway.common.HealthService;
 import gov.cdc.izgateway.soap.net.SoapMessageConverter;
+import gov.cdc.izgateway.utils.SystemUtils;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -102,9 +104,17 @@ public class Application implements WebMvcConfigurer {
         }
 
         loadStaticResource(BUILD, BUILD_FILE);
+        setInitialHealth();
 
         String build = getBuild();
-        log.info("Application loaded\n{}", build);
+        log.info("Xform application loaded");
+        log.info("Build: {}", build);
+    }
+
+    private static void setInitialHealth() {
+        HealthService.setBuildName(getBuild());
+        HealthService.setHealthy(true, "Application started");
+        HealthService.setServerName(SystemUtils.getHostname());
     }
 
     private static void initialize() {

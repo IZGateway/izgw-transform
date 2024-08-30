@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class XformSolutionLogDetail extends XformLogDetail {
-    String direction;
+    private String direction;
+    private String pipelineName;
 }

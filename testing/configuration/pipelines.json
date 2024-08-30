@@ -136,4 +136,87 @@
       "comparisonValue" : "VXU"
     } ]
   } ]
-} ]
+}, {
+  "pipelineName": "Pipeline for California State Health Monitoring Agency",
+  "id": "7952c20c-0832-49a8-bd84-2286d7aa0f4d",
+  "organizationId": "eb369b0e-38db-4eb2-bf8d-b327b1a5cdc5",
+  "description": "California State Health Monitoring Agency pipeline description",
+  "inboundEndpoint": "izgts:IISHubService",
+  "outboundEndpoint": "izghub:IISHubService",
+  "active": true,
+  "pipes": [
+    {
+      "id": "064a1de6-3754-42e9-be82-815b37d125c6",
+      "solutionId": "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
+      "solutionVersion": "1.0",
+      "preconditions": []
+    }
+  ]
+}, {
+  "pipelineName" : "Pipeline for Texas Community Wellness Initiative",
+  "id" : "41a31ddb-4e4d-4edd-8003-f5faff4cc684",
+  "organizationId" : "5872d93d-8f22-4772-b9c0-b26943c74708",
+  "description" : "Texas Community Wellness Initiative pipeline description",
+  "inboundEndpoint" : "izgts:IISHubService",
+  "outboundEndpoint" : "izghub:IISHubService",
+  "active" : true,
+  "pipes" : [ {
+    "id" : "8962c2c4-3a4b-4777-a6f9-2e26f75f3af8",
+    "solutionId" : "7e9ab0bf-e174-4073-a63f-75e2fabdb3a3",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ ]
+  }, {
+    "id" : "178ae430-1f3a-49ea-9b99-47fbf717f7b9",
+    "solutionId" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ ]
+  } ]
+}, {
+  "pipelineName" : "Pipeline for Florida Statewide Disease Prevention Program",
+  "id" : "c78e886f-eb1f-4d09-9f91-a822de531b16",
+  "organizationId" : "55dbc8c9-ca16-402d-b16b-e56cc805de90",
+  "description" : "Florida Statewide Disease Prevention Program pipeline description",
+  "inboundEndpoint" : "izgts:IISHubService",
+  "outboundEndpoint" : "izghub:IISHubService",
+  "active" : true,
+  "pipes" : [ {
+    "id" : "0b19484b-d645-4e2e-ba23-0cc14868474b",
+    "solutionId" : "7e9ab0bf-e174-4073-a63f-75e2fabdb3a3",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ ]
+  }, {
+    "id" : "1771a176-4a4d-4169-a1b2-0add9d9ad68c",
+    "solutionId" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ ]
+  } ]
+}, {
+  "pipelineName" : "Pipeline for New York Public Health Data Exchange",
+  "id" : "56dccf8b-158f-49e5-9cdb-0114327ed544",
+  "organizationId" : "6388c0c6-8c58-4c8c-aa31-4ccbb81068c6",
+  "description" : "New York Public Health Data Exchange pipeline description",
+  "inboundEndpoint" : "izgts:IISHubService",
+  "outboundEndpoint" : "izghub:IISHubService",
+  "active" : true,
+  "pipes" : [ {
+    "id" : "768cd215-ebfe-48d0-984a-025c203b0422",
+    "solutionId" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ ]
+  } ]
+}, {
+  "pipelineName" : "Pipeline for Illinois State Health Improvement Coalition",
+  "id" : "39eab870-c5e5-45ed-bbf5-31e54e454ed1",
+  "organizationId" : "8c905096-c79c-4351-86a7-1d6b7da5ec44",
+  "description" : "Illinois State Health Improvement Coalition pipeline description",
+  "inboundEndpoint" : "izgts:IISHubService",
+  "outboundEndpoint" : "izghub:IISHubService",
+  "active" : true,
+  "pipes" : [ {
+    "id" : "7a2d83e0-a76a-44db-9d3c-db1d3072dcb7",
+    "solutionId" : "7e9ab0bf-e174-4073-a63f-75e2fabdb3a3",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ ]
+  } ]
+}
+]
