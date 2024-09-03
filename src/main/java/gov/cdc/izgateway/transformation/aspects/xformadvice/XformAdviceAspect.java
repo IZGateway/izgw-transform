@@ -81,7 +81,6 @@ public class XformAdviceAspect {
         xformAdvice.setName(name);
         xformAdvice.setProcessError(hasErrored);
         xformAdvice.setOrganizationId(context.getOrganizationId());
-        xformAdvice.setDestinationId(context.getDestinationId());
 
         if ( context.getCurrentDirection() == DataFlowDirection.REQUEST ) {
             updateRequestMessage(context, methodDisposition, hasTransformed, xformAdvice);

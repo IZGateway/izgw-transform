@@ -152,7 +152,6 @@ public class HubController extends SoapControllerBase {
                     "izghub:IISHubService",
                     DataType.HL7V2,
                     submitSingleMessage.getFacilityID(),
-                    submitSingleMessage.getHubHeader().getDestinationId(),
                     submitSingleMessage.getHl7Message());
         } catch (HL7Exception e) {
             throw new HubControllerFault(e.getMessage());

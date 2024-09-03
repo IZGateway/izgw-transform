@@ -18,7 +18,6 @@ public class XformAdviceDTO {
 
     private boolean processError;
     private String className;
-    private String destinationId;
     private UUID organizationId;
     private String name;
     @JsonIgnore
