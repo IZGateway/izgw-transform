@@ -2,10 +2,14 @@ package gov.cdc.izgateway.transformation.logging;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class XformLogDetail {
     private String eventId;
     private String concept;
+    private String destinationId;
+    private UUID organizationId;
     private boolean processError;
     private String name;
     private String requestMessageType;

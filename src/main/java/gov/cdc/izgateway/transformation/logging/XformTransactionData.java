@@ -51,6 +51,8 @@ public class XformTransactionData extends TransactionData {
         pipelineAdvice.setName(advice.getName());
         pipelineAdvice.setId(advice.getId());
         pipelineAdvice.setProcessError(advice.isProcessError());
+        pipelineAdvice.setDestinationId(advice.getDestinationId());
+        pipelineAdvice.setOrganizationId(advice.getOrganizationId());
         if ( advice.getTransformedRequest() != null)
             pipelineAdvice.setTransformedRequest(advice.getTransformedRequest());
         if ( advice.getResponse() != null )
@@ -62,6 +64,8 @@ public class XformTransactionData extends TransactionData {
     public void addAdvice(SolutionAdviceDTO advice) {
 
         currentSolutionAdvice = pipelineAdvice.getSolutionAdvice(advice);
+        currentSolutionAdvice.setDestinationId(advice.getDestinationId());
+        currentSolutionAdvice.setOrganizationId(advice.getOrganizationId());
 
         if ( advice.isProcessError() ) {
             currentSolutionAdvice.setProcessError(true);
@@ -132,6 +136,8 @@ public class XformTransactionData extends TransactionData {
     private XformLogDetail initializeLogDetail(XformLogDetail logDetail, String concept, String name) {
         logDetail.setEventId(this.getEventId());
         logDetail.setConcept(concept);
+        logDetail.setDestinationId(this.getDestination().getId() + "PAUL");
+        logDetail.setOrganizationId(pipelineAdvice.getOrganizationId());
         logDetail.setName(name);
         logDetail.setProcessError(this.getHasProcessError());
         logDetail.setRequestMessageType(this.getRequestPayloadType().toString());
