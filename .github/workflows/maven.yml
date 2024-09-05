@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - Release*
+      - IGDD-1697_pipeline_improvements
 
   pull_request:
     branches:
@@ -29,6 +30,15 @@ jobs:
           java-version: "17"
           distribution: "adopt"
           cache: maven
+
+      - name: Check version format in develop branch
+        if: github.ref == 'refs/heads/IGDD-1697_pipeline_improvements'
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
+            echo "Version $VERSION is not in the correct format. It should be #.#.#-SNAPSHOT."
+            exit 1
+          fi
 
       - name: Set up Maven
         uses: stCarolas/setup-maven@v5
