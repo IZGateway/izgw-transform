@@ -21,6 +21,9 @@ jobs:
           ssh-key: ${{secrets.ACTIONS_KEY}}
 
   call-workflow-passing-data:
+    needs: checkout
     uses: ./.github/workflows/common.yml
+    with:
+      workspace: ${{ needs.checkout.outputs.workspace }}
     secrets:
       ACTIONS_KEY: ${{ secrets.GITHUB_TOKEN }}
