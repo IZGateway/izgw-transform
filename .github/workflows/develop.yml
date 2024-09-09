@@ -14,4 +14,9 @@ jobs:
     secrets:
         ACTIONS_KEY: ${{secrets.ACTIONS_KEY}}
 
+  additional-build:
+    uses: ./.github/workflows/common2.yml
+    secrets:
+      ACTIONS_KEY: ${{secrets.ACTIONS_KEY}}
+
 # More to come...
