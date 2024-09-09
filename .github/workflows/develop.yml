@@ -10,7 +10,7 @@ concurrency: dev
 
 jobs:
   build:
-    uses: .//.github/workflows/common.yml
+    uses: .//.github/workflows/common.yml@${{ github.ref }}
     secrets:
         ACTIONS_KEY: ${{secrets.ACTIONS_KEY}}
 
