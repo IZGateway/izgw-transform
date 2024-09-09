@@ -11,20 +11,27 @@ concurrency: dev
 jobs:
   checkout:
     runs-on: ubuntu-latest
+    outputs:
+      workspace: ${{ steps.checkout.outputs.workspace }}
     steps:
       - name: Checkout the software
+        id: checkout
         uses: actions/checkout@v4
         with:
           ssh-key: ${{secrets.ACTIONS_KEY}}
 
   build:
+    needs: checkout
     uses: ./.github/workflows/common.yml
-    secrets:
-        ACTIONS_KEY: ${{secrets.ACTIONS_KEY}}
-
-  additional-build:
-    uses: ./.github/workflows/common2.yml
+    with:
+      workspace: ${{ needs.checkout.outputs.workspace }}
     secrets:
       ACTIONS_KEY: ${{secrets.ACTIONS_KEY}}
 
-# More to come...
+  additional-build:
+    needs: checkout
+    uses: ./.github/workflows/common2.yml
+    with:
+      workspace: ${{ needs.checkout.outputs.workspace }}
+    secrets:
+      ACTIONS_KEY: ${{secrets.ACTIONS_KEY}}
