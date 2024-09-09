@@ -1,0 +1,36 @@
+name: Java CI with Maven
+
+on:
+  workflow_call:
+    secrets:
+      ACTIONS_KEY:
+        required: true
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the software
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{secrets.ACTIONS_KEY}}
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "adopt"
+          cache: maven
+
+      - name: Check version format in develop branch
+        if: github.ref == 'refs/heads/IGDD-1697_pipeline_improvements'
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
+            echo "Version $VERSION is not in the correct format. It should be #.#.#-SNAPSHOT."
+            exit 1
+          fi
+
+# More to come...
