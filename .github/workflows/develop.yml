@@ -9,6 +9,14 @@ on:
 concurrency: dev
 
 jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the software
+        uses: actions/checkout@v4
+        with:
+          ssh-key: ${{secrets.ACTIONS_KEY}}
+
   build:
     uses: ./.github/workflows/common.yml
     secrets:
