@@ -3,7 +3,7 @@ name: Java CI with Maven
 on:
   push:
     branches:
-      - IGDD-1697_pipeline_improvements
+      - develop
 
   pull_request:
     branches:
@@ -30,7 +30,6 @@ jobs:
           cache: maven
 
       - name: Check version format
-        # change this to be the develop branch and not IGDD-1697_pipeline_improvements
         if: github.ref == 'refs/heads/develop'
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
