@@ -79,9 +79,12 @@ jobs:
         if: github.ref == 'refs/heads/develop'
         run: |
           echo "Setting env vars for develop"
-          echo IMAGE_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed "s/-SNAPSHOT$/-SNAPSHOT-${{github.run_number}}/"`
-          echo IMAGE_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed "s/-SNAPSHOT$/-SNAPSHOT-${{github.run_number}}/"` >> $GITHUB_ENV
-          echo IMAGE_BRANCH_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed "s/-SNAPSHOT$/-SNAPSHOT/"` >> $GITHUB_ENV
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT
+          IMAGE_TAG="${VERSION}-${{github.run_number}}"
+          echo IMAGE_TAG="${IMAGE_TAG}"
+          echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
+          echo IMAGE_BRANCH_TAG="${VERSION}"
+          echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
 
       - name: Sets env vars for main
         if: github.ref == 'refs/heads/main'
