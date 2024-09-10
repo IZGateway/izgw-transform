@@ -92,8 +92,10 @@ jobs:
           echo "Setting env vars for main"
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           IMAGE_TAG="${VERSION}-${{github.run_number}}"
+          echo IMAGE_TAG="${IMAGE_TAG}"
           echo IMAGE_TAG=$IMAGE_TAG >> $GITHUB_ENV
           echo IMAGE_BRANCH_TAG=$VERSION >> $GITHUB_ENV
+          echo IMAGE_BRANCH_TAG="${VERSION}"
 
       - name: Sets check env vars
         run: |
