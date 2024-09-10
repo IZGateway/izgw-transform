@@ -10,7 +10,7 @@
     </parent>
     <groupId>gov.cdc.izgateway</groupId>
     <artifactId>transformation</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.0-IGDD-1697_pipeline_improvements-SNAPSHOT</version>
     <name>transformation</name>
     <description>Demo project for Spring Boot</description>
     <properties>
