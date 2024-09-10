@@ -76,13 +76,13 @@ jobs:
           EOF
 
       - name: Sets env vars for develop
-        if: github.event.pull_request.base.ref == 'develop'
+        if: github.ref == 'refs/heads/develop'
         run: |
           echo IMAGE_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed "s/-SNAPSHOT$/-SNAPSHOT-${{github.run_number}}/"` >> $GITHUB_ENV
           echo IMAGE_BRANCH_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed "s/-SNAPSHOT$/-SNAPSHOT/"` >> $GITHUB_ENV
 
       - name: Sets env vars for main
-        if: github.event.pull_request.base.ref == 'main'
+        if: github.ref == 'refs/heads/main'
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           IMAGE_TAG="${VERSION}-${{github.run_number}}"
