@@ -3,7 +3,7 @@ name: Java CI with Maven
 on:
   push:
     branches:
-      - IGDD-1697_pipeline_improvements
+      - IGDD-1697_pipeline_improvementsxyz
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
