@@ -25,12 +25,21 @@ jobs:
           distribution: "adopt"
           cache: maven
 
-      - name: Check version format
+      - name: Check version format for develop branch
         if: github.ref == 'refs/heads/develop'
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$ ]]; then
             echo "Version $VERSION is not in the correct format. It should be #.#.#-SNAPSHOT."
+            exit 1
+          fi
+
+      - name: Check version format for main branch
+        if: github.ref == 'refs/heads/main'
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version $VERSION is not in the correct format. It should be #.#.#"
             exit 1
           fi
 
@@ -129,6 +138,7 @@ jobs:
           aws ecs update-service --cluster izgateway-dev-izgateway-services --service izgw-xform-dev --force-new-deployment --enable-execute-command --desired-count 1 | jq ".service.deployments[].id"
 
       - name: Login to GitHub Repository
+        if: github.ref == 'refs/heads/main'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -136,6 +146,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Tag, push and deploy image to Github Repository
+        if: github.ref == 'refs/heads/main'
         run: |
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
