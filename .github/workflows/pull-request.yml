@@ -99,9 +99,3 @@ jobs:
               -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
               -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
               -Dimage.tag=$IMAGE_BRANCH_TAG
-
-      - name: If pull request skip the rest
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "Pull request detected. Skipping the rest of the build."
-          exit 0
