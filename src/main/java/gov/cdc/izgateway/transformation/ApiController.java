@@ -27,6 +27,7 @@ public class ApiController {
     private final SolutionService solutionService;
     private final MappingService mappingService;
     private final PreconditionFieldService preconditionFieldService;
+    private final PreconditionService preconditionService;
 
     @Value("${transformationservice.allow-delete-via-api}")
     private Boolean allowDelete;
@@ -37,13 +38,15 @@ public class ApiController {
             PipelineService pipelineService,
             SolutionService solutionService,
             MappingService mappingService,
-            PreconditionFieldService preconditionFieldService
+            PreconditionFieldService preconditionFieldService,
+            PreconditionService preconditionService
     ) {
         this.organizationService = organizationService;
         this.pipelineService = pipelineService;
         this.solutionService = solutionService;
         this.mappingService = mappingService;
         this.preconditionFieldService = preconditionFieldService;
+        this.preconditionService = preconditionService;
     }
 
     @GetMapping("/api/v1/pipelines/{uuid}")
@@ -214,6 +217,16 @@ public class ApiController {
 
         organizationService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/api/v1/preconditions/available")
+    public ResponseEntity<List<PreconditionInfo>> getAvailablePreconditionList() {
+        try {
+            return ResponseEntity.ok(preconditionService.getList());
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/api/v1/preconditions/fields")

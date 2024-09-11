@@ -1,22 +1,25 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
+import gov.cdc.izgateway.transformation.annotations.ExcludeField;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
 @Getter
 @Setter
-@Slf4j
 public class Exists implements Precondition {
 
     private UUID id;
     private String dataPath;
 
-    protected Exists() {}
+    @ExcludeField
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Exists.class);
+
+    protected Exists() {
+    }
 
     protected Exists(Exists exists) {
         this.id = exists.id;
@@ -24,7 +27,7 @@ public class Exists implements Precondition {
     }
 
     protected Exists(String dataPath) {
-        this.dataPath =  dataPath;
+        this.dataPath = dataPath;
     }
 
     @Override
