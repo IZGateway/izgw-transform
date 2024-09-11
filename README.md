@@ -6,16 +6,6 @@ The Transformation Service, as a new optional use case within the IZ Gateway, of
 
 Please see [Docker](docs/Docker.md) for instructions on how to run the Transformation Service in Docker.
 
-## Paul's Notes
-- May 29 
-  - Had to add to application.yml:
-  - spring:
-    autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-- May 27 Name conflcit with applicationController - try to figure out why this is.  Most likely due to camel
-
 ## Development Team Notes to Address
 
 - Some environment variables were added to this project that may not be needed after the core library is refactored.  For example, an environment variable for the DB URL is needed now, but will not be needed after the refactor.
