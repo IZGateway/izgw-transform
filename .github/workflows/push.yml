@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - main
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
