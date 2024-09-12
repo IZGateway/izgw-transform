@@ -39,10 +39,12 @@ public class Equals implements Precondition {
     @Override
     public boolean evaluate(ServiceContext context) {
 
-        log.trace(String.format("Precondition: %s / dataPath: '%s' / comparisonValue: '%s'",
-                this.getClass().getSimpleName(),
-                this.getDataPath(),
-                this.getComparisonValue()));
+        if (log.isTraceEnabled()) {
+            log.trace("Precondition: {} / dataPath: '{}' / comparisonValue: '{}'",
+                    this.getClass().getSimpleName(),
+                    this.getDataPath(),
+                    this.getComparisonValue());
+        }
 
         if (this.dataPath.startsWith("state.")) {
             String stateKey = this.dataPath.split("\\.")[1];

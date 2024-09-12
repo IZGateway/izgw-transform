@@ -39,11 +39,13 @@ public class RegexMatch implements Precondition {
     @Override
     public boolean evaluate(ServiceContext context) {
 
-        log.trace(String.format("Precondition: %s / id: '%s' / dataPath: '%s' / regex: '%s'",
-                this.getClass().getSimpleName(),
-                this.getId().toString(),
-                this.getDataPath(),
-                this.getRegex()));
+        if (log.isTraceEnabled()) {
+            log.trace("Precondition: {} / id: '{}' / dataPath: '{}' / regex: '{}'",
+                    this.getClass().getSimpleName(),
+                    this.getId().toString(),
+                    this.getDataPath(),
+                    this.getRegex());
+        }
 
         if (this.dataPath.startsWith("state.")) {
             String stateKey = this.dataPath.split("\\.")[1];

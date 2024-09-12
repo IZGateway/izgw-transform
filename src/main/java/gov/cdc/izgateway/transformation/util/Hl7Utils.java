@@ -7,7 +7,6 @@ import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
 
 import java.io.IOException;
-import java.util.UUID;
 
 public class Hl7Utils {
     public static String getHl7Message(String message) {
