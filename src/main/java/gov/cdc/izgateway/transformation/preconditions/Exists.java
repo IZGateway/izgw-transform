@@ -32,9 +32,11 @@ public class Exists implements Precondition {
 
     @Override
     public boolean evaluate(ServiceContext context) {
-        log.trace(String.format("Precondition: %s / dataPath: '%s'",
-                this.getClass().getSimpleName(),
-                this.getDataPath()));
+        if (log.isTraceEnabled()) {
+            log.trace("Precondition: {} / dataPath: '{}'",
+                    this.getClass().getSimpleName(),
+                    this.getDataPath());
+        }
 
         if (this.dataPath.startsWith("state.")) {
             String stateKey = this.dataPath.split("\\.")[1];

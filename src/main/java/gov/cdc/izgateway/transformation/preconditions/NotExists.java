@@ -22,9 +22,11 @@ public class NotExists extends Exists implements Precondition {
 
     @Override
     public boolean evaluate(ServiceContext context) {
-        log.trace(String.format("Precondition: %s / dataPath: '%s'",
-                this.getClass().getSimpleName(),
-                this.getDataPath()));
+        if (log.isTraceEnabled()) {
+            log.trace("Precondition: {} / dataPath: '{}'",
+                    this.getClass().getSimpleName(),
+                    this.getDataPath());
+        }
 
         if (this.getDataPath().startsWith("state.")) {
             String stateKey = this.getDataPath().split("\\.")[1];
