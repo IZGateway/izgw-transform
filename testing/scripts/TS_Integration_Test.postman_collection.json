@@ -6228,6 +6228,97 @@
 									"response": []
 								}
 							]
+						},
+						{
+							"name": "Available",
+							"item": [
+								{
+									"name": "Get Available Preconditions - exists",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/*",
+													"    Here we test to see that all known Preconditions are in the API response.",
+													"",
+													"    We also check to see if there is a Precondition that we haven't explicitly listed.",
+													"*/",
+													"",
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"// Preconditions that have been coded",
+													"// ADD an entry here when new Preconditions have been added to the system",
+													"const expectedMethods = [\"equals\", \"not_equals\", \"exists\", \"not_exists\", \"regex_match\"];",
+													"",
+													"// Keep track of methods we find in the response",
+													"let foundMethods = {};",
+													"expectedMethods.forEach(method => foundMethods[method] = false);",
+													"",
+													"// Check each method in the response",
+													"response.forEach(item => {",
+													"    if (expectedMethods.includes(item.method)) {",
+													"        foundMethods[item.method] = true;",
+													"    } else {",
+													"        pm.test(`Unexpected method found: ${item.method}`, function() {",
+													"            pm.expect.fail(`Found unexpected method: ${item.method}`);",
+													"        });",
+													"    }",
+													"});",
+													"",
+													"// Test for presence of all expected methods",
+													"expectedMethods.forEach(method => {",
+													"    pm.test(`Found ${method} method`, function() {",
+													"        pm.expect(foundMethods[method]).to.be.true;",
+													"    });",
+													"});",
+													"",
+													"// Test to ensure no extra methods are present",
+													"pm.test(\"No extra methods present\", function() {",
+													"    pm.expect(response.length).to.equal(expectedMethods.length);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/preconditions/available",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"preconditions",
+												"available"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"description": "This folder contains tests for the piece of the API which lets a call know what Preconditions are available in the running system.\n\nAs we add Preconditions to the system we need to remember to add a bit to the _Post Response_ script to check for it."
 						}
 					]
 				},
@@ -7497,6 +7588,52 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "GoodResponse",
+			"value": ""
+		},
+		{
+			"key": "GoodResponseLF",
+			"value": ""
+		},
+		{
+			"key": "GoodResponseCRLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageCRLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageVXULF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageVXUCRLF",
+			"value": ""
+		},
+		{
+			"key": "TooLargeMessage",
+			"value": ""
+		},
+		{
+			"key": "IisTooLargeMessage",
+			"value": ""
+		},
+		{
+			"key": "hex0b",
+			"value": ""
+		},
+		{
+			"key": "hex1b",
+			"value": ""
 		}
 	]
 }
