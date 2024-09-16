@@ -1,17 +1,20 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
+import gov.cdc.izgateway.transformation.annotations.ExcludeField;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
-@Slf4j
 public class NotExists extends Exists implements Precondition {
 
-    protected NotExists() {}
+    @ExcludeField
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotExists.class);
+
+    protected NotExists() {
+    }
 
     protected NotExists(NotExists notExists) {
         super(notExists);
@@ -19,9 +22,11 @@ public class NotExists extends Exists implements Precondition {
 
     @Override
     public boolean evaluate(ServiceContext context) {
-        log.trace(String.format("Precondition: %s / dataPath: '%s'",
-                this.getClass().getSimpleName(),
-                this.getDataPath()));
+        if (log.isTraceEnabled()) {
+            log.trace("Precondition: {} / dataPath: '{}'",
+                    this.getClass().getSimpleName(),
+                    this.getDataPath());
+        }
 
         if (this.getDataPath().startsWith("state.")) {
             String stateKey = this.getDataPath().split("\\.")[1];

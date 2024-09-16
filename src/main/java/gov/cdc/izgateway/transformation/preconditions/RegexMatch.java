@@ -1,24 +1,28 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
+import gov.cdc.izgateway.transformation.annotations.ExcludeField;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 @Getter
 @Setter
-@Slf4j
 public class RegexMatch implements Precondition {
     private UUID id;
     private String dataPath;
     private String regex;
 
-    protected RegexMatch() {}
+    @ExcludeField
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RegexMatch.class);
+
+    protected RegexMatch() {
+    }
 
     protected RegexMatch(RegexMatch regexMatch) {
         this.id = regexMatch.id;
@@ -35,11 +39,13 @@ public class RegexMatch implements Precondition {
     @Override
     public boolean evaluate(ServiceContext context) {
 
-        log.trace(String.format("Precondition: %s / id: '%s' / dataPath: '%s' / regex: '%s'",
-                this.getClass().getSimpleName(),
-                this.getId().toString(),
-                this.getDataPath(),
-                this.getRegex()));
+        if (log.isTraceEnabled()) {
+            log.trace("Precondition: {} / id: '{}' / dataPath: '{}' / regex: '{}'",
+                    this.getClass().getSimpleName(),
+                    this.getId().toString(),
+                    this.getDataPath(),
+                    this.getRegex());
+        }
 
         if (this.dataPath.startsWith("state.")) {
             String stateKey = this.dataPath.split("\\.")[1];
