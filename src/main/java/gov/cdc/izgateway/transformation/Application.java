@@ -1,14 +1,23 @@
 package gov.cdc.izgateway.transformation;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
+import gov.cdc.izgateway.common.HealthService;
 import gov.cdc.izgateway.soap.net.SoapMessageConverter;
 import gov.cdc.izgateway.transformation.endpoints.fhir.FhirConverter;
 
+import gov.cdc.izgateway.utils.SystemUtils;
 import org.apache.catalina.connector.Connector;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
@@ -69,6 +78,9 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootApplication
 @ComponentScan(basePackages={"gov.cdc.izgateway.transformation", "gov.cdc.izgateway.soap.net", "gov.cdc.izgateway.configuration","gov.cdc.izgateway.security","gov.cdc.izgateway.service.impl"})
 public class Application implements WebMvcConfigurer {
+    private static final Map<String, byte[]> staticPages = new TreeMap<>();
+    static final String BUILD = "build";
+    private static final String BUILD_FILE = "build.txt";
 
     @Value("${spring.application.fix-newlines}")
     private boolean fixNewlines;
@@ -94,9 +106,18 @@ public class Application implements WebMvcConfigurer {
             System.exit(1);
         }
 
+        loadStaticResource(BUILD, BUILD_FILE);
+        setInitialHealth();
+
         String build = getBuild();
-        log.info("Application loaded\n{}", build);
-        // FUTURE: Get from a configuration property
+        log.info("Xform application loaded");
+        log.info("Build: {}", build);
+    }
+
+    private static void setInitialHealth() {
+        HealthService.setBuildName(getBuild());
+        HealthService.setHealthy(true, "Application started");
+        HealthService.setServerName(SystemUtils.getHostname());
     }
 
     private static void initialize() {
@@ -125,11 +146,26 @@ public class Application implements WebMvcConfigurer {
         });
     }
 
+    private static void loadStaticResource(String name, String location) {
+        try (InputStream inStream = Application.class.getClassLoader().getResourceAsStream(location)) {
+            byte[] data = IOUtils.toByteArray(inStream);
+            staticPages.put(name, data);
+        } catch (IOException | NullPointerException e) {
+            log.error("Cannot load resource '{}' from {}", name, location);
+        }
+    }
+
     public static void shutdown() {
     }
 
     public static String getBuild() {
-        return("TODO: TSBuild");
+        byte[] v = staticPages.get(BUILD);
+        String version = v == null ? "" : new String(v);
+        return StringUtils.substringBetween(version, "Build:", "\n").trim();
+    }
+
+    public static String getPage(String page) {
+        return new String(staticPages.get(page), StandardCharsets.UTF_8);
     }
 
     /**
