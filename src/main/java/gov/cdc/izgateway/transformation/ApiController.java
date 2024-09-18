@@ -3,11 +3,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.izgateway.transformation.model.*;
+import gov.cdc.izgateway.security.AccessControlRegistry;
+//import gov.cdc.izgateway.transformation.security.AccessControlRegistry;
 import gov.cdc.izgateway.transformation.services.*;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Log
 @RestController
+@Lazy(false)
 public class ApiController {
     private final OrganizationService organizationService;
     private final PipelineService pipelineService;
@@ -39,7 +44,8 @@ public class ApiController {
             SolutionService solutionService,
             MappingService mappingService,
             PreconditionFieldService preconditionFieldService,
-            PreconditionService preconditionService
+            PreconditionService preconditionService,
+            AccessControlRegistry registry
     ) {
         this.organizationService = organizationService;
         this.pipelineService = pipelineService;
@@ -47,6 +53,7 @@ public class ApiController {
         this.mappingService = mappingService;
         this.preconditionFieldService = preconditionFieldService;
         this.preconditionService = preconditionService;
+        registry.register(this);
     }
 
     @GetMapping("/api/v1/pipelines/{uuid}")
@@ -97,6 +104,7 @@ public class ApiController {
         return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
     }
 
+    @RolesAllowed({"admin", "superuser"})
     @GetMapping("/api/v1/pipelines")
     public ResponseEntity<String> getPipelinesList(
             @RequestParam(required = false) String nextCursor,

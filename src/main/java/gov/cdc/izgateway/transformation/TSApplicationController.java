@@ -1,15 +1,27 @@
 package gov.cdc.izgateway.transformation;
 
 import gov.cdc.izgateway.common.HealthService;
+import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
+import gov.cdc.izgateway.security.AccessControlRegistry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 
 @Log
 @RestController
+@Lazy(false)
+@RolesAllowed({"admin"})
 public class TSApplicationController {
+
+    @Autowired
+    public TSApplicationController(AccessControlRegistry registry) {
+        registry.register(this);
+    }
 
     @GetMapping("/health")
     public gov.cdc.izgateway.logging.event.Health getHealth() {
