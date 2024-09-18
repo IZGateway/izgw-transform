@@ -45,6 +45,8 @@ import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.StringType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -62,9 +64,13 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.v251.message.QBP_Q11;
 import gov.cdc.izgateway.common.HasDestinationUri;
+import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.logging.info.SourceInfo;
 import gov.cdc.izgateway.logging.markers.Markers2;
 import gov.cdc.izgateway.model.RetryStrategy;
+import gov.cdc.izgateway.security.AccessControlValve;
 import gov.cdc.izgateway.security.Roles;
+import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.fault.UnexpectedExceptionFault;
 import gov.cdc.izgateway.soap.message.FaultMessage;
 import gov.cdc.izgateway.soap.message.SoapMessage;
@@ -77,6 +83,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -121,15 +128,38 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FhirController {
 
+	/**
+	 * Configuration of the V2toFHIR Conversion
+	 * @author Audacious Inquiry
+	 */
+	@Configuration
+	@ConfigurationProperties(prefix = "v2tofhir")
+	@Data
+	public static class FhirConfiguration {
+		/** The sending application value to use in the HL7 V2 message */
+		private String sendingApplication;
+		/** The sending facility value to use in the HL7 V2 message */
+		private String sendingFacility;
+		/** The receiving application value to use in the HL7 V2 message */
+		private String receivingApplication;
+		/** The receiving facility value to use in the HL7 V2 message */
+		private String receivingFacility;
+		/** The facility id value to use in the IZG Hub Message */
+		private String facilityId;
+	}
+	
+	private final FhirConfiguration config;
 	private final HubController hub;
 
 	/**
 	 * Construct the FhirController.  It calls HubController methods directly so
 	 * needs to know where the hub is.
 	 * @param hub	The hub controller to talk to.
+	 * @param config The configuration for the converter
 	 */
-	public FhirController(@Autowired HubController hub) {
+	public FhirController(@Autowired HubController hub, FhirConfiguration config) {
 		this.hub = hub;
+		this.config = config;
 	}
 	
     /**
@@ -151,6 +181,7 @@ public class FhirController {
      * @throws FaultException When a SoapFault is reported.
      * @throws HL7Exception When a message cannot be parsed.
      * @throws UnexpectedException When something goes wrong that shouldn't have
+     * @throws SecurityFault When a security fault occurs
      */
     @Operation(
     	summary = "Request an Immunization History or Immunization Recommendation via FHIR",
@@ -196,7 +227,7 @@ public class FhirController {
 	public ResponseEntity<Bundle> iisQuery(
 		@PathVariable String destinationId,
 		HttpServletRequest req
-	) throws FaultException, HL7Exception, UnexpectedException {
+	) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
 		return processQuery(req, destinationId);
 	}
 
@@ -211,6 +242,7 @@ public class FhirController {
      * @throws FaultException	When a fault occurs.
      * @throws HL7Exception	When an HL7 Message exception occurs
      * @throws UnexpectedException When some other exception occurs
+     * @throws SecurityFault When a security fault occurs
      */
     @Operation(
         	summary = "Read an Immunization, ImmunizationRecommendation or Patient resource via FHIR",
@@ -257,7 +289,7 @@ public class FhirController {
     	@PathVariable String destinationId,
     	@PathVariable String id,
     	HttpServletRequest req
-    ) throws FaultException, HL7Exception, UnexpectedException {
+    ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
     	String decodedId = null;
     	try {
     		decodedId = FhirIdCodec.decode(id);
@@ -300,6 +332,7 @@ public class FhirController {
      * @throws FaultException	When a fault occurs.
      * @throws HL7Exception	When an HL7 Message exception occurs
      * @throws UnexpectedException When some other exception occurs
+     * @throws SecurityFault When a security fault occurs
      */
     @Operation(
         	summary = "Perform the Patient/$match operation",
@@ -342,7 +375,7 @@ public class FhirController {
     	@PathVariable String destinationId,
     	@RequestBody Resource body,
     	HttpServletRequest req
-    ) throws FaultException, HL7Exception, UnexpectedException {
+    ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
     	Patient searchPatient;
     	int count = 5;
     	boolean onlySingleMatch = false;
@@ -505,27 +538,33 @@ public class FhirController {
 	/**
 	 * Generate an Immunization query to an IIS and convert the result to FHIR, returning
 	 * the requested information.
+	 * @throws SecurityFault 
 	 */
 	private ResponseEntity<Bundle> processQuery(
 		HttpServletRequest req, 
 		String destinationId
-	) throws FaultException, HL7Exception, UnexpectedException {
+	) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
 		String queryType = StringUtils.contains(req.getRequestURI(), "ImmunizationRecommendation") ? IzQuery.RECOMMENDATION : IzQuery.HISTORY;
 		
 		// Create the request and set the destination
 		SubmitSingleMessageRequest request = new SubmitSingleMessageRequest();
 		request.setSchema(SoapMessage.HUB_NS);
 		request.getHubHeader().setDestinationId(destinationId);
-		request.setFacilityID("IZG");  // TODO: Fixme
+		request.setFacilityID(config.getFacilityId());
+		
+		SourceInfo source = RequestContext.getSourceInfo();
+		if (StringUtils.isEmpty(source.getCommonName()) && AccessControlValve.isLocalHost(source.getIpAddress())) {
+			source.setCommonName("localhost");
+		}
 		SubmitSingleMessageResponse resp = null;
 		try {
 			// Create the message structure
 			QBP_Q11 qbp = QBPUtils.createMessage(queryType);
 			
-			QBPUtils.setSendingApplication(qbp, "FHIR");
-			QBPUtils.setSendingFacility(qbp, "DUFFY");
-			QBPUtils.setReceivingApplication(qbp, "TEST");
-			QBPUtils.setReceivingFacility(qbp, "MOCK");
+			QBPUtils.setSendingApplication(qbp, config.getSendingApplication());
+			QBPUtils.setSendingFacility(qbp, config.getSendingFacility());
+			QBPUtils.setReceivingApplication(qbp, config.getReceivingApplication());
+			QBPUtils.setReceivingFacility(qbp, config.getReceivingFacility());
 			
 			boolean isPatient = StringUtils.contains(req.getRequestURI(), "/Patient");
 

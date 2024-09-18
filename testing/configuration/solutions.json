@@ -1,0 +1,250 @@
+[ {
+  "id" : "018f7881-7607-7220-a94b-fe0c7e81cbec",
+  "solutionName" : "EqualsPrecondition",
+  "description" : "Sets a field if Equals precondition is met",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "026ab6c8-84d1-4bc8-927f-0ee770c2506e",
+      "dataPath" : "/MSH-1-1",
+      "comparisonValue" : "|"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-22-1",
+      "setValue" : "EqualsPrecondition_Solution"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "64bc92f4-053c-4e55-85b5-5ff52f5ff47f",
+  "solutionName" : "NotEqualsPrecondition",
+  "description" : "Sets a field if NotEquals precondition is met",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "not_equals",
+      "id" : "9201fa07-e7c9-407e-b715-a527a5caac18",
+      "dataPath" : "/MSH-1-1",
+      "comparisonValue" : "x"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-22-2",
+      "setValue" : "NotEqualsPrecondition_Solution"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "79def078-5953-4d31-b44a-79d4da9beef9",
+  "solutionName" : "RegexMatchPrecondition",
+  "description" : "Sets a field if RegexMatch precondition is met",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "b1181da0-5b7d-4853-b39f-33596d94243a",
+      "dataPath" : "/MSH-1-1",
+      "regex" : "^\\|$"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-22-3",
+      "setValue" : "RegexMatchPrecondition_Solution"
+    } ]
+  }, {
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "2e6048c8-630a-449f-a3b4-f63425a60442",
+      "dataPath" : "/MSH-9-1",
+      "regex" : "^VXU$"
+    } ],
+    "operationList" : [ {
+      "method" : "mapper",
+      "order" : 0,
+      "codeField" : "/PID-10-1",
+      "codeSystemField" : "/PID-10-3",
+      "codeSystemDefault" : "CDCREC"
+    } ]
+  } ],
+  "responseOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-7-1",
+      "setValue" : "MSH 7 NEW VALUE"
+    } ]
+  } ]
+}, {
+  "id" : "8abc8887-1cab-4a96-98ea-29f8f6c977d5",
+  "solutionName" : "AllOperations",
+  "description" : "Calls all implemented Operations.  Sets MSH-23-1 to a value.  Then copies that value to MSH-23-2.  Then does a goofy regex on it to reverse the first two characters",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-23-1",
+      "setValue" : "HELLO THERE!"
+    }, {
+      "method" : "copy",
+      "order" : 0,
+      "sourceField" : "/MSH-23-1",
+      "destinationField" : "/MSH-23-2"
+    }, {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/MSH-23-2",
+      "regex" : "([\\S]{1})([\\S]{1})(.+)",
+      "replacement" : "$2$1$3"
+    }, {
+      "method" : "save_state",
+      "order" : 0,
+      "field" : "/MSH-23-2",
+      "key" : "myKey"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "c6460960-f2e9-42bd-8186-3103e7cde260",
+  "solutionName" : "Race Code Mapping",
+  "description" : "Normalize Race Codes in PID.",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : null,
+    "operationList" : [ ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "40ac2845-d026-47ea-ad0b-d3ade3915a82",
+  "solutionName" : "CauseErrorOnSet",
+  "description" : "Causes an error when setting a field",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "b1181da0-5b7d-4853-b39f-33596d94243a",
+      "dataPath" : "/MSH-1-1",
+      "regex" : "^\\|$"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-22-3",
+      "setValue" : "RegexMatchPrecondition_Solution"
+    } ]
+  } ],
+  "responseOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSX-7-1",
+      "setValue" : "MSH 7 NEW VALUE"
+    } ]
+  } ]
+}, {
+  "id" : "7e9ab0bf-e174-4073-a63f-75e2fabdb3a3",
+  "solutionName" : "MapperExampleForVXU",
+  "description" : "Translates a code for an HL7 field based on the mapping settings for a VXU message",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "2e6048c8-630a-449f-a3b4-f63425a60442",
+      "dataPath" : "/MSH-9-1",
+      "comparisonValue" : "VXU"
+    } ],
+    "operationList" : [ {
+      "method" : "mapper",
+      "order" : 0,
+      "codeField" : "/PID-10-1",
+      "codeSystemField" : "/PID-10-3",
+      "codeSystemDefault" : "CDCREC"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
+  "solutionName" : "ZipFixer",
+  "description" : "Standardizes the zip for PID-11-5",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "d21c3430-39cc-41e2-9f66-33f7b52e1f56",
+      "dataPath" : "/MSH-9-1",
+      "comparisonValue" : "VXU"
+    } ],
+    "operationList" : [ {
+      "method" : "regex_replace",
+      "order" : 0,
+      "field" : "/PID-11-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "bf3326fe-ab52-4d6c-b37f-7db5f1769c4c",
+  "solutionName" : "POSTMAN MSH-7-1 Response Transformer - DO NOT DELETE",
+  "description" : "Used in Postman Tests",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ ]
+  } ],
+  "responseOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-7-1",
+      "setValue" : "MSH 7 NEW VALUE"
+    } ]
+  } ]
+}, {
+  "id" : "0f150b3d-44ca-464e-99cb-8757c150f9a0",
+  "solutionName" : "Postman Test For State Precondition",
+  "description" : "",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "save_state",
+      "order" : 0,
+      "field" : "/MSH-9-1",
+      "key" : "POSTMAN"
+    } ]
+  } ],
+  "responseOperations" : [ {
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "6f0d9f5f-f41e-432b-8dd1-82db0e13e840",
+      "dataPath" : "state.POSTMAN",
+      "regex" : "^(VXU|QBP)$"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "order" : 0,
+      "destinationField" : "/MSH-22-1",
+      "setValue" : "STATE_CHECKS"
+    } ]
+  } ]
+} ]

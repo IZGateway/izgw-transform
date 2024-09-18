@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.LinkedHashSet;
 
-
 @Repository
 public class PipelineFileRepository extends GenericFileRepository<Pipeline> {
 
@@ -20,4 +19,5 @@ public class PipelineFileRepository extends GenericFileRepository<Pipeline> {
     protected TypeReference<LinkedHashSet<Pipeline>> getTypeReference() {
         return new TypeReference<>() {};
     }
+
 }

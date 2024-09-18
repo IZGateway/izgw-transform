@@ -24,10 +24,6 @@ public class Hl7v2Exists extends Exists implements Precondition {
     @Override
     public boolean evaluate(ServiceContext context) {
 
-        log.trace(String.format("Precondition: %s / dataPath: '%s'",
-                this.getClass().getSimpleName(),
-                this.getDataPath()));
-
         Message message = context.getCurrentMessage();
         Terser terser = new Terser(message);
 

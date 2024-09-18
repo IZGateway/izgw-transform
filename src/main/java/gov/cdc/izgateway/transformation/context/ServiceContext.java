@@ -1,16 +1,12 @@
 package gov.cdc.izgateway.transformation.context;
 
-import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.parser.PipeParser;
-import ca.uhn.hl7v2.validation.impl.NoValidation;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import lombok.Data;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -24,12 +20,14 @@ public class ServiceContext {
     private DataFlowDirection currentDirection;
     private DataType dataType;
     private HashMap<String, String> state;
+    public String facilityId;
 
-    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, DataType dataType, String rawMessage) throws HL7Exception {
+    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, DataType dataType, String facilityId, String rawMessage) throws HL7Exception {
         this.organizationId = organizationId;
         this.inboundEndpoint = inboundEndpoint;
         this.outboundEndpoint = outboundEndpoint;
         this.dataType = dataType;
+        this.facilityId = facilityId;
 
         if (dataType.equals(DataType.HL7V2)) {
             this.requestMessage = Hl7Utils.parseHl7v2Message(rawMessage);

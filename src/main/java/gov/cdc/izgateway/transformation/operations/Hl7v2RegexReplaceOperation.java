@@ -5,11 +5,11 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.transformation.configuration.OperationRegexReplaceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.logging.Level;
 
-@Log
+@Slf4j
 public class Hl7v2RegexReplaceOperation extends BaseOperation<OperationRegexReplaceConfig> implements Operation {
 
     public Hl7v2RegexReplaceOperation(OperationRegexReplaceConfig config) {
@@ -19,7 +19,7 @@ public class Hl7v2RegexReplaceOperation extends BaseOperation<OperationRegexRepl
     @Override
     public void thisOperation(ServiceContext context) throws HL7Exception {
 
-        log.log(Level.WARNING, String.format("Operation: %s on '%s' with regex '%s' and replacement '%s'",
+        log.trace(String.format("Operation: %s on '%s' with regex '%s' and replacement '%s'",
                 this.getClass().getSimpleName(),
                 this.operationConfig.getField(),
                 this.operationConfig.getRegex(),

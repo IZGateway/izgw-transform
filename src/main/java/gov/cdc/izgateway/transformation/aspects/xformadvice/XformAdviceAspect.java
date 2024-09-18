@@ -5,8 +5,9 @@ import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.logging.advice.*;
+import gov.cdc.izgateway.transformation.model.Pipeline;
+import gov.cdc.izgateway.transformation.services.SolutionService;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
@@ -15,23 +16,31 @@ public class XformAdviceAspect {
 
     @Around("execution(* *(..)) && @annotation(gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice)")
     public Object processXformAdviceAspect(ProceedingJoinPoint joinPoint) throws Throwable {
-        addAdvice(joinPoint, MethodDisposition.PREEXECUTION);
-        Object response = joinPoint.proceed();
-        addAdvice(joinPoint, MethodDisposition.POSTEXECUTION);
+        boolean hasErrored = false;
 
-        return response;
+        addAdvice(joinPoint, MethodDisposition.PREEXECUTION, hasErrored);
+
+        try {
+            return joinPoint.proceed();
+        } catch (Exception e) {
+            hasErrored = true;
+            throw e;
+        } finally {
+            addAdvice(joinPoint, MethodDisposition.POSTEXECUTION, hasErrored);
+        }
+
     }
 
-    private void addAdvice(ProceedingJoinPoint joinPoint, MethodDisposition methodDisposition) throws HL7Exception {
+    private void addAdvice(ProceedingJoinPoint joinPoint, MethodDisposition methodDisposition, boolean hasErrored) throws HL7Exception {
         for (Object arg : joinPoint.getArgs()) {
             if (arg instanceof ServiceContext context) {
-                XformAdviceCollector.getTransactionData().addAdvice(getXformAdvice(joinPoint, context, methodDisposition));
+                XformAdviceCollector.getTransactionData().addAdvice(getXformAdvice(joinPoint, context, methodDisposition, hasErrored));
                 break;
             }
         }
     }
 
-    private XformAdviceDTO getXformAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
+    private XformAdviceDTO getXformAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasErrored) throws HL7Exception {
         XformAdviceDTO xformAdvice = null;
 
         if (AdviceUtil.isPipelineAdvice(joinPoint.getTarget().getClass().getSimpleName())) {
@@ -44,12 +53,12 @@ public class XformAdviceAspect {
             return null;
         }
 
-        populateAdvice(xformAdvice, joinPoint, context, methodDisposition);
+        populateAdvice(xformAdvice, joinPoint, context, methodDisposition, hasErrored);
 
         return xformAdvice;
     }
 
-    private void populateAdvice(XformAdviceDTO xformAdvice, ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition) throws HL7Exception {
+    private void populateAdvice(XformAdviceDTO xformAdvice, ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasErrored) throws HL7Exception {
         String name = "Unknown";
         String id = "Unknown";
         boolean hasTransformed = false;
@@ -58,15 +67,25 @@ public class XformAdviceAspect {
         if (targetObject instanceof Advisable advisable) {
             name = advisable.getName();
             id = advisable.getId();
-            hasTransformed = advisable.hasTransformed();
+        }
+
+        if (methodDisposition == MethodDisposition.POSTEXECUTION && xformAdvice instanceof PipelineAdviceDTO) {
+            hasTransformed = context.getCurrentDirection() == DataFlowDirection.REQUEST
+                    ? XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed()
+                    : XformAdviceCollector.getTransactionData().getPipelineAdvice().isResponseTransformed();
+        } else if (targetObject instanceof Transformable transformable) {
+            hasTransformed = transformable.hasTransformed();
         }
 
         xformAdvice.setClassName(joinPoint.getTarget().getClass().getSimpleName());
         xformAdvice.setName(name);
+        xformAdvice.setProcessError(hasErrored);
+        xformAdvice.setOrganizationId(context.getOrganizationId());
+
         if ( context.getCurrentDirection() == DataFlowDirection.REQUEST ) {
-            updateRequestMessage(joinPoint, context, methodDisposition, hasTransformed, xformAdvice);
+            updateRequestMessage(context, methodDisposition, hasTransformed, xformAdvice);
         } else {
-            updateResponseMessage(joinPoint, context, methodDisposition, hasTransformed, xformAdvice);
+            updateResponseMessage(context, methodDisposition, hasTransformed, xformAdvice);
         }
 
         // TODO There may be some refactoring Austin and Paul are working on that may include an "Id" for an Operation which means
@@ -76,9 +95,11 @@ public class XformAdviceAspect {
         } else if ( xformAdvice instanceof SolutionAdviceDTO solutionAdvice ) {
             solutionAdvice.setId(id);
         }
+
+
     }
 
-    private void updateRequestMessage(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
+    private void updateRequestMessage(ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
         if ( advice instanceof PipelineAdviceDTO && methodDisposition == MethodDisposition.PREEXECUTION) {
             advice.setRequest(context.getRequestMessage().encode());
         } else if ( methodDisposition == MethodDisposition.POSTEXECUTION && hasTransformed) {
@@ -86,7 +107,7 @@ public class XformAdviceAspect {
         }
     }
 
-    private void updateResponseMessage(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
+    private void updateResponseMessage(ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
         Message responseMessage = context.getResponseMessage();
 
         if ( advice instanceof PipelineAdviceDTO && methodDisposition == MethodDisposition.PREEXECUTION ) {

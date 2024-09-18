@@ -2,10 +2,13 @@ transformationservice:
   allow-delete-via-api: false
   destination: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
   configurations:
-    main: all_preconditions_all_operations.json
-    organizations: src/main/resources/organizations.json
-    pipelines: src/main/resources/pipelines.json
-    solutions: src/main/resources/solutions.json
+    organizations: testing/configuration/organizations.json
+    pipelines: testing/configuration/pipelines.json
+    solutions: testing/configuration/solutions.json
+    mappings: testing/configuration/mappings.json
+    access-control: testing/configuration/access-control.json
+    precondition-fields: testing/configuration/precondition-fields.json
+  access-control-enabled: ${TS_ACCESS_CONTROL_ENABLED:false}
 
 spring:
   autoconfigure:
@@ -30,6 +33,13 @@ elastic:
   host: ${ELASTIC_HOST:https://audacioussearchtest.es.us-east-1.aws.found.io:9243}
   index: ${ELASTIC_INDEX:izgw-dev-logstash}
 
+v2tofhir:
+  sendingApplication: ${SENDING_APPLICATION:FHIR}
+  sendingFacility: ${SENDING_FACILITY:DUFFY}
+  receivingApplication: ${RECEIVING_APPLICATION:TEST}
+  receivingFacility: ${RECEIVING_FACILITY:MOCK}
+  facilityId: ${FACILITY_ID:IZG}
+  
 management:
   metrics:
     export:
@@ -140,7 +150,7 @@ logging:
     gov:
       cdc:
         izgateway:
-          transformation: TRACE
+          transformation: ${LOGGING_LEVEL:INFO}
           security:
             AccessControlRegistry: INFO
             AccessControlInterceptor: INFO

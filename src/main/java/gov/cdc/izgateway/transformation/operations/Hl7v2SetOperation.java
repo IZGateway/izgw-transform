@@ -5,10 +5,8 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.transformation.configuration.OperationSetConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.logging.Level;
 
 @Slf4j
 public class Hl7v2SetOperation extends BaseOperation<OperationSetConfig> implements Operation {

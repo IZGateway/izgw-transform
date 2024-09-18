@@ -15,14 +15,10 @@ public class Hl7Utils {
 
     public static Message parseHl7v2Message(String rawHl7Message) throws HL7Exception {
         PipeParser parser;
-        try (DefaultHapiContext context = new DefaultHapiContext()) {
-            rawHl7Message = rawHl7Message.replace("\n", "\r");
-            context.setValidationContext(new NoValidation());
-            parser = context.getPipeParser();
-        } catch (IOException e) {
-            throw new HL7Exception(e);
-        }
-
+        DefaultHapiContext context = new DefaultHapiContext();
+        rawHl7Message = rawHl7Message.replace("\n", "\r");
+        context.setValidationContext(new NoValidation());
+        parser = context.getPipeParser();
         return parser.parse(rawHl7Message);
     }
 }

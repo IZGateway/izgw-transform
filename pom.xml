@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
 	<artifactId>transformation</artifactId>
-	<version>0.3.0</version>
+    <version>0.3.0</version>
 	<name>transformation</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
@@ -62,8 +62,6 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
-			<!-- spring-boot-starter-web pulls 6.2.2 which has CVE-2024-22257 -->
-			<version>6.3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -148,7 +146,7 @@
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>izgw-core</artifactId>
-			<version>2.1.0-izgw-core-SNAPSHOT</version>
+			<version>2.1.2-izgw-core-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -174,12 +172,10 @@
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
-			<version>1.9.22</version>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
-			<version>1.9.22</version>
 		</dependency>
 		<dependency>
 			<groupId>cdc.gov.izgw</groupId>
@@ -190,7 +186,7 @@
 	<build>
 		<plugins>
 			<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
+				<groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
@@ -217,9 +213,9 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>		
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>3.4.0</version>
 				<executions>
@@ -319,7 +315,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
-				<version>3.1.0</version>
 				<executions>
 					<execution>
 						<id>generate-test-keystores</id>
@@ -471,7 +466,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.2.5</version>
 				<configuration>
 					<environmentVariables>
 						<security.ssl-path>${project.build.directory}</security.ssl-path>

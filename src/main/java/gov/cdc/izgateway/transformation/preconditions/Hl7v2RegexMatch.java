@@ -6,15 +6,8 @@ import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Hl7v2RegexMatch extends RegexMatch implements Precondition {
-
-    public Hl7v2RegexMatch() {}
-
-    public Hl7v2RegexMatch(String dataPath, String regex) {
-        super(dataPath, regex);
-    }
 
     public Hl7v2RegexMatch(RegexMatch regexMatch) {
         super(regexMatch);
@@ -44,8 +37,7 @@ public class Hl7v2RegexMatch extends RegexMatch implements Precondition {
             return false;
         }
 
-        Pattern pattern = Pattern.compile(this.getRegex());
-        Matcher matcher = pattern.matcher(sourceValue);
+        Matcher matcher = getMatcher(sourceValue);
         return matcher.matches();
     }
 

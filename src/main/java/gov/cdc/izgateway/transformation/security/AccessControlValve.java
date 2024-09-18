@@ -1,10 +1,6 @@
 package gov.cdc.izgateway.transformation.security;
 
-import gov.cdc.izgateway.logging.RequestContext;
-import gov.cdc.izgateway.logging.info.HostInfo;
-import gov.cdc.izgateway.security.Roles;
-import gov.cdc.izgateway.service.IAccessControlService;
-import gov.cdc.izgateway.utils.SystemUtils;
+import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.utils.X500Utils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +10,6 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
@@ -23,30 +18,46 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Performs access control checks.
- * TODO: Complete the access control checks.
  */
 @Slf4j
 @Component("xformValveAccessControl")
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class AccessControlValve extends ValveBase {
+    private final OrganizationService organizationService;
+
+    @Value("${transformationservice.access-control-enabled}")
+    private boolean accessControlEnabled;
+
+    @Autowired
+    public AccessControlValve(OrganizationService organizationService) {
+        this.organizationService = organizationService;
+    }
 
     @Override
     public void invoke(Request req, Response resp) throws IOException, ServletException {
         if (accessAllowed(req, resp)) {
-        	try {
-        		this.getNext().invoke(req, resp);
-        	} finally {
-        	}
+            this.getNext().invoke(req, resp);
         }
     }
     
     public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
-        return true;
+
+        if (!accessControlEnabled) {
+            return true;
+        }
+
+        X509Certificate[] certs = (X509Certificate[]) req.getAttribute(Globals.CERTIFICATES_ATTR);
+        String commonName = X500Utils.getCommonName(certs[0].getSubjectX500Principal());
+
+        if ( organizationService.organizationExists(commonName)) {
+            return true;
+        } else {
+            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
+        }
+
     }
 }

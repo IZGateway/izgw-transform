@@ -88,10 +88,12 @@ public class HubController extends SoapControllerBase {
         try {
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
 
-            if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed())
-                context.getSubmitSingleMessageResponse().getXformHeader().setTransformedRequest(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());
-            if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isResponseTransformed())
-                context.getSubmitSingleMessageResponse().getXformHeader().setOriginalResponse(XformAdviceCollector.getTransactionData().getPipelineAdvice().getResponse());
+            if (XformAdviceCollector.getTransactionData().getPipelineAdvice() != null) {
+	            if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed())
+	                context.getSubmitSingleMessageResponse().getXformHeader().setTransformedRequest(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());
+	            if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isResponseTransformed())
+	                context.getSubmitSingleMessageResponse().getXformHeader().setOriginalResponse(XformAdviceCollector.getTransactionData().getPipelineAdvice().getResponse());
+            }
 
             context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
         } catch (CamelExecutionException | HL7Exception e) {
@@ -102,13 +104,11 @@ public class HubController extends SoapControllerBase {
     }
 
     private Organization getOrganization(String commonName) throws Fault {
-        Organization organization = organizationService.getOrganizationByCommonName(commonName);
-
+        Organization organization = checkOrganizationOverride(organizationService.getOrganizationByCommonName(commonName));
         if (organization == null) {
-            throw new HubControllerFault("Organization not found for common name: " + commonName);
+            throw new HubControllerFault("Organization not found for " + commonName);
         }
-
-        return checkOrganizationOverride(organization);
+        return organization;
     }
 
     /**
@@ -134,7 +134,7 @@ public class HubController extends SoapControllerBase {
             }
             return organizationOverride;
         }
-
+        
         return organization;
     }
 
@@ -197,7 +197,7 @@ public class HubController extends SoapControllerBase {
             produces = {"application/soap+xml", "application/soap", "application/xml", "text/xml", "text/plain", "text/html"}
     )
     @Override
-    public ResponseEntity<?> submitSoapRequest(@RequestBody SoapMessage soapMessage, @Schema(description = "Throws the fault specified in the header parameter") @RequestHeader(value = "X-IIS-Hub-Dev-Action",required = false) String devAction) {
+    public ResponseEntity<?> submitSoapRequest(@RequestBody SoapMessage soapMessage, @Schema(description = "Throws the fault specified in the header parameter") @RequestHeader(value = "X-IIS-Hub-Dev-Action",required = false) String devAction) throws SecurityFault {
 
         return super.submitSoapRequest(soapMessage, devAction);
     }

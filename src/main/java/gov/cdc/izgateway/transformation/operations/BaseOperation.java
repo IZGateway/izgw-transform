@@ -4,8 +4,9 @@ import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
+import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 
-abstract class BaseOperation<T> implements Operation, Advisable {
+abstract class BaseOperation<T> implements Operation, Advisable, Transformable {
 
     Operation nextOperation;
     T operationConfig;
