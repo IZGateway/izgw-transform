@@ -12,6 +12,8 @@ import java.util.TreeMap;
 
 import gov.cdc.izgateway.common.HealthService;
 import gov.cdc.izgateway.soap.net.SoapMessageConverter;
+import gov.cdc.izgateway.transformation.endpoints.fhir.FhirConverter;
+
 import gov.cdc.izgateway.utils.SystemUtils;
 import org.apache.catalina.connector.Connector;
 import org.apache.commons.io.IOUtils;
@@ -53,6 +55,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import ca.uhn.fhir.context.FhirContext;
 import gov.cdc.izgateway.security.SSLImplementation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
@@ -216,8 +219,13 @@ public class Application implements WebMvcConfigurer {
         SoapMessageConverter smc = new SoapMessageConverter(SoapMessageConverter.INBOUND);
         smc.setHub(true);
         messageConverters.add(smc);
+        // FhirConverter should go before jackson converters
+        // because they also handle application/json and we'd
+        // prefer to use the HAPI based FHIR parsers rather
+        // than the jackson ones for FHIR content.
+        messageConverters.add(0, new FhirConverter());
     }
-
+    
     @Bean
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
@@ -231,6 +239,7 @@ public class Application implements WebMvcConfigurer {
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer )
     {
+    	// TODO: Check with others about this, messes up FHIR expectations.
         configurer.ignoreAcceptHeader(true).defaultContentType(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.ALL);
     }
     @Bean

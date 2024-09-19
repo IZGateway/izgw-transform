@@ -218,5 +218,14 @@
     "solutionVersion" : "1.0",
     "preconditions" : [ ]
   } ]
+}, {
+  "pipelineName" : "Empty Pipeline for localhost",
+  "id" : "603f7f4a-6233-4283-914e-93660e218dee",
+  "organizationId" : "a10bb561-5d7b-4ec7-84c5-b6fa73efe562",
+  "description" : "Empty Pipeline for localhost",
+  "inboundEndpoint" : "izgts:IISHubService",
+  "outboundEndpoint" : "izghub:IISHubService",
+  "active" : true,
+  "pipes" : []
 }
 ]

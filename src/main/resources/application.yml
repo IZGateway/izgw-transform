@@ -33,6 +33,13 @@ elastic:
   host: ${ELASTIC_HOST:https://audacioussearchtest.es.us-east-1.aws.found.io:9243}
   index: ${ELASTIC_INDEX:izgw-dev-logstash}
 
+v2tofhir:
+  sendingApplication: ${SENDING_APPLICATION:FHIR}
+  sendingFacility: ${SENDING_FACILITY:DUFFY}
+  receivingApplication: ${RECEIVING_APPLICATION:TEST}
+  receivingFacility: ${RECEIVING_FACILITY:MOCK}
+  facilityId: ${FACILITY_ID:IZG}
+  
 management:
   metrics:
     export:

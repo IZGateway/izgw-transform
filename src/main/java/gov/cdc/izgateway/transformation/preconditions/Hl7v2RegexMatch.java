@@ -17,7 +17,10 @@ public class Hl7v2RegexMatch extends RegexMatch implements Precondition {
     public boolean evaluate(ServiceContext context) {
 
         Message message = context.getCurrentMessage();
-
+        if (message == null) {
+        	// If there was a fault, message will be null.
+        	return false;
+        }
         Terser terser = new Terser(message);
 
         String sourceValue;
