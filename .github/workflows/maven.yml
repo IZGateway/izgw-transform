@@ -1,16 +1,15 @@
 name: Java CI with Maven
 
 on:
-  push:
+  pull_request:
     branches:
       - develop
-      - main
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
@@ -77,7 +76,7 @@ jobs:
           EOF
 
       - name: Sets env vars for develop
-        if: github.ref == 'refs/heads/develop'
+        if: github.event.pull_request.base.ref == 'develop'
         run: |
           echo "Setting env vars for develop"
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT
@@ -88,7 +87,7 @@ jobs:
           echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
 
       - name: Sets env vars for main
-        if: github.ref == 'refs/heads/main'
+        if: github.event.pull_request.base.ref == 'main'
         run: |
           echo "Setting env vars for main"
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
@@ -163,5 +162,3 @@ jobs:
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
           docker image push --all-tags ghcr.io/izgateway/izgw-transform
-
-# More to come...
