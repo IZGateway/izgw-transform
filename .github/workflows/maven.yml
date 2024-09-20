@@ -86,12 +86,12 @@ jobs:
             VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-igdd$(date +%Y%m%d%H%M)
             echo VERSION="${VERSION}" >> $GITHUB_ENV
 
-      - name: Set version 2
-        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/develop') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/develop' ) }}
-        run: |
-          echo "Setting the temporary version"
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT
-          echo VERSION="${VERSION}" >> $GITHUB_ENV
+#      - name: Set version 2
+#        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/develop') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/develop' ) }}
+#        run: |
+#          echo "Setting the temporary version"
+#          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT
+#          echo VERSION="${VERSION}" >> $GITHUB_ENV
 
       - name: Set tags
         run: |
