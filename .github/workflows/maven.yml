@@ -3,11 +3,15 @@ name: Java CI with Maven
 on:
   pull_request:
     branches:
-      - develop
+      - IGDD-1714_develop
+      - IGDD-1714_release
+      - IGDD-1714_main
 
   push:
     branches:
-      - IGDD*
+      - IGDD-1714_develop
+      - IGDD-1714_release
+      - IGDD-1714_main
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
