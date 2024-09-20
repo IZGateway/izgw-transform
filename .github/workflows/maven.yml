@@ -83,6 +83,12 @@ jobs:
           </toolchains>
           EOF
 
+      - name: Output target branch
+        run: |
+          echo "github.event.pull_request.base.ref: ${{ github.event.pull_request.base.ref }}"
+          echo "github.ref: ${{ github.ref }}"
+          echo "github.event_name: ${{ github.event_name }}"
+
       - name: Set version for develop branch
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_develop' ) || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/IGDD-1714_develop') }}
         run: |
