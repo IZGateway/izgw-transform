@@ -79,26 +79,33 @@ jobs:
           </toolchains>
           EOF
 
-      - name: Set version
-        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/IGDD') ) || (github.event_name == 'pull_request' && startsWith(github.event.pull_request.base.ref, 'refs/heads/IGDD' )) }}
-        run: |
-            echo "Setting the temporary version"
-            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-igdd$(date +%Y%m%d%H%M)
-            echo VERSION="${VERSION}" >> $GITHUB_ENV
+#      - name: Set version
+#        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/IGDD') ) || (github.event_name == 'pull_request' && startsWith(github.event.pull_request.base.ref, 'refs/heads/IGDD' )) }}
+#        run: |
+#            echo "Setting the temporary version"
+#            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-igdd$(date +%Y%m%d%H%M)
+#            echo VERSION="${VERSION}" >> $GITHUB_ENV
 
-      - name: Set version 2
+      - name: Set version for develop branch
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_develop' ) || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/IGDD-1714_develop') }}
         run: |
           echo "Setting the snapshot version"
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT
           echo VERSION="${VERSION}" >> $GITHUB_ENV
 
-#      - name: Set version 2
-#        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/develop') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/develop' ) }}
-#        run: |
-#          echo "Setting the temporary version"
-#          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT
-#          echo VERSION="${VERSION}" >> $GITHUB_ENV
+      - name: Set version for release branch
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_release') || (github.event_name == 'pull_request' && github.ref == 'refs/heads/IGDD-1714_release') }}
+        run: |
+          echo "Setting the release candidate version"
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-rc$(date +%Y%m%d%H%M)
+          echo VERSION="${VERSION}" >> $GITHUB_ENV
+
+      - name: Set version for main branch
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_main') || (github.event_name == 'pull_request' && github.ref == 'refs/heads/IGDD-1714_main') }}
+        run: |
+          echo "Setting the release version"
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo VERSION="${VERSION}" >> $GITHUB_ENV
 
       - name: Set tags
         run: |
