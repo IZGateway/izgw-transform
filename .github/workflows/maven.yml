@@ -83,13 +83,6 @@ jobs:
           </toolchains>
           EOF
 
-#      - name: Set version
-#        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/IGDD') ) || (github.event_name == 'pull_request' && startsWith(github.event.pull_request.base.ref, 'refs/heads/IGDD' )) }}
-#        run: |
-#            echo "Setting the temporary version"
-#            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-igdd$(date +%Y%m%d%H%M)
-#            echo VERSION="${VERSION}" >> $GITHUB_ENV
-
       - name: Set version for develop branch
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_develop' ) || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/IGDD-1714_develop') }}
         run: |
@@ -122,66 +115,66 @@ jobs:
       - name: Print all environment variables
         run: printenv
 
-#      - name: Sets check env vars
-#        run: |
-#          # default to force a revision check unless releasing
-#          echo DO_REVISION_CHECK=true >> $GITHUB_ENV
-#          # Skip dependency check
-#          echo SKIP_DEPENDENCY_CHECK=true >> $GITHUB_ENV
-#
-#
-#      - name: Maven Install
-#        env:
-#          COMMON_PASS: ${{ secrets.COMMON_PASS }}
-#          ELASTIC_API_KEY: ${{ secrets.ELASTIC_API_KEY }}
-#          SSL_SHARE: ${{ github.workspace }}/target
-#
-#        run: |
-#          env && mvn -B clean package install -Dbuildno=${{github.run_number}} \
-#              -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
-#              -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
-#              -Dimage.tag=$IMAGE_BRANCH_TAG
-#
-#      - name: Configure AWS credentials
-#        uses: aws-actions/configure-aws-credentials@v4
-#        with:
-#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws-region: us-east-1
-#
-#      - name: Login to Amazon ECR
-#        id: login-ecr
-#        uses: aws-actions/amazon-ecr-login@v1
-#
-#      - name: Tag and push image to Amazon ECR
-#        env:
-#          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#          ECR_REPOSITORY: transformation-service
-#        run: |
-#          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_TAG}}
-#          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_BRANCH_TAG}}
-#          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
-#          docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
-#
-#      - name: Update ECS service to force new deployment of latest image
-#        env:
-#          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#          ECR_REPOSITORY: transformation-service
-#        run: |
-#          aws ecs update-service --cluster izgateway-dev-izgateway-services --service izgw-xform-dev --force-new-deployment --enable-execute-command --desired-count 1 | jq ".service.deployments[].id"
-#
-#      - name: Login to GitHub Repository
-#        if: github.ref == 'refs/heads/main'
-#        uses: docker/login-action@v3
-#        with:
-#          registry: ghcr.io
-#          username: ${{ github.actor }}
-#          password: ${{ secrets.GITHUB_TOKEN }}
-#
-#      - name: Tag, push and deploy image to Github Repository
-#        if: github.ref == 'refs/heads/main'
-#        run: |
-#          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
-#          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
-#          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
-#          docker image push --all-tags ghcr.io/izgateway/izgw-transform
+      - name: Sets check env vars
+        run: |
+          # default to force a revision check unless releasing
+          echo DO_REVISION_CHECK=true >> $GITHUB_ENV
+          # Skip dependency check
+          echo SKIP_DEPENDENCY_CHECK=true >> $GITHUB_ENV
+
+
+      - name: Maven Install
+        env:
+          COMMON_PASS: ${{ secrets.COMMON_PASS }}
+          ELASTIC_API_KEY: ${{ secrets.ELASTIC_API_KEY }}
+          SSL_SHARE: ${{ github.workspace }}/target
+
+        run: |
+          env && mvn -B clean package install -Dbuildno=${{github.run_number}} \
+              -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
+              -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
+              -Dimage.tag=$IMAGE_BRANCH_TAG
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Tag and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: transformation-service
+        run: |
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_BRANCH_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
+
+      - name: Update ECS service to force new deployment of latest image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: transformation-service
+        run: |
+          aws ecs update-service --cluster izgateway-dev-izgateway-services --service izgw-xform-dev --force-new-deployment --enable-execute-command --desired-count 1 | jq ".service.deployments[].id"
+
+      - name: Login to GitHub Repository
+        if: github.ref == 'refs/heads/main'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag, push and deploy image to Github Repository
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
+          docker image push --all-tags ghcr.io/izgateway/izgw-transform
