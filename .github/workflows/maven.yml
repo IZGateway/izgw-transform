@@ -90,21 +90,21 @@ jobs:
           echo "github.event_name: ${{ github.event_name }}"
 
       - name: Set version for develop branch
-        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_develop' ) || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'refs/heads/IGDD-1714_develop') }}
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_develop' ) || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'IGDD-1714_develop') }}
         run: |
           echo "Setting the snapshot version"
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT
           echo VERSION="${VERSION}" >> $GITHUB_ENV
 
       - name: Set version for release branch
-        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_release') || (github.event_name == 'pull_request' && github.ref == 'refs/heads/IGDD-1714_release') }}
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_release') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'IGDD-1714_release') }}
         run: |
           echo "Setting the release candidate version"
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-rc$(date +%Y%m%d%H%M)
           echo VERSION="${VERSION}" >> $GITHUB_ENV
 
       - name: Set version for main branch
-        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_main') || (github.event_name == 'pull_request' && github.ref == 'refs/heads/IGDD-1714_main') }}
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/IGDD-1714_main') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'IGDD-1714_main') }}
         run: |
           echo "Setting the release version"
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
