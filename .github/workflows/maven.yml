@@ -80,73 +80,15 @@ jobs:
           EOF
 
       - name: Set version
+        if: ${{ github.event_name == 'push' }}
         run: |
-          if: ${{ github.event_name == 'pull_request' }}
-            if: ${{ github.ref == 'refs/heads/develop' }}
-              echo "Setting version to snapshot"
-              VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT          
-              IMAGE_TAG="${VERSION}-${{github.run_number}}"
-              echo IMAGE_TAG="${IMAGE_TAG}"
-              echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
-              echo IMAGE_BRANCH_TAG="${VERSION}"
-              echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
-            elif: ${{ github.ref == 'refs/heads/main' }}
-              echo "Setting the release version"
-              VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-              IMAGE_TAG="${VERSION}-${{github.run_number}}"
-              echo IMAGE_TAG="${IMAGE_TAG}"
-              echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
-              echo IMAGE_BRANCH_TAG="${VERSION}"
-              echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
-            elif: ${{ github.ref == 'refs/heads/release*' }}
-              echo "Setting the release version"
-              VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-rc$(date +%Y%m%d%H%M)
-              IMAGE_TAG="${VERSION}-${{github.run_number}}"
-              echo IMAGE_TAG="${IMAGE_TAG}"
-              echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
-              echo IMAGE_BRANCH_TAG="${VERSION}"
-              echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
-            elif: ${{ github.ref == 'refs/heads/IGDD*' }}
-              echo "Setting the temporary version"
-              VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-igdd$(date +%Y%m%d%H%M)
-              IMAGE_TAG="${VERSION}-${{github.run_number}}"
-              echo IMAGE_TAG="${IMAGE_TAG}"
-              echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
-              echo IMAGE_BRANCH_TAG="${VERSION}"
-              echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
-          if: ${{ github.event_name == 'push' }}
-            if: ${{ github.ref == 'refs/heads/develop' }}
-              echo "Setting version to snapshot"
-              VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT          
-              IMAGE_TAG="${VERSION}-${{github.run_number}}"
-              echo IMAGE_TAG="${IMAGE_TAG}"
-              echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
-              echo IMAGE_BRANCH_TAG="${VERSION}"
-              echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
-            elif: ${{ github.ref == 'refs/heads/main' }}
-              echo "Setting the release version"
-              VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-              IMAGE_TAG="${VERSION}-${{github.run_number}}"
-              echo IMAGE_TAG="${IMAGE_TAG}"
-              echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
-              echo IMAGE_BRANCH_TAG="${VERSION}"
-              echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
-            elif: ${{ github.ref == 'refs/heads/release*' }}
-              echo "Setting the release version"
-              VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-rc$(date +%Y%m%d%H%M)
-              IMAGE_TAG="${VERSION}-${{github.run_number}}"
-              echo IMAGE_TAG="${IMAGE_TAG}"
-              echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
-              echo IMAGE_BRANCH_TAG="${VERSION}"
-              echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
-            elif: ${{ github.ref == 'refs/heads/IGDD*' }}
-              echo "Setting the temporary version"
-              VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-igdd$(date +%Y%m%d%H%M)
-              IMAGE_TAG="${VERSION}-${{github.run_number}}"
-              echo IMAGE_TAG="${IMAGE_TAG}"
-              echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
-              echo IMAGE_BRANCH_TAG="${VERSION}"
-              echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
+            echo "Setting the temporary version"
+            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-igdd$(date +%Y%m%d%H%M)
+            IMAGE_TAG="${VERSION}-${{github.run_number}}"
+            echo IMAGE_TAG="${IMAGE_TAG}"
+            echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
+            echo IMAGE_BRANCH_TAG="${VERSION}"
+            echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
 
       - name: Print all environment variables
         run: printenv
