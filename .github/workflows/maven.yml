@@ -1,16 +1,23 @@
 name: Java CI with Maven
 
 on:
+  pull_request:
+    branches:
+      - develop
+      - Release*
+      - main
+
   push:
     branches:
       - develop
+      - Release*
       - main
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
 
 jobs:
-  build:
+  validate:
     runs-on: ubuntu-latest
 
     steps:
@@ -76,27 +83,43 @@ jobs:
           </toolchains>
           EOF
 
-      - name: Sets env vars for develop
-        if: github.ref == 'refs/heads/develop'
+      - name: Output target branch
         run: |
-          echo "Setting env vars for develop"
+          echo "github.event.pull_request.base.ref: ${{ github.event.pull_request.base.ref }}"
+          echo "github.ref: ${{ github.ref }}"
+          echo "github.event_name: ${{ github.event_name }}"
+
+      - name: Set version for develop branch
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/develop' ) || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'develop') }}
+        run: |
+          echo "Setting the snapshot version"
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT
+          echo VERSION="${VERSION}" >> $GITHUB_ENV
+
+      - name: Set version for release branch
+        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')) || (github.event_name == 'pull_request' && startsWith(github.event.pull_request.base.ref, 'Release') ) }}
+        run: |
+          echo "Setting the release candidate version"
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-rc$(date +%Y%m%d%H%M)
+          echo VERSION="${VERSION}" >> $GITHUB_ENV
+
+      - name: Set version for main branch
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main') }}
+        run: |
+          echo "Setting the release version"
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo VERSION="${VERSION}" >> $GITHUB_ENV
+
+      - name: Set tags
+        run: |
           IMAGE_TAG="${VERSION}-${{github.run_number}}"
           echo IMAGE_TAG="${IMAGE_TAG}"
           echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
           echo IMAGE_BRANCH_TAG="${VERSION}"
           echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
 
-      - name: Sets env vars for main
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "Setting env vars for main"
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          IMAGE_TAG="${VERSION}-${{github.run_number}}"
-          echo IMAGE_TAG="${IMAGE_TAG}"
-          echo IMAGE_TAG=$IMAGE_TAG >> $GITHUB_ENV
-          echo IMAGE_BRANCH_TAG=$VERSION >> $GITHUB_ENV
-          echo IMAGE_BRANCH_TAG="${VERSION}"
+      - name: Print all environment variables
+        run: printenv
 
       - name: Sets check env vars
         run: |
@@ -105,8 +128,6 @@ jobs:
           # Skip dependency check
           echo SKIP_DEPENDENCY_CHECK=true >> $GITHUB_ENV
 
-      - name: Print all environment variables
-        run: printenv
 
       - name: Maven Install
         env:
@@ -163,5 +184,3 @@ jobs:
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
           docker image push --all-tags ghcr.io/izgateway/izgw-transform
-
-# More to come...
