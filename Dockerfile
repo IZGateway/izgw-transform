@@ -60,4 +60,4 @@ RUN ["chmod", "u+r+x", "run.sh"]
 
 ENV XFORM_VERSION=$XFORM_VERSION
 
-ENTRYPOINT ["sh","-c","bash run.sh app.jar"]
+ENTRYPOINT ["sh","-c","crond && bash run.sh app.jar"]

@@ -2,7 +2,41 @@
 
 cd /usr/share/izg-transform || exit
 
+# Get Service Name from AWS for log reporting.
+SERVICE_NAME=unknown
+if [[ $ECS_CONTAINER_METADATA_URI_V4 ]]
+then
+    SERVICE_NAME=`curl -s $ECS_CONTAINER_METADATA_URI_V4 | jq -r '.Labels["com.amazonaws.ecs.container-name"]'`
+fi
+export SERVICE_NAME
+
+# If an API Key has been given, then send data to elastic search.
+if [[ $ELASTIC_API_KEY ]]
+then
+    filebeat -e &
+    echo Started Filebeat
+else
+    echo Filebeat logging not enabled
+fi
+
+if [[ $ELASTIC_API_KEY ]]
+then
+    metricbeat -e &
+    echo Started MetricBeat
+else
+    echo MetricBeat logging not enabled
+fi
+
 jarfilename=$1
+
+#Save original nameserver in temp file and empty contents
+echo nameserver 127.0.0.1 > /tmp/newresolv.conf
+cat /etc/resolv.conf >> /tmp/newresolv.conf
+truncate -s 0 /etc/resolv.conf
+cat /tmp/newresolv.conf > /etc/resolv.conf
+
+#Start dnsmasq as root
+dnsmasq  --use-stale-cache=0 --log-queries=extra --user=root --log-facility=/var/log/dnsmasq.log
 
 # Enable remote debugging if DEBUG is set in the environment
 JAVA_TOOL_OPTS=
@@ -14,25 +48,6 @@ then
     # you may think your IP Address of the host is 127.0.0.1, it's not inside the container.
     JAVA_TOOL_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address="*:8000"
 fi
-
-# If an API Key has been given, then send data to elastic search.
-if [[ $ELASTIC_API_KEY ]]
-then
-    filebeat -e &
-    echo Started Filebeat
-else
-    echo Filebeat logging not enabled
-fi
-
-
-#Save original nameserver in temp file and empty contents
-echo nameserver 127.0.0.1 > /tmp/newresolv.conf
-cat /etc/resolv.conf >> /tmp/newresolv.conf
-truncate -s 0 /etc/resolv.conf
-cat /tmp/newresolv.conf > /etc/resolv.conf
-
-#Start dnsmasq as root
-dnsmasq  --use-stale-cache=0 --log-queries=extra --user=root --log-facility=/var/log/dnsmasq.log
 
 java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaagent:lib/spring-instrument-5.3.8.jar \
    -XX:+CreateCoredumpOnCrash -cp ./lib/bc-fips-1.0.2.5.jar:./lib/bcpkix-fips-1.0.7.jar:./lib/bctls-fips-1.0.19.jar \
