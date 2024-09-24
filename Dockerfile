@@ -15,6 +15,7 @@ EXPOSE 9082
 EXPOSE 8000
 
 COPY docker/data/filebeat.yml /usr/share/izg-transform/
+COPY docker/data/metricbeat.yml /usr/share/izg-transform/
 
 # Install logrotate
 RUN rm /etc/logrotate.conf
@@ -24,17 +25,22 @@ RUN (crontab -l 2>/dev/null; echo "*/15 * * * * /etc/periodic/daily/logrotate") 
 WORKDIR /
 
 # Install filebeat
+# Install metricbeat
 # Rename default dnsmasq file to make sure dnsmasq does not read its entries
 RUN rm -f /filebeat/filebeat.yml && \
     cp /usr/share/izg-transform/filebeat.yml /filebeat/ && \
+    rm -f /metricbeat/metricbeat.yml && \
+    cp /usr/share/izg-transform/metricbeat.yml /metricbeat/ && \
     mv /etc/dnsmasq.conf /etc/dnsmasq.conf.bkup && \
     echo 'cache-size=10000' > /etc/dnsmasq.conf
 
-# This is fialing - need to debug RUN rm -f /metricbeat/metricbeat.yml && cp /usr/share/izgateway/metricbeat.yml /metricbeat/
-
 # Set working directory
 WORKDIR /usr/share/izg-transform
-COPY docker/data/lib/*.jar lib/
+
+# Copy jars from docker/data/lib
+# This ensures we only use NIST certified publicly available BC-FIPS packages
+# And gives us the aspectjweaver and spring-instrument jars
+COPY docker/data/lib/*.jar /usr/share/izg-transform/lib/
 
 # Add izgw-transform jar file
 ADD target/$JAR_FILENAME app.jar
@@ -42,7 +48,7 @@ ADD target/$JAR_FILENAME app.jar
 # add script to run
 COPY docker/fatjar-run.sh run1.sh
 
-# Remove carriage returns from batch file (for build on WinDoze).
+# Remove carriage returns from runs script (for build on WinDoze).
 RUN tr -d '\r' <run1.sh >run.sh && \
     rm run1.sh
 

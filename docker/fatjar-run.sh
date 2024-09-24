@@ -34,7 +34,14 @@ cat /tmp/newresolv.conf > /etc/resolv.conf
 #Start dnsmasq as root
 dnsmasq  --use-stale-cache=0 --log-queries=extra --user=root --log-facility=/var/log/dnsmasq.log
 
-java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar \
+java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaagent:lib/spring-instrument-5.3.8.jar \
+   -XX:+CreateCoredumpOnCrash -cp ./lib/bc-fips-1.0.2.5.jar:./lib/bcpkix-fips-1.0.7.jar:./lib/bctls-fips-1.0.19.jar \
+   --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
+   --add-opens=java.base/java.net=ALL-UNNAMED \
+   --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED \
+   -Dorg.bouncycastle.fips.approved_only=true \
+   -Dorg.bouncycastle.jsse.client.dh.unrestrictedGroups=true \
+   -Djavax.net.ssl.trustStorePassword=changeit \
    -Xms4g \
    -Xmx8g \
    -Djava.library.path=lib \
