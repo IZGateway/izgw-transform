@@ -355,6 +355,7 @@
 					<repository>izgw-transform</repository>
 					<buildArgs>
 						<JAR_FILENAME>${project.build.finalName}.jar</JAR_FILENAME>
+						<XFORM_VERSION>${project.version}</XFORM_VERSION>
 					</buildArgs>
 				</configuration>
 			</plugin>
