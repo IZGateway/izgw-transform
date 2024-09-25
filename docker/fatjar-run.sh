@@ -45,8 +45,9 @@ then
     # To enable remote debugging, set JAVA_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,address=*:8000,server=y,suspend=n
     # NOTE: The * below is important.  It enables your debugger to attach through whatever IP Address Docker is using
     # to recieve connections on port 8000.  If not used, then only connections from 127.0.0.1 are accepted, and while
-    # you may think your IP Address of the host is 127.0.0.1, it's not inside the container.
-    JAVA_TOOL_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address="*:8000"
+    # you may think your IP Address of the host is 127.0.0.1, it's not inside the container.  Change suspend=n to suspend=y to
+    # debug application startup, but revert to suspend=n before final checkin.
+    JAVA_TOOL_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000
 fi
 
 java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaagent:lib/spring-instrument-5.3.8.jar \
