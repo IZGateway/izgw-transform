@@ -36,6 +36,7 @@ RUN rm -f /filebeat/filebeat.yml && \
 
 # Set working directory
 WORKDIR /usr/share/izg-transform
+RUN mkdir module
 
 # Copy jars from docker/data/lib
 # This ensures we only use NIST certified publicly available BC-FIPS packages
