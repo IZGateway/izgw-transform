@@ -513,7 +513,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
 					<environmentVariables>
-						<security.ssl-path>${project.build.directory}</security.ssl-path>
+						<SSL_SHARE>${project.build.directory}</SSL_SHARE>
 						<COMMON_PASS>${maven.build.timestamp}</COMMON_PASS>
 					</environmentVariables>
 				</configuration>
