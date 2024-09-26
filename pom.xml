@@ -355,6 +355,7 @@
 					<repository>izgw-transform</repository>
 					<buildArgs>
 						<JAR_FILENAME>${project.build.finalName}.jar</JAR_FILENAME>
+						<XFORM_VERSION>${project.version}</XFORM_VERSION>
 					</buildArgs>
 				</configuration>
 			</plugin>
@@ -465,7 +466,7 @@
 									<arg value="-provider" />
 									<arg value="org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider" />
 									<arg value="-providerpath" />
-									<arg value="${project.basedir}/docker/data/bc-fips-1.0.2.4.jar" />
+									<arg value="${project.basedir}/docker/data/lib/bc-fips-1.0.2.5.jar" />
 								</exec>
 								<exec executable="keytool" failonerror="true">
 									<arg value="-keystore" />
@@ -499,7 +500,7 @@
 									<arg value="-provider" />
 									<arg value="org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider" />
 									<arg value="-providerpath" />
-									<arg value="${project.basedir}/docker/data/bc-fips-1.0.2.4.jar" />
+									<arg value="${project.basedir}/docker/data/lib/bc-fips-1.0.2.5.jar" />
 								</exec>
 							</target>
 						</configuration>
