@@ -51,12 +51,6 @@ public class TransformationRouter extends RouteBuilder {
         .to("izghub:IISHubService")
         .bean(dataTransformerService);
 
-      from("direct:izgfhir")
-              .bean(fhirToV2Transformer)
-              .bean(dataTransformerService)
-              .to("izghub:IISHubService")
-              .bean(dataTransformerService);
-
 //    from("file:/Users/cahilp/temp/hl7?noop=true")
 //      .to("direct:izghubTransformerPipeline")
 //      .to("file:/Users/cahilp/temp/hl7/processed?fileName=${date:now:yyyyMMddHHmmssSSS}.txt");

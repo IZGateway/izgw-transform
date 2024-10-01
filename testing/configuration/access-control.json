@@ -4,8 +4,7 @@
     "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
     "active": true,
     "roles": [
-      "admin",
-      "user"
+      "xform-sending-system"
     ]
   },
   {

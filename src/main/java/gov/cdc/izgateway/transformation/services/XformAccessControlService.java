@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.transformation.services;
 
+import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.transformation.model.AccessControl;
 import gov.cdc.izgateway.transformation.repository.TxFormRepository;
@@ -27,7 +28,7 @@ public class XformAccessControlService extends GenericService<AccessControl> {
 
     public List<String> getAllowedRoles(RequestMethod method, String path) {
         List<String> roles = registry.getAllowedRoles(method, path);
-        log.info("Roles for {} {} are {}", method, path, roles);
+        log.debug("Roles allowed for {} {} are {}", method, path, roles);
         return roles.isEmpty() ? Arrays.asList(ADMIN_ROLE) : roles;
     }
 
@@ -35,6 +36,17 @@ public class XformAccessControlService extends GenericService<AccessControl> {
         List<String> roles = getAllowedRoles(RequestMethod.valueOf(method), path);
 
         return roles.isEmpty() ? null : false;
+    }
+
+    public Boolean checkAccess(String method, String path) {
+        List<String> roles = getAllowedRoles(RequestMethod.valueOf(method), path);
+
+        // If RequestContext.getRoles() has one role that matches the roles list, return true
+        if (RequestContext.getRoles().stream().anyMatch(roles::contains)) {
+            return true;
+        }
+
+        return false;
     }
 
     public boolean isUserInRole(UUID organizationId, String role) {
@@ -46,6 +58,6 @@ public class XformAccessControlService extends GenericService<AccessControl> {
         return repo.getEntitySet().stream().filter(o -> o.getOrganizationId().equals(organizationId)).findFirst().orElse(null);
     }
 }
-
+// TODO: PCahill if no certificate is present, the system shall force the user to be "localhost".  The localhost user would have access control lists, etc...
 // TODO: PCahill xform service does not manage users.  Remember that.
 // TODO: PCahill create a JWT role mapping service that will map the JWT roles to the xform roles.

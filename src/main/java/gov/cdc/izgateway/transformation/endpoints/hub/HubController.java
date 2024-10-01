@@ -49,7 +49,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RolesAllowed({Roles.SOAP, Roles.ADMIN})
+@RolesAllowed({Roles.ADMIN, gov.cdc.izgateway.transformation.security.Roles.XFORM_SENDING_SYSTEM})
 @RequestMapping("/IISHubService")
 @Lazy(false)
 @Slf4j
@@ -104,16 +104,18 @@ public class HubController extends SoapControllerBase {
     }
 
     private Organization getOrganization(String commonName) throws Fault {
-        Organization organization = checkOrganizationOverride(organizationService.getOrganizationByCommonName(commonName));
-        if (organization == null) {
-            throw new HubControllerFault("Organization not found for " + commonName);
+        if (commonName == null) {
+            // If there is no common name, then the organization can be determined by the x-xform-organization header.
+            return checkOrganizationOverride(null);
+        } else {
+            Organization organization = organizationService.getOrganizationByCommonName(commonName);
+            return checkOrganizationOverride(organization);
         }
-        return organization;
     }
 
     /**
      * In some scenarios such as testing, it is desirable that the incoming request use a different Organization
-     * than the one related to the client-side certificate.  If the Organization is an admin, then the incoming
+     * than the one related to the client-side certificate.  If the request is from an admin, then the incoming
      * request is checked for an x-xform-organization header.  If the header is present, the organization is set to
      * this header value.
      *
@@ -122,19 +124,21 @@ public class HubController extends SoapControllerBase {
      * @throws Fault
      */
     private Organization checkOrganizationOverride(Organization organization) throws Fault {
-        if (RequestContext.getHttpHeaders() != null
-                && RequestContext.getHttpHeaders().containsKey("x-xform-organization")
-                && accessControlService.isUserInRole(organization.getId(), XformAccessControlService.ADMIN_ROLE)) {
-
-            Map<String, List<String>> headers = RequestContext.getHttpHeaders();
-            String orgId = headers.get("x-xform-organization").get(0);
+        if (RequestContext.getRoles().contains(XformAccessControlService.ADMIN_ROLE) &&
+                RequestContext.getHttpHeaders() != null &&
+                RequestContext.getHttpHeaders().containsKey("x-xform-organization")) {
+            String orgId = RequestContext.getHttpHeaders().get("x-xform-organization").get(0);
             Organization organizationOverride = organizationService.getObject(UUID.fromString(orgId));
             if (organizationOverride == null) {
                 throw new HubControllerFault("Organization not found for organizationId: " + orgId);
             }
             return organizationOverride;
         }
-        
+
+        if (organization == null) {
+            throw new HubControllerFault("Organization could not be determined.");
+        }
+
         return organization;
     }
 

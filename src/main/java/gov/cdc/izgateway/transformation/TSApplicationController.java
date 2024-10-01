@@ -24,6 +24,8 @@ public class TSApplicationController {
     }
 
     @GetMapping("/health")
+    //@RolesAllowed({"admin", "superuser", "ROLE_FROM_CERT"})
+    @RolesAllowed({"admin"})
     public gov.cdc.izgateway.logging.event.Health getHealth() {
         return HealthService.getHealth();
     }
