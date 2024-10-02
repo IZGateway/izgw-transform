@@ -1,76 +1,76 @@
 [ {
-  "organizationName" : "Oklahoma FAKE TEST",
+  "organizationName" : "Nebula Health Network",
   "id" : "19c3dd20-31f4-4508-87ee-705fca9603b3",
   "active" : true,
   "commonName" : "OK"
 }, {
-  "organizationName" : "Audacious Test Organization",
+  "organizationName" : "Starfleet Medical Systems",
   "id" : "0d15449b-fb08-4013-8985-20c148b353fe",
   "active" : true,
   "commonName" : "pcahill.testing.izgateway.org"
-},{
-  "organizationName" : "Audacious Test Organization (localhost)",
+}, {
+  "organizationName" : "Cosmic Ray Immunization Center (localhost)",
   "id" : "a10bb561-5d7b-4ec7-84c5-b6fa73efe562",
   "active" : true,
   "commonName" : "localhost"
 }, {
-  "organizationName" : "Audacious Test Organization (Keith)",
+  "organizationName" : "Galaxy Quest Wellness Clinic",
   "id" : "f56a10cc-bf37-4257-bba7-44dcf376dc3e",
   "active" : true,
   "commonName" : "kboone.testing.izgateway.org"
 }, {
-  "organizationName" : "Audacious Test Organization (CI/CD)",
+  "organizationName" : "Andromeda Data Registry (CI/CD)",
   "id" : "2cde9f8b-e867-43a9-82b5-1ec25be15dd2",
   "active" : true,
   "commonName" : "cicd.testing.izgateway.org"
 }, {
-  "organizationName" : "Maryland FAKE TEST",
+  "organizationName" : "Orion's Belt Family Practice",
   "id" : "b9bdedc5-cb33-4772-be37-b78dc7bf3786",
   "active" : true,
   "commonName" : "xpcahill.testing.izgateway.org"
 }, {
-  "organizationName" : "Faulty Organization",
+  "organizationName" : "Supernova Vaccination Services",
   "id" : "8fbcad81-dc40-4da5-a696-962bf919e5fe",
   "active" : true,
   "commonName" : "xpcahill.testing.izgateway.org"
 }, {
-  "organizationName" : "Organization to use for Postman tests",
+  "organizationName" : "Lunar Colony Health Alliance",
   "id" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
   "active" : true,
   "commonName" : "use override"
 }, {
-  "organizationName" : "Audacious Test Organization (Austin)",
+  "organizationName" : "Comet Tail Pharmacy Chain",
   "id" : "6d531709-6911-463f-9ee8-5fd704f22b24",
   "active" : true,
   "commonName" : "amoody.testing.izgateway.org"
 }, {
-  "organizationName" : "Audacious Test Organization (Brian)",
+  "organizationName" : "Solar Flare Medical Associates",
   "id" : "a9bc153a-d400-42e7-8e74-2e7d8b2e1481",
   "active" : true,
   "commonName" : "bharris.testing.izgateway.org"
 }, {
-  "organizationName" : "California State Health Monitoring Agency",
+  "organizationName" : "Interstellar Immunization Database",
   "id" : "eb369b0e-38db-4eb2-bf8d-b327b1a5cdc5",
   "active" : true,
   "commonName" : "tbd"
 }, {
-  "organizationName" : "Texas Community Wellness Initiative",
+  "organizationName" : "Quasar Health Collaborative",
   "id" : "5872d93d-8f22-4772-b9c0-b26943c74708",
   "active" : true,
   "commonName" : "tbd"
 }, {
-  "organizationName" : "Florida Statewide Disease Prevention Program",
+  "organizationName" : "Milky Way Wellness Center",
   "id" : "55dbc8c9-ca16-402d-b16b-e56cc805de90",
   "active" : true,
   "commonName" : "tbd"
-},{
-  "organizationName" : "New York Public Health Data Exchange",
+}, {
+  "organizationName" : "Black Hole Data Storage Systems",
   "id" : "6388c0c6-8c58-4c8c-aa31-4ccbb81068c6",
   "active" : true,
   "commonName" : "tbd"
 }, {
-  "organizationName" : "Illinois State Health Improvement Coalition",
+  "organizationName" : "Nova Prime Medical Research",
   "id" : "8c905096-c79c-4351-86a7-1d6b7da5ec44",
   "active" : true,
   "commonName" : "tbd"
-}]
+} ]
