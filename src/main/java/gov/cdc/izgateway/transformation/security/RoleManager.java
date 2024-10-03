@@ -1,6 +1,5 @@
 package gov.cdc.izgateway.transformation.security;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,22 +15,30 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.cert.X509Certificate;
-import java.util.function.Function;
 
 import gov.cdc.izgateway.utils.X500Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 
+/**
+ * Manages roles for the current request based on the certificate, JWT token and source IP address.
+ */
 @Service
 @Slf4j
 public class RoleManager {
+    public static final String NOT_ADMIN_HEADER = "X-Not-Admin";
+
     private final OrganizationService organizationService;
     private final XformAccessControlService accessControlService;
     private final List<String> LOCAL_HOST_IPS = Arrays.asList(HostInfo.LOCALHOST_IP4, "0:0:0:0:0:0:0:1", HostInfo.LOCALHOST_IP6);
+
+    @Value("${transformationservice.jwt-secret}")
+    private String jwtSecret;
 
     @Autowired
     public RoleManager(OrganizationService organizationService, XformAccessControlService accessControlService) {
@@ -39,8 +46,8 @@ public class RoleManager {
         this.accessControlService = accessControlService;
     }
 
-    public void addAllRoles(HttpServletRequest request, X509Certificate[] certs) {
 
+    public void addAllRoles(HttpServletRequest request, X509Certificate[] certs) {
         addRolesUsingCert(certs);
         addRolesUsingJWT(request);
         addRolesIfFromLocalhost(request);
@@ -66,6 +73,8 @@ public class RoleManager {
         if (StringUtils.isEmpty(commonName)) {
             log.warn("No common name found in certificate");
             return;
+        } else {
+            RequestContext.setUser(commonName);
         }
 
         Organization org = organizationService.getOrganizationByCommonName(commonName);
@@ -76,13 +85,6 @@ public class RoleManager {
 
         // Add roles for the organization as specified in the access control configuration
         AccessControl accessControl = accessControlService.getAccessControlByOrganization(org.getId());
-//        if (accessControl != null && accessControl.getRoles() != null && accessControl.getRoles().length > 0) {
-//            RequestContext.getRoles().addAll(Arrays.stream(accessControl.getRoles()).toList());
-//            log.debug("Added roles {} for organization: {}", accessControl.getRoles(), org.getOrganizationName());
-//        } else {
-//            log.warn("No roles found for organization: {}", org.getOrganizationName());
-//        }
-
         if (Utils.isEmpty(accessControl, AccessControl::getRoles)) {
             log.warn("No roles found for organization: {}", org.getOrganizationName());
         } else {
@@ -90,20 +92,6 @@ public class RoleManager {
             log.debug("Added roles {} for organization: {}", accessControl.getRoles(), org.getOrganizationName());
         }
     }
-
-//    private <T, R> boolean isEmpty(T obj, Function<T, R> mapper) {
-//        if (obj == null) {
-//            return true;
-//        }
-//        R result = mapper.apply(obj);
-//        if (result == null) {
-//            return true;
-//        }
-//        if (result instanceof Object[] && ((Object[]) result).length == 0) {
-//            return true;
-//        }
-//        return false;
-//    }
 
     private void addRolesUsingJWT(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
@@ -114,25 +102,36 @@ public class RoleManager {
         }
 
         try {
-            SecretKey secretKey = Keys.hmacShaKeyFor("zI2oClQyzIjQS2fQ9QLvuxM/fgN9T59M3gW6bPeliP0=".getBytes());
+            SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
             String token = authHeader.substring(7);
             Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
             log.debug("JWT claims for current request: {}", claims);
-
-            Object roles = claims.get("roles");
-            if(roles instanceof List<?> rolesList) {
-                for (Object role : rolesList) {
-                    RequestContext.getRoles().add(role.toString());
-                }
-            }
+            RequestContext.setUser(claims.getSubject());
+            addRolesFromClaims(claims);
 
         } catch (Exception e) {
             log.error("Error parsing JWT token", e);
         }
     }
 
+    private void addRolesFromClaims(Claims claims) {
+        Object roles = claims.get("roles");
+        if (roles instanceof List<?> rolesList) {
+            for (Object roleObject : rolesList) {
+                if (roleObject instanceof String role) {
+                    if (Roles.isSupportedRole(role)) {
+                        RequestContext.getRoles().add(role);
+                        log.debug("Added role {} to current request from JWT token", role);
+                    } else {
+                        log.warn("Unsupported role {} found in JWT token", role);
+                    }
+                }
+            }
+        }
+    }
+
     private void addRolesIfFromLocalhost(HttpServletRequest request) {
-        if (isLocalHost(request.getRemoteHost()) && StringUtils.isEmpty(request.getHeader(Roles.NOT_ADMIN_HEADER))) {
+        if (isLocalHost(request.getRemoteHost()) && StringUtils.isEmpty(request.getHeader(NOT_ADMIN_HEADER))) {
             log.debug("Adding ADMIN role for localhost request");
             RequestContext.getRoles().add(Roles.ADMIN);
         }

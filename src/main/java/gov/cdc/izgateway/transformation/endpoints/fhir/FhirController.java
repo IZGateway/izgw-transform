@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.transformation.endpoints.fhir;
 
+import gov.cdc.izgateway.transformation.security.Roles;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import gov.cdc.izgw.v2tofhir.datatype.HumanNameParser;
 import gov.cdc.izgw.v2tofhir.segment.PIDParser;
@@ -69,7 +70,6 @@ import gov.cdc.izgateway.logging.info.SourceInfo;
 import gov.cdc.izgateway.logging.markers.Markers2;
 import gov.cdc.izgateway.model.RetryStrategy;
 import gov.cdc.izgateway.security.AccessControlValve;
-import gov.cdc.izgateway.security.Roles;
 import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.fault.UnexpectedExceptionFault;
 import gov.cdc.izgateway.soap.message.FaultMessage;
@@ -123,7 +123,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author Audacious Inquiry 
  */
 @RestController
-@RolesAllowed({Roles.SOAP, Roles.ADMIN})
+@RolesAllowed({Roles.XFORM_SENDING_SYSTEM, Roles.ADMIN})
 @RequestMapping("/fhir")
 @Slf4j
 public class FhirController {

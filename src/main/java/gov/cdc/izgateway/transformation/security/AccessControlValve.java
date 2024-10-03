@@ -24,6 +24,10 @@ import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 
+/*
+Differences from core
+No blacklist
+ */
 /**
  * Performs access control checks.
  */
@@ -31,7 +35,6 @@ import java.security.cert.X509Certificate;
 @Component("xformValveAccessControl")
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class AccessControlValve extends ValveBase {
-    private final OrganizationService organizationService;
     private final XformAccessControlService accessControlService;
     private final RoleManager roleManager;
 
@@ -39,8 +42,7 @@ public class AccessControlValve extends ValveBase {
     private boolean accessControlEnabled;
 
     @Autowired
-    public AccessControlValve(OrganizationService organizationService, XformAccessControlService accessControlService, RoleManager roleManager) {
-        this.organizationService = organizationService;
+    public AccessControlValve(XformAccessControlService accessControlService, RoleManager roleManager) {
         this.accessControlService = accessControlService;
         this.roleManager = roleManager;
     }
@@ -53,7 +55,7 @@ public class AccessControlValve extends ValveBase {
     }
     
     public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
-        // TODO: Paul - consider taking this out if we have everything covered using the RoleManager
+        // TODO: Consider taking this out if we have everything covered using the RoleManager
         if (!accessControlEnabled) {
             return true;
         }
@@ -71,40 +73,5 @@ public class AccessControlValve extends ValveBase {
         } else {
             return true;
         }
-
-        // moved this to RoleManager checkJwt(req);
-
-
-        // TODO get the following into RoleManager
-//        X509Certificate[] certs = (X509Certificate[]) req.getAttribute(Globals.CERTIFICATES_ATTR);
-//        String commonName = X500Utils.getCommonName(certs[0].getSubjectX500Principal());
-//
-//        if ( organizationService.organizationExists(commonName)) {
-//            return true;
-//        } else {
-//            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            return false;
-//        }
-
     }
-
-//    private void checkJwt(HttpServletRequest request) {
-//        log.info("Checking JWT token!!!");
-//        String authHeader = request.getHeader("Authorization");
-//
-//        if ( authHeader == null || !authHeader.startsWith("Bearer ")) {
-//            log.info("No JWT token found in Authorization header");
-//            return;
-//        }
-//
-//        try {
-//            SecretKey secretKey = Keys.hmacShaKeyFor("zI2oClQyzIjQS2fQ9QLvuxM/fgN9T59M3gW6bPeliP0=".getBytes());
-//            String token = authHeader.substring(7);
-//            Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
-//            log.info("JWT claims: {}", claims);
-//        } catch (Exception e) {
-//            log.error("Error parsing JWT token", e);
-//        }
-//    }
-
 }

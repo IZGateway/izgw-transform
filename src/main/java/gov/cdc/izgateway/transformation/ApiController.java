@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.izgateway.transformation.model.*;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 //import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.transformation.security.Roles;
 import gov.cdc.izgateway.transformation.services.*;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
@@ -97,6 +98,7 @@ public class ApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.ADMIN})
     @PutMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> updateOrganization(@PathVariable UUID uuid, @RequestBody Organization updatedOrganization) {
         updatedOrganization.setId(uuid);
@@ -120,6 +122,7 @@ public class ApiController {
         }
     }
 
+    @RolesAllowed({Roles.ADMIN})
     @GetMapping("/api/v1/organizations")
     public ResponseEntity<String> getOrganizationsList(
         @RequestParam(required = false) String nextCursor,

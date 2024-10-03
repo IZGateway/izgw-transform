@@ -7,7 +7,7 @@ import gov.cdc.izgateway.logging.LogstashMessageSerializer;
 import gov.cdc.izgateway.logging.MemoryAppender;
 import gov.cdc.izgateway.logging.event.LogEvent;
 import gov.cdc.izgateway.security.AccessControlRegistry;
-import gov.cdc.izgateway.security.Roles;
+import gov.cdc.izgateway.transformation.security.Roles;
 import gov.cdc.izgateway.utils.ListConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

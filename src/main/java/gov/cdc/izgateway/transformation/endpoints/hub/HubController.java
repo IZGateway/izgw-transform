@@ -5,7 +5,6 @@ import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.security.AccessControlRegistry;
-import gov.cdc.izgateway.security.Roles;
 import gov.cdc.izgateway.service.IMessageHeaderService;
 import gov.cdc.izgateway.soap.SoapControllerBase;
 import gov.cdc.izgateway.soap.fault.Fault;
@@ -22,6 +21,7 @@ import gov.cdc.izgateway.transformation.model.DestinationId;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.model.Organization;
+import gov.cdc.izgateway.transformation.security.Roles;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.services.XformAccessControlService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +49,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RolesAllowed({Roles.ADMIN, gov.cdc.izgateway.transformation.security.Roles.XFORM_SENDING_SYSTEM})
+@RolesAllowed({Roles.ADMIN, Roles.XFORM_SENDING_SYSTEM})
 @RequestMapping("/IISHubService")
 @Lazy(false)
 @Slf4j
@@ -124,7 +124,7 @@ public class HubController extends SoapControllerBase {
      * @throws Fault
      */
     private Organization checkOrganizationOverride(Organization organization) throws Fault {
-        if (RequestContext.getRoles().contains(XformAccessControlService.ADMIN_ROLE) &&
+        if (RequestContext.getRoles().contains(Roles.ADMIN) &&
                 RequestContext.getHttpHeaders() != null &&
                 RequestContext.getHttpHeaders().containsKey("x-xform-organization")) {
             String orgId = RequestContext.getHttpHeaders().get("x-xform-organization").get(0);
