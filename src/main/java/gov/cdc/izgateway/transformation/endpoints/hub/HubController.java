@@ -5,6 +5,7 @@ import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.service.IAccessControlService;
 import gov.cdc.izgateway.service.IMessageHeaderService;
 import gov.cdc.izgateway.soap.SoapControllerBase;
 import gov.cdc.izgateway.soap.fault.Fault;
@@ -23,7 +24,6 @@ import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.security.Roles;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
-import gov.cdc.izgateway.transformation.services.XformAccessControlService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -56,7 +56,7 @@ import java.util.UUID;
 public class HubController extends SoapControllerBase {
     private final ProducerTemplate producerTemplate;
     private final OrganizationService organizationService;
-    private final XformAccessControlService accessControlService;
+    private final IAccessControlService accessControlService;
 
     @Value("${transformationservice.destination}")
     private String destinationUri;
@@ -67,7 +67,7 @@ public class HubController extends SoapControllerBase {
             AccessControlRegistry registry,
             ProducerTemplate producerTemplate,
             OrganizationService organizationService,
-            XformAccessControlService accessControlService
+            IAccessControlService accessControlService
     ) {
         // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
         super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));

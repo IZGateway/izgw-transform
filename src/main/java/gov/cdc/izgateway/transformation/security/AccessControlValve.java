@@ -1,7 +1,7 @@
 package gov.cdc.izgateway.transformation.security;
 
+import gov.cdc.izgateway.service.IAccessControlService;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
-import gov.cdc.izgateway.transformation.services.XformAccessControlService;
 import gov.cdc.izgateway.utils.X500Utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -35,14 +35,14 @@ No blacklist
 @Component("xformValveAccessControl")
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class AccessControlValve extends ValveBase {
-    private final XformAccessControlService accessControlService;
+    private final IAccessControlService accessControlService;
     private final RoleManager roleManager;
 
     @Value("${transformationservice.access-control-enabled}")
     private boolean accessControlEnabled;
 
     @Autowired
-    public AccessControlValve(XformAccessControlService accessControlService, RoleManager roleManager) {
+    public AccessControlValve(IAccessControlService accessControlService, RoleManager roleManager) {
         this.accessControlService = accessControlService;
         this.roleManager = roleManager;
     }
@@ -67,7 +67,7 @@ public class AccessControlValve extends ValveBase {
         // TODO: Paul, after all the roles are set, then look at the org override
         //      * Add roles for the organization specified in the override header only if the request is from localhost.
 
-        if ( ! accessControlService.checkAccess(req.getMethod(), path) ) {
+        if ( ! accessControlService.checkAccess("FIXTHIS - ADD USER", req.getMethod(), path) ) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         } else {

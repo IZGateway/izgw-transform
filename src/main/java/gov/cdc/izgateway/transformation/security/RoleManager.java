@@ -5,16 +5,16 @@ import java.util.List;
 
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.info.HostInfo;
-import gov.cdc.izgateway.transformation.model.AccessControl;
+import gov.cdc.izgateway.service.IAccessControlService;
 import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
-import gov.cdc.izgateway.transformation.services.XformAccessControlService;
-import gov.cdc.izgateway.transformation.util.Utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.cert.X509Certificate;
+import java.util.Map;
+import java.util.TreeSet;
 
 import gov.cdc.izgateway.utils.X500Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -34,14 +34,14 @@ public class RoleManager {
     public static final String NOT_ADMIN_HEADER = "X-Not-Admin";
 
     private final OrganizationService organizationService;
-    private final XformAccessControlService accessControlService;
+    private final IAccessControlService accessControlService;
     private final List<String> LOCAL_HOST_IPS = Arrays.asList(HostInfo.LOCALHOST_IP4, "0:0:0:0:0:0:0:1", HostInfo.LOCALHOST_IP6);
 
     @Value("${transformationservice.jwt-secret}")
     private String jwtSecret;
 
     @Autowired
-    public RoleManager(OrganizationService organizationService, XformAccessControlService accessControlService) {
+    public RoleManager(OrganizationService organizationService, IAccessControlService accessControlService) {
         this.organizationService = organizationService;
         this.accessControlService = accessControlService;
     }
@@ -84,12 +84,13 @@ public class RoleManager {
         }
 
         // Add roles for the organization as specified in the access control configuration
-        AccessControl accessControl = accessControlService.getAccessControlByOrganization(org.getId());
-        if (Utils.isEmpty(accessControl, AccessControl::getRoles)) {
+        Map<String, TreeSet<String>> userRoles = accessControlService.getUserRoles();
+        TreeSet<String> roles = userRoles.get(org.getId().toString());
+        if (roles == null || roles.isEmpty()) {
             log.warn("No roles found for organization: {}", org.getOrganizationName());
         } else {
-            RequestContext.getRoles().addAll(Arrays.stream(accessControl.getRoles()).toList());
-            log.debug("Added roles {} for organization: {}", accessControl.getRoles(), org.getOrganizationName());
+            RequestContext.getRoles().addAll(roles);
+            log.debug("Added roles {} for organization: {}", roles, org.getOrganizationName());
         }
     }
 
