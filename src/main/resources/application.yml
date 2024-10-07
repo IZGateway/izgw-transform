@@ -8,6 +8,7 @@ transformationservice:
     mappings: testing/configuration/mappings.json
     access-control: testing/configuration/access-control.json
     precondition-fields: testing/configuration/precondition-fields.json
+    users: testing/configuration/users.json
   access-control-enabled: ${TS_ACCESS_CONTROL_ENABLED:false}
   jwt-secret: ${TS_JWT_SECRET:}
 

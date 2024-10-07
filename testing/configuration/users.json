@@ -1,0 +1,20 @@
+[
+  {
+    "id": "8c942339-e10d-418f-8898-d8e73388198c",
+    "userName": "pcahill.testing.izgateway.org",
+    "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",
+    "active": true
+  },
+  {
+    "id": "f1d0616c-ec7c-4070-b43a-9e7295d45d21",
+    "userName": "amoody.testing.izgateway.org",
+    "organizationId": "6d531709-6911-463f-9ee8-5fd704f22b24",
+    "active": true
+  },
+  {
+    "id": "61d7e381-2807-4d0f-8e6a-8a0df182d70d",
+    "userName": "bharris.testing.izgateway.org",
+    "organizationId": "a9bc153a-d400-42e7-8e74-2e7d8b2e1481",
+    "active": true
+  }
+]

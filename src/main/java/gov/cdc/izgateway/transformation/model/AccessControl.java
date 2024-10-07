@@ -13,8 +13,8 @@ import java.util.UUID;
 public class AccessControl implements BaseModel {
     @NotNull(message = "Access Control ID is required")
     private UUID id;
-    @NotNull(message = "Organization ID is required")
-    private UUID organizationId;
+    @NotNull(message = "User ID is required")
+    private UUID userId;
     @NotNull(message = "Access Control active status is required")
     private Boolean active;
     @NotNull(message = "Access Control roles are required")

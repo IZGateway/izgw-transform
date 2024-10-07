@@ -17,5 +17,8 @@ public class User implements BaseModel {
     @NotBlank(message = "User name is required")
     private String userName;
 
+    // The organization associated with the user - null means the user has no organization affiliation
+    private UUID organizationId;
     private Boolean active;
 }
+

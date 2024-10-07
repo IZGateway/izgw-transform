@@ -35,37 +35,25 @@ public class AccessControlService  extends GenericService<AccessControl> impleme
         return roles;
     }
 
+    // TODO: PCahill - document why we don't need the user parameter
     @Override
     public Boolean checkAccess(String user, String method, String path) {
-        List<String> roles = getAllowedRoles(RequestMethod.valueOf(method), path);
+        List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);
 
         // If RequestContext.getRoles() has one role that matches the roles list, return true
-        return RequestContext.getRoles().stream().anyMatch(roles::contains);
+        return RequestContext.getRoles().stream().anyMatch(allowedRoles::contains);
     }
-
-//    public Boolean checkAccess(String method, String path) {
-//        List<String> roles = getAllowedRoles(RequestMethod.valueOf(method), path);
-//
-//        // If RequestContext.getRoles() has one role that matches the roles list, return true
-//        return RequestContext.getRoles().stream().anyMatch(roles::contains);
-//    }
 
     @Override
     public Map<String, TreeSet<String>> getUserRoles() {
         Map<String, TreeSet<String>> userRoleMap = new HashMap<>();
         for (AccessControl ac : repo.getEntitySet()) {
-            userRoleMap.put(ac.getOrganizationId().toString(), new TreeSet<>(List.of(ac.getRoles())));
+            userRoleMap.put(ac.getUserId().toString(), new TreeSet<>(List.of(ac.getRoles())));
         }
 
         return userRoleMap;
     }
 
-
-    // TODO: PCahill - instead use core - IAccessControlService.getUserRoles
-//    public AccessControl getAccessControlByOrganization(UUID organizationId) {
-//        return repo.getEntitySet().stream().filter(o -> o.getOrganizationId().equals(organizationId)).findFirst().orElse(null);
-//    }
-    /////////////////////////
 
     @Override
     public String getServerName() {

@@ -7,7 +7,9 @@ import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.info.HostInfo;
 import gov.cdc.izgateway.service.IAccessControlService;
 import gov.cdc.izgateway.transformation.model.Organization;
+import gov.cdc.izgateway.transformation.model.User;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
+import gov.cdc.izgateway.transformation.services.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -35,15 +37,18 @@ public class RoleManager {
 
     private final OrganizationService organizationService;
     private final IAccessControlService accessControlService;
+    private final UserService userService;
+
     private final List<String> LOCAL_HOST_IPS = Arrays.asList(HostInfo.LOCALHOST_IP4, "0:0:0:0:0:0:0:1", HostInfo.LOCALHOST_IP6);
 
     @Value("${transformationservice.jwt-secret}")
     private String jwtSecret;
 
     @Autowired
-    public RoleManager(OrganizationService organizationService, IAccessControlService accessControlService) {
+    public RoleManager(OrganizationService organizationService, IAccessControlService accessControlService, UserService userService) {
         this.organizationService = organizationService;
         this.accessControlService = accessControlService;
+        this.userService = userService;
     }
 
 
@@ -77,20 +82,20 @@ public class RoleManager {
             RequestContext.setUser(commonName);
         }
 
-        Organization org = organizationService.getOrganizationByCommonName(commonName);
-        if (org == null) {
-            log.warn("Organization not found for common name: {}", commonName);
+        User user = userService.getUserByUserName(commonName);
+        if (user == null) {
+            log.warn("User not found for common name: {}", commonName);
             return;
         }
 
-        // Add roles for the organization as specified in the access control configuration
+        // Add roles for the user as specified in the access control configuration
         Map<String, TreeSet<String>> userRoles = accessControlService.getUserRoles();
-        TreeSet<String> roles = userRoles.get(org.getId().toString());
+        TreeSet<String> roles = userRoles.get(user.getId().toString());
         if (roles == null || roles.isEmpty()) {
-            log.warn("No roles found for organization: {}", org.getOrganizationName());
+            log.warn("No roles found for user: {}", user.getUserName());
         } else {
             RequestContext.getRoles().addAll(roles);
-            log.debug("Added roles {} for organization: {}", roles, org.getOrganizationName());
+            log.debug("Added roles {} for user: {}", roles, user.getUserName());
         }
     }
 
