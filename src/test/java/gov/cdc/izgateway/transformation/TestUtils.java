@@ -5,7 +5,6 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
-import gov.cdc.izgateway.transformation.configuration.OperationSetConfig;
 import gov.cdc.izgateway.transformation.operations.*;
 
 public class TestUtils {
@@ -17,11 +16,11 @@ public class TestUtils {
         return copyBase;
     }
 
-    public static Hl7v2SetOperation getSetOperation(String destinationField, String setValue) {
-        OperationSetConfig config = new OperationSetConfig();
-        config.setDestinationField(destinationField);
-        config.setSetValue(setValue);
-        return new Hl7v2SetOperation(config);
+    public static Set getSetOperation(String destinationField, String setValue) {
+        Set setBase = new Set();
+        setBase.setDestinationField(destinationField);
+        setBase.setSetValue(setValue);
+        return setBase;
     }
 
     public static RegexReplace getRegexOperation(String sourceField, String regex, String replacement) {

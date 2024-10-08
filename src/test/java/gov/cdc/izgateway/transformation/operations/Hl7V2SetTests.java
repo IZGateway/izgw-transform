@@ -12,7 +12,7 @@ import java.util.UUID;
 import static gov.cdc.izgateway.transformation.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class Hl7v2SetOperationTests {
+class Hl7V2SetTests {
 
     @Test
     void testSetComponentExistingField() throws OperationException, HL7Exception {
@@ -99,7 +99,7 @@ PV1|1|I|Ward123&1^Room456^Bed789|||||||||||||||||1234567890""";
     private void runSetTrueTest(String testHL7, String expectedHL7, String destinationField, String setValue) throws OperationException, HL7Exception {
         ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(), "", "", DataType.HL7V2, "", testHL7);
 
-        Hl7v2SetOperation testClass = getSetOperation(destinationField, setValue);
+        Set testClass = getSetOperation(destinationField, setValue);
 
         String expected = getEncodedHl7FromString(expectedHL7);
 
