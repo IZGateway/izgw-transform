@@ -5,20 +5,17 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.PipeParser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
-import gov.cdc.izgateway.transformation.configuration.OperationCopyConfig;
 import gov.cdc.izgateway.transformation.configuration.OperationRegexReplaceConfig;
 import gov.cdc.izgateway.transformation.configuration.OperationSetConfig;
-import gov.cdc.izgateway.transformation.operations.Hl7v2CopyOperation;
-import gov.cdc.izgateway.transformation.operations.Hl7v2RegexReplaceOperation;
-import gov.cdc.izgateway.transformation.operations.Hl7v2SetOperation;
+import gov.cdc.izgateway.transformation.operations.*;
 
 public class TestUtils {
 
-    public static Hl7v2CopyOperation getCopyOperation(String sourceField, String destinationField) {
-        OperationCopyConfig config = new OperationCopyConfig();
-        config.setSourceField(sourceField);
-        config.setDestinationField(destinationField);
-        return new Hl7v2CopyOperation(config);
+    public static Copy getCopyOperation(String sourceField, String destinationField) {
+        Copy copyBase = new Copy();
+        copyBase.setSourceField(sourceField);
+        copyBase.setDestinationField(destinationField);
+        return copyBase;
     }
 
     public static Hl7v2SetOperation getSetOperation(String destinationField, String setValue) {

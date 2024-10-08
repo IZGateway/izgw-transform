@@ -5,9 +5,8 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.transformation.configuration.OperationRegexReplaceConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.logging.Level;
 
 @Slf4j
 public class Hl7v2RegexReplaceOperation extends BaseOperation<OperationRegexReplaceConfig> implements Operation {
@@ -17,7 +16,7 @@ public class Hl7v2RegexReplaceOperation extends BaseOperation<OperationRegexRepl
 
     }
     @Override
-    public void thisOperation(ServiceContext context) throws HL7Exception {
+    public void thisOperation(ServiceContext context) throws OperationException {
 
         log.trace(String.format("Operation: %s on '%s' with regex '%s' and replacement '%s'",
                 this.getClass().getSimpleName(),
@@ -25,16 +24,20 @@ public class Hl7v2RegexReplaceOperation extends BaseOperation<OperationRegexRepl
                 this.operationConfig.getRegex(),
                 this.operationConfig.getReplacement()));
 
-        Message message = context.getCurrentMessage();
+        try {
+            Message message = context.getCurrentMessage();
 
-        Terser terser = new Terser(message);
+            Terser terser = new Terser(message);
 
-        String sourceValue = terser.get(operationConfig.getField());
-        if(sourceValue != null){
-            String cleanedValue = sourceValue.replaceAll(operationConfig.getRegex(), operationConfig.getReplacement());
-            terser.set(operationConfig.getField(), cleanedValue);
+            String sourceValue = terser.get(operationConfig.getField());
+            if (sourceValue != null) {
+                String cleanedValue = sourceValue.replaceAll(operationConfig.getRegex(), operationConfig.getReplacement());
+                terser.set(operationConfig.getField(), cleanedValue);
 
-            context.setCurrentMessage(message);
+                context.setCurrentMessage(message);
+            }
+        } catch (HL7Exception ex) {
+            throw new OperationException(ex.getMessage(), ex.getCause());
         }
         
     }

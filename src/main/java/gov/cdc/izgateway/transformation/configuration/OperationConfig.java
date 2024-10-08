@@ -2,9 +2,12 @@ package gov.cdc.izgateway.transformation.configuration;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 @Getter
@@ -19,4 +22,6 @@ import org.springframework.stereotype.Component;
 })
 public class OperationConfig {
     private int order;
+    @NotNull(message = "Organization ID is required")
+    private UUID id;
 }

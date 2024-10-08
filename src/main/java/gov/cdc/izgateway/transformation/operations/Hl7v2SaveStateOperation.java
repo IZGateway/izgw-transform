@@ -5,6 +5,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.transformation.configuration.OperationSaveStateConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -14,17 +15,21 @@ public class Hl7v2SaveStateOperation extends BaseOperation<OperationSaveStateCon
     }
 
     @Override
-    public void thisOperation(ServiceContext context) throws HL7Exception {
+    public void thisOperation(ServiceContext context) throws OperationException {
         log.trace(String.format("Operation: %s / Save value from %s To key %s",
                 this.getClass().getSimpleName(),
                 this.operationConfig.getField(),
                 this.operationConfig.getKey()));
 
-        Message message = context.getCurrentMessage();
+        try {
+            Message message = context.getCurrentMessage();
 
-        Terser terser = new Terser(message);
+            Terser terser = new Terser(message);
 
-        String sourceValue = terser.get(operationConfig.getField());
-        context.getState().put(operationConfig.getKey(), sourceValue);
+            String sourceValue = terser.get(operationConfig.getField());
+            context.getState().put(operationConfig.getKey(), sourceValue);
+        } catch (HL7Exception ex) {
+            throw new OperationException(ex.getMessage(), ex.getCause());
+        }
     }
 }

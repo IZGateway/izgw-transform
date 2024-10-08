@@ -4,6 +4,7 @@ import ca.uhn.hl7v2.HL7Exception;
 
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class Hl7v2RegexReplaceOperationTests {
 
     @Test
-    void testReplaceNonAlphaNumExistingComponent() throws HL7Exception{
+    void testReplaceNonAlphaNumExistingComponent() throws OperationException, HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -31,7 +32,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testReplaceNonAlphaNumExistingSubComponent() throws HL7Exception {
+    void testReplaceNonAlphaNumExistingSubComponent() throws OperationException, HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -48,7 +49,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testReplaceNonAlphaNumNonExistingComponent() throws HL7Exception {
+    void testReplaceNonAlphaNumNonExistingComponent() throws OperationException, HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -65,7 +66,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testReplaceNonAlphaNumNonExistingSubComponet() throws HL7Exception{
+    void testReplaceNonAlphaNumNonExistingSubComponet() throws OperationException, HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -82,7 +83,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testReplaceNonAlphaNumExistingComponentNoChange() throws HL7Exception {
+    void testReplaceNonAlphaNumExistingComponentNoChange() throws OperationException, HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|LettersAndNumbers12345Only|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -99,7 +100,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testAddHyphenExistingComponent() throws HL7Exception {
+    void testAddHyphenExistingComponent() throws OperationException, HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -116,7 +117,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testAddHyphenExistingComponentTooShort() throws HL7Exception{
+    void testAddHyphenExistingComponentTooShort() throws OperationException, HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -133,7 +134,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testAddHyphenExistingComponentToShort2() throws HL7Exception {
+    void testAddHyphenExistingComponentToShort2() throws OperationException, HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -150,7 +151,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testAddHyphenNonExistingComponent() throws HL7Exception {
+    void testAddHyphenNonExistingComponent() throws OperationException, HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -167,7 +168,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
     }
 
     @Test
-    void testAddHyphenNonExistingSubComponet() throws HL7Exception{
+    void testAddHyphenNonExistingSubComponet() throws OperationException, HL7Exception {
 
         String testHL7 = """
 MSH|^~\\&|SendingSystem|SendingFacility|ReceivingSystem|ReceivingFacility|20240516120000||ADT^A08|MSGID12345|P|2.5.1\r
@@ -182,7 +183,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890""";
         runRegexTrueTest(testHL7, expectedHL7, "/PV1-3-4-1", "^(\\d{5})(\\d{4})$", "$1-$2");
     }
 
-    private void runRegexTrueTest(String testHL7, String expectedHL7, String field, String regex, String replacement) throws HL7Exception {
+    private void runRegexTrueTest(String testHL7, String expectedHL7, String field, String regex, String replacement) throws OperationException, HL7Exception {
         ServiceContext serviceContext = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", testHL7);
 
         Hl7v2RegexReplaceOperation testClass = getRegexOperation(field, regex, replacement);

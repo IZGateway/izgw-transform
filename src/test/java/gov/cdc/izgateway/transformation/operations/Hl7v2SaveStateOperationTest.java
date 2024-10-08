@@ -4,6 +4,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.transformation.configuration.OperationSaveStateConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -21,7 +22,7 @@ class Hl7v2SaveStateOperationTest {
             "/ORDER/OBSERVATION(0)/OBX-3-2,OBX.3.2.FIRST_REPETITION,OBX.3.2.FIRST_REPETITION",
             "/ORDER/OBSERVATION(1)/OBX-3-2,OBX.3.2.SECOND_REPETITION,OBX.3.2.SECOND_REPETITION"
     })
-    void testSaveState(String field, String key, String expected) throws HL7Exception {
+    void testSaveState(String field, String key, String expected) throws OperationException, HL7Exception {
         ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
 
         OperationSaveStateConfig config = new OperationSaveStateConfig();

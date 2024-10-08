@@ -1,8 +1,8 @@
 package gov.cdc.izgateway.transformation.operations;
 
-import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 
@@ -16,25 +16,15 @@ abstract class BaseOperation<T> implements Operation, Advisable, Transformable {
     }
 
     @Override
-    public void setNextOperation(Operation nextOperation) {
-        this.nextOperation = nextOperation;
-    }
-
-    @Override
-    public Operation getNextOperation() {
-        return nextOperation;
-    }
-
-    @Override
     @CaptureXformAdvice
-    public final void execute(ServiceContext context) throws HL7Exception {
-        thisOperation(context);
-        nextOperation(context);
+    public final void execute(ServiceContext context) throws OperationException {
+            thisOperation(context);
+            nextOperation(context);
     }
 
-    public abstract void thisOperation(ServiceContext context) throws HL7Exception;
+    public abstract void thisOperation(ServiceContext context) throws OperationException;
 
-    public void nextOperation(ServiceContext context) throws HL7Exception {
+    public void nextOperation(ServiceContext context) throws OperationException {
         if (nextOperation != null) {
             nextOperation.execute(context);
         }
