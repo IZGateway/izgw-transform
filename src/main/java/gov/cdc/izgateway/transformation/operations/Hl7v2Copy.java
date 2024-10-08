@@ -8,8 +8,8 @@ import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class Hl7v2CopyOperation extends Copy implements Operation {
-    public Hl7v2CopyOperation(Copy copy) {
+public class Hl7v2Copy extends Copy implements Operation {
+    public Hl7v2Copy(Copy copy) {
         super(copy);
     }
 

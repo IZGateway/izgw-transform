@@ -12,7 +12,7 @@ import static gov.cdc.izgateway.transformation.TestUtils.getCopyOperation;
 import static gov.cdc.izgateway.transformation.TestUtils.getEncodedHl7FromString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class Hl7v2CopyOperationTests {
+class Hl7V2CopyTests {
 
     @Test
     void testCopyComponentToComponentSameSegment() throws OperationException, HL7Exception

@@ -37,7 +37,7 @@ public class Copy implements Operation {
         }
 
         if (context.getDataType().equals(DataType.HL7V2)) {
-            Hl7v2CopyOperation copy = new Hl7v2CopyOperation(this);
+            Hl7v2Copy copy = new Hl7v2Copy(this);
             copy.execute(context);
         }
 
