@@ -78,8 +78,6 @@ public class RoleManager {
         if (StringUtils.isEmpty(commonName)) {
             log.warn("No common name found in certificate");
             return;
-        } else {
-            RequestContext.setUser(commonName);
         }
 
         User user = userService.getUserByUserName(commonName);
@@ -87,6 +85,7 @@ public class RoleManager {
             log.warn("User not found for common name: {}", commonName);
             return;
         }
+        RequestContext.setUser(user);
 
         // Add roles for the user as specified in the access control configuration
         Map<String, TreeSet<String>> userRoles = accessControlService.getUserRoles();
@@ -112,7 +111,7 @@ public class RoleManager {
             String token = authHeader.substring(7);
             Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
             log.debug("JWT claims for current request: {}", claims);
-            RequestContext.setUser(claims.getSubject());
+            RequestContext.setUser(new User(claims.getSubject()));
             addRolesFromClaims(claims);
 
         } catch (Exception e) {
