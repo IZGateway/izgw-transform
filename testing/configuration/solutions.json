@@ -1,48 +1,4 @@
 [ {
-  "id" : "018f7881-7607-7220-a94b-fe0c7e81cbec",
-  "solutionName" : "EqualsPrecondition",
-  "description" : "Sets a field if Equals precondition is met",
-  "version" : "1.0",
-  "active" : true,
-  "requestOperations" : [ {
-    "preconditions" : [ {
-      "method" : "equals",
-      "id" : "026ab6c8-84d1-4bc8-927f-0ee770c2506e",
-      "dataPath" : "/MSH-1-1",
-      "comparisonValue" : "|"
-    } ],
-    "operationList" : [ {
-      "method" : "set",
-      "order" : 0,
-      "id" : null,
-      "destinationField" : "/MSH-22-1",
-      "setValue" : "EqualsPrecondition_Solution"
-    } ]
-  } ],
-  "responseOperations" : [ ]
-}, {
-  "id" : "64bc92f4-053c-4e55-85b5-5ff52f5ff47f",
-  "solutionName" : "NotEqualsPrecondition",
-  "description" : "Sets a field if NotEquals precondition is met",
-  "version" : "1.0",
-  "active" : true,
-  "requestOperations" : [ {
-    "preconditions" : [ {
-      "method" : "not_equals",
-      "id" : "9201fa07-e7c9-407e-b715-a527a5caac18",
-      "dataPath" : "/MSH-1-1",
-      "comparisonValue" : "x"
-    } ],
-    "operationList" : [ {
-      "method" : "set",
-      "order" : 0,
-      "id" : null,
-      "destinationField" : "/MSH-22-2",
-      "setValue" : "NotEqualsPrecondition_Solution"
-    } ]
-  } ],
-  "responseOperations" : [ ]
-}, {
   "id" : "79def078-5953-4d31-b44a-79d4da9beef9",
   "solutionName" : "RegexMatchPrecondition",
   "description" : "Sets a field if RegexMatch precondition is met",
@@ -57,8 +13,8 @@
     } ],
     "operationList" : [ {
       "method" : "set",
+      "id" : "edb9e6b9-d807-491c-a97f-19a54e0d0e90",
       "order" : 0,
-      "id" : null,
       "destinationField" : "/MSH-22-3",
       "setValue" : "RegexMatchPrecondition_Solution"
     } ]
@@ -71,8 +27,8 @@
     } ],
     "operationList" : [ {
       "method" : "mapper",
+      "id" : "3cf98427-a5d5-4cd5-82ca-4fe7b30141ef",
       "order" : 0,
-      "id" : null,
       "codeField" : "/PID-10-1",
       "codeSystemField" : "/PID-10-3",
       "codeSystemDefault" : "CDCREC"
@@ -82,8 +38,8 @@
     "preconditions" : [ ],
     "operationList" : [ {
       "method" : "set",
+      "id" : "c995f9f1-7cca-4b01-a1fa-1087a35d5502",
       "order" : 0,
-      "id" : null,
       "destinationField" : "/MSH-7-1",
       "setValue" : "MSH 7 NEW VALUE"
     } ]
@@ -98,27 +54,27 @@
     "preconditions" : [ ],
     "operationList" : [ {
       "method" : "set",
+      "id" : "4610be15-b142-4a3d-8df6-28604b8d80a7",
       "order" : 0,
-      "id" : null,
       "destinationField" : "/MSH-23-1",
       "setValue" : "HELLO THERE!"
     }, {
       "method" : "copy",
+      "id" : "1b5cfe2d-e868-4cbe-baec-5a237362000a",
       "order" : 0,
-      "id" : null,
       "sourceField" : "/MSH-23-1",
       "destinationField" : "/MSH-23-2"
     }, {
       "method" : "regex_replace",
+      "id" : "477497d6-59bc-4005-8e2f-69c2a0533790",
       "order" : 0,
-      "id" : null,
       "field" : "/MSH-23-2",
       "regex" : "([\\S]{1})([\\S]{1})(.+)",
       "replacement" : "$2$1$3"
     }, {
       "method" : "save_state",
+      "id" : "18c62d23-2501-4003-8cc4-13b9de8bacdb",
       "order" : 0,
-      "id" : null,
       "field" : "/MSH-23-2",
       "key" : "myKey"
     } ]
@@ -131,7 +87,7 @@
   "version" : "1.0",
   "active" : true,
   "requestOperations" : [ {
-    "preconditions" : null,
+    "preconditions" : [ ],
     "operationList" : [ ]
   } ],
   "responseOperations" : [ ]
@@ -150,8 +106,8 @@
     } ],
     "operationList" : [ {
       "method" : "set",
+      "id" : "c0e3c374-f489-43ac-a4f9-8c0514e1c6ee",
       "order" : 0,
-      "id" : null,
       "destinationField" : "/MSH-22-3",
       "setValue" : "RegexMatchPrecondition_Solution"
     } ]
@@ -160,8 +116,8 @@
     "preconditions" : [ ],
     "operationList" : [ {
       "method" : "set",
+      "id" : "ef3eb737-0cf2-44cc-8608-84e7017e5c27",
       "order" : 0,
-      "id" : null,
       "destinationField" : "/MSX-7-1",
       "setValue" : "MSH 7 NEW VALUE"
     } ]
@@ -181,8 +137,8 @@
     } ],
     "operationList" : [ {
       "method" : "mapper",
+      "id" : "3428bc15-c0b5-4eae-aea5-5ea5ca4d8388",
       "order" : 0,
-      "id" : null,
       "codeField" : "/PID-10-1",
       "codeSystemField" : "/PID-10-3",
       "codeSystemDefault" : "CDCREC"
@@ -204,8 +160,8 @@
     } ],
     "operationList" : [ {
       "method" : "regex_replace",
+      "id" : "ad5920c1-83fb-4b94-afd7-38b67c9bbcf4",
       "order" : 0,
-      "id" : null,
       "field" : "/PID-11-5",
       "regex" : "^(\\d{5})(\\d{4})$",
       "replacement" : "$1-$2"
@@ -226,8 +182,8 @@
     "preconditions" : [ ],
     "operationList" : [ {
       "method" : "set",
+      "id" : "6f750e31-3b60-49bc-a01e-1c2d8b84e3db",
       "order" : 0,
-      "id" : null,
       "destinationField" : "/MSH-7-1",
       "setValue" : "MSH 7 NEW VALUE"
     } ]
@@ -242,8 +198,8 @@
     "preconditions" : [ ],
     "operationList" : [ {
       "method" : "save_state",
+      "id" : "7282e599-ea82-4725-8f23-fccc4eaeb38c",
       "order" : 0,
-      "id" : null,
       "field" : "/MSH-9-1",
       "key" : "POSTMAN"
     } ]
@@ -257,10 +213,54 @@
     } ],
     "operationList" : [ {
       "method" : "set",
-      "order" : 0,
       "id" : "3a9aa66e-2989-495e-a66b-df5eae8f61c8",
+      "order" : 0,
       "destinationField" : "/MSH-22-1",
       "setValue" : "STATE_CHECKS"
     } ]
   } ]
+}, {
+  "id" : "018f7881-7607-7220-a94b-fe0c7e81cbec",
+  "solutionName" : "EqualsPrecondition",
+  "description" : "Sets a field if Equals precondition is met",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "026ab6c8-84d1-4bc8-927f-0ee770c2506e",
+      "dataPath" : "/MSH-1-1",
+      "comparisonValue" : "|"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "id" : "a0a7b7bb-59b8-4e44-ada7-d57fc335abbf",
+      "order" : 0,
+      "destinationField" : "/MSH-22-1",
+      "setValue" : "EqualsPrecondition_Solution"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "64bc92f4-053c-4e55-85b5-5ff52f5ff47f",
+  "solutionName" : "NotEqualsPrecondition",
+  "description" : "Sets a field if NotEquals precondition is met",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "not_equals",
+      "id" : "9201fa07-e7c9-407e-b715-a527a5caac18",
+      "dataPath" : "/MSH-1-1",
+      "comparisonValue" : "x"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "id" : "aa796915-91ef-4ba2-8bb0-c2d5ba6818e5",
+      "order" : 0,
+      "destinationField" : "/MSH-22-2",
+      "setValue" : "NotEqualsPrecondition_Solution"
+    } ]
+  } ],
+  "responseOperations" : [ ]
 } ]
