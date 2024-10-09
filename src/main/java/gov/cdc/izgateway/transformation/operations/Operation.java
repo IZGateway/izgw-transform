@@ -10,7 +10,8 @@ import gov.cdc.izgateway.transformation.exceptions.OperationException;
         @JsonSubTypes.Type(value = Copy.class, name = "copy"),
         @JsonSubTypes.Type(value = Mapper.class, name = "mapper"),
         @JsonSubTypes.Type(value = RegexReplace.class, name = "regex_replace"),
-        @JsonSubTypes.Type(value = Set.class, name = "set")
+        @JsonSubTypes.Type(value = Set.class, name = "set"),
+        @JsonSubTypes.Type(value = SaveState.class, name = "save_state")
 })
 public interface Operation {
     void execute(ServiceContext context) throws OperationException;
