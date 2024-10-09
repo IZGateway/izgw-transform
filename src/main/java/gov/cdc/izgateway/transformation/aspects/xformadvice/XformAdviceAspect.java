@@ -5,8 +5,7 @@ import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.logging.advice.*;
-import gov.cdc.izgateway.transformation.model.Pipeline;
-import gov.cdc.izgateway.transformation.services.SolutionService;
+import gov.cdc.izgateway.transformation.operations.Operation;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -47,7 +46,7 @@ public class XformAdviceAspect {
             xformAdvice = new PipelineAdviceDTO();
         } else if (AdviceUtil.isSolutionAdvice(joinPoint.getTarget().getClass().getSimpleName())) {
             xformAdvice = new SolutionAdviceDTO();
-        } else if (AdviceUtil.isOperationAdvice(joinPoint.getTarget().getClass().getSimpleName())) {
+        } else if (joinPoint.getTarget() instanceof Operation) {
             xformAdvice = new OperationAdviceDTO();
         } else {
             return null;
