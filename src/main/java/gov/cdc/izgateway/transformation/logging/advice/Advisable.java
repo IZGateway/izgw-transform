@@ -1,6 +1,8 @@
 package gov.cdc.izgateway.transformation.logging.advice;
 
+import java.util.UUID;
+
 public interface Advisable {
     public String getName();
-    public String getId();
+    public UUID getId();
 }

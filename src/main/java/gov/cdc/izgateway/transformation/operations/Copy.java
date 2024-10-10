@@ -53,11 +53,6 @@ public class Copy implements Operation, Advisable, Transformable {
     }
 
     @Override
-    public String getId() {
-        return this.id.toString();
-    }
-
-    @Override
     public boolean hasTransformed() {
         return true;
     }

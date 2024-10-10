@@ -9,16 +9,21 @@ import gov.cdc.izgateway.transformation.model.Pipe;
 import gov.cdc.izgateway.transformation.model.Pipeline;
 import gov.cdc.izgateway.transformation.preconditions.*;
 import gov.cdc.izgateway.transformation.solutions.Solution;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
+@Getter
 public class PipelineRunnerService implements Advisable, Transformable {
     private final TxServiceConfig txServiceConfig;
     private ServiceContext context;
     private Pipeline pipeline;
+    private UUID id;
 
     @Autowired
     public PipelineRunnerService(TxServiceConfig txServiceConfig) {
@@ -31,18 +36,19 @@ public class PipelineRunnerService implements Advisable, Transformable {
         this.context = context;
 
         if (pipeline != null) {
-            log.trace(String.format("Executing Pipeline (%s) '%s'", pipeline.getId(), pipeline.getPipelineName()));
+            log.trace("Executing Pipeline ({}) '{}'", pipeline.getId(), pipeline.getPipelineName());
+            id = pipeline.getId();
         } else {
             log.trace("No Pipeline Found");
         }
 
         for (Pipe pipe : pipeline.getPipes()) {
-            log.trace(String.format("Executing Pipe: %s", pipe.getId()));
+            log.trace("Executing Pipe: {}", pipe.getId());
 
             if (Boolean.TRUE.equals(preconditionsPassed(pipe))) {
                 // Create & Execute Solution
                 gov.cdc.izgateway.transformation.model.Solution solutionModel = txServiceConfig.getSolution(pipe.getSolutionId());
-                log.trace(String.format("Solution Name: %s", solutionModel.getSolutionName()));
+                log.trace("Solution Name: {}", solutionModel.getSolutionName());
                 Solution solution = new Solution(solutionModel);
                 solution.execute(context);
             }
@@ -70,14 +76,6 @@ public class PipelineRunnerService implements Advisable, Transformable {
             return "No Pipeline";
         }
     }
-
-    @Override
-    public String getId() {
-        if (pipeline != null) {
-            return pipeline.getId().toString();
-        } else {
-            return "No Pipeline";
-        }    }
 
     @Override
     public boolean hasTransformed() {

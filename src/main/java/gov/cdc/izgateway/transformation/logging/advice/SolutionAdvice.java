@@ -3,13 +3,14 @@ package gov.cdc.izgateway.transformation.logging.advice;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Data
 public class SolutionAdvice extends SolutionAdviceDTO {
     private final ArrayList<OperationAdviceDTO> requestOperationAdviceList = new ArrayList<>();
     private final ArrayList<OperationAdviceDTO> responseOperationAdviceList = new ArrayList<>();
 
-    public SolutionAdvice(String id, String className, String name) {
+    public SolutionAdvice(UUID id, String className, String name) {
         super(id, className, name);
     }
 

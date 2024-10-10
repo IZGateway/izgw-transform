@@ -35,10 +35,13 @@ public class SolutionOperation {
                 try {
                     op.execute(context);
                 } catch (OperationException e) {
-                    throw new SolutionOperationException("Failed to execute operation: " + op.getClass().getSimpleName(), e);
+                    throw new SolutionOperationException(
+                            String.format("Failed to execute operation: %s - %s",
+                                    op.getClass().getSimpleName(),
+                                    e.getMessage()),
+                            e.getCause());
                 }
             }
-
         }
     }
 }

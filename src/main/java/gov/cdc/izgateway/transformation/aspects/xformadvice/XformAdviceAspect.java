@@ -10,6 +10,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 
+import java.util.UUID;
+
 @Aspect
 public class XformAdviceAspect {
 
@@ -40,7 +42,7 @@ public class XformAdviceAspect {
     }
 
     private XformAdviceDTO getXformAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasErrored) throws HL7Exception {
-        XformAdviceDTO xformAdvice = null;
+        XformAdviceDTO xformAdvice;
 
         if (AdviceUtil.isPipelineAdvice(joinPoint.getTarget().getClass().getSimpleName())) {
             xformAdvice = new PipelineAdviceDTO();
@@ -59,7 +61,7 @@ public class XformAdviceAspect {
 
     private void populateAdvice(XformAdviceDTO xformAdvice, ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasErrored) throws HL7Exception {
         String name = "Unknown";
-        String id = "Unknown";
+        UUID id = null;
         boolean hasTransformed = false;
 
         Object targetObject = joinPoint.getTarget();
