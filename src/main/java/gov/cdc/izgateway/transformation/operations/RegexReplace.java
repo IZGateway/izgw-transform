@@ -40,8 +40,8 @@ public class RegexReplace implements Operation {
         }
 
         if (context.getDataType().equals(DataType.HL7V2)) {
-            Hl7v2RegexReplace copy = new Hl7v2RegexReplace(this);
-            copy.execute(context);
+            Hl7v2RegexReplace regexReplace = new Hl7v2RegexReplace(this);
+            regexReplace.execute(context);
         }
 
     }

@@ -40,6 +40,7 @@ public class PipelineRunnerService implements Advisable, Transformable {
             id = pipeline.getId();
         } else {
             log.trace("No Pipeline Found");
+            return;
         }
 
         for (Pipe pipe : pipeline.getPipes()) {

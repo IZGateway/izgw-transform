@@ -3,6 +3,7 @@ package gov.cdc.izgateway.transformation.operations;
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.annotations.ExcludeField;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
+import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.logging.advice.Transformable;
@@ -37,6 +38,11 @@ public class SaveState implements Operation, Advisable, Transformable {
     public void execute(ServiceContext context) throws OperationException {
         if (log.isTraceEnabled()) {
             log.trace("Operation: {} / Save value from {} To key {}", this.getClass().getSimpleName(), this.field, this.key);
+        }
+
+        if (context.getDataType().equals(DataType.HL7V2)) {
+            Hl7v2SaveState saveState = new Hl7v2SaveState(this);
+            saveState.execute(context);
         }
     }
 
