@@ -1,12 +1,9 @@
 package gov.cdc.izgateway.transformation.operations;
 
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
-import gov.cdc.izgateway.transformation.annotations.ExcludeField;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.exceptions.OperationException;
-import gov.cdc.izgateway.transformation.logging.advice.Advisable;
-import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,17 +11,17 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class Copy implements Operation, Advisable, Transformable {
+public class Copy implements Operation {
 
     private UUID id;
     private int order;
     private String sourceField;
     private String destinationField;
 
-    @ExcludeField
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Copy.class);
 
-    public Copy() {}
+    public Copy() {
+    }
 
     protected Copy(Copy copy) {
         this.id = copy.id;
@@ -47,13 +44,4 @@ public class Copy implements Operation, Advisable, Transformable {
 
     }
 
-    @Override
-    public String getName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public boolean hasTransformed() {
-        return true;
-    }
 }

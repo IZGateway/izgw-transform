@@ -1,6 +1,5 @@
 package gov.cdc.izgateway.transformation.operations;
 
-import gov.cdc.izgateway.transformation.annotations.ExcludeField;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.exceptions.OperationException;
@@ -19,7 +18,6 @@ public class RegexReplace implements Operation {
     private String regex;
     private String replacement;
 
-    @ExcludeField
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RegexReplace.class);
 
     public RegexReplace() {}

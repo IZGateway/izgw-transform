@@ -1,4 +1,5 @@
 package gov.cdc.izgateway.transformation;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +29,7 @@ public class ApiController {
     private final MappingService mappingService;
     private final PreconditionFieldService preconditionFieldService;
     private final PreconditionService preconditionService;
+    private final OperationService operationService;
 
     @Value("${transformationservice.allow-delete-via-api}")
     private Boolean allowDelete;
@@ -39,7 +41,8 @@ public class ApiController {
             SolutionService solutionService,
             MappingService mappingService,
             PreconditionFieldService preconditionFieldService,
-            PreconditionService preconditionService
+            PreconditionService preconditionService,
+            OperationService operationService
     ) {
         this.organizationService = organizationService;
         this.pipelineService = pipelineService;
@@ -47,6 +50,7 @@ public class ApiController {
         this.mappingService = mappingService;
         this.preconditionFieldService = preconditionFieldService;
         this.preconditionService = preconditionService;
+        this.operationService = operationService;
     }
 
     @GetMapping("/api/v1/pipelines/{uuid}")
@@ -114,10 +118,10 @@ public class ApiController {
 
     @GetMapping("/api/v1/organizations")
     public ResponseEntity<String> getOrganizationsList(
-        @RequestParam(required = false) String nextCursor,
-        @RequestParam(required = false) String prevCursor,
-        @RequestParam(defaultValue = "false") Boolean includeInactive,
-        @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(required = false) String nextCursor,
+            @RequestParam(required = false) String prevCursor,
+            @RequestParam(defaultValue = "false") Boolean includeInactive,
+            @RequestParam(defaultValue = "10") int limit) {
         try {
             return processList(organizationService.getList(), nextCursor, prevCursor, includeInactive, limit);
 
@@ -129,10 +133,10 @@ public class ApiController {
 
     @GetMapping("/api/v1/solutions")
     public ResponseEntity<String> getSolutionsList(
-        @RequestParam(required = false) String nextCursor,
-        @RequestParam(required = false) String prevCursor,
-        @RequestParam(defaultValue = "false") Boolean includeInactive,
-        @RequestParam(defaultValue = "10") int limit
+            @RequestParam(required = false) String nextCursor,
+            @RequestParam(required = false) String prevCursor,
+            @RequestParam(defaultValue = "false") Boolean includeInactive,
+            @RequestParam(defaultValue = "10") int limit
     ) {
         try {
             return processList(solutionService.getList(), nextCursor, prevCursor, includeInactive, limit);
@@ -168,7 +172,7 @@ public class ApiController {
     @PostMapping("/api/v1/organizations")
     public ResponseEntity<Organization> createOrganization(
             @Valid @RequestBody() Organization organization
-             ){
+    ) {
         organizationService.create(organization);
         return new ResponseEntity<>(organization, HttpStatus.OK);
     }
@@ -217,6 +221,16 @@ public class ApiController {
 
         organizationService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/api/v1/operations/available")
+    public ResponseEntity<List<OperationInfo>> getAvailableOperationList() {
+        try {
+            return ResponseEntity.ok(operationService.getList());
+        } catch (Exception e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/api/v1/preconditions/available")
@@ -289,14 +303,13 @@ public class ApiController {
 
         List<T> filteredEntityList = filterList(includeInactive, allEntityList);
 
-        for (int i = 0; i < filteredEntityList.size(); i++){
+        for (int i = 0; i < filteredEntityList.size(); i++) {
             T newEntity = filteredEntityList.get(i);
-            if(newEntity.getId().toString().equals(nextCursor)){
-                min = i+1;
-                max = i+limit+1;
-            }
-            else if(newEntity.getId().toString().equals(prevCursor)){
-                min = i-limit-1;
+            if (newEntity.getId().toString().equals(nextCursor)) {
+                min = i + 1;
+                max = i + limit + 1;
+            } else if (newEntity.getId().toString().equals(prevCursor)) {
+                min = i - limit - 1;
                 max = i;
             }
         }
