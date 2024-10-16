@@ -16,6 +16,8 @@ public class Mapper extends BaseOperation implements Operation {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Mapper.class);
 
+    protected Mapper() {}
+
     protected Mapper(Mapper mapper) {
         super(mapper.getId(), mapper.getOrder());
         this.codeField = mapper.getCodeField();
