@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "2bc192b8-0bb6-4521-bf61-21f944727dec",
+		"_postman_id": "7d9920eb-d345-47aa-b532-f061e5514e99",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/AustinM~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-2bc192b8-0bb6-4521-bf61-21f944727dec?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/AustinM~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-7d9920eb-d345-47aa-b532-f061e5514e99?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -6319,6 +6319,101 @@
 								}
 							],
 							"description": "This folder contains tests for the piece of the API which lets a call know what Preconditions are available in the running system.\n\nAs we add Preconditions to the system we need to remember to add a bit to the _Post Response_ script to check for it."
+						}
+					]
+				},
+				{
+					"name": "Operations",
+					"item": [
+						{
+							"name": "Available",
+							"item": [
+								{
+									"name": "Get Available Operations - exists",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/*",
+													"    Here we test to see that all known Operations are in the API response.",
+													"",
+													"    We also check to see if there is an Operation that we haven't explicitly listed.",
+													"*/",
+													"",
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"// Operations that have been coded",
+													"// ADD an entry here when new Operations have been added to the system",
+													"const expectedMethods = [\"copy\", \"mapper\", \"regex_replace\", \"set\", \"save_state\"];",
+													"",
+													"// Keep track of methods we find in the response",
+													"let foundMethods = {};",
+													"expectedMethods.forEach(method => foundMethods[method] = false);",
+													"",
+													"// Check each method in the response",
+													"response.forEach(item => {",
+													"    if (expectedMethods.includes(item.method)) {",
+													"        foundMethods[item.method] = true;",
+													"    } else {",
+													"        pm.test(`Unexpected method found: ${item.method}`, function() {",
+													"            pm.expect.fail(`Found unexpected method: ${item.method}`);",
+													"        });",
+													"    }",
+													"});",
+													"",
+													"// Test for presence of all expected methods",
+													"expectedMethods.forEach(method => {",
+													"    pm.test(`Found ${method} method`, function() {",
+													"        pm.expect(foundMethods[method]).to.be.true;",
+													"    });",
+													"});",
+													"",
+													"// Test to ensure no extra methods are present",
+													"pm.test(\"No extra methods present\", function() {",
+													"    pm.expect(response.length).to.equal(expectedMethods.length);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/operations/available",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"operations",
+												"available"
+											]
+										}
+									},
+									"response": []
+								}
+							]
 						}
 					]
 				},

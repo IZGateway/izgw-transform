@@ -1,14 +1,16 @@
 package gov.cdc.izgateway.transformation.solutions;
 
-import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
+import gov.cdc.izgateway.transformation.exceptions.SolutionException;
+import gov.cdc.izgateway.transformation.exceptions.SolutionOperationException;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Solution implements Advisable, Transformable {
 
@@ -32,18 +34,28 @@ public class Solution implements Advisable, Transformable {
     }
 
     @CaptureXformAdvice
-    public void execute(ServiceContext context) throws HL7Exception {
+    public void execute(ServiceContext context) throws SolutionException {
+
         if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
             for (SolutionOperation so : requestOperations) {
                 hasTransformed = true;
-                so.execute(context);
+                try {
+                    so.execute(context);
+                } catch (SolutionOperationException e) {
+                    throw new SolutionException(String.format("Failed to execute solution: %s - %s", so.getClass().getSimpleName(), e.getMessage()), e.getCause());
+                }
             }
         } else if (context.getCurrentDirection().equals(DataFlowDirection.RESPONSE)) {
             for (SolutionOperation so : responseOperations) {
                 hasTransformed = true;
-                so.execute(context);
+                try {
+                    so.execute(context);
+                } catch (SolutionOperationException e) {
+                    throw new SolutionException(String.format("Failed to execute solution: %s - %s", so.getClass().getSimpleName(), e.getMessage()), e.getCause());
+                }
             }
         }
+
     }
 
     @Override
@@ -52,8 +64,8 @@ public class Solution implements Advisable, Transformable {
     }
 
     @Override
-    public String getId() {
-        return configuration.getId().toString();
+    public UUID getId() {
+        return configuration.getId();
     }
 
     @Override

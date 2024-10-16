@@ -1,7 +1,7 @@
 package gov.cdc.izgateway.transformation.services;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
-import gov.cdc.izgateway.transformation.annotations.ExcludeField;
 import gov.cdc.izgateway.transformation.model.PreconditionInfo;
 import gov.cdc.izgateway.transformation.model.PreconditionInfoProperty;
 import gov.cdc.izgateway.transformation.preconditions.Precondition;
@@ -64,9 +64,10 @@ public class PreconditionService implements TxFormService<PreconditionInfo> {
     }
 
     private boolean shouldIncludeField(Field field) {
-        return !field.isAnnotationPresent(ExcludeField.class) &&
-                !Modifier.isStatic(field.getModifiers()) &&
-                !field.isSynthetic();
+        // If a field is annotated with @JsonIgnore in a Precondition do not include this in the output.
+        // If a field is static do not include in the output.  Only non-static fields would be updated in
+        // the state so this will exclude the AspectJ objects that may show up.
+        return !field.isAnnotationPresent(JsonIgnore.class) && !Modifier.isStatic(field.getModifiers());
     }
 
     private void getAllFields(Class<?> clazz, Map<String, PreconditionInfoProperty> properties) {

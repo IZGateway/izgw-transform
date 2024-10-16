@@ -1,6 +1,5 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
-import gov.cdc.izgateway.transformation.annotations.ExcludeField;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import lombok.Getter;
@@ -18,7 +17,6 @@ public class RegexMatch implements Precondition {
     private String dataPath;
     private String regex;
 
-    @ExcludeField
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RegexMatch.class);
 
     protected RegexMatch() {

@@ -12,10 +12,6 @@ public class AdviceUtil {
         return className.contains("Solution") || className.endsWith("Pipe");
     }
 
-    public static boolean isOperationAdvice(String className) {
-        return className.endsWith("Operation");
-    }
-
     // TODO - add Precondition
 
 }

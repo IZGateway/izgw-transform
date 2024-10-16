@@ -2,17 +2,14 @@ package gov.cdc.izgateway.transformation.logging.advice;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class PipelineAdviceDTO extends XformAdviceDTO {
-    private String id;
-
-
     public PipelineAdviceDTO() {
     }
 
-    public PipelineAdviceDTO(String id, String className, String name) {
-        super(className, name);
-        this.id = id;
+    public PipelineAdviceDTO(UUID id, String className, String name) {
+        super(id, className, name);
     }
-
 }
