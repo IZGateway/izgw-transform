@@ -6,7 +6,6 @@ import java.util.List;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.info.HostInfo;
 import gov.cdc.izgateway.service.IAccessControlService;
-import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.model.User;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.services.UserService;
@@ -35,7 +34,6 @@ import javax.crypto.SecretKey;
 public class RoleManager {
     public static final String NOT_ADMIN_HEADER = "X-Not-Admin";
 
-    private final OrganizationService organizationService;
     private final IAccessControlService accessControlService;
     private final UserService userService;
 
@@ -45,8 +43,7 @@ public class RoleManager {
     private String jwtSecret;
 
     @Autowired
-    public RoleManager(OrganizationService organizationService, IAccessControlService accessControlService, UserService userService) {
-        this.organizationService = organizationService;
+    public RoleManager(IAccessControlService accessControlService, UserService userService) {
         this.accessControlService = accessControlService;
         this.userService = userService;
     }

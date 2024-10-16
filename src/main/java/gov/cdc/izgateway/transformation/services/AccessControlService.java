@@ -35,7 +35,7 @@ public class AccessControlService  extends GenericService<AccessControl> impleme
         return roles;
     }
 
-    // TODO: PCahill - document why we don't need the user parameter
+    // TODO: PCahill - discuss why we may not need the user parameter
     @Override
     public Boolean checkAccess(String user, String method, String path) {
         List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);

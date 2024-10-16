@@ -55,19 +55,11 @@ public class AccessControlValve extends ValveBase {
     }
     
     public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
-        // TODO: Consider taking this out if we have everything covered using the RoleManager
-        if (!accessControlEnabled) {
-            return true;
-        }
-
         roleManager.addAllRoles(req, (X509Certificate[]) req.getAttribute(Globals.CERTIFICATES_ATTR));
 
         String path = req.getRequestURI();
 
-        // TODO: Paul, after all the roles are set, then look at the org override
-        //      * Add roles for the organization specified in the override header only if the request is from localhost.
-
-        if ( ! accessControlService.checkAccess("FIXTHIS - ADD USER", req.getMethod(), path) ) {
+        if ( ! accessControlService.checkAccess("Talk through this during review", req.getMethod(), path) ) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         } else {
