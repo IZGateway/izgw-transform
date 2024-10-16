@@ -3,19 +3,13 @@ package gov.cdc.izgateway.transformation.operations;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.exceptions.OperationException;
-import gov.cdc.izgateway.transformation.logging.advice.Advisable;
-import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
-public class SaveState implements Operation, Advisable, Transformable {
+public class SaveState extends BaseOperation implements Operation {
 
-    private UUID id;
-    private int order;
     private String field;
     private String key;
 
@@ -24,8 +18,7 @@ public class SaveState implements Operation, Advisable, Transformable {
     public SaveState() {}
 
     protected SaveState(SaveState saveState) {
-        this.id = saveState.id;
-        this.order = saveState.order;
+        super(saveState.getId(), saveState.getOrder());
         this.field = saveState.field;
         this.key = saveState.key;
     }
@@ -40,15 +33,5 @@ public class SaveState implements Operation, Advisable, Transformable {
             Hl7v2SaveState saveState = new Hl7v2SaveState(this);
             saveState.execute(context);
         }
-    }
-
-    @Override
-    public String getName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public boolean hasTransformed() {
-        return true;
     }
 }
