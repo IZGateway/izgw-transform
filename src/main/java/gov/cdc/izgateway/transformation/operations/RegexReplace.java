@@ -6,14 +6,10 @@ import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
-public class RegexReplace implements Operation {
+public class RegexReplace extends BaseOperation implements Operation {
 
-    private UUID id;
-    private int order;
     private String field;
     private String regex;
     private String replacement;
@@ -23,8 +19,7 @@ public class RegexReplace implements Operation {
     public RegexReplace() {}
 
     protected RegexReplace(RegexReplace regexReplace) {
-        this.id = regexReplace.id;
-        this.order = regexReplace.order;
+        super(regexReplace.getId(), regexReplace.getOrder());
         this.field = regexReplace.field;
         this.regex = regexReplace.regex;
         this.replacement = regexReplace.replacement;
