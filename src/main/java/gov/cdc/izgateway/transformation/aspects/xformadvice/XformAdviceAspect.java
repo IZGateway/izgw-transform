@@ -80,6 +80,7 @@ public class XformAdviceAspect {
 
         xformAdvice.setClassName(joinPoint.getTarget().getClass().getSimpleName());
         xformAdvice.setName(name);
+        xformAdvice.setId(id);
         xformAdvice.setProcessError(hasErrored);
         xformAdvice.setOrganizationId(context.getOrganizationId());
 
@@ -88,16 +89,6 @@ public class XformAdviceAspect {
         } else {
             updateResponseMessage(context, methodDisposition, hasTransformed, xformAdvice);
         }
-
-        // TODO There may be some refactoring Austin and Paul are working on that may include an "Id" for an Operation which means
-        // we could get away with a single XformAdvice object with no class needed to extend it.
-        if ( xformAdvice instanceof PipelineAdviceDTO pipelineAdvice ) {
-            pipelineAdvice.setId(id);
-        } else if ( xformAdvice instanceof SolutionAdviceDTO solutionAdvice ) {
-            solutionAdvice.setId(id);
-        }
-
-
     }
 
     private void updateRequestMessage(ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {

@@ -6,14 +6,12 @@ import java.util.UUID;
 
 @Data
 public class SolutionAdviceDTO extends XformAdviceDTO {
-    private UUID id;
 
     public SolutionAdviceDTO() {
     }
 
     public SolutionAdviceDTO(UUID id, String className, String name) {
-        super(className, name);
-        this.id = id;
+        super(id, className, name);
     }
 
 

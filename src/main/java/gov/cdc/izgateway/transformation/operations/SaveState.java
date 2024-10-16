@@ -1,6 +1,5 @@
 package gov.cdc.izgateway.transformation.operations;
 
-import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import gov.cdc.izgateway.transformation.exceptions.OperationException;
@@ -32,7 +31,6 @@ public class SaveState implements Operation, Advisable, Transformable {
     }
 
     @Override
-    @CaptureXformAdvice
     public void execute(ServiceContext context) throws OperationException {
         if (log.isTraceEnabled()) {
             log.trace("Operation: {} / Save value from {} To key {}", this.getClass().getSimpleName(), this.field, this.key);
@@ -51,6 +49,6 @@ public class SaveState implements Operation, Advisable, Transformable {
 
     @Override
     public boolean hasTransformed() {
-        return false;
+        return true;
     }
 }
