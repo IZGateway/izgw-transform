@@ -6,25 +6,18 @@ import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
-public class Mapper implements Operation {
+public class Mapper extends BaseOperation implements Operation {
 
-    private UUID id;
-    private int order;
     private String codeField;
     private String codeSystemField;
     private String codeSystemDefault;
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Mapper.class);
 
-    public Mapper() {}
-
     protected Mapper(Mapper mapper) {
-        this.id = mapper.getId();
-        this.order = mapper.getOrder();
+        super(mapper.getId(), mapper.getOrder());
         this.codeField = mapper.getCodeField();
         this.codeSystemField = mapper.getCodeSystemField();
         this.codeSystemDefault = mapper.getCodeSystemDefault();

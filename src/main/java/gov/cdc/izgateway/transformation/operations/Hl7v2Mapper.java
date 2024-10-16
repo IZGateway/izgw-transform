@@ -3,6 +3,7 @@ package gov.cdc.izgateway.transformation.operations;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
+import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import gov.cdc.izgateway.transformation.model.Code;
@@ -23,6 +24,7 @@ public class Hl7v2Mapper extends Mapper implements Operation {
     }
 
     @Override
+    @CaptureXformAdvice
     public void execute(ServiceContext context) throws OperationException {
 
         try {

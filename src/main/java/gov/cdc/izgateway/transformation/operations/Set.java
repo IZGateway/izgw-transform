@@ -6,14 +6,10 @@ import gov.cdc.izgateway.transformation.exceptions.OperationException;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
-public class Set implements Operation {
+public class Set extends BaseOperation implements Operation {
 
-    private UUID id;
-    private int order;
     private String destinationField;
     private String setValue;
 
@@ -22,8 +18,7 @@ public class Set implements Operation {
     public Set() {}
 
     protected Set(Set set) {
-        this.id = set.id;
-        this.order = set.order;
+        super(set.getId(), set.getOrder());
         this.destinationField = set.destinationField;
         this.setValue = set.setValue;
     }
