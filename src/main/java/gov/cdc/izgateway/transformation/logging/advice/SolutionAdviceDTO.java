@@ -2,16 +2,16 @@ package gov.cdc.izgateway.transformation.logging.advice;
 
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class SolutionAdviceDTO extends XformAdviceDTO {
-    private String id;
 
     public SolutionAdviceDTO() {
     }
 
-    public SolutionAdviceDTO(String id, String className, String name) {
-        super(className, name);
-        this.id = id;
+    public SolutionAdviceDTO(UUID id, String className, String name) {
+        super(id, className, name);
     }
 
 

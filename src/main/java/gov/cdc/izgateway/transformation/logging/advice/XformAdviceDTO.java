@@ -11,11 +11,13 @@ public class XformAdviceDTO {
     public XformAdviceDTO() {
     }
 
-    public XformAdviceDTO(String className, String name) {
+    public XformAdviceDTO(UUID id, String className, String name) {
         this.className = className;
         this.name = name;
+        this.id = id;
     }
 
+    private UUID id;
     private boolean processError;
     private String className;
     private UUID organizationId;

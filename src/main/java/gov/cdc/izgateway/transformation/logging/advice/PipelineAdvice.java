@@ -3,11 +3,12 @@ package gov.cdc.izgateway.transformation.logging.advice;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Data
 public class PipelineAdvice extends PipelineAdviceDTO {
     private ArrayList<SolutionAdvice> solutionAdviceList = new ArrayList<>();
-    private String id;
+    private UUID id;
     private boolean requestTransformed = false;
     private boolean responseTransformed = false;
 

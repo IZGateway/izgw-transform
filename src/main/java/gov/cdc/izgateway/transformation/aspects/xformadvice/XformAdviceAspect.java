@@ -5,11 +5,12 @@ import ca.uhn.hl7v2.model.Message;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.logging.advice.*;
-import gov.cdc.izgateway.transformation.model.Pipeline;
-import gov.cdc.izgateway.transformation.services.SolutionService;
+import gov.cdc.izgateway.transformation.operations.Operation;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+
+import java.util.UUID;
 
 @Aspect
 public class XformAdviceAspect {
@@ -41,13 +42,13 @@ public class XformAdviceAspect {
     }
 
     private XformAdviceDTO getXformAdvice(ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasErrored) throws HL7Exception {
-        XformAdviceDTO xformAdvice = null;
+        XformAdviceDTO xformAdvice;
 
         if (AdviceUtil.isPipelineAdvice(joinPoint.getTarget().getClass().getSimpleName())) {
             xformAdvice = new PipelineAdviceDTO();
         } else if (AdviceUtil.isSolutionAdvice(joinPoint.getTarget().getClass().getSimpleName())) {
             xformAdvice = new SolutionAdviceDTO();
-        } else if (AdviceUtil.isOperationAdvice(joinPoint.getTarget().getClass().getSimpleName())) {
+        } else if (joinPoint.getTarget() instanceof Operation) {
             xformAdvice = new OperationAdviceDTO();
         } else {
             return null;
@@ -60,7 +61,7 @@ public class XformAdviceAspect {
 
     private void populateAdvice(XformAdviceDTO xformAdvice, ProceedingJoinPoint joinPoint, ServiceContext context, MethodDisposition methodDisposition, boolean hasErrored) throws HL7Exception {
         String name = "Unknown";
-        String id = "Unknown";
+        UUID id = null;
         boolean hasTransformed = false;
 
         Object targetObject = joinPoint.getTarget();
@@ -79,6 +80,7 @@ public class XformAdviceAspect {
 
         xformAdvice.setClassName(joinPoint.getTarget().getClass().getSimpleName());
         xformAdvice.setName(name);
+        xformAdvice.setId(id);
         xformAdvice.setProcessError(hasErrored);
         xformAdvice.setOrganizationId(context.getOrganizationId());
 
@@ -87,16 +89,6 @@ public class XformAdviceAspect {
         } else {
             updateResponseMessage(context, methodDisposition, hasTransformed, xformAdvice);
         }
-
-        // TODO There may be some refactoring Austin and Paul are working on that may include an "Id" for an Operation which means
-        // we could get away with a single XformAdvice object with no class needed to extend it.
-        if ( xformAdvice instanceof PipelineAdviceDTO pipelineAdvice ) {
-            pipelineAdvice.setId(id);
-        } else if ( xformAdvice instanceof SolutionAdviceDTO solutionAdvice ) {
-            solutionAdvice.setId(id);
-        }
-
-
     }
 
     private void updateRequestMessage(ServiceContext context, MethodDisposition methodDisposition, boolean hasTransformed, XformAdviceDTO advice) throws HL7Exception {
