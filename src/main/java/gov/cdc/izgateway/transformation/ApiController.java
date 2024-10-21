@@ -27,7 +27,6 @@ public class ApiController {
     private final PipelineService pipelineService;
     private final SolutionService solutionService;
     private final MappingService mappingService;
-    private final PreconditionFieldService preconditionFieldService;
     private final PreconditionService preconditionService;
     private final OperationService operationService;
     private final OperationPreconditionFieldService operationPreconditionFieldService;
@@ -41,7 +40,6 @@ public class ApiController {
             PipelineService pipelineService,
             SolutionService solutionService,
             MappingService mappingService,
-            PreconditionFieldService preconditionFieldService,
             PreconditionService preconditionService,
             OperationService operationService,
             OperationPreconditionFieldService operationPreconditionFieldService
@@ -50,7 +48,6 @@ public class ApiController {
         this.pipelineService = pipelineService;
         this.solutionService = solutionService;
         this.mappingService = mappingService;
-        this.preconditionFieldService = preconditionFieldService;
         this.preconditionService = preconditionService;
         this.operationService = operationService;
         this.operationPreconditionFieldService = operationPreconditionFieldService;
@@ -246,25 +243,27 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/api/v1/{fieldType}/fields")
+    @GetMapping(
+            {
+                    "/api/v1/{fieldType}/fields"
+                    ,"/api/v1/fields"
+            }
+    )
     public ResponseEntity<String> getFieldsList(
-            @PathVariable String fieldType,
+            @PathVariable(required = false) String fieldType,
             @RequestParam(required = false) String nextCursor,
             @RequestParam(required = false) String prevCursor,
             @RequestParam(defaultValue = "false") Boolean includeInactive,
             @RequestParam(defaultValue = "10") int limit
     ) {
         try {
-            // check if field is for precondition or operation depending on call
-            boolean isPreconditionRequest = fieldType.equals("preconditions");
-            boolean isOperationRequest = fieldType.equals("operations");
 
-            if (isOperationRequest) {
+            if (fieldType != null && fieldType.equals("operations")) {
                 return processList(operationPreconditionFieldService.getOperationList(), nextCursor, prevCursor, includeInactive, limit);
-            } else if (isPreconditionRequest) {
+            } else if (fieldType != null && fieldType.equals("preconditions")) {
                 return processList(operationPreconditionFieldService.getPreconditionList(), nextCursor, prevCursor, includeInactive, limit);
             } else {
-                return new ResponseEntity<>(String.format("Endpoint does not handle field type: '%s'", fieldType), HttpStatus.BAD_REQUEST);
+                return processList(operationPreconditionFieldService.getList(), nextCursor, prevCursor, includeInactive, limit);
             }
 
         } catch (JsonProcessingException e) {
@@ -273,82 +272,46 @@ public class ApiController {
         }
     }
 
-    @GetMapping("/api/v1/{fieldType}/fields/{uuid}")
-    public ResponseEntity<OperationPreconditionField> getFieldByUUID(
-            @PathVariable String fieldType,
+    @GetMapping("/api/v1/fields/{uuid}")
+    public ResponseEntity<Object> getFieldByUUID(
             @PathVariable UUID uuid
     ) {
         OperationPreconditionField entity = operationPreconditionFieldService.getObject(uuid);
 
-        // If the field simply doesn't exist return 404
         if (entity == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        // check if field is for precondition or operation depending on call
-        boolean isPreconditionRequest = fieldType.equals("preconditions");
-        boolean isOperationRequest = fieldType.equals("operations");
-
-        if (
-                (
-                        isPreconditionRequest && Boolean.FALSE.equals(entity.getForPrecondition())
-                ) || (
-                        isOperationRequest && Boolean.FALSE.equals(entity.getForOperation())
-                )
-        ) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
-    @PutMapping("/api/v1/{fieldType}/fields/{uuid}")
+    @PutMapping("/api/v1/fields/{uuid}")
     public ResponseEntity<Object> updateField(
-            @PathVariable String fieldType,
             @PathVariable UUID uuid,
             @RequestBody @Valid OperationPreconditionField updatedPreconditionField
     ) {
-        // check if field is for precondition or operation depending on call
-        boolean isPreconditionRequest = fieldType.equals("preconditions");
-        boolean isOperationRequest = fieldType.equals("operations");
-
-        if (!isPreconditionRequest && !isOperationRequest) {
-            return new ResponseEntity<>(String.format("Endpoint does not handle field type: '%s'", fieldType), HttpStatus.BAD_REQUEST);
-        }
-
         updatedPreconditionField.setId(uuid);
-
-        if (
-                (
-                        isPreconditionRequest && Boolean.FALSE.equals(updatedPreconditionField.getForPrecondition())
-                ) || (
-                        isOperationRequest && Boolean.FALSE.equals(updatedPreconditionField.getForOperation())
-                )
-        ) {
-            return new ResponseEntity<>(String.format("For field type '%s' the appropriate 'for' field must be set true", fieldType), HttpStatus.BAD_REQUEST);
-        }
-
         operationPreconditionFieldService.update(updatedPreconditionField);
         return new ResponseEntity<>(updatedPreconditionField, HttpStatus.OK);
     }
 
-    @PostMapping("/api/v1/preconditions/fields")
-    public ResponseEntity<PreconditionField> createPreconditionField(
-            @Valid @RequestBody() PreconditionField preconditionField
+    @PostMapping("/api/v1/fields")
+    public ResponseEntity<OperationPreconditionField> createField(
+            @Valid @RequestBody() OperationPreconditionField operationPreconditionField
     ) {
-        preconditionFieldService.create(preconditionField);
-        return new ResponseEntity<>(preconditionField, HttpStatus.OK);
+        operationPreconditionFieldService.create(operationPreconditionField);
+        return new ResponseEntity<>(operationPreconditionField, HttpStatus.OK);
     }
 
-    @DeleteMapping("/api/v1/preconditions/fields/{uuid}")
-    public ResponseEntity<PreconditionField> deletePreconditionField(
+    @DeleteMapping("/api/v1/fields/{uuid}")
+    public ResponseEntity<OperationPreconditionField> deleteFieldByUUID(
             @PathVariable UUID uuid
     ) {
         if (Boolean.FALSE.equals(allowDelete)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        preconditionFieldService.delete(uuid);
+        operationPreconditionFieldService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
