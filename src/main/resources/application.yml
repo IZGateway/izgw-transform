@@ -8,6 +8,7 @@ transformationservice:
     mappings: testing/configuration/mappings.json
     access-control: testing/configuration/access-control.json
     precondition-fields: testing/configuration/precondition-fields.json
+    operation-precondition-fields: testing/configuration/operation-precondition-fields.json
   access-control-enabled: ${TS_ACCESS_CONTROL_ENABLED:false}
 
 spring:

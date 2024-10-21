@@ -1,0 +1,50 @@
+[ {
+  "id" : "b8f6adcb-ffa4-4793-a157-ffc2db85da7b",
+  "fieldName" : "Sending Application",
+  "dataPath" : "/MSH-3-1",
+  "forPrecondition" : true,
+  "forOperation" : false,
+  "active" : true
+}, {
+  "id" : "fedc7c31-a702-483e-a5c5-380fa0f1de7f",
+  "fieldName" : "Sending Facility",
+  "dataPath" : "/MSH-4-1",
+  "forPrecondition" : true,
+  "forOperation" : false,
+  "active" : true
+}, {
+  "id" : "49df00f0-4078-4edf-94aa-81e78f925f44",
+  "fieldName" : "Receiving Application",
+  "dataPath" : "/MSH-5-1",
+  "forPrecondition" : true,
+  "forOperation" : false,
+  "active" : true
+}, {
+  "id" : "50063223-e996-4124-97df-09156dfcc2f8",
+  "fieldName" : "Receiving Facility",
+  "dataPath" : "/MSH-6-1",
+  "forPrecondition" : true,
+  "forOperation" : false,
+  "active" : true
+}, {
+  "id" : "ae21993f-31fc-424a-bb4f-18dbdb1476d3",
+  "fieldName" : "Message Type",
+  "dataPath" : "/MSH-9-1",
+  "forPrecondition" : true,
+  "forOperation" : false,
+  "active" : true
+}, {
+  "id" : "84f7a5ce-fc59-4c2d-be12-3aa64bbd3b48",
+  "fieldName" : "Trigger Event",
+  "dataPath" : "/MSH-9-2",
+  "forPrecondition" : true,
+  "forOperation" : false,
+  "active" : true
+}, {
+  "id" : "07d52845-6c34-4318-a8c9-2117072ca6e3",
+  "fieldName" : "Facility IDx",
+  "dataPath" : "context.FacilityID",
+  "forPrecondition" : true,
+  "forOperation" : false,
+  "active" : true
+} ]
