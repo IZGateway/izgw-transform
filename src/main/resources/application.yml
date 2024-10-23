@@ -24,6 +24,11 @@ spring:
   application:
     name: transformation
     fix-newlines: ${FIX_NEWLINES:true}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${TS_JWK_SET_URI:https://izgateway1.oktapreview.com/.well-known/openid-configuration}
   servlet:
     multipart:
       enabled: true
@@ -76,7 +81,7 @@ server:
   local-port: 9082
   ssl:
     enabled: true
-    client-auth: need
+    client-auth: want
     enabled-protocols:
       - TLSv1.2
       - TLSv1.3

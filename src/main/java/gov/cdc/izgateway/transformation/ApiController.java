@@ -17,6 +17,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -125,10 +127,10 @@ public class ApiController {
     @RolesAllowed({Roles.ADMIN})
     @GetMapping("/api/v1/organizations")
     public ResponseEntity<String> getOrganizationsList(
-        @RequestParam(required = false) String nextCursor,
-        @RequestParam(required = false) String prevCursor,
-        @RequestParam(defaultValue = "false") Boolean includeInactive,
-        @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam(required = false) String nextCursor,
+            @RequestParam(required = false) String prevCursor,
+            @RequestParam(defaultValue = "false") Boolean includeInactive,
+            @RequestParam(defaultValue = "10") int limit) {
         try {
             return processList(organizationService.getList(), nextCursor, prevCursor, includeInactive, limit);
 

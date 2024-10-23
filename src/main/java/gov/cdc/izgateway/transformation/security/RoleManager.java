@@ -3,6 +3,9 @@ package gov.cdc.izgateway.transformation.security;
 import java.util.Arrays;
 import java.util.List;
 
+import com.nimbusds.jose.JOSEObjectType;
+import com.nimbusds.jose.proc.DefaultJOSEObjectTypeVerifier;
+import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.info.HostInfo;
 import gov.cdc.izgateway.service.IAccessControlService;
@@ -22,6 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -96,6 +102,10 @@ public class RoleManager {
     }
 
     private void addRolesUsingJWT(HttpServletRequest request) {
+        JwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri("https://izgateway1.oktapreview.com/oauth2/v1/keys").jwtProcessorCustomizer(jwtProcessor -> {
+            jwtProcessor.setJWSTypeVerifier(new DefaultJOSEObjectTypeVerifier<>(new JOSEObjectType("application/okta-internal-at+jwt")));
+        }).build();
+
         String authHeader = request.getHeader("Authorization");
 
         if ( authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -104,12 +114,17 @@ public class RoleManager {
         }
 
         try {
-            SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
             String token = authHeader.substring(7);
-            Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
-            log.debug("JWT claims for current request: {}", claims);
-            RequestContext.setUser(new User(claims.getSubject()));
-            addRolesFromClaims(claims);
+
+            log.info("*** TRYING JWT");
+            Jwt jwt = jwtDecoder.decode(token);
+            log.info("*** JWT claims for current request: {}", jwt.getClaims());
+//            SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
+//            String token = authHeader.substring(7);
+//            Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
+//            log.debug("JWT claims for current request: {}", claims);
+//            RequestContext.setUser(new User(claims.getSubject()));
+//            addRolesFromClaims(claims);
 
         } catch (Exception e) {
             log.error("Error parsing JWT token", e);
