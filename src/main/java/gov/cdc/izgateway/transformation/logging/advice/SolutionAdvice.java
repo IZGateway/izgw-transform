@@ -7,6 +7,8 @@ import java.util.UUID;
 
 @Data
 public class SolutionAdvice extends SolutionAdviceDTO {
+    private final ArrayList<PreconditionAdviceDTO> requestPreconditionAdviceList = new ArrayList<>();
+    private final ArrayList<PreconditionAdviceDTO> responsePreconditionAdviceList = new ArrayList<>();
     private final ArrayList<OperationAdviceDTO> requestOperationAdviceList = new ArrayList<>();
     private final ArrayList<OperationAdviceDTO> responseOperationAdviceList = new ArrayList<>();
 
@@ -20,6 +22,22 @@ public class SolutionAdvice extends SolutionAdviceDTO {
 
     public void addResponseOperationAdvice(OperationAdviceDTO operationAdvice) {
         responseOperationAdviceList.add(operationAdvice);
+    }
+
+    public void addRequestPreconditionAdvice(PreconditionAdviceDTO advice) {
+        PreconditionAdvice preconditionAdvice = new PreconditionAdvice(advice.getId(), advice.getClassName(), advice.getName());
+        int adviceIndex = requestPreconditionAdviceList.indexOf(preconditionAdvice);
+        if ( adviceIndex < 0 ) {
+            requestPreconditionAdviceList.add(preconditionAdvice);
+        }
+    }
+
+    public void addResponsePreconditionAdvice(PreconditionAdviceDTO advice) {
+        PreconditionAdvice preconditionAdvice = new PreconditionAdvice(advice.getId(), advice.getClassName(), advice.getName());
+        int adviceIndex = responsePreconditionAdviceList.indexOf(preconditionAdvice);
+        if ( adviceIndex < 0 ) {
+            responsePreconditionAdviceList.add(preconditionAdvice);
+        }
     }
 
     @Override

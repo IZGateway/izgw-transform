@@ -12,6 +12,4 @@ public class AdviceUtil {
         return className.contains("Solution") || className.endsWith("Pipe");
     }
 
-    // TODO - add Precondition
-
 }

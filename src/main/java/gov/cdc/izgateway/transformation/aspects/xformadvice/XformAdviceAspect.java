@@ -6,6 +6,7 @@ import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.logging.advice.*;
 import gov.cdc.izgateway.transformation.operations.Operation;
+import gov.cdc.izgateway.transformation.preconditions.Precondition;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -50,6 +51,8 @@ public class XformAdviceAspect {
             xformAdvice = new SolutionAdviceDTO();
         } else if (joinPoint.getTarget() instanceof Operation) {
             xformAdvice = new OperationAdviceDTO();
+        } else if (joinPoint.getTarget() instanceof Precondition) {
+            xformAdvice = new PreconditionAdviceDTO();
         } else {
             return null;
         }

@@ -40,6 +40,8 @@ public class XformTransactionData extends TransactionData {
             addAdvice(sAdvice);
         else if ( advice instanceof OperationAdviceDTO oAdvice)
             addAdvice(oAdvice);
+        else if ( advice instanceof PreconditionAdviceDTO preAdvice )
+            addAdvice(preAdvice);
     }
 
     public void addAdvice(PipelineAdviceDTO advice) {
@@ -84,6 +86,28 @@ public class XformTransactionData extends TransactionData {
             currentSolutionAdvice.addRequestOperationAdvice(advice);
         if (advice.getTransformedResponse() != null)
             currentSolutionAdvice.addResponseOperationAdvice(advice);
+
+    }
+
+    public void addAdvice(PreconditionAdviceDTO advice) {
+        if (currentSolutionAdvice == null) {
+            // There isn't a solution seen yet... so we are at the pipeline level
+            // Add the Precondition if it isn't here
+            pipelineAdvice.addPreconditionAdvice(advice);
+        } else {
+            // There is a current solution...
+            // Check to make sure this wasn't saved on the pipeline first
+            if (!pipelineAdvice.preconditionExists(advice)) {
+
+                if (advice.getTransformedRequest() != null) {
+                    currentSolutionAdvice.addRequestPreconditionAdvice(advice);
+                }
+
+                if (advice.getTransformedResponse() != null) {
+                    currentSolutionAdvice.addResponsePreconditionAdvice(advice);
+                }
+            }
+        }
 
     }
 
