@@ -119,12 +119,6 @@ public class RoleManager {
             log.info("*** TRYING JWT");
             Jwt jwt = jwtDecoder.decode(token);
             log.info("*** JWT claims for current request: {}", jwt.getClaims());
-//            SecretKey secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-//            String token = authHeader.substring(7);
-//            Claims claims = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();
-//            log.debug("JWT claims for current request: {}", claims);
-//            RequestContext.setUser(new User(claims.getSubject()));
-//            addRolesFromClaims(claims);
 
         } catch (Exception e) {
             log.error("Error parsing JWT token", e);
