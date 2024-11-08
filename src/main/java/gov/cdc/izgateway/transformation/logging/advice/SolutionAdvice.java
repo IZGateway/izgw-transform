@@ -25,18 +25,16 @@ public class SolutionAdvice extends SolutionAdviceDTO {
     }
 
     public void addRequestPreconditionAdvice(PreconditionAdviceDTO advice) {
-        PreconditionAdvice preconditionAdvice = new PreconditionAdvice(advice.getId(), advice.getClassName(), advice.getName());
-        int adviceIndex = requestPreconditionAdviceList.indexOf(preconditionAdvice);
+        int adviceIndex = requestPreconditionAdviceList.indexOf(advice);
         if ( adviceIndex < 0 ) {
-            requestPreconditionAdviceList.add(preconditionAdvice);
+            requestPreconditionAdviceList.add(advice);
         }
     }
 
     public void addResponsePreconditionAdvice(PreconditionAdviceDTO advice) {
-        PreconditionAdvice preconditionAdvice = new PreconditionAdvice(advice.getId(), advice.getClassName(), advice.getName());
-        int adviceIndex = responsePreconditionAdviceList.indexOf(preconditionAdvice);
+        int adviceIndex = responsePreconditionAdviceList.indexOf(advice);
         if ( adviceIndex < 0 ) {
-            responsePreconditionAdviceList.add(preconditionAdvice);
+            responsePreconditionAdviceList.add(advice);
         }
     }
 

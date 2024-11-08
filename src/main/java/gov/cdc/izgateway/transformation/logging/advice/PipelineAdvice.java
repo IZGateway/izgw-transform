@@ -8,7 +8,7 @@ import java.util.UUID;
 @Data
 public class PipelineAdvice extends PipelineAdviceDTO {
     private ArrayList<SolutionAdvice> solutionAdviceList = new ArrayList<>();
-    private ArrayList<PreconditionAdvice> preconditionAdviceList = new ArrayList<>();
+    private ArrayList<PreconditionAdviceDTO> preconditionAdviceList = new ArrayList<>();
     private UUID id;
     private boolean requestTransformed = false;
     private boolean responseTransformed = false;
@@ -36,15 +36,14 @@ public class PipelineAdvice extends PipelineAdviceDTO {
     }
 
     public void addPreconditionAdvice(PreconditionAdviceDTO advice) {
-        PreconditionAdvice preconditionAdvice = new PreconditionAdvice(advice.getId(), advice.getClassName(), advice.getName());
-        int adviceIndex = preconditionAdviceList.indexOf(preconditionAdvice);
+        int adviceIndex = preconditionAdviceList.indexOf(advice);
         if ( adviceIndex < 0 ) {
-            preconditionAdviceList.add(preconditionAdvice);
+            preconditionAdviceList.add(advice);
         }
     }
 
     public boolean preconditionExists(PreconditionAdviceDTO precondition) {
-        for (PreconditionAdvice p : preconditionAdviceList) {
+        for (PreconditionAdviceDTO p : preconditionAdviceList) {
             if (p.getId().equals(precondition.getId())) {
                 return true;
             }
