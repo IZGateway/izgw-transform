@@ -3,12 +3,9 @@ package gov.cdc.izgateway.transformation.preconditions;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
-import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
-import gov.cdc.izgateway.transformation.logging.advice.Advisable;
-import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 
-public class Hl7v2Equals extends Equals implements Precondition, Advisable, Transformable {
+public class Hl7v2Equals extends Equals implements Precondition {
 
     public Hl7v2Equals() {}
 
@@ -21,7 +18,6 @@ public class Hl7v2Equals extends Equals implements Precondition, Advisable, Tran
     }
 
     @Override
-    @CaptureXformAdvice
     public boolean evaluate(ServiceContext context) {
 
         Message message = context.getCurrentMessage();
@@ -48,18 +44,5 @@ public class Hl7v2Equals extends Equals implements Precondition, Advisable, Tran
 
         return (sourceValue.equals(this.getComparisonValue()));
 
-    }
-
-    @Override
-    public String getName() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
-    public boolean hasTransformed() {
-        // TODO - trying to see if this is what triggers getTransformedRequest and getTransformedResponse
-        // TODO - run by Paul.  Should this only return true if the Precondition evaluations to true?  Not
-        // sure I'm using this flag correctly.
-        return true;
     }
 }

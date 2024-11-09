@@ -43,12 +43,6 @@ public class PipelineAdvice extends PipelineAdviceDTO {
     }
 
     public boolean preconditionExists(PreconditionAdviceDTO precondition) {
-        for (PreconditionAdviceDTO p : preconditionAdviceList) {
-            if (p.getId().equals(precondition.getId())) {
-                return true;
-            }
-        }
-
-        return false;
+        return (preconditionAdviceList.contains(precondition));
     }
 }

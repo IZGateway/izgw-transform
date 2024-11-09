@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
+import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class NotEquals extends Equals implements Precondition {
     }
 
     @Override
+    @CaptureXformAdvice
     public boolean evaluate(ServiceContext context) {
         if (log.isTraceEnabled()) {
             log.trace("Precondition: {} / dataPath: '{}' / comparisonValue: '{}'",
