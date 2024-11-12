@@ -67,9 +67,6 @@ public class Equals implements Precondition, Advisable, Transformable {
 
     @Override
     public boolean hasTransformed() {
-        // TODO - trying to see if this is what triggers getTransformedRequest and getTransformedResponse
-        // TODO - run by Paul.  Should this only return true if the Precondition evaluations to true?  Not
-        // sure I'm using this flag correctly.
         return true;
     }
 }
