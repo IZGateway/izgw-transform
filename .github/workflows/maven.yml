@@ -180,7 +180,16 @@ jobs:
       - name: Tag, push and deploy image to Github Repository
         if: github.ref == 'refs/heads/main'
         run: |
-          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
+            docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
           docker image push --all-tags ghcr.io/izgateway/izgw-transform
+
+      - name: Configure AWS credentials for APHL
+        if: ${{ (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/Release') || github.ref == 'refs/heads/IGDD-1788_APHL_Image_Push')) }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AUSTIN_APHL_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AUSTIN_APHL_AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AUSTIN_APHL_AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
