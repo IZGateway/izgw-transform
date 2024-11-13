@@ -100,7 +100,7 @@ jobs:
           echo VERSION="${VERSION}" >> $GITHUB_ENV
 
       - name: Set version for release branch
-        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')) || (github.event_name == 'pull_request' && startsWith(github.event.pull_request.base.ref, 'Release') ) }}
+        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/IGDD-1788_APHL_Image_Push')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')) || (github.event_name == 'pull_request' && startsWith(github.event.pull_request.base.ref, 'Release') ) }}
         run: |
           echo "Setting the release candidate version"
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-rc$(date +%Y%m%d%H%M)
