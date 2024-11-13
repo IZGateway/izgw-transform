@@ -12,6 +12,9 @@ on:
       - develop
       - Release*
       - main
+      - IGDD-1788_APHL_Image_Push
+
+  # TODO remove IGDD-1788 from above list....
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
@@ -180,7 +183,7 @@ jobs:
       - name: Tag, push and deploy image to Github Repository
         if: github.ref == 'refs/heads/main'
         run: |
-            docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
           docker image push --all-tags ghcr.io/izgateway/izgw-transform
