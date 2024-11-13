@@ -197,3 +197,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AUSTIN_APHL_AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AUSTIN_APHL_AWS_SESSION_TOKEN }}
           aws-region: us-east-1
+
+      - name: Login to APHL Amazon ECR
+        if: ${{ (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/Release') || github.ref == 'refs/heads/IGDD-1788_APHL_Image_Push')) }}
+        id: login-aphl-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Tag and push image to APHL Amazon ECR
+        if: ${{ (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/Release') || github.ref == 'refs/heads/IGDD-1788_APHL_Image_Push')) }}
+        env:
+          ECR_REGISTRY: ${{ secrets.APHL_ECR_REGISTRY }}
+          ECR_REPOSITORY: ${{ secrets.APHL_ECR_REPOSITORY }}
+        run: |
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_BRANCH_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
