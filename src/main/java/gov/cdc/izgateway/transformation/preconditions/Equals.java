@@ -1,7 +1,10 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
+import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.logging.advice.Advisable;
+import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +15,7 @@ import gov.cdc.izgateway.transformation.constants.XformConstants;
 
 @Getter
 @Setter
-public class Equals implements Precondition {
+public class Equals implements Precondition, Advisable, Transformable {
     private UUID id;
     private String dataPath;
     private String comparisonValue;
@@ -35,6 +38,7 @@ public class Equals implements Precondition {
     }
 
     @Override
+    @CaptureXformAdvice
     public boolean evaluate(ServiceContext context) {
 
         if (log.isTraceEnabled()) {
@@ -54,5 +58,15 @@ public class Equals implements Precondition {
         }
 
         return false;
+    }
+
+    @Override
+    public String getName() {
+        return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean hasTransformed() {
+        return true;
     }
 }

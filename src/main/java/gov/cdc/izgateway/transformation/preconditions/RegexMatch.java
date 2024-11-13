@@ -1,7 +1,10 @@
 package gov.cdc.izgateway.transformation.preconditions;
 
+import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.logging.advice.Advisable;
+import gov.cdc.izgateway.transformation.logging.advice.Transformable;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +15,7 @@ import java.util.regex.Pattern;
 
 @Getter
 @Setter
-public class RegexMatch implements Precondition {
+public class RegexMatch implements Precondition, Advisable, Transformable {
     private UUID id;
     private String dataPath;
     private String regex;
@@ -35,6 +38,7 @@ public class RegexMatch implements Precondition {
     }
 
     @Override
+    @CaptureXformAdvice
     public boolean evaluate(ServiceContext context) {
 
         if (log.isTraceEnabled()) {
@@ -60,5 +64,15 @@ public class RegexMatch implements Precondition {
     protected Matcher getMatcher(String sourceValue) {
         Pattern pattern = Pattern.compile(this.getRegex());
         return pattern.matcher(sourceValue);
+    }
+
+    @Override
+    public String getName() {
+        return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean hasTransformed() {
+        return true;
     }
 }
