@@ -13,8 +13,6 @@ on:
       - Release*
       - main
 
-  # TODO - What about IZGW_ALL_REPO_ACCESS_TOKEN (if my change worked)
-
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
 
