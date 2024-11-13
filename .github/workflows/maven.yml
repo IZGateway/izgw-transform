@@ -186,7 +186,7 @@ jobs:
           docker image push --all-tags ghcr.io/izgateway/izgw-transform
 
       - name: Configure AWS credentials for APHL
-        if: ${{ (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/Release') || github.ref == 'refs/heads/IGDD-1788_APHL_Image_Push')) }}
+        if: (github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/Release') || github.ref == 'refs/heads/IGDD-1788_APHL_Image_Push'))
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AUSTIN_APHL_AWS_ACCESS_KEY_ID }}
