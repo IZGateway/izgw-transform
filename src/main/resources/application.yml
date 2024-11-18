@@ -1,6 +1,11 @@
 transformationservice:
   allow-delete-via-api: false
-  destination: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
+  destination:
+    hub: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
+    iis:
+      uri: ${TS_IIS_DESTINATION:https://localhost/dev/IISService}
+      id: ${TS_IIS_DESTINATION_ID:iis}
+      type: 5
   configurations:
     organizations: testing/configuration/organizations.json
     pipelines: testing/configuration/pipelines.json
@@ -158,6 +163,10 @@ logging:
               ClientSecurityInterceptor: INFO
             server:
               ServerSecurityInterceptor: INFO
+    javax:
+      net:
+        ssl:
+          DEBUG
     org:
       springframework:
         web: INFO
@@ -167,3 +176,7 @@ logging:
             net:
               NioChannel:
                 handshake: DEBUG
+    sun:
+      security:
+        ssl:
+          DEBUG

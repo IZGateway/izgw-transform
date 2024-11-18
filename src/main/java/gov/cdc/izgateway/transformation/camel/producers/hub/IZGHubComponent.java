@@ -25,7 +25,7 @@ public class IZGHubComponent extends DefaultComponent {
     // The IZ Gateway Hub Destination Type will always be 0.
     private static final int HUB_DESTINATION_TYPE = 0;
 
-    @Value("${transformationservice.destination}")
+    @Value("${transformationservice.destination.hub:}")
     private String destinationUri;
 
     private final HubMessageSender messageSender;

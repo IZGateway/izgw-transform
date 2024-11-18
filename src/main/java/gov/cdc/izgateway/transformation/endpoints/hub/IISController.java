@@ -13,9 +13,9 @@ import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
 import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
-import gov.cdc.izgateway.transformation.logging.advice.XformAdviceCollector;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
 import gov.cdc.izgateway.transformation.enums.DataType;
+import gov.cdc.izgateway.transformation.logging.advice.XformAdviceCollector;
 import gov.cdc.izgateway.transformation.model.Organization;
 import gov.cdc.izgateway.transformation.services.OrganizationService;
 import gov.cdc.izgateway.transformation.services.XformAccessControlService;
@@ -31,11 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,16 +40,16 @@ import java.util.UUID;
 
 @RestController
 @RolesAllowed({Roles.SOAP, Roles.ADMIN})
-@RequestMapping("/IISHubService")
+@RequestMapping("/IISService")
 @Lazy(false)
 @Slf4j
-public class HubController extends SoapControllerBase {
+public class IISController extends SoapControllerBase {
     private final ProducerTemplate producerTemplate;
     private final OrganizationService organizationService;
     private final XformAccessControlService accessControlService;
 
     @Autowired
-    public HubController(
+    public IISController(
             IMessageHeaderService mshService,
             AccessControlRegistry registry,
             ProducerTemplate producerTemplate,
@@ -61,7 +57,7 @@ public class HubController extends SoapControllerBase {
             XformAccessControlService accessControlService
     ) {
         // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
-        super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));
+        super(mshService, SoapMessage.IIS2014_NS, "cdc-iis.wsdl", Arrays.asList(SoapMessage.IIS2014_NS));
         this.producerTemplate = producerTemplate;
         this.organizationService = organizationService;
         this.accessControlService = accessControlService;
@@ -72,11 +68,12 @@ public class HubController extends SoapControllerBase {
 
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+        //RequestContext.getDestinationInfo().setId(destinationId);
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
         HubWsdlTransformationContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
 
         try {
-            producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
+            producerTemplate.sendBody("direct:iisTransformerPipeline", context);
 
             if (XformAdviceCollector.getTransactionData().getPipelineAdvice() != null) {
 	            if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed())
@@ -124,7 +121,7 @@ public class HubController extends SoapControllerBase {
             }
             return organizationOverride;
         }
-        
+
         return organization;
     }
 
