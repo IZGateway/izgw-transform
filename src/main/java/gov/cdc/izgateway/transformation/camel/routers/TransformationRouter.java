@@ -45,11 +45,14 @@ public class TransformationRouter extends RouteBuilder {
      * +----------------------------------+------------+--------------------+--+--+
      * | direct:izghubTransformerPipeline | Consumer   | IZGHub-hosted only |  |  |
      * +----------------------------------+------------+--------------------+--+--+
-     * | direct:iisTransformerPipeline    | Consumer   | IIS-hosted only    |  |  |
+     * | direct:iisTransformerPipeline    | Consumer   | IZGHub-hosted and  |  |  |
+     * |                                  |            | IIS-hosted         |  |  |
      * +----------------------------------+------------+--------------------+--+--+
-     * | izghub:IISHubService             | Producer   | Both               |  |  |
+     * | izghub:IISHubService             | Producer   | IZGHub-hosted and  |  |  |
+     * |                                  |            | IIS-hosted         |  |  |
      * +----------------------------------+------------+--------------------+--+--+
-     * | iis:IISService                   | Producer   | IIS-hosted only    |  |  |
+     * | iis:IISService                   | Producer   | IZGHub-hosted and  |  |  |
+     * |                                  |            | IIS-hosted         |  |  |
      * +----------------------------------+------------+--------------------+--+--+
      * |                                  |            |                    |  |  |
      * +----------------------------------+------------+--------------------+--+--+
