@@ -34,7 +34,7 @@ public class IISProducer extends ProducerBase {
 
         IZGTransformationContext context = exchange.getIn().getBody(IZGTransformationContext.class);
 
-        IDestination destination = createDestination();
+        IDestination destination = createDestination(getIISComponent());
         destination.setUsername(context.getSubmitSingleMessageRequest().getUsername());
         destination.setPassword(context.getSubmitSingleMessageRequest().getPassword());
         setDestinationInfoFromDestination(RequestContext.getDestinationInfo(), destination);
@@ -52,20 +52,6 @@ public class IISProducer extends ProducerBase {
         context.getServiceContext().setResponseMessage(Hl7Utils.parseHl7v2Message(response.getHl7Message()));
         context.setSubmitSingleMessageResponse(response);
 
-    }
-
-    private IDestination createDestination() throws UnknownDestinationFault {
-        IDestinationId destinationIdObject = new DestinationId();
-        destinationIdObject.setDestId(getIISComponent().getDestinationId());
-        destinationIdObject.setDestType(getIISComponent().getDestinationType());
-
-        Destination destination = new Destination();
-        destination.setDestUri(getIISComponent().getDestinationUri());
-        destination.setDestId(getIISComponent().getDestinationId());
-        destination.setDestTypeId(SystemUtils.getDestType());
-        destination.setId(destinationIdObject);
-
-        return destination;
     }
 
     private IISComponent getIISComponent() {

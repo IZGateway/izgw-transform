@@ -38,4 +38,17 @@ public abstract class ProducerBase extends DefaultProducer {
         info.setId(route.getDestId());
     }
 
+    protected IDestination createDestination(IZGComponent component) throws UnknownDestinationFault {
+        IDestinationId destinationIdObject = new DestinationId();
+        destinationIdObject.setDestId(component.getDestinationId());
+        destinationIdObject.setDestType(component.getDestinationType());
+
+        Destination destination = new Destination();
+        destination.setDestUri(component.getDestinationUri());
+        destination.setDestId(component.getDestinationId());
+        destination.setDestTypeId(SystemUtils.getDestType());
+        destination.setId(destinationIdObject);
+
+        return destination;
+    }
 }

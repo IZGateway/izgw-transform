@@ -3,6 +3,7 @@ package gov.cdc.izgateway.transformation.camel.producers.iis;
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
+import gov.cdc.izgateway.transformation.camel.producers.IZGComponent;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubMessageSender;
 import gov.cdc.izgateway.transformation.model.Destination;
 import gov.cdc.izgateway.transformation.model.DestinationId;
@@ -18,7 +19,7 @@ import java.util.Map;
 
 @Component("iis")
 @Getter
-public class IISComponent extends DefaultComponent {
+public class IISComponent extends DefaultComponent implements IZGComponent {
 
     @Value("${transformationservice.destination.iis.uri}")
     private String destinationUri;
