@@ -1,7 +1,10 @@
 transformationservice:
   allow-delete-via-api: false
   destination:
-    hub: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
+    hub:
+      uri: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
+      id: ${TS_HUB_DESTINATION_ID:hub}
+      type: 5
     iis:
       uri: ${TS_IIS_DESTINATION:https://localhost:8000/soap/qbp}
       id: ${TS_IIS_DESTINATION_ID:iis}

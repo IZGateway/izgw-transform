@@ -7,6 +7,7 @@ import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
+import gov.cdc.izgateway.transformation.camel.producers.ProducerBase;
 import gov.cdc.izgateway.transformation.context.IZGTransformationContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubControllerFault;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubMessageSender;
@@ -21,7 +22,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.support.DefaultProducer;
 
 @Slf4j
-public class IISProducer extends DefaultProducer {
+public class IISProducer extends ProducerBase {
 
     public IISProducer(Endpoint endpoint) {
         super(endpoint);
@@ -69,16 +70,6 @@ public class IISProducer extends DefaultProducer {
 
     private IISComponent getIISComponent() {
         return (IISComponent) getEndpoint().getComponent();
-    }
-
-    public void setDestinationInfoFromDestination(DestinationInfo info, IDestination route) {
-        if (route == null) {
-            info.setUrl(null);
-            info.setId(null);
-            return;
-        }
-        info.setUrl(route.getDestUri());
-        info.setId(route.getDestId());
     }
 
 }
