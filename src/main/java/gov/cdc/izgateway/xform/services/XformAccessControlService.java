@@ -1,7 +1,7 @@
 package gov.cdc.izgateway.xform.services;
 
 import gov.cdc.izgateway.xform.model.AccessControl;
-import gov.cdc.izgateway.xform.repository.TxFormRepository;
+import gov.cdc.izgateway.xform.repository.XformRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ public class XformAccessControlService extends GenericService<AccessControl> {
     public static final String ADMIN_ROLE = "admin";
 
     @Autowired
-    public XformAccessControlService(TxFormRepository<AccessControl> repo) {
+    public XformAccessControlService(XformRepository<AccessControl> repo) {
         super(repo);
     }
 

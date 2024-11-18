@@ -1,7 +1,7 @@
 package gov.cdc.izgateway.xform.services;
 
 import gov.cdc.izgateway.xform.model.OperationPreconditionField;
-import gov.cdc.izgateway.xform.repository.TxFormRepository;
+import gov.cdc.izgateway.xform.repository.XformRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public class OperationPreconditionFieldService extends GenericService<OperationPreconditionField> {
-    protected OperationPreconditionFieldService(TxFormRepository<OperationPreconditionField> repo) {
+    protected OperationPreconditionFieldService(XformRepository<OperationPreconditionField> repo) {
         super(repo);
     }
 

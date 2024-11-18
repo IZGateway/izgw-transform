@@ -12,7 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public abstract class GenericFileRepository<T extends BaseModel> implements TxFormRepository<T> {
+public abstract class GenericFileRepository<T extends BaseModel> implements XformRepository<T> {
 
 
     protected LinkedHashSet<T> entities;

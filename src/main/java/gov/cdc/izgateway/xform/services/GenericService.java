@@ -1,7 +1,7 @@
 package gov.cdc.izgateway.xform.services;
 
 import gov.cdc.izgateway.xform.model.BaseModel;
-import gov.cdc.izgateway.xform.repository.TxFormRepository;
+import gov.cdc.izgateway.xform.repository.XformRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -9,9 +9,9 @@ import java.util.*;
 
 public abstract class GenericService<T extends BaseModel> implements TxFormService<T> {
 
-    protected final TxFormRepository<T> repo;
+    protected final XformRepository<T> repo;
 
-    protected GenericService(TxFormRepository<T> repo){
+    protected GenericService(XformRepository<T> repo){
         this.repo = repo;
     }
 
