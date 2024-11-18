@@ -13,13 +13,13 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class TxServiceConfig {
+public class XformConfig {
     private final OrganizationService organizationService;
     private final PipelineService pipelineService;
     private final SolutionService solutionService;
 
     @Autowired
-    public TxServiceConfig(OrganizationService organizationService, PipelineService pipelineService, SolutionService solutionService) {
+    public XformConfig(OrganizationService organizationService, PipelineService pipelineService, SolutionService solutionService) {
         this.pipelineService = pipelineService;
         this.solutionService = solutionService;
         this.organizationService = organizationService;

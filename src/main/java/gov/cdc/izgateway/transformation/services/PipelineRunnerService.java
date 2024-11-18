@@ -1,7 +1,7 @@
 package gov.cdc.izgateway.transformation.services;
 
 import gov.cdc.izgateway.transformation.annotations.CaptureXformAdvice;
-import gov.cdc.izgateway.transformation.configuration.TxServiceConfig;
+import gov.cdc.izgateway.transformation.configuration.XformConfig;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.logging.advice.Advisable;
 import gov.cdc.izgateway.transformation.logging.advice.Transformable;
@@ -20,19 +20,19 @@ import java.util.UUID;
 @Slf4j
 @Getter
 public class PipelineRunnerService implements Advisable, Transformable {
-    private final TxServiceConfig txServiceConfig;
+    private final XformConfig xformConfig;
     private ServiceContext context;
     private Pipeline pipeline;
     private UUID id;
 
     @Autowired
-    public PipelineRunnerService(TxServiceConfig txServiceConfig) {
-        this.txServiceConfig = txServiceConfig;
+    public PipelineRunnerService(XformConfig xformConfig) {
+        this.xformConfig = xformConfig;
     }
 
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws Exception {
-        pipeline = txServiceConfig.findPipelineByContext(context);
+        pipeline = xformConfig.findPipelineByContext(context);
         this.context = context;
 
         if (pipeline != null) {
@@ -48,7 +48,7 @@ public class PipelineRunnerService implements Advisable, Transformable {
 
             if (Boolean.TRUE.equals(preconditionsPassed(pipe))) {
                 // Create & Execute Solution
-                gov.cdc.izgateway.transformation.model.Solution solutionModel = txServiceConfig.getSolution(pipe.getSolutionId());
+                gov.cdc.izgateway.transformation.model.Solution solutionModel = xformConfig.getSolution(pipe.getSolutionId());
                 log.trace("Solution Name: {}", solutionModel.getSolutionName());
                 Solution solution = new Solution(solutionModel);
                 solution.execute(context);
