@@ -51,6 +51,6 @@ public class XformLoggingValve extends LoggingValveBase {
 
     @Override
     protected boolean isLogged(String requestURI) {
-        return requestURI.startsWith("/IISHubService") || requestURI.startsWith("/dev/");
+        return requestURI.startsWith("/IISHubService") || requestURI.startsWith("/dev/") || requestURI.startsWith("/IISService");
     }
 }

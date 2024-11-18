@@ -38,6 +38,26 @@ public class TransformationRouter extends RouteBuilder {
               })
               .handled(false);
 
+
+    /*
+     * +----------------------------------+------------+--------------------+--+--+
+     * | Endpoint URI                     | Camel Role | Hosting model      |  |  |
+     * +----------------------------------+------------+--------------------+--+--+
+     * | direct:izghubTransformerPipeline | Consumer   | IZGHub-hosted only |  |  |
+     * +----------------------------------+------------+--------------------+--+--+
+     * | direct:iisTransformerPipeline    | Consumer   | IZGHub-hosted and  |  |  |
+     * |                                  |            | IIS-hosted         |  |  |
+     * +----------------------------------+------------+--------------------+--+--+
+     * | izghub:IISHubService             | Producer   | IZGHub-hosted and  |  |  |
+     * |                                  |            | IIS-hosted         |  |  |
+     * +----------------------------------+------------+--------------------+--+--+
+     * | iis:IISService                   | Producer   | IZGHub-hosted and  |  |  |
+     * |                                  |            | IIS-hosted         |  |  |
+     * +----------------------------------+------------+--------------------+--+--+
+     * |                                  |            |                    |  |  |
+     * +----------------------------------+------------+--------------------+--+--+
+     */
+
     /*
      * This route will take the incoming message (the IZGHub wsdl
      * endpoint used for the transformation service)  and transform it
@@ -49,6 +69,12 @@ public class TransformationRouter extends RouteBuilder {
     from("direct:izghubTransformerPipeline")
         .bean(dataTransformerService)
         .to("izghub:IISHubService")
+        .bean(dataTransformerService);
+
+    // KY Use case
+    from("direct:iisTransformerPipeline")
+        .bean(dataTransformerService)
+        .to("iis:IISService")
         .bean(dataTransformerService);
 
 //    from("file:/Users/cahilp/temp/hl7?noop=true")
