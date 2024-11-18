@@ -11,7 +11,7 @@ import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.message.HasCredentials;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
-import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
+import gov.cdc.izgateway.transformation.context.IZGTransformationContext;
 import gov.cdc.izgateway.transformation.context.ServiceContext;
 import gov.cdc.izgateway.transformation.logging.advice.XformAdviceCollector;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
@@ -73,7 +73,7 @@ public class HubController extends SoapControllerBase {
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
-        HubWsdlTransformationContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
+        IZGTransformationContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
 
         try {
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
@@ -128,11 +128,11 @@ public class HubController extends SoapControllerBase {
         return organization;
     }
 
-    private HubWsdlTransformationContext createHubWsdlTransformationContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+    private IZGTransformationContext createHubWsdlTransformationContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage);
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
-        return new HubWsdlTransformationContext(serviceContext, submitSingleMessage);
+        return new IZGTransformationContext(serviceContext, submitSingleMessage);
     }
 
     private ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {

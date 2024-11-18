@@ -1,6 +1,6 @@
 package gov.cdc.izgateway.transformation.services;
 
-import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
+import gov.cdc.izgateway.transformation.context.IZGTransformationContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ public class DataTransformerService {
         this.pipelineRunnerService = pipelineRunnerService;
     }
 
-    public HubWsdlTransformationContext transform(HubWsdlTransformationContext context) throws Exception {
+    public IZGTransformationContext transform(IZGTransformationContext context) throws Exception {
         pipelineRunnerService.execute(context.getServiceContext());
         return context;
     }

@@ -7,25 +7,25 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Context object required for a pipeline that uses the Hub outbound endpoint.
+ * Context object required for a pipeline that uses the Hub or IIS outbound endpoints.
  * 
  * @author Audacious Inquiry
  */
 @Getter
 @Setter
-public class HubWsdlTransformationContext {
+public class IZGTransformationContext {
     private ServiceContext serviceContext;
     private SubmitSingleMessageRequest submitSingleMessageRequest;
     private SubmitSingleMessageResponse submitSingleMessageResponse;
     private FaultMessage faultMessage;
     
-    public HubWsdlTransformationContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest) {
+    public IZGTransformationContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest) {
         this.serviceContext = serviceContext;
         this.submitSingleMessageRequest = submitSingleMessageRequest;
         this.submitSingleMessageResponse = null;
     }
 
-    public HubWsdlTransformationContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest, SubmitSingleMessageResponse submitSingleMessageResponse) {
+    public IZGTransformationContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest, SubmitSingleMessageResponse submitSingleMessageResponse) {
         this.serviceContext = serviceContext;
         this.submitSingleMessageRequest = submitSingleMessageRequest;
         this.submitSingleMessageResponse = submitSingleMessageResponse;

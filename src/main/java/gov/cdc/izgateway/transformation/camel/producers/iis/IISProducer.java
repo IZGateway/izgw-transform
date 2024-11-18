@@ -5,7 +5,7 @@ import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
-import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
+import gov.cdc.izgateway.transformation.context.IZGTransformationContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubControllerFault;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubMessageSender;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 import org.apache.camel.support.DefaultProducer;
-import org.springframework.beans.factory.annotation.Value;
 
 @Slf4j
 public class IISProducer extends DefaultProducer {
@@ -30,7 +29,7 @@ public class IISProducer extends DefaultProducer {
     public void process(Exchange exchange) throws Exception {
         HubMessageSender messageSender = getIISComponent().getMessageSender();
 
-        HubWsdlTransformationContext context = exchange.getIn().getBody(HubWsdlTransformationContext.class);
+        IZGTransformationContext context = exchange.getIn().getBody(IZGTransformationContext.class);
 
         IDestination destination = createDestination();
         destination.setUsername(context.getSubmitSingleMessageRequest().getUsername());

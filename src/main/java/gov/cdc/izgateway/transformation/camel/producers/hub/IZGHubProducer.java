@@ -1,9 +1,8 @@
 package gov.cdc.izgateway.transformation.camel.producers.hub;
 
 import ca.uhn.hl7v2.HL7Exception;
-import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
-import gov.cdc.izgateway.transformation.context.HubWsdlTransformationContext;
+import gov.cdc.izgateway.transformation.context.IZGTransformationContext;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubControllerFault;
 import gov.cdc.izgateway.transformation.endpoints.hub.HubMessageSender;
 import gov.cdc.izgateway.transformation.enums.DataFlowDirection;
@@ -25,7 +24,7 @@ public class IZGHubProducer extends DefaultProducer {
         IZGHubComponent hubComponent = (IZGHubComponent) getEndpoint().getComponent();
         HubMessageSender messageSender = hubComponent.getMessageSender();
 
-        HubWsdlTransformationContext context = exchange.getIn().getBody(HubWsdlTransformationContext.class);
+        IZGTransformationContext context = exchange.getIn().getBody(IZGTransformationContext.class);
         try {
             context.getSubmitSingleMessageRequest().setHl7Message(context.getServiceContext().getRequestMessage().encode());
         }
