@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Log
 @RestController
-public class TSApplicationController {
+public class XformApplicationController {
 
     @GetMapping("/health")
     public gov.cdc.izgateway.logging.event.Health getHealth() {
