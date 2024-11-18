@@ -7,7 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-public abstract class GenericService<T extends BaseModel> implements TxFormService<T> {
+public abstract class GenericService<T extends BaseModel> implements XformService<T> {
 
     protected final XformRepository<T> repo;
 

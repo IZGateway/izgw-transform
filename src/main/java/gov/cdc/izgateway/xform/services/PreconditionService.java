@@ -13,7 +13,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 
 @Service
-public class PreconditionService implements TxFormService<PreconditionInfo> {
+public class PreconditionService implements XformService<PreconditionInfo> {
     @Override
     public PreconditionInfo getObject(UUID id) {
         return null;

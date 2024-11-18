@@ -13,7 +13,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 
 @Service
-public class OperationService implements TxFormService<OperationInfo> {
+public class OperationService implements XformService<OperationInfo> {
     @Override
     public OperationInfo getObject(UUID id) {
         return null;
