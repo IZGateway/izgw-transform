@@ -1,6 +1,8 @@
 package gov.cdc.izgateway.transformation.camel.producers.iis;
 
 import ca.uhn.hl7v2.HL7Exception;
+import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.logging.info.DestinationInfo;
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
@@ -34,6 +36,7 @@ public class IISProducer extends DefaultProducer {
         IDestination destination = createDestination();
         destination.setUsername(context.getSubmitSingleMessageRequest().getUsername());
         destination.setPassword(context.getSubmitSingleMessageRequest().getPassword());
+        setDestinationInfoFromDestination(RequestContext.getDestinationInfo(), destination);
 
         try {
             context.getSubmitSingleMessageRequest().setHl7Message(context.getServiceContext().getRequestMessage().encode());
@@ -67,4 +70,15 @@ public class IISProducer extends DefaultProducer {
     private IISComponent getIISComponent() {
         return (IISComponent) getEndpoint().getComponent();
     }
+
+    public void setDestinationInfoFromDestination(DestinationInfo info, IDestination route) {
+        if (route == null) {
+            info.setUrl(null);
+            info.setId(null);
+            return;
+        }
+        info.setUrl(route.getDestUri());
+        info.setId(route.getDestId());
+    }
+
 }
