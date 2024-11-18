@@ -65,9 +65,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @OpenAPIDefinition(
         info = @Info(
-                title = "Transformation Service",
+                title = "Xform Service",
                 version = "1.0",
-                description = "Operations and maintenantence APIs for Transformation Service",
+                description = "Operations and maintenantence APIs for Xform Service",
                 license = @License(name = "Apache 2.0", url = "https://www.apache.org/licenses/LICENSE-2.0"),
                 contact = @Contact(url = "https://support.izgateway.org/plugins/servlet/desk/portal/3",
                         name = "IZ Gateway",
@@ -120,7 +120,7 @@ public class Application implements WebMvcConfigurer {
     }
 
     private static void initialize() {
-        Thread.currentThread().setName("Transformation Service");
+        Thread.currentThread().setName("Xform Service");
 
 
         // This is necessary initialization to use BCFKS module

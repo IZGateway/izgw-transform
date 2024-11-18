@@ -16,17 +16,17 @@
  */
 package gov.cdc.izgateway.xform.camel.routers;
 
-import gov.cdc.izgateway.xform.services.DataTransformerService;
+import gov.cdc.izgateway.xform.services.DataXformService;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TransformationRouter extends RouteBuilder {
+public class XformRouter extends RouteBuilder {
 
   @Autowired
-  DataTransformerService dataTransformerService;
+  DataXformService dataXformService;
 
   @Override
   public void configure() throws Exception {
@@ -67,15 +67,15 @@ public class TransformationRouter extends RouteBuilder {
      * hl7TransformerService.
      */
     from("direct:izghubTransformerPipeline")
-        .bean(dataTransformerService)
+        .bean(dataXformService)
         .to("izghub:IISHubService")
-        .bean(dataTransformerService);
+        .bean(dataXformService);
 
     // KY Use case
     from("direct:iisTransformerPipeline")
-        .bean(dataTransformerService)
+        .bean(dataXformService)
         .to("iis:IISService")
-        .bean(dataTransformerService);
+        .bean(dataXformService);
 
 //    from("file:/Users/cahilp/temp/hl7?noop=true")
 //      .to("direct:izghubTransformerPipeline")

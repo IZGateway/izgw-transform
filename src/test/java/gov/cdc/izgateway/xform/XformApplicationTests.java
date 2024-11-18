@@ -17,7 +17,7 @@ import java.security.SecureRandom;
 import java.security.Security;
 
 @SpringBootTest
-class TransformationApplicationTests {
+class XformApplicationTests {
     private static SecureRandom secureRandom;
 
     @BeforeAll

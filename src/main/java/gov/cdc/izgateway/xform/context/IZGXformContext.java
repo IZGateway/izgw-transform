@@ -13,19 +13,19 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class IZGTransformationContext {
+public class IZGXformContext {
     private ServiceContext serviceContext;
     private SubmitSingleMessageRequest submitSingleMessageRequest;
     private SubmitSingleMessageResponse submitSingleMessageResponse;
     private FaultMessage faultMessage;
     
-    public IZGTransformationContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest) {
+    public IZGXformContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest) {
         this.serviceContext = serviceContext;
         this.submitSingleMessageRequest = submitSingleMessageRequest;
         this.submitSingleMessageResponse = null;
     }
 
-    public IZGTransformationContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest, SubmitSingleMessageResponse submitSingleMessageResponse) {
+    public IZGXformContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest, SubmitSingleMessageResponse submitSingleMessageResponse) {
         this.serviceContext = serviceContext;
         this.submitSingleMessageRequest = submitSingleMessageRequest;
         this.submitSingleMessageResponse = submitSingleMessageResponse;

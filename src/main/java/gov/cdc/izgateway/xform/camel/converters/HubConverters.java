@@ -2,7 +2,7 @@ package gov.cdc.izgateway.xform.camel.converters;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.event.TransactionData;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
-import gov.cdc.izgateway.xform.context.IZGTransformationContext;
+import gov.cdc.izgateway.xform.context.IZGXformContext;
 import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.enums.DataType;
 import lombok.extern.slf4j.Slf4j;
@@ -21,18 +21,18 @@ import java.util.UUID;
 @Slf4j
 public class HubConverters implements TypeConverters {
     @Converter
-    public InputStream contextToStream(IZGTransformationContext context) {
+    public InputStream contextToStream(IZGXformContext context) {
         String hl7Message = context.getSubmitSingleMessageResponse().getHl7Message();
         return new ByteArrayInputStream(hl7Message.getBytes());
     }
 
     @Converter
-    public String contextToString(IZGTransformationContext context) {
+    public String contextToString(IZGXformContext context) {
         return context.getSubmitSingleMessageResponse().getHl7Message();
     }
 
     @Converter
-    public IZGTransformationContext fileToContext(GenericFile<File> file) {
+    public IZGXformContext fileToContext(GenericFile<File> file) {
         File thebody = (File) file.getBody();
 
         UUID organization = UUID.fromString("0d15449b-fb08-4013-8985-20c148b353fe");
@@ -58,7 +58,7 @@ public class HubConverters implements TypeConverters {
         TransactionData t = new TransactionData("TODO: A Real EVENTID");
         RequestContext.setTransactionData(t);
 
-        return new IZGTransformationContext(serviceContext, request, null);
+        return new IZGXformContext(serviceContext, request, null);
 
     }
 

@@ -11,7 +11,7 @@ import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.message.HasCredentials;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
-import gov.cdc.izgateway.xform.context.IZGTransformationContext;
+import gov.cdc.izgateway.xform.context.IZGXformContext;
 import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
 import gov.cdc.izgateway.xform.enums.DataFlowDirection;
@@ -73,7 +73,7 @@ public class HubController extends SoapControllerBase {
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
-        IZGTransformationContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
+        IZGXformContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
 
         try {
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
@@ -128,11 +128,11 @@ public class HubController extends SoapControllerBase {
         return organization;
     }
 
-    private IZGTransformationContext createHubWsdlTransformationContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+    private IZGXformContext createHubWsdlTransformationContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage);
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
-        return new IZGTransformationContext(serviceContext, submitSingleMessage);
+        return new IZGXformContext(serviceContext, submitSingleMessage);
     }
 
     private ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {

@@ -5,7 +5,7 @@ import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.xform.camel.producers.ProducerBase;
-import gov.cdc.izgateway.xform.context.IZGTransformationContext;
+import gov.cdc.izgateway.xform.context.IZGXformContext;
 import gov.cdc.izgateway.xform.endpoints.hub.HubControllerFault;
 import gov.cdc.izgateway.xform.endpoints.hub.HubMessageSender;
 import gov.cdc.izgateway.xform.enums.DataFlowDirection;
@@ -25,7 +25,7 @@ public class IZGHubProducer extends ProducerBase {
     public void process(Exchange exchange) throws Exception {
         HubMessageSender messageSender = getHubComponent().getMessageSender();
 
-        IZGTransformationContext context = exchange.getIn().getBody(IZGTransformationContext.class);
+        IZGXformContext context = exchange.getIn().getBody(IZGXformContext.class);
 
         IDestination destination = createDestination(getHubComponent());
         destination.setUsername(context.getSubmitSingleMessageRequest().getUsername());
