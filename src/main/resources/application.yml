@@ -166,10 +166,6 @@ logging:
               ClientSecurityInterceptor: INFO
             server:
               ServerSecurityInterceptor: INFO
-    javax:
-      net:
-        ssl:
-          DEBUG
     org:
       springframework:
         web: INFO
@@ -179,7 +175,3 @@ logging:
             net:
               NioChannel:
                 handshake: DEBUG
-    sun:
-      security:
-        ssl:
-          DEBUG
