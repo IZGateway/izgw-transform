@@ -70,7 +70,7 @@ public class IISController extends SoapControllerBase {
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         //RequestContext.getDestinationInfo().setId(destinationId);
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
-        IZGXformContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
+        IZGXformContext context = createIZGXformContext(organization, submitSingleMessage);
 
         try {
             producerTemplate.sendBody("direct:iisTransformerPipeline", context);
@@ -125,7 +125,7 @@ public class IISController extends SoapControllerBase {
         return organization;
     }
 
-    private IZGXformContext createHubWsdlTransformationContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+    private IZGXformContext createIZGXformContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage);
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 

@@ -185,7 +185,7 @@ public class FhirController {
      */
     @Operation(
     	summary = "Request an Immunization History or Immunization Recommendation via FHIR",
-        description = "Send a request to the FHIR Interface for IZ Gateway Transformation Service"
+        description = "Send a request to the FHIR Interface for IZ Gateway Xform Service"
     )
     @ApiResponse(
         responseCode = "200",

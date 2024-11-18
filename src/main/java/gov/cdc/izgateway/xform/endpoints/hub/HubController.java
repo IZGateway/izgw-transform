@@ -60,7 +60,7 @@ public class HubController extends SoapControllerBase {
             OrganizationService organizationService,
             XformAccessControlService accessControlService
     ) {
-        // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
+        // The base schema for HUB messages is still the iis-2014 schema, except for HubHeader and certain faults.
         super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));
         this.producerTemplate = producerTemplate;
         this.organizationService = organizationService;
@@ -73,7 +73,7 @@ public class HubController extends SoapControllerBase {
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
-        IZGXformContext context = createHubWsdlTransformationContext(organization, submitSingleMessage);
+        IZGXformContext context = createIZGXformContext(organization, submitSingleMessage);
 
         try {
             producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
@@ -128,7 +128,7 @@ public class HubController extends SoapControllerBase {
         return organization;
     }
 
-    private IZGXformContext createHubWsdlTransformationContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+    private IZGXformContext createIZGXformContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage);
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
