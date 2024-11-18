@@ -31,7 +31,7 @@ public class ApiController {
     private final OperationService operationService;
     private final OperationPreconditionFieldService operationPreconditionFieldService;
 
-    @Value("${transformationservice.allow-delete-via-api}")
+    @Value("${xform.allow-delete-via-api}")
     private Boolean allowDelete;
 
     @Autowired

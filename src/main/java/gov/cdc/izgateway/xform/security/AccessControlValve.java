@@ -28,7 +28,7 @@ import java.security.cert.X509Certificate;
 public class AccessControlValve extends ValveBase {
     private final OrganizationService organizationService;
 
-    @Value("${transformationservice.access-control-enabled}")
+    @Value("${xform.access-control-enabled}")
     private boolean accessControlEnabled;
 
     @Autowired

@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 @Repository
 public class AccessControlFileRepository extends GenericFileRepository<AccessControl> {
 
-    @Value("${transformationservice.configurations.access-control}")
+    @Value("${xform.configurations.access-control}")
     protected void setFilePath(String filePath) {
         this.filePath = filePath;
     }

@@ -15,13 +15,13 @@ import java.util.Map;
 @Getter
 public class IISComponent extends DefaultComponent implements IZGComponent {
 
-    @Value("${transformationservice.destination.iis.uri}")
+    @Value("${xform.destination.iis.uri}")
     private String destinationUri;
 
-    @Value("${transformationservice.destination.iis.id}")
+    @Value("${xform.destination.iis.id}")
     private String destinationId;
 
-    @Value("${transformationservice.destination.iis.type}")
+    @Value("${xform.destination.iis.type}")
     private int destinationType;
 
     private final HubMessageSender messageSender;

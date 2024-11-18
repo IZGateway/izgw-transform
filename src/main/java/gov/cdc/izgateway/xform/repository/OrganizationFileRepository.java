@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 @Repository
 public class OrganizationFileRepository extends GenericFileRepository<Organization> {
 
-    @Value("${transformationservice.configurations.organizations}")
+    @Value("${xform.configurations.organizations}")
     protected void setFilePath(String filePath) {
         this.filePath = filePath;
     }

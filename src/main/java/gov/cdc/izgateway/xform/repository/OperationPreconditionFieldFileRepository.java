@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 @Repository
 public class OperationPreconditionFieldFileRepository extends GenericFileRepository<OperationPreconditionField> {
 
-    @Value("${transformationservice.configurations.operation-precondition-fields}")
+    @Value("${xform.configurations.operation-precondition-fields}")
     protected void setFilePath(String filePath) {
         this.filePath = filePath;
     }

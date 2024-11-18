@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 @Repository
 public class PipelineFileRepository extends GenericFileRepository<Pipeline> {
 
-    @Value("${transformationservice.configurations.pipelines}")
+    @Value("${xform.configurations.pipelines}")
     protected void setFilePath(String filePath) {
         this.filePath = filePath;
     }

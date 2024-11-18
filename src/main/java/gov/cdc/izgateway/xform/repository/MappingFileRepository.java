@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 @Repository
 public class MappingFileRepository extends GenericFileRepository<Mapping> {
 
-    @Value("${transformationservice.configurations.mappings}")
+    @Value("${xform.configurations.mappings}")
     protected void setFilePath(String filePath) {
         this.filePath = filePath;
     }
