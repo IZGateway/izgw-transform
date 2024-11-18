@@ -1,0 +1,20 @@
+package gov.cdc.izgateway.xform.model;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.UUID;
+
+@Getter
+@Setter
+public class AccessControl implements BaseModel {
+    @NotNull(message = "Access Control ID is required")
+    private UUID id;
+    @NotNull(message = "Organization ID is required")
+    private UUID organizationId;
+    @NotNull(message = "Access Control active status is required")
+    private Boolean active;
+    @NotNull(message = "Access Control roles are required")
+    private String[] roles;
+}

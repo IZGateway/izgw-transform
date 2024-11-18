@@ -3,7 +3,6 @@ package gov.cdc.izgateway.soap.net;
 import gov.cdc.izgateway.logging.event.EventId;
 import gov.cdc.izgateway.soap.message.*;
 import gov.cdc.izgateway.soap.message.SoapMessage.Response;
-import gov.cdc.izgateway.transformation.util.Hl7Utils;
 import gov.cdc.izgateway.utils.HL7Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;

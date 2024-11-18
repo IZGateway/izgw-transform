@@ -330,7 +330,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>gov.cdc.izgateway.transformation.Application</mainClass>
+					<mainClass>gov.cdc.izgateway.xform.Application</mainClass>
 					<jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
 					<requiresUnpack>
 						<dependency>
