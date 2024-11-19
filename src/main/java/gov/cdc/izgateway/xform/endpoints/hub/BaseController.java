@@ -49,7 +49,7 @@ public abstract class BaseController extends SoapControllerBase {
 
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String pipeline) throws Fault {
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
-        IZGXformContext context = createHubWsdlXformContext(organization, submitSingleMessage);
+        IZGXformContext context = createXformContext(organization, submitSingleMessage);
 
         try {
             producerTemplate.sendBody(pipeline, context);
@@ -94,7 +94,7 @@ public abstract class BaseController extends SoapControllerBase {
         return organization;
     }
 
-    protected IZGXformContext createHubWsdlXformContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+    protected IZGXformContext createXformContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage);
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
 
