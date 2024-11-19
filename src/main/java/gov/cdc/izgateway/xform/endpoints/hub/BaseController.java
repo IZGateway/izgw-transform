@@ -101,18 +101,7 @@ public abstract class BaseController extends SoapControllerBase {
         return new IZGXformContext(serviceContext, submitSingleMessage);
     }
 
-    protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
-        try {
-            return new ServiceContext(organization,
-                    "izgts:IISHubService",
-                    "izghub:IISHubService",
-                    DataType.HL7V2,
-                    submitSingleMessage.getFacilityID(),
-                    submitSingleMessage.getHl7Message());
-        } catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
-        }
-    }
+    abstract protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault;
 
     @Override
     protected void checkCredentials(HasCredentials s) throws SecurityFault {

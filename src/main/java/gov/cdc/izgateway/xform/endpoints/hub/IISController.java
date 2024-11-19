@@ -56,7 +56,7 @@ public class IISController extends BaseController {
     }
 
     @Override
-    protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+    protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
 
         return super.submitSingleMessage(submitSingleMessage, "direct:iisTransformerPipeline");
     }
@@ -84,4 +84,18 @@ public class IISController extends BaseController {
     public ResponseEntity<?> submitSoapRequest(@RequestBody SoapMessage soapMessage, @Schema(description = "Throws the fault specified in the header parameter") @RequestHeader(value = "X-IIS-Hub-Dev-Action",required = false) String devAction) throws SecurityFault {
         return super.submitSoapRequest(soapMessage, devAction);
     }
+
+    protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+        try {
+            return new ServiceContext(organization,
+                    "izgts:IISHubService",
+                    "izghub:IISHubService",
+                    DataType.HL7V2,
+                    submitSingleMessage.getFacilityID(),
+                    submitSingleMessage.getHl7Message());
+        } catch (HL7Exception e) {
+            throw new HubControllerFault(e.getMessage());
+        }
+    }
+
 }

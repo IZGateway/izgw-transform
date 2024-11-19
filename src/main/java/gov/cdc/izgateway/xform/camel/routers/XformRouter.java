@@ -16,6 +16,8 @@
  */
 package gov.cdc.izgateway.xform.camel.routers;
 
+import gov.cdc.izgateway.xform.camel.constants.Components;
+import gov.cdc.izgateway.xform.camel.constants.EndpointPaths;
 import gov.cdc.izgateway.xform.services.DataXformService;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
@@ -66,15 +68,15 @@ public class XformRouter extends RouteBuilder {
      * the IZ Gateway Hub will be transformed using the
      * hl7TransformerService.
      */
-    from("direct:izghubTransformerPipeline")
+    from(Components.DIRECT + ":" + EndpointPaths.IZGHUB_TRANSFORMER_PIPELINE)
         .bean(dataXformService)
-        .to("izghub:IISHubService")
+        .to(Components.IZGHUB + ":" + EndpointPaths.HUB_SERVICE)
         .bean(dataXformService);
 
     // KY Use case
-    from("direct:iisTransformerPipeline")
+    from(Components.DIRECT + ":" + EndpointPaths.IIS_TRANSFORMER_PIPELINE)
         .bean(dataXformService)
-        .to("iis:IISService")
+        .to(Components.IIS + ":" + EndpointPaths.IIS_SERVICE)
         .bean(dataXformService);
 
 //    from("file:/Users/cahilp/temp/hl7?noop=true")
