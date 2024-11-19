@@ -11,6 +11,7 @@ import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.message.HasCredentials;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.xform.camel.constants.EndpointUris;
 import gov.cdc.izgateway.xform.context.IZGXformContext;
 import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
@@ -62,7 +63,7 @@ public class HubController extends BaseController {
 
     @Override
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
-        return super.submitSingleMessage(submitSingleMessage, "direct:izghubTransformerPipeline");
+        return super.submitSingleMessage(submitSingleMessage, EndpointUris.DIRECT_HUB_PIPELINE);
     }
 
     @Operation(
@@ -92,8 +93,8 @@ public class HubController extends BaseController {
     protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         try {
             return new ServiceContext(organization,
-                    "izgts:IISHubService",
-                    "izghub:IISHubService",
+                    EndpointUris.IZGTS_IISHubService,
+                    EndpointUris.IZGHUB_IISHubService,
                     DataType.HL7V2,
                     submitSingleMessage.getFacilityID(),
                     submitSingleMessage.getHl7Message());
