@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-* GitHub Image Access &rarr; Access to IZG Github Image Repository via Personal Access Token to pull the Transformation
+* GitHub Image Access &rarr; Access to IZG Github Image Repository via Personal Access Token to pull the Xform
   Service image
 * Store Files
     * Server Key Store
@@ -51,7 +51,7 @@ For the purposes of our example later in this document we will name this file cl
 
 ### Configuration Files
 
-The Transformation Service relies on six configuration files at this time: Organization, Pipelines, Solutions, Mapping, Access Control, and Precondition Fields. These
+The Transformation Service relies on six configuration files at this time: Organization, Pipelines, Solutions, Mapping, Access Control, and Operation/Precondition Fields. These
 ultimately determine the changes that will happen to data as it travels through the Transformation Service but also _who_ can access API's.
 
 You may download example configurations from the repository as described here:
@@ -61,7 +61,7 @@ You may download example configurations from the repository as described here:
 * Solutions &rarr; [solutions.json](/testing/configuration/solutions.json)
 * Mappings &rarr; [mappings.json](/testing/configuration/mappings.json)
 * Access Control &rarr; [access-control.json](/testing/configuration/access-control.json)
-* Precondition Fields &rarr; [precondition-fields.json](/testing/configuration/precondition-fields.json)
+* Operation/Precondition Fields &rarr; [operation-precondition-fields.json](/testing/configuration/operation-precondition-fields.json)
 
 You'll need to have these files located in a place that can be accessed by the running Docker container. For our example
 let's say we put these in a /izgw-xform/configuration directory. This local directory will be mapped into the running
@@ -70,56 +70,53 @@ environment variables when running the image.
 
 The necessary environment variables for the configuration files:
 
-* transformationservice.configurations.organizations
-* transformationservice.configurations.pipelines
-* transformationservice.configurations.solutions
-* transformationservice.configurations.mappings
-* transformationservice.configurations.access-control
-* transformationservice.configurations.precondition-fields
+* XFORM_CONFIGURATIONS_ORGANIZATIONS
+* XFORM_CONFIGURATIONS_PIPELINES
+* XFORM_CONFIGURATIONS_SOLUTIONS
+* XFORM_CONFIGURATIONS_MAPPINGS
+* XFORM_CONFIGURATIONS_ACCESS-CONTROL
+* XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS
 
 ## Running Transformation Service Locally via Docker
 
 To run the image we need to set a few environment variables used by the running container. Those are:
 
-* transformationservice.configurations.organizations
+* XFORM_CONFIGURATIONS_ORGANIZATIONS
     * This specifies the name and location on the running container of the configuration for Organizations. For our
       example we will look for the organizations.json in the /configuration folder. So we would set this to
       /configuration/organizations.json.
-* transformationservice.configurations.pipelines
+* XFORM_CONFIGURATIONS_PIPELINES
     * This specifies the name and location on the running container of the configuration for Pipelines. For our example
       we will look for the pipelines.json in the /configuration folder. So we would set this to
       /configuration/pipelines.json.
-* transformationservice.configurations.solutions
+* XFORM_CONFIGURATIONS_SOLUTIONS
     * This specifies the name and location on the running container of the configuration for Solutions. For our example
       we will look for the solutions.json in the /configuration folder. So we would set this to
       /configuration/solutions.json.
-* transformationservice.configurations.mappings
+* XFORM_CONFIGURATIONS_MAPPINGS
     * This specifies the name and location on the running container of the configuration for Mappings. For our example
       we will look for the mappings.json in the /configuration folder. So we would set this to
       /configuration/mappings.json.
-* transformationservice.configurations.access-control
+* XFORM_CONFIGURATIONS_ACCESS-CONTROL
     * This specifies the name and location on the running container of the configuration for access control. For our example
       we will look for the access-control.json in the /configuration folder. So we would set this to
       /configuration/access-control.json.
-* transformationservice.configurations.precondition-fields
-    * This specifies the name and the location on the running container of the configuration for access control.  For our example we will look for the precondition-fields.json in the /configuration folder. So we would set this to /configuration/precondition-fields.json.
-* SSL_SHARE
-    * This specifies the directory on the running container where the Server Key Store and Client Trust Store are
-      located. For our example we will look for these files in /ssl
+* XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS
+    * This specifies the name and the location on the running container of the configuration for fields available in configuring operations and preconditions.  For our example we will look for the precondition-fields.json in the /configuration folder. So we would set this to /configuration/precondition-fields.json.
 * COMMON_PASS
     * This is the password which is necessary to open the Server Key Store and Client Trust Store files
-* TS_SERVER_PORT
+* XFORM_SERVER_PORT
     * This is the port that we want the Transformation Service to listen on. For our example we will use port 444
-* transformationservice.destination
+* XFORM_DESTINATION_HUB_URI
     * This is the downstream IZ Gateway Hub that we want the Transformation Service to submit messages to. For our
       example we will use https://dev.izgateway.org/IISHubService
-* TS_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE
+* XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE
     * This specifies the path and file on the running container for the Server Key Store.  For our example we will look for these files in the /ssl directory and the name of the file is server_keystore.bcfks
-* TS_CRYPTO_STORE_KEY_WS_CLIENT_FILE
+* XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE
   * Same as TS_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE
-* TS_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE
+* XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE
   * Same as TS_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE
-* TS_CRYPTO_STORE_TRUST_WS_CLIENT_FILE
+* XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE
     * This specifies the path and file on the running container for the Client Key Store.  For our example we will look for these files in the /ssl directory and the name of the file is client_keystore.bcfks
 
 To run the image we can issue a single docker command as follows:
@@ -127,20 +124,20 @@ To run the image we can issue a single docker command as follows:
 ```bash
 docker run \
 --env=COMMON_PASS=<PASSWORD> \
---env=transformationservice.destination=https://dev.izgateway.org/IISHubService \
---env=TS_SERVER_PORT=444 \
---env=transformationservice.configurations.organizations=/configuration/organizations.json \
---env=transformationservice.configurations.pipelines=/configuration/pipelines.json \
---env=transformationservice.configurations.solutions=/configuration/solutions.json \
---env=transformationservice.configurations.mappings=/configuration/mappings.json \
---env=transformationservice.configurations.access-control=/configuration/access-control.json \
---env=transformationservice.configurations.precondition-fields=/configuration/precondition-fields.json \
---env=TS_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE=/ssl/server_keystore.bcfks \
---env=TS_CRYPTO_STORE_KEY_WS_CLIENT_FILE=/ssl/server_keystore.bcfks \
---env=TS_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE=/ssl/server_keystore.bcfks \
---env=TS_CRYPTO_STORE_TRUST_WS_CLIENT_FILE=/ssl/client_keystore.bcfks \
---volume=/Users/moodya/Dev/Fed/izg/izgw-transform/src/main/resources:/configuration \
---volume=/Users/moodya/Dev/Fed/izg/dev.izgateway.org_stores/conf/ssl:/ssl \
+--env=XFORM_DESTINATION_HUB_URI=https://dev.izgateway.org/IISHubService \
+--env=XFORM_SERVER_PORT=444 \
+--env=XFORM_CONFIGURATIONS_ORGANIZATIONS=/configuration/organizations.json \
+--env=XFORM_CONFIGURATIONS_PIPELINES=/configuration/pipelines.json \
+--env=XFORM_CONFIGURATIONS_SOLUTIONS=/configuration/solutions.json \
+--env=XFORM_CONFIGURATIONS_MAPPINGS=/configuration/mappings.json \
+--env=XFORM_CONFIGURATIONS_ACCESS-CONTROL=/configuration/access-control.json \
+--env=XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS=/configuration/operation-precondition-fields.json \
+--env=XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE=/ssl/server_keystore.bcfks \
+--env=XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE=/ssl/server_keystore.bcfks \
+--env=XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE=/ssl/server_keystore.bcfks \
+--env=XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE=/ssl/client_keystore.bcfks \
+--volume=/path/to/configuration:/configuration \
+--volume=/path/to/ssl:/ssl \
 -p 444:444 \
 -d \
 ghcr.io/izgateway/izgw-transform:latest

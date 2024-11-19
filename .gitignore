@@ -37,6 +37,7 @@ build/
 
 ### Local .env Files ###
 **/.env
+docker/.env
 
 ### Logs
 logs/*
