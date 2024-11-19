@@ -66,6 +66,50 @@
     } ]
   } ]
 }, {
+  "pipelineName" : "Pipeline for Postman Tests for IIS endpoint",
+  "id" : "4dd6a3bb-6813-4357-ab63-3efd2765aeee",
+  "organizationId" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
+  "description" : "Pipeline used to test: mappings, ...",
+  "inboundEndpoint" : "izgts:IISService",
+  "outboundEndpoint" : "iis:IISService",
+  "active" : true,
+  "pipes" : [ {
+    "id" : "19488c3c-d105-4234-aba5-baa850a71eee",
+    "solutionId" : "0f150b3d-44ca-464e-99cb-8757c150f9a0",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ ]
+  }, {
+    "id" : "4f1e7b4d-a8ab-495d-a137-be9abc4d8333",
+    "solutionId" : "bf3326fe-ab52-4d6c-b37f-7db5f1769c4c",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "a82afb21-975b-4fdf-a098-f2a872cf2000",
+      "dataPath" : "/MSH-9-1",
+      "comparisonValue" : "RSP"
+    } ]
+  }, {
+    "id" : "5de30369-9deb-4fd0-854e-2bf87e9ab666",
+    "solutionId" : "7e9ab0bf-e174-4073-a63f-75e2fabdb3a3",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "04efbba8-9333-43bc-9fb7-d2bca5831999",
+      "dataPath" : "/MSH-9-1",
+      "comparisonValue" : "VXU"
+    } ]
+  }, {
+    "id" : "f90d99d4-0406-4500-a15d-5a6075248222",
+    "solutionId" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ {
+      "method" : "equals",
+      "id" : "e55248e0-156c-45b7-b03b-56bd207a3ccc",
+      "dataPath" : "/MSH-9-1",
+      "comparisonValue" : "VXU"
+    } ]
+  } ]
+},{
   "pipelineName" : "Starfleet Medical Systems to Nebula Health Network Pipeline",
   "id" : "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
   "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
