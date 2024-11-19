@@ -6,7 +6,7 @@ xform:
       id: ${XFORM_HUB_DESTINATION_ID:hub}
       type: 5
     iis:
-      uri: ${XFORM_IIS_DESTINATION:https://localhost:8000/soap/qbp}
+      uri: ${XFORM_IIS_DESTINATION:https://localhost/dev/IISService}
       id: ${XFORM_IIS_DESTINATION_ID:iis}
       type: 5
   configurations:
