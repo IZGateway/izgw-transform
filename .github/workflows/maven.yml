@@ -155,7 +155,7 @@ jobs:
       - name: Tag and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: xform-service
+          ECR_REPOSITORY: transformation-service
         run: |
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_BRANCH_TAG}}
@@ -165,7 +165,7 @@ jobs:
       - name: Update ECS service to force new deployment of latest image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: xform-service
+          ECR_REPOSITORY: transformation-service
         run: |
           aws ecs update-service --cluster izgateway-dev-izgateway-services --service izgw-xform-dev --force-new-deployment --enable-execute-command --desired-count 1 | jq ".service.deployments[].id"
 
