@@ -2,10 +2,10 @@
     <weaver options="-verbose -showWeaveInfo">
         <!-- <weaver options="-verbose -showWeaveInfo"> -->
         <!-- Specify packages to be woven -->
-        <include within="gov.cdc.izgateway.transformation..*"/>
+        <include within="gov.cdc.izgateway.xform..*"/>
     </weaver>
     <aspects>
         <!-- Specify your aspects here -->
-        <aspect name="gov.cdc.izgateway.transformation.aspects.xformadvice.XformAdviceAspect"/>
+        <aspect name="gov.cdc.izgateway.xform.aspects.xformadvice.XformAdviceAspect"/>
     </aspects>
 </aspectj>

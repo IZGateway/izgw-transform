@@ -9,10 +9,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
-	<artifactId>transformation</artifactId>
+	<artifactId>xform</artifactId>
     <version>0.3.0</version>
-	<name>transformation</name>
-	<description>Demo project for Spring Boot</description>
+	<name>xform</name>
+	<description>IZ Gateway Xform Service</description>
 	<properties>
 		<java.version>17</java.version>
 		<timestamp>${maven.build.timestamp}</timestamp>
@@ -330,7 +330,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<mainClass>gov.cdc.izgateway.transformation.Application</mainClass>
+					<mainClass>gov.cdc.izgateway.xform.Application</mainClass>
 					<jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
 					<requiresUnpack>
 						<dependency>
@@ -450,7 +450,7 @@
 									<arg value="-out" />
 									<arg value="${project.build.directory}/self_signed_unit_tests.pfx" />
 									<arg value="-name" />
-									<arg value="IZG Transformation Service Unit Tests" />
+									<arg value="IZG Xform Service Unit Tests" />
 								</exec>
 								<exec executable="keytool" failonerror="true">
 									<arg value="-keystore" />
