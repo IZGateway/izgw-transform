@@ -89,6 +89,15 @@ jobs:
           echo "github.ref: ${{ github.ref }}"
           echo "github.event_name: ${{ github.event_name }}"
 
+      - name: Set version example
+        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/version-test' )  }}
+        run: |
+          echo "Setting the snapshot version"
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-PAULTEST
+          echo VERSION="${VERSION}" >> $GITHUB_ENV
+          mvn versions:set -DnewVersion=$VERSION
+          mvn versions:commit
+
       - name: Set version for develop branch
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/develop' ) || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'develop') }}
         run: |
