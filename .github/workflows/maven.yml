@@ -12,6 +12,7 @@ on:
       - develop
       - Release*
       - main
+      - version-test
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
