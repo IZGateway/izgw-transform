@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "080dacac-1d21-4c8f-9d2c-96b075a2fd4e",
+		"_postman_id": "7d9920eb-d345-47aa-b532-f061e5514e99",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/THSALink~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-080dacac-1d21-4c8f-9d2c-96b075a2fd4e?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/AustinM~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-7d9920eb-d345-47aa-b532-f061e5514e99?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -38,7 +38,7 @@
 									"\r",
 									"});\r",
 									"\r",
-                                    "utils.testForPHIInLogs(pm);\r",
+									"utils.testForPHIInLogs(pm);\r",
 									"utils.testSLA(pm, LONG_SLA);\r",
 									"\r",
 									"\r",
@@ -122,7 +122,7 @@
 									"\r",
 									"});\r",
 									"\r",
-                                    "utils.testForPHIInLogs(pm);\r",
+									"utils.testForPHIInLogs(pm);\r",
 									"utils.testSLA(pm, LONG_SLA);\r",
 									"\r",
 									"\r",
@@ -213,7 +213,7 @@
 									"\r",
 									"});\r",
 									"\r",
-                                    "utils.testForPHIInLogs(pm);\r",
+									"utils.testForPHIInLogs(pm);\r",
 									"utils.testSLA(pm, LONG_SLA);\r",
 									"\r",
 									"\r",
@@ -304,7 +304,7 @@
 									"\r",
 									"});\r",
 									"\r",
-                                    "utils.testForPHIInLogs(pm);\r",
+									"utils.testForPHIInLogs(pm);\r",
 									"utils.testSLA(pm, LONG_SLA);\r",
 									"\r",
 									"\r",
@@ -395,7 +395,7 @@
 									"\r",
 									"});\r",
 									"\r",
-                                    "utils.testForPHIInLogs(pm);\r",
+									"utils.testForPHIInLogs(pm);\r",
 									"utils.testSLA(pm, LONG_SLA);\r",
 									"\r",
 									"\r",
@@ -457,7 +457,98 @@
 						}
 					},
 					"response": []
-				}
+				},
+              {
+                "name": "TS_TC_06 QBP RESPONSE MSH-7 CDC-WSDL",
+                "event": [
+                  {
+                    "listen": "test",
+                    "script": {
+                      "exec": [
+                        "const xml2js = require('xml2js');\r",
+                        "\r",
+                        "pm.test(\"Status code is 200\", function () {\r",
+                        "    pm.response.to.have.status(200);\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
+                        "    var response = utils.removeNS(xml2Json(responseBody));\r",
+                        "    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+                        "    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
+                        "\r",
+                        "\r",
+                        "});\r",
+                        "\r",
+                        "pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
+                        "    var response = utils.removeNS(xml2Json(responseBody));\r",
+                        "    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
+                        "    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
+                        "\r",
+                        "});\r",
+                        "\r",
+                        "utils.testForPHIInLogs(pm);\r",
+                        "utils.testSLA(pm, LONG_SLA);\r",
+                        "\r",
+                        "\r",
+                        ""
+                      ],
+                      "type": "text/javascript",
+                      "packages": {}
+                    }
+                  },
+                  {
+                    "listen": "prerequest",
+                    "script": {
+                      "exec": [
+                        "utils.setup(pm);"
+                      ],
+                      "type": "text/javascript",
+                      "packages": {}
+                    }
+                  }
+                ],
+                "protocolProfileBehavior": {
+                  "disabledSystemHeaders": {
+                    "host": true
+                  }
+                },
+                "request": {
+                  "method": "POST",
+                  "header": [
+                    {
+                      "key": "Host",
+                      "value": "{{hostHeader}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/xml",
+                      "type": "text"
+                    },
+                    {
+                      "key": "x-xform-organization",
+                      "value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+                      "type": "text"
+                    }
+                  ],
+                  "body": {
+                    "mode": "raw",
+                    "raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <wsa:Action>urn:cdc:iisb:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn:SubmitSingleMessageRequest>\r\n      <urn:Username>duser</urn:Username>\r\n      <urn:Password>dpassword</urn:Password>\r\n      <urn:Hl7Message>{{GoodMessageLF}}</urn:Hl7Message>\r\n    </urn:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>\r\n"
+                  },
+                  "url": {
+                    "raw": "{{protocol}}://{{host}}:{{port}}/IISService",
+                    "protocol": "{{protocol}}",
+                    "host": [
+                      "{{host}}"
+                    ],
+                    "port": "{{port}}",
+                    "path": [
+                      "IISService"
+                    ]
+                  }
+                },
+                "response": []
+              }
 			]
 		},
 		{
@@ -4790,6 +4881,2052 @@
 					]
 				},
 				{
+					"name": "Preconditions",
+					"item": [
+						{
+							"name": "Fields",
+							"item": [
+								{
+									"name": "Create Operation Field",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/*",
+													"    Here we add a Field that is for an Operation but NOT for a Precondition.",
+													"    We want to make a call to get precondition/fields and make sure this is NOT there.",
+													"*/",
+													"",
+													"pm.collectionVariables.clear();",
+													"",
+													"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentDataPath\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+													"pm.collectionVariables.set(\"currentForPrecondition\", false);",
+													"pm.collectionVariables.set(\"currentForOperation\", false);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let savedData = JSON.stringify(response);",
+													"",
+													"pm.collectionVariables.set(\"createdEntity\", savedData);",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+													"    pm.expect(response.fieldName).to.equal(pm.collectionVariables.get(\"currentName\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+													"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
+													"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
+													"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
+													"})",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"fields"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Precondition Fields",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let foundOperationOnly = false;",
+													"let foundForPreconditionFalse = false;",
+													"",
+													"for (var i = 0; i < response[\"data\"].length; i++) {",
+													"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"currentId\")) {",
+													"        foundOperationOnly = true;",
+													"    }",
+													"",
+													"    if (response[\"data\"][i].forPrecondition == false) {",
+													"        foundForPreconditionFalse = true;",
+													"    }",
+													"}",
+													"",
+													"pm.test(\"DID NOT Find Operation Only\", function() {",
+													"    pm.expect(foundOperationOnly).to.be.false;",
+													"});",
+													"",
+													"pm.test(\"DID NOT Find forPrecondition = false\", function() {",
+													"    pm.expect(foundForPreconditionFalse).to.be.false;",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/preconditions/fields?limit=100000",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"preconditions",
+												"fields"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "100000"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Operation Field",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{currentId}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"fields",
+												"{{currentId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Available",
+							"item": [
+								{
+									"name": "Get Available Preconditions - exists",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/*",
+													"    Here we test to see that all known Preconditions are in the API response.",
+													"",
+													"    We also check to see if there is a Precondition that we haven't explicitly listed.",
+													"*/",
+													"",
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"// Preconditions that have been coded",
+													"// ADD an entry here when new Preconditions have been added to the system",
+													"const expectedMethods = [\"equals\", \"not_equals\", \"exists\", \"not_exists\", \"regex_match\"];",
+													"",
+													"// Keep track of methods we find in the response",
+													"let foundMethods = {};",
+													"expectedMethods.forEach(method => foundMethods[method] = false);",
+													"",
+													"// Check each method in the response",
+													"response.forEach(item => {",
+													"    if (expectedMethods.includes(item.method)) {",
+													"        foundMethods[item.method] = true;",
+													"    } else {",
+													"        pm.test(`Unexpected method found: ${item.method}`, function() {",
+													"            pm.expect.fail(`Found unexpected method: ${item.method}`);",
+													"        });",
+													"    }",
+													"});",
+													"",
+													"// Test for presence of all expected methods",
+													"expectedMethods.forEach(method => {",
+													"    pm.test(`Found ${method} method`, function() {",
+													"        pm.expect(foundMethods[method]).to.be.true;",
+													"    });",
+													"});",
+													"",
+													"// Test to ensure no extra methods are present",
+													"pm.test(\"No extra methods present\", function() {",
+													"    pm.expect(response.length).to.equal(expectedMethods.length);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/preconditions/available",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"preconditions",
+												"available"
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"description": "This folder contains tests for the piece of the API which lets a call know what Preconditions are available in the running system.\n\nAs we add Preconditions to the system we need to remember to add a bit to the _Post Response_ script to check for it."
+						}
+					]
+				},
+				{
+					"name": "Operations",
+					"item": [
+						{
+							"name": "Available",
+							"item": [
+								{
+									"name": "Get Available Operations - exists",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/*",
+													"    Here we test to see that all known Operations are in the API response.",
+													"",
+													"    We also check to see if there is an Operation that we haven't explicitly listed.",
+													"*/",
+													"",
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"// Operations that have been coded",
+													"// ADD an entry here when new Operations have been added to the system",
+													"const expectedMethods = [\"copy\", \"mapper\", \"regex_replace\", \"set\", \"save_state\"];",
+													"",
+													"// Keep track of methods we find in the response",
+													"let foundMethods = {};",
+													"expectedMethods.forEach(method => foundMethods[method] = false);",
+													"",
+													"// Check each method in the response",
+													"response.forEach(item => {",
+													"    if (expectedMethods.includes(item.method)) {",
+													"        foundMethods[item.method] = true;",
+													"    } else {",
+													"        pm.test(`Unexpected method found: ${item.method}`, function() {",
+													"            pm.expect.fail(`Found unexpected method: ${item.method}`);",
+													"        });",
+													"    }",
+													"});",
+													"",
+													"// Test for presence of all expected methods",
+													"expectedMethods.forEach(method => {",
+													"    pm.test(`Found ${method} method`, function() {",
+													"        pm.expect(foundMethods[method]).to.be.true;",
+													"    });",
+													"});",
+													"",
+													"// Test to ensure no extra methods are present",
+													"pm.test(\"No extra methods present\", function() {",
+													"    pm.expect(response.length).to.equal(expectedMethods.length);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/operations/available",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"operations",
+												"available"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Fields",
+							"item": [
+								{
+									"name": "Create Precondition Field",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/*",
+													"    Here we add a Field that is for an Operation but NOT for a Precondition.",
+													"    We want to make a call to get precondition/fields and make sure this is NOT there.",
+													"*/",
+													"",
+													"pm.collectionVariables.clear();",
+													"",
+													"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentDataPath\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+													"pm.collectionVariables.set(\"currentForPrecondition\", true);",
+													"pm.collectionVariables.set(\"currentForOperation\", false);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let savedData = JSON.stringify(response);",
+													"",
+													"pm.collectionVariables.set(\"createdEntity\", savedData);",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+													"    pm.expect(response.fieldName).to.equal(pm.collectionVariables.get(\"currentName\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+													"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
+													"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
+													"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
+													"})",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"fields"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Operation Fields",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let foundPreconditionOnly = false;",
+													"let foundForOperationFalse = false;",
+													"",
+													"for (var i = 0; i < response[\"data\"].length; i++) {",
+													"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"currentId\")) {",
+													"        foundPreconditionOnly = true;",
+													"    }",
+													"",
+													"    if (response[\"data\"][i].forOperation == false) {",
+													"        foundForOperationFalse = true;",
+													"    }",
+													"}",
+													"",
+													"pm.test(\"DID NOT Find Precondition Only\", function() {",
+													"    pm.expect(foundPreconditionOnly).to.be.false;",
+													"});",
+													"",
+													"pm.test(\"DID NOT Find forOperation = false\", function() {",
+													"    pm.expect(foundForOperationFalse).to.be.false;",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/operations/fields?limit=100000",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"operations",
+												"fields"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "100000"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Precondition Field",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{currentId}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"fields",
+												"{{currentId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Fields",
+					"item": [
+						{
+							"name": "Create Field - Net New",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.clear();",
+											"",
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentDataPath\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"pm.collectionVariables.set(\"currentForPrecondition\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"pm.collectionVariables.set(\"currentForOperation\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"created object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.fieldName).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
+											"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
+											"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
+											"})",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Fields should match object created in previous \"Create Pipeline - Net New\" step",
+											"let response = pm.response.json();",
+											"pm.test(\"gotten object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.fieldName).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
+											"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
+											"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
+											"}",
+											")"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field - Non Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 404 NOT FOUND code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(404);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"nonExistingId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{nonExistingId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields",
+										"{{nonExistingId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Field - Existing",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 409 CONFLICT code\", function() {",
+											"    pm.expect(pm.response.code = 409);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Field - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"created object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.fieldName).to.equal(pm.collectionVariables.get(\"currentName\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
+											"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
+											"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
+											"})"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{createdEntity}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Field - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Field - Non Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 404 NOT FOUND code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(404);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"nonExistingId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{nonExistingId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields",
+										"{{nonExistingId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Field - Non Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 404 NOT FOUND code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(404);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"pm.collectionVariables.set(\"currentForOperation\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"pm.collectionVariables.set(\"currentForPrecondition\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"fieldName\": \"{{currentName}}\",\n    \"id\": \"{{currentId}}\",\n    \"active\": {{currentActive}},\n    \"dataPath\": \"{{currentDataPath}}\",\n    \"forPrecondition\": {{currentForPrecondition}},\n    \"forOperation\": {{currentForOperation}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Field - New For List 0",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let entityNumber = 0;",
+											"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"dataPath\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"forPrecondition\" + entityNumber, pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"pm.collectionVariables.set(\"forOperation\" + entityNumber, pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"",
+											"pm.collectionVariables.unset(\"thisName\");",
+											"pm.collectionVariables.unset(\"thisId\");",
+											"pm.collectionVariables.unset(\"thisCommonName\");",
+											"pm.collectionVariables.unset(\"thisForPrecondition\");",
+											"pm.collectionVariables.unset(\"thisForOperation\");",
+											"",
+											"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"dataPath\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisForPrecondition\", pm.collectionVariables.get(\"forPrecondition\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisForOperation\", pm.collectionVariables.get(\"forOperation\" + entityNumber));",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"fieldName\" : \"{{thisName}}\",\n  \"dataPath\": \"{{thisCommonName}}\",\n  \"active\": true,\n  \"forPrecondition\": {{thisForPrecondition}},\n  \"forOperation\": {{thisForOperation}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Field - New For List 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let entityNumber = 1;",
+											"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"dataPath\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"forPrecondition\" + entityNumber, pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"pm.collectionVariables.set(\"forOperation\" + entityNumber, pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"",
+											"pm.collectionVariables.unset(\"thisName\");",
+											"pm.collectionVariables.unset(\"thisId\");",
+											"pm.collectionVariables.unset(\"thisCommonName\");",
+											"pm.collectionVariables.unset(\"thisForPrecondition\");",
+											"pm.collectionVariables.unset(\"thisForOperation\");",
+											"",
+											"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"dataPath\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisForPrecondition\", pm.collectionVariables.get(\"forPrecondition\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisForOperation\", pm.collectionVariables.get(\"forOperation\" + entityNumber));",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"fieldName\" : \"{{thisName}}\",\n  \"dataPath\": \"{{thisCommonName}}\",\n  \"active\": true,\n  \"forPrecondition\": {{thisForPrecondition}},\n  \"forOperation\": {{thisForOperation}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Field - New For List 2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"let entityNumber = 2;",
+											"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"dataPath\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"forPrecondition\" + entityNumber, pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"pm.collectionVariables.set(\"forOperation\" + entityNumber, pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"",
+											"pm.collectionVariables.unset(\"thisName\");",
+											"pm.collectionVariables.unset(\"thisId\");",
+											"pm.collectionVariables.unset(\"thisCommonName\");",
+											"pm.collectionVariables.unset(\"thisForPrecondition\");",
+											"pm.collectionVariables.unset(\"thisForOperation\");",
+											"",
+											"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"dataPath\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisForPrecondition\", pm.collectionVariables.get(\"forPrecondition\" + entityNumber));",
+											"pm.collectionVariables.set(\"thisForOperation\", pm.collectionVariables.get(\"forOperation\" + entityNumber));",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"fieldName\" : \"{{thisName}}\",\n  \"dataPath\": \"{{thisCommonName}}\",\n  \"active\": true,\n  \"forPrecondition\": {{thisForPrecondition}},\n  \"forOperation\": {{thisForOperation}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Check to see if the 2 active we added in 3 previous steps are in the response",
+											"let response = pm.response.json();",
+											"let found0 = false;",
+											"let found1 = false;",
+											"",
+											"console.log(\"Find id0: \" + pm.collectionVariables.get(\"id0\"));",
+											"console.log(\"Find id1: \" + pm.collectionVariables.get(\"id1\"));",
+											"",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"Found New 0\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"Found New 1\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields?limit=100000",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "100000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field - Include Inactive",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Check to see if the all 3 added previous are here now since one was set active = false",
+											"let response = pm.response.json();",
+											"let found0 = false;",
+											"let found1 = false;",
+											"let found2 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id2\")) {",
+											"        found2 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"Found New 0\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"Found New 1\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"Found New 2\", function() {",
+											"    pm.expect(found2).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields?includeInactive=true&limit=100000",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										},
+										{
+											"key": "limit",
+											"value": "100000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field - Limit",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// After we added 3 we should be able to set limit = 2 and only get 2 pipelines back.  ",
+											"// Also the has_more should be true",
+											"let response = pm.response.json();",
+											"pm.test(\"Only 1 Returned\", function() {",
+											"    pm.expect(response[\"data\"].length).to.equal(1);",
+											"});",
+											"",
+											"console.log(response[\"has_more\"]);",
+											"pm.test(\"has_more is true\", function() {",
+											"    pm.expect(response[\"has_more\"]).to.equal(\"true\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields?limit=1",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field - Extreme Limit",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Setting an extreme limit and then making sure has_more is false.",
+											"let response = pm.response.json();",
+											"pm.test(\"has_more is false\", function() {",
+											"    pm.expect(response[\"has_more\"]).to.equal(\"false\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields?limit=1000000",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "1000000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field - Existing Cursor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Setting nextCursor to the last item that we added should mean that we do not see any of the 3 that we added.",
+											"// It also means that the has_more should be false",
+											"let response = pm.response.json();",
+											"",
+											"let found0 = false;",
+											"let found1 = false;",
+											"let found2 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id2\")) {",
+											"        found2 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"New 0 NOT FOUND\", function() {",
+											"    pm.expect(found0).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"New 1 NOT FOUND\", function() {",
+											"    pm.expect(found1).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"New 2 NOT FOUND\", function() {",
+											"    pm.expect(found2).to.be.false;",
+											"});",
+											"",
+											"pm.test(\"has_more is false\", function() {",
+											"    pm.expect(response[\"has_more\"]).to.equal(\"false\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields?includeInactive=true&nextCursor={{id2}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										},
+										{
+											"key": "nextCursor",
+											"value": "{{id2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field - Non Existing Cursor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Setting nextCursor to a random UUID should mean we just get back the same thing as requesting everything",
+											"// It also means that the has_more should be false",
+											"let response = pm.response.json();",
+											"",
+											"let found0 = false;",
+											"let found1 = false;",
+											"let found2 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id2\")) {",
+											"        found2 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"New 0 FOUND\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 1 FOUND\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 2 FOUND\", function() {",
+											"    pm.expect(found2).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields?includeInactive=true&nextCursor=5926368C-F578-4D62-BD3C-CE11AA0187E7&limit=100000",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										},
+										{
+											"key": "nextCursor",
+											"value": "5926368C-F578-4D62-BD3C-CE11AA0187E7"
+										},
+										{
+											"key": "limit",
+											"value": "100000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field - Existing Prev Cursor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Setting prevCursor to the last item that we added should mean that we get back the first two that we added",
+											"let response = pm.response.json();",
+											"",
+											"let found0 = false;",
+											"let found1 = false;",
+											"let found2 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id2\")) {",
+											"        found2 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"New 0 FOUND\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 1 FOUND\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 2 NOT FOUND\", function() {",
+											"    pm.expect(found2).to.be.false;",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields?includeInactive=true&prevCursor={{id2}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										},
+										{
+											"key": "prevCursor",
+											"value": "{{id2}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Field - Non Existing Prev Cursor",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Setting prevCursor to a random UUID should mean we just get back the same thing as requesting everything",
+											"// It also means that the has_more should be false",
+											"let response = pm.response.json();",
+											"",
+											"let found0 = false;",
+											"let found1 = false;",
+											"let found2 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id2\")) {",
+											"        found2 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"New 0 FOUND\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 1 FOUND\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"New 2 FOUND\", function() {",
+											"    pm.expect(found2).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields?includeInactive=true&prevCursor=407A00CB-7B00-4682-AA4E-B2C0C0FFFBB6&limit=100000",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields"
+									],
+									"query": [
+										{
+											"key": "includeInactive",
+											"value": "true"
+										},
+										{
+											"key": "prevCursor",
+											"value": "407A00CB-7B00-4682-AA4E-B2C0C0FFFBB6"
+										},
+										{
+											"key": "limit",
+											"value": "100000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Field - New 0",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{id0}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields",
+										"{{id0}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Field - New 1",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{id1}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields",
+										"{{id1}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Field - New 2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});",
+											"",
+											"pm.collectionVariables.clear();"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/fields/{{id2}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"fields",
+										"{{id2}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Check Build ID",
 					"event": [
 						{
@@ -4841,55 +6978,55 @@
 					},
 					"response": []
 				},
-                {
-                "name": "Check Health",
-                "event": [
-                  {
-                    "listen": "test",
-                    "script": {
-                      "exec": [
-                        "pm.test(\"returns 200 OK code\", function() {\r",
-                        "    pm.expect(pm.response.code).to.equal(200);\r",
-                        "});\r",
-                        "\r",
-                        "let response = pm.response.json();\r",
-                        "pm.test(\"healthy is equal to true\", function() {\r",
-                        "    pm.expect(response.healthy).to.equal(true);\r",
-                        "});\r",
-                        "\r",
-                        "pm.test(\"last change reason is not null\", function() {\r",
-                        "    pm.expect(response.lastChangeReason).to.not.be.null;\r",
-                        "});\r",
-                        ""
-                      ],
-                      "type": "text/javascript",
-                      "packages": {}
-                    }
-                  }
-                ],
-                "request": {
-                  "method": "GET",
-                  "header": [
-                    {
-                      "key": "X-Not-Admin",
-                      "value": "true",
-                      "description": "Leave it this way to verify access control functionality."
-                    }
-                  ],
-                  "url": {
-                    "raw": "{{protocol}}://{{host}}:{{port}}/health",
-                    "protocol": "{{protocol}}",
-                    "host": [
-                      "{{host}}"
-                    ],
-                    "port": "{{port}}",
-                    "path": [
-                      "health"
-                    ]
-                  }
-                },
-                "response": []
-              }
+				{
+					"name": "Check Health",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"returns 200 OK code\", function() {\r",
+									"    pm.expect(pm.response.code).to.equal(200);\r",
+									"});\r",
+									"\r",
+									"let response = pm.response.json();\r",
+									"pm.test(\"healthy is equal to true\", function() {\r",
+									"    pm.expect(response.healthy).to.equal(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"last change reason is not null\", function() {\r",
+									"    pm.expect(response.lastChangeReason).to.not.be.null;\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Not-Admin",
+								"value": "true",
+								"description": "Leave it this way to verify access control functionality."
+							}
+						],
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/health",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
 			]
 		}
 	],
@@ -4905,11 +7042,11 @@
 					"pm.collectionVariables.set(\"GoodResponseLF\", goodResponse.replace(\"\\r\", \"\\n\"))",
 					"pm.collectionVariables.set(\"GoodResponseCRLF\", goodResponse.replace(\"\\r\", \"\\r\\n\"))",
 					"",
-					"var goodRequest = \"MSH|^~\\\\&amp;|IRIS IIS|IRIS|TEST|TC_04|20210402091512.000-0100||QBP^Q11^QBP_Q11|20210330093013AZQ231|P|2.5.1|||ER|AL|||||Z34^CDCPHINVS|SIISCLIENT28374|\\nQPD|Z34^Request Immunization History^CDCPHINVS|20210330093013LA231|LAMASM77BF4BA6^^^IZGATEWAYTEST&amp;2.16.840.1.113883.40.1&amp;ISO^MR|Johnson^James^Andrew^^^^L|Leung^Jen^^^^^M|20160414|M|Main Street&amp;&amp;123^^New Orleans^LA^70115^^L|^PRN^PH^^^555^5551111|Y|1\"; //pm.collectionVariables.get(\"GoodMessage\");",
+					"var goodRequest = \"MSH|^~\\\\&amp;|IRIS IIS|IRIS|TEST|TC_04|20210402091512.000-0100||QBP^Q11^QBP_Q11|20210330093013AZQ231|P|2.5.1|||ER|AL|||||Z34^CDCPHINVS|SIISCLIENT28374|\\nQPD|Z34^Request Immunization History^CDCPHINVS|20210330093013LA231|LAMASM77BF4BA6^^^IZGATEWAYTEST&amp;2.16.840.1.113883.40.1&amp;ISO^MR|JohnsonIZG^James^Andrew^^^^L|Leung^Jen^^^^^M|20160414|M|Main Street&amp;&amp;123^^New Orleans^LA^70115^^L|^PRN^PH^^^555^5551111|Y|1\"; //pm.collectionVariables.get(\"GoodMessage\");",
 					"pm.collectionVariables.set(\"GoodMessageLF\", goodRequest.replace(\"\\r\", \"\\n\"))",
 					"pm.collectionVariables.set(\"GoodMessageCRLF\", goodRequest.replace(\"\\r\", \"\\r\\n\"))",
 					"",
-					"var goodRequestVXU = \"MSH|^~\\\\&amp;|IZGATEWAY|FLHOSP1|FLSHOTS|FLSHOTS|20230809110858-0500||VXU^V04^VXU_V04|IZGIIS-IIS-PreTestVXU-IISA|X|2.5.1|||ER|AL|\\nPID|1||DC1ADMIN^IZG-TEST^MR||BABY^BABY^AmeliaIZG^^L|BrunoIZG^EllaIZG^TeresaIZG^^M|20170723|F||2106-3^White^CDCREC~2054-5^Black or African American^CDCREC|123 Main Street^^TAMPA^FL^376041234^USA||(423) 364-3003^PRN^CP^1^215^5551213||eng^English^ISO639|||||||2135-2^Hispanic or Latino^CDCREC|||\\nPD1|||||||||||02^Reminder/Recall - any method^HL70215|||||A|20150901|20150901|\\nNK1|1|WinchesterIZG^EllaIZG^TeresaIZG^^^L|MTH^Mother^HL70063|5255 Loughboro Rd NW^^Tampa^FL^33601^USA^P|^PRN^PH^1^555^5551212NETizgatewaytesting@gmail.com|||||||||||||||||||||||||||^^^^43040-1234\\nORC|RE||197028^SP|||||||1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN||2223334445^Jones^Casey^^^^L^^NPI^^^^^^MD|||||DMC53427^IZ Gateway Clinic^HL70362|||||^^^^08540\\nRXA|0|1|20200815|20200815|03^measles, mumps, rubella virus vaccine^CVX^00006-4681-01^MMR II^NDC|0.5|mLUCUM||02^Historical information - from other provider^NIP001|1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN|^DMC53427^^^4 First Street^PO Box^Tampa^FL^33601||||0934GG|20211231|MSD^Merck Sharp \\T\\ Dohme Corp^MVX|||CP|A|\\nRXR|C38299^Subcutaneous^NCIT^SC^Subcutaneous^HL70162|RA^Right Arm^HL70163|\\nOBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|2|V02^VFC eligible-Medicaid/Medicaid Managed Care^HL70064||||||F|||20201031||||||||\\nOBX|2|CE|30963-3^Vaccine funding source^LN|2|VXC50^Public^CDCPHINVS||||||F|||20201031|\\nORC|RE||197028^SP|||||||1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN||2223334445^Jonesizg^Caseyizg^^^^L^^NPI^^^^^^MD|||||DMC53427^IZ Gateway Clinic^HL70362|||||^^^^129011234\\nRXA|0|1|20211020||21^Varicella^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001|1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN|^DMC53427^^^4 First Street^PO Box^Tampa^FL^33601||||U6329BP|20211231|MSD^Merck and Co^MVX|||CP|A|\\nRXR|C38299NCIT|RA^HL70163|\\nOBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V01^Not VFC elig^HL70064||||||F|||20210723|\\nOBX|2|CE|30963-3^Vaccine funding source^LN|1|VXC50^Public^HL70064||||||F|||20220406|\";",
+					"var goodRequestVXU = \"MSH|^~\\\\&amp;|IZGATEWAY|FLHOSP1|FLSHOTS|FLSHOTS|20230809110858-0500||VXU^V04^VXU_V04|IZGIIS-IIS-PreTestVXU-IISA|X|2.5.1|||ER|AL|\\nPID|1||DC1ADMIN^IZG-TEST^MR||BABYIZG^BABYIZG^AmeliaIZG^^L|BrunoIZG^EllaIZG^TeresaIZG^^M|20170723|F||2106-3^White^CDCREC~2054-5^Black or African American^CDCREC|123 Main Street^^TAMPA^FL^376041234^USA||(423) 364-3003^PRN^CP^1^215^5551213||eng^English^ISO639|||||||2135-2^Hispanic or Latino^CDCREC|||\\nPD1|||||||||||02^Reminder/Recall - any method^HL70215|||||A|20150901|20150901|\\nNK1|1|WinchesterIZG^EllaIZG^TeresaIZG^^^L|MTH^Mother^HL70063|5255 Loughboro Rd NW^^Tampa^FL^33601^USA^P|^PRN^PH^1^555^5551212NETizgatewaytesting@gmail.com|||||||||||||||||||||||||||^^^^43040-1234\\nORC|RE||197028^SP|||||||1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN||2223334445^Jones^Casey^^^^L^^NPI^^^^^^MD|||||DMC53427^IZ Gateway Clinic^HL70362|||||^^^^08540\\nRXA|0|1|20200815|20200815|03^measles, mumps, rubella virus vaccine^CVX^00006-4681-01^MMR II^NDC|0.5|mLUCUM||02^Historical information - from other provider^NIP001|1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN|^DMC53427^^^4 First Street^PO Box^Tampa^FL^33601||||0934GG|20211231|MSD^Merck Sharp \\T\\ Dohme Corp^MVX|||CP|A|\\nRXR|C38299^Subcutaneous^NCIT^SC^Subcutaneous^HL70162|RA^Right Arm^HL70163|\\nOBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|2|V02^VFC eligible-Medicaid/Medicaid Managed Care^HL70064||||||F|||20201031||||||||\\nOBX|2|CE|30963-3^Vaccine funding source^LN|2|VXC50^Public^CDCPHINVS||||||F|||20201031|\\nORC|RE||197028^SP|||||||1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN||2223334445^Jonesizg^Caseyizg^^^^L^^NPI^^^^^^MD|||||DMC53427^IZ Gateway Clinic^HL70362|||||^^^^129011234\\nRXA|0|1|20211020||21^Varicella^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001|1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN|^DMC53427^^^4 First Street^PO Box^Tampa^FL^33601||||U6329BP|20211231|MSD^Merck and Co^MVX|||CP|A|\\nRXR|C38299NCIT|RA^HL70163|\\nOBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V01^Not VFC elig^HL70064||||||F|||20210723|\\nOBX|2|CE|30963-3^Vaccine funding source^LN|1|VXC50^Public^HL70064||||||F|||20220406|\";",
 					"",
 					"pm.collectionVariables.set(\"GoodMessageVXULF\", goodRequestVXU.replace(\"\\r\", \"\\n\"))",
 					"pm.collectionVariables.set(\"GoodMessageVXUCRLF\", goodRequestVXU.replace(\"\\r\", \"\\r\\n\"))",
@@ -6009,41 +8146,41 @@
 					"        var regex = /PID\\||OBX\\||QPD\\||PV1\\||AL1\\||DG1\\||IN1\\||NK1\\||GT1\\||ORC\\||RXA\\|/;",
 					"        ",
 					"        return this.searchStringInObject(jsonObj, regex);",
-                    "},",
-                    "    testForPHIInLogs: function (pm) {",
-                    "        // Test to determine if logs have PHI",
-                    "        pm.sendRequest({",
-                    "            url: 'https://' + pm.environment.get('host') + ':' + pm.environment.get('port') + '/rest/logs', ",
-                    "            method: 'GET'",
-                    "        }, function (err, res) {",
-                    "            if (err) {",
-                    "                console.error(err);",
-                    "                pm.test(\"Error has occurred.\", function () {",
-                    "                    pm.expect(err.errno).to.equal('0');",
-                    "                });",
-                    "                return;",
-                    "            }",
-                    "",
-                    "            var jsonResponse = res.json();",
-                    "",
-                    "            pm.test(\"Log status is OK\", function () {",
-                    "                pm.expect(res.status).to.equal('OK');",
-                    "            });",
-                    "",
-                    "",
-                    "            // Regex to use to determine if logs have PHI    ",
-                    "            var isPHIPresent = utils.mayContainPHI(jsonResponse);",
-                    "",
-                    "            pm.test('Logs created from this request do not contain PHI', function () {",
-                    "                pm.expect(isPHIPresent).to.be.false;",
-                    "            });",
-                    "",
-                    "",
-                    "        });",
-                    "}",
-                    "}",
-                    "",
-                    "utils = Object.create(Utils);"
+					"},",
+					"    testForPHIInLogs: function (pm) {",
+					"        // Test to determine if logs have PHI",
+					"        pm.sendRequest({",
+					"            url: 'https://' + pm.environment.get('host') + ':' + pm.environment.get('port') + '/rest/logs', ",
+					"            method: 'GET'",
+					"        }, function (err, res) {",
+					"            if (err) {",
+					"                console.error(err);",
+					"                pm.test(\"Error has occurred.\", function () {",
+					"                    pm.expect(err.errno).to.equal('0');",
+					"                });",
+					"                return;",
+					"            }",
+					"",
+					"            var jsonResponse = res.json();",
+					"",
+					"            pm.test(\"Log status is OK\", function () {",
+					"                pm.expect(res.status).to.equal('OK');",
+					"            });",
+					"",
+					"",
+					"            // Regex to use to determine if logs have PHI    ",
+					"            var isPHIPresent = utils.mayContainPHI(jsonResponse);",
+					"",
+					"            pm.test('Logs created from this request do not contain PHI', function () {",
+					"                pm.expect(isPHIPresent).to.be.false;",
+					"            });",
+					"",
+					"",
+					"        });",
+					"}",
+					"}",
+					"",
+					"utils = Object.create(Utils);"
 				]
 			}
 		},

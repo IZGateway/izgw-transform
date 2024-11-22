@@ -23,7 +23,7 @@ public class XformHeader implements Serializable {
 
     @Schema(description="The transformed request.")
     private String transformedRequest;
-    @Schema(description="The original response prior to transformation.")
+    @Schema(description="The original response prior to xform.")
     private String originalResponse;
 
 	private static List<Pair<String, Function<SoapMessage, String>>> pairs = Arrays.asList(

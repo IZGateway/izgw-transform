@@ -1,13 +1,22 @@
-transformationservice:
+xform:
   allow-delete-via-api: false
-  destination: ${TS_HUB_DESTINATION:https://localhost/IISHubService}
+  destination:
+    hub:
+      uri: ${XFORM_HUB_DESTINATION:https://localhost/IISHubService}
+      id: ${XFORM_HUB_DESTINATION_ID:hub}
+      type: 5
+    iis:
+      uri: ${XFORM_IIS_DESTINATION:https://localhost/dev/IISService}
+      id: ${XFORM_IIS_DESTINATION_ID:iis}
+      type: 5
   configurations:
     organizations: testing/configuration/organizations.json
     pipelines: testing/configuration/pipelines.json
     solutions: testing/configuration/solutions.json
     mappings: testing/configuration/mappings.json
     access-control: testing/configuration/access-control.json
-  access-control-enabled: ${TS_ACCESS_CONTROL_ENABLED:false}
+    operation-precondition-fields: testing/configuration/operation-precondition-fields.json
+  access-control-enabled: ${XFORM_ACCESS_CONTROL_ENABLED:false}
 
 spring:
   autoconfigure:
@@ -32,6 +41,13 @@ elastic:
   host: ${ELASTIC_HOST:https://audacioussearchtest.es.us-east-1.aws.found.io:9243}
   index: ${ELASTIC_INDEX:izgw-dev-logstash}
 
+v2tofhir:
+  sendingApplication: ${SENDING_APPLICATION:FHIR}
+  sendingFacility: ${SENDING_FACILITY:DUFFY}
+  receivingApplication: ${RECEIVING_APPLICATION:TEST}
+  receivingFacility: ${RECEIVING_FACILITY:MOCK}
+  facilityId: ${FACILITY_ID:IZG}
+  
 management:
   metrics:
     export:
@@ -60,9 +76,9 @@ springdoc:
 server:
   error:
     include-message: always
-  hostname: ${TS_SERVER_HOSTNAME:dev.izgateway.org}
+  hostname: ${XFORM_SERVER_HOSTNAME:dev.izgateway.org}
   protocol: https
-  port: ${TS_SERVER_PORT:444}
+  port: ${XFORM_SERVER_PORT:444}
   local-port: 9082
   ssl:
     enabled: true
@@ -84,12 +100,12 @@ server:
 
 
 
-    key-store: ${TS_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE:${security.ssl-path}/awsdev_keystore.bcfks}
+    key-store: ${XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE:${security.ssl-path}/awsdev_keystore.bcfks}
     key-store-password: ${COMMON_PASS:}
     key-store-provider: BCFIPS
     key-store-type: bcfks
 
-    trust-store: ${TS_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE:${security.ssl-path}/awsdev_keystore.bcfks}
+    trust-store: ${XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE:${security.ssl-path}/awsdev_keystore.bcfks}
     trust-store-password: ${COMMON_PASS:}
     trust-store-provider: BCFIPS
     trust-store-type: bcfks
@@ -116,12 +132,12 @@ client:
       - TLS_DHE_DSS_WITH_AES_256_GCM_SHA384
       - TLS_DHE_RSA_WITH_AES_128_GCM_SHA256
       - TLS_DHE_DSS_WITH_AES_128_GCM_SHA256
-    key-store: ${TS_CRYPTO_STORE_KEY_WS_CLIENT_FILE:${security.ssl-path}/awsdev_keystore.bcfks}
+    key-store: ${XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE:${security.ssl-path}/awsdev_keystore.bcfks}
     key-store-password: ${COMMON_PASS:}
     key-store-provider: BCFIPS
     key-store-type: bcfks
 
-    trust-store: ${TS_CRYPTO_STORE_TRUST_WS_CLIENT_FILE:${security.ssl-path}/izgw_client_trust.bcfks}
+    trust-store: ${XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE:${security.ssl-path}/izgw_client_trust.bcfks}
     trust-store-password: ${COMMON_PASS:}
     trust-store-provider: BCFIPS
     trust-store-type: bcfks

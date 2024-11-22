@@ -1,3 +1,6 @@
+# Filebeat configuration
+path.data: /usr/share/filebeat/data
+
 # Filebeat Inputs section
 # Add another item to the "filebeat.inputs" object.
 
@@ -18,7 +21,8 @@ filebeat.inputs:
 
     processors:
       - add_host_metadata: ~
-      - add_cloud_metadata: ~
+      - add_cloud_metadata:
+          providers: ["aws"]
       - copy_fields:
           fields:
             - from: host.hostname.keyword

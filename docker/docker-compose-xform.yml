@@ -6,23 +6,25 @@ services:
     ports:
       - '444:444'
     environment:
-      COMMON_PASS: "${COMMON_PASS}"
-      SSL_SHARE: '/ssl'
-      TS_SERVER_PORT: '444'
-      TS_HUB_DESTINATION: "${TS_HUB_DESTINATION}"
-      ELASTIC_API_KEY: "${ELASTIC_API_KEY}"
-      LOGGING_LEVEL: "${LOGGING_LEVEL}"
-      transformationservice.configurations.organizations: "${CONFIG_ORGANIZATIONS}"
-      transformationservice.configurations.solutions: "${CONFIG_SOLUTIONS}"
-      transformationservice.configurations.pipelines: "${CONFIG_PIPELINES}"
-      transformationservice.configurations.mappings: "${CONFIG_MAPPINGS}"
-      transformationservice.configurations.access-control: "${CONFIG_ACCESSCONTROL}"
+      COMMON_PASS: ${COMMON_PASS}
+      XFORM_DESTINATION_HUB_URI: ${XFORM_DESTINATION_HUB_URI}
+      XFORM_SERVER_PORT: ${XFORM_SERVER_PORT}
+      XFORM_CONFIGURATIONS_ORGANIZATIONS: /configuration/organizations.json
+      XFORM_CONFIGURATIONS_PIPELINES: /configuration/pipelines.json
+      XFORM_CONFIGURATIONS_SOLUTIONS: /configuration/solutions.json
+      XFORM_CONFIGURATIONS_MAPPINGS: /configuration/mappings.json
+      XFORM_CONFIGURATIONS_ACCESS-CONTROL: /configuration/access-control.json
+      XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS: /configuration/operation-precondition-fields.json
+      XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE: /ssl/server_keystore.bcfks
+      XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE: /ssl/server_keystore.bcfks
+      XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE: /ssl/server_keystore.bcfks
+      XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE: /ssl/client_keystore.bcfks
     volumes:
       - type: bind
-        source: "${SSL_SOURCE}"
+        source: ${SSL_SOURCE}
         target: /ssl
       - type: bind
-        source: "${CONFIG_SOURCE}"
+        source: ${CONFIG_SOURCE}
         target: /configuration
     networks:
       - izgw-network
