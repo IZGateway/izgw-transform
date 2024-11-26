@@ -4,10 +4,7 @@
 
 The Transformation Service (a.k.a Xform Service) is an optional service that transforms messages as part of the IZ Gateway Hub message flow.  This document describes how to install and configure the Transformation Service as an IIS Receiver (hosted within the Receiving IIS's hosted environment).
 
-![Transformation Service Diagram](https://raw.githubusercontent.com/IZGateway/izgw-transform/refs/heads/IGDD-1775_documentation_for_selfhosted/docs/images/xform-as-iis-receiver.png)
-
-
-## Introduction
+## Actors and Data Flow
 
 The document uses actors to describe the flow of data through the IZ Gateway Hub and the Transformation Service.  The actors are broken down into two groups: those that are part of the IZ Gateway Hub and those that are part of the Transformation Service.
 
@@ -34,6 +31,8 @@ The Transformation Service has three actors when deployed as an IIS Receiver:
 3. **Transformation Service Actor #2** (Transformation Engine) transforms the message.
 4. **Transformation Service Actor #3** (IIS SOAP Client Sender) sends the message to **IIS Receiving System**.
 5. **IIS Receiving System** responds to the message, and the message flows back through the actors to the original **IIS Sending System**.
+
+![Transformation Service Diagram](https://raw.githubusercontent.com/IZGateway/izgw-transform/refs/heads/IGDD-1775_documentation_for_selfhosted/docs/images/xform-as-iis-receiver.png)
 
 ## Prerequisites
 
@@ -175,7 +174,26 @@ CONTAINER ID   IMAGE                                     COMMAND                
 ded59e415a2b   ghcr.io/izgateway/izgw-transform:latest   "sh -c 'bash run.sh …"   2 minutes ago   Up 2 minutes   8000/tcp, 0.0.0.0:444->444/tcp, 9082/tcp   local-xform
 ```
 
-## Generate Server Key Store
+## Sending a Sample Message to the Transformation Service
+curl --location 'https://localhost:444/IISService' \
+--header 'Content-Type: application/xml' \
+--data '<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:cdc:iisb:2014">
+<soap:Header xmlns:wsa="http://www.w3.org/2005/08/addressing">
+<wsa:Action>urn:cdc:iisb:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>
+<wsa:MessageID>TS_TC_06</wsa:MessageID>
+</soap:Header>
+<soap:Body>
+<urn:SubmitSingleMessageRequest>
+<urn:Username>duser</urn:Username>
+<urn:Password>dpassword</urn:Password>
+<urn:Hl7Message>MSH|^~\&amp;|IRIS IIS|IRIS|TEST|TC_04|20210402091512.000-0100||QBP^Q11^QBP_Q11|20210330093013AZQ231|P|2.5.1|||ER|AL|||||Z34^CDCPHINVS|SIISCLIENT28374|
+QPD|Z34^Request Immunization History^CDCPHINVS|20210330093013LA231|LAMASM77BF4BA6^^^IZGATEWAYTEST&amp;2.16.840.1.113883.40.1&amp;ISO^MR|JohnsonIZG^James^Andrew^^^^L|Leung^Jen^^^^^M|20160414|M|Main Street&amp;&amp;123^^New Orleans^LA^70115^^L|^PRN^PH^^^555^5551111|Y|1</urn:Hl7Message>
+</urn:SubmitSingleMessageRequest>
+</soap:Body>
+</soap:Envelope>
+'
+## Appendix
+### Generate Server Key Store
 
 One of the files mentioned previously is the keystore that is needed to have the Transformation Service run.  For our example we will name this server_keystore.bcfks.
 
@@ -195,7 +213,7 @@ Steps to create the keystore bcfks file:
 * To list the contents of the bcfks file:
     * ```keytool -list -keystore ./server_keystore.bcfks -storepass 'password' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-1.0.2.4.jar```
 
-## Generate Client Trust Store
+### Generate Client Trust Store
 
 You may already have a file that works for this if you are connecting to a dev or test IZ Gateway. However, as an
 example, below are steps to generate this file to connect to the Development IZ Gateway hosted at dev.izgateway.org.  For out example, our output file will be named client_keystore.bcfks.
