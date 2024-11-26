@@ -4,8 +4,8 @@
 
 The Transformation Service (a.k.a Xform Service) is an optional service that transforms messages as part of the IZ Gateway Hub message flow.  This document describes how to install and configure the Transformation Service as an IIS Receiver (hosted within the Receiving IIS's hosted environment).
 
-![Transformation Service Diagram](changeme)
-https://github.com/IZGateway/izgw-transform/blob/main/docs/images/github_generate_token_1.png?raw=true
+![Transformation Service Diagram](https://raw.githubusercontent.com/IZGateway/izgw-transform/refs/heads/IGDD-1775_documentation_for_selfhosted/docs/images/xform-as-iis-receiver.png)
+
 
 ## Introduction
 
