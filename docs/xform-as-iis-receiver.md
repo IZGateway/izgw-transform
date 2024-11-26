@@ -26,11 +26,14 @@ The Transformation Service has three actors when deployed as an IIS Receiver:
 
 ### Data Flow with Transformation Service
 
-1. **Transformation Service Actor #1** (IIS SOAP Endpoint Listener) sits in front of **IIS Receiving System**.
-2. It receives the SOAP call from **IZ Gateway Hub IIS Client Sender**.
-3. **Transformation Service Actor #2** (Transformation Engine) transforms the message.
-4. **Transformation Service Actor #3** (IIS SOAP Client Sender) sends the message to **IIS Receiving System**.
-5. **IIS Receiving System** responds to the message, and the message flows back through the actors to the original **IIS Sending System**.
+1. **IIS Sending System** send message to IZ Gateway.
+2. **IZ Gateway Hub SOAP Endpoint Listener** receives the message, then passes control to **IZ Gateway Hub IIS Client Sender**.
+3. **IZ Gateway Hub IIS Client Sender** sends the message to the Transformation Service **IIS SOAP Endpoint Listener**.
+4. **IIS SOAP Endpoint Listener** receives the message, then passes control to the **Transformation Engine**.
+5. **Transformation Engine** processes the transformation logic.
+6. **Transformation Engine** passes control to the **IIS SOAP Client Sender**.
+7. **IIS SOAP Client Sender** sends the transformed message to the **IIS Receiving System**.
+8. **IIS Receiving System** receives the transformed message, processes it, then returns the response.
 
 ![Transformation Service Diagram](https://raw.githubusercontent.com/IZGateway/izgw-transform/refs/heads/IGDD-1775_documentation_for_selfhosted/docs/images/xform-as-iis-receiver.png)
 
