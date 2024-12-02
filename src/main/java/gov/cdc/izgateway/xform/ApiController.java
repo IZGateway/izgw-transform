@@ -3,8 +3,11 @@ package gov.cdc.izgateway.xform;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.xform.model.*;
+import gov.cdc.izgateway.xform.security.Roles;
 import gov.cdc.izgateway.xform.services.*;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +45,8 @@ public class ApiController {
             MappingService mappingService,
             PreconditionService preconditionService,
             OperationService operationService,
-            OperationPreconditionFieldService operationPreconditionFieldService
+            OperationPreconditionFieldService operationPreconditionFieldService,
+            AccessControlRegistry registry
     ) {
         this.organizationService = organizationService;
         this.pipelineService = pipelineService;
@@ -51,6 +55,7 @@ public class ApiController {
         this.preconditionService = preconditionService;
         this.operationService = operationService;
         this.operationPreconditionFieldService = operationPreconditionFieldService;
+        registry.register(this);
     }
 
     @GetMapping("/api/v1/pipelines/{uuid}")
@@ -94,6 +99,7 @@ public class ApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.ADMIN})
     @PutMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> updateOrganization(@PathVariable UUID uuid, @RequestBody Organization updatedOrganization) {
         updatedOrganization.setId(uuid);
@@ -101,6 +107,7 @@ public class ApiController {
         return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
     }
 
+    @RolesAllowed({"admin", "superuser"})
     @GetMapping("/api/v1/pipelines")
     public ResponseEntity<String> getPipelinesList(
             @RequestParam(required = false) String nextCursor,
@@ -116,6 +123,7 @@ public class ApiController {
         }
     }
 
+    @RolesAllowed({Roles.ADMIN})
     @GetMapping("/api/v1/organizations")
     public ResponseEntity<String> getOrganizationsList(
             @RequestParam(required = false) String nextCursor,
