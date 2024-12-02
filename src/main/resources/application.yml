@@ -82,7 +82,7 @@ server:
   local-port: 9082
   ssl:
     enabled: true
-    client-auth: want
+    client-auth: need
     enabled-protocols:
       - TLSv1.2
       - TLSv1.3
