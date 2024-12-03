@@ -28,16 +28,21 @@ import java.security.cert.X509Certificate;
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class AccessControlValve extends ValveBase {
     private final IAccessControlService accessControlService;
-    private final RoleManager roleManager;
+    // Paul - may not be needed any longer ... private final RoleManager roleManager;
 
     @Value("${xform.access-control-enabled}")
     private boolean accessControlEnabled;
 
     @Autowired
-    public AccessControlValve(IAccessControlService accessControlService, RoleManager roleManager) {
+    public AccessControlValve(IAccessControlService accessControlService) {
         this.accessControlService = accessControlService;
-        this.roleManager = roleManager;
     }
+
+//    @Autowired
+//    public AccessControlValve(IAccessControlService accessControlService, RoleManager roleManager) {
+//        this.accessControlService = accessControlService;
+//        this.roleManager = roleManager;
+//    }
 
     @Override
     public void invoke(Request req, Response resp) throws IOException, ServletException {
@@ -47,11 +52,9 @@ public class AccessControlValve extends ValveBase {
     }
 
     public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
-        roleManager.addAllRoles(req, (X509Certificate[]) req.getAttribute(Globals.CERTIFICATES_ATTR));
-
         String path = req.getRequestURI();
 
-        if ( ! accessControlService.checkAccess("Talk through this during review", req.getMethod(), path) ) {
+        if ( Boolean.FALSE.equals(accessControlService.checkAccess("Talk through this during review", req.getMethod(), path)) ) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         } else {

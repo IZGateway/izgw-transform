@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Log
 @RestController
+@Lazy(false)
 public class ApiController {
     private final OrganizationService organizationService;
     private final PipelineService pipelineService;

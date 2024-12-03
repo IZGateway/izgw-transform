@@ -16,7 +16,10 @@ xform:
     mappings: testing/configuration/mappings.json
     access-control: testing/configuration/access-control.json
     operation-precondition-fields: testing/configuration/operation-precondition-fields.json
+    users: testing/configuration/users.json
   access-control-enabled: ${XFORM_ACCESS_CONTROL_ENABLED:false}
+jwt:
+  shared-secret: ${TS_JWT_SECRET:}
 
 spring:
   autoconfigure:
@@ -158,7 +161,7 @@ logging:
     gov:
       cdc:
         izgateway:
-          transformation: ${LOGGING_LEVEL:INFO}
+          xform: ${LOGGING_LEVEL:INFO}
           security:
             AccessControlRegistry: INFO
             AccessControlInterceptor: INFO
