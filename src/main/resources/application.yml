@@ -17,6 +17,7 @@ xform:
     access-control: testing/configuration/access-control.json
     operation-precondition-fields: testing/configuration/operation-precondition-fields.json
     users: testing/configuration/users.json
+    group-role-mapping: testing/configuration/group-role-mapping.json
   access-control-enabled: ${XFORM_ACCESS_CONTROL_ENABLED:false}
 jwt:
   shared-secret: ${TS_JWT_SECRET:}
@@ -167,6 +168,7 @@ logging:
             AccessControlInterceptor: INFO
             client:
               ClientSecurityInterceptor: INFO
+            principal: ${LOGGING_LEVEL:INFO}
             server:
               ServerSecurityInterceptor: INFO
     org:

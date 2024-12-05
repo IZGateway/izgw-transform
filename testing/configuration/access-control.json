@@ -4,8 +4,7 @@
     "userId": "8c942339-e10d-418f-8898-d8e73388198c",
     "active": true,
     "roles": [
-      "xform-sending-system",
-      "admin"
+      "xform-sender"
     ]
   },
   {
@@ -13,9 +12,8 @@
     "userId": "f1d0616c-ec7c-4070-b43a-9e7295d45d21",
     "active": true,
     "roles": [
-      "xform-sending-system",
-      "admin",
-      "user"
+      "xform-sender",
+      "admin"
     ]
   },
   {
@@ -23,8 +21,7 @@
     "userId": "61d7e381-2807-4d0f-8e6a-8a0df182d70d",
     "active": true,
     "roles": [
-      "admin",
-      "user"
+      "admin"
     ]
   }
 ]

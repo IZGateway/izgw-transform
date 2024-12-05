@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * The AccessControlService is a placeholder for the IAccessControlService interface.  We will be implementing
  * a simpler repository than the existing DB repository.
- * This class contains no-ops for all methods.
+ * This class contains no-ops for some methods.
  * Ticket to track this: https://support.izgateway.org/browse/IGDD-1664
  */
 @Slf4j
@@ -36,7 +36,9 @@ public class AccessControlService  extends GenericService<AccessControl> impleme
         return roles;
     }
 
-    // TODO: PCahill - discuss why we may not need the user parameter
+    // TODO: PCahill - discuss ... we don't need the user parameter because the request context has the current user
+    //       and their roles.
+    //       Should we update the interface to allow a checkAccess method that doesn't require a user parameter?
     @Override
     public Boolean checkAccess(String user, String method, String path) {
         List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);

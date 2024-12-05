@@ -28,21 +28,11 @@ import java.security.cert.X509Certificate;
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class AccessControlValve extends ValveBase {
     private final IAccessControlService accessControlService;
-    // Paul - may not be needed any longer ... private final RoleManager roleManager;
-
-    @Value("${xform.access-control-enabled}")
-    private boolean accessControlEnabled;
 
     @Autowired
     public AccessControlValve(IAccessControlService accessControlService) {
         this.accessControlService = accessControlService;
     }
-
-//    @Autowired
-//    public AccessControlValve(IAccessControlService accessControlService, RoleManager roleManager) {
-//        this.accessControlService = accessControlService;
-//        this.roleManager = roleManager;
-//    }
 
     @Override
     public void invoke(Request req, Response resp) throws IOException, ServletException {
