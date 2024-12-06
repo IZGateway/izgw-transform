@@ -114,6 +114,7 @@ public class ApiController {
         return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
     }
 
+    // TODO - Paul to look at AccessControl as it works with groups too.
     @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/pipelines")
     public ResponseEntity<String> getPipelinesList(

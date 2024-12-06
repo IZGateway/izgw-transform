@@ -65,8 +65,6 @@ public class XformPrincipalService implements PrincipalService {
             addRolesIfFromLocalhost(izgPrincipal, request);
         }
 
-        List<String> tempList = groupRoleMappingService.getRolesByGroup("IZG Operations");
-
         return izgPrincipal;
     }
 
@@ -99,8 +97,8 @@ public class XformPrincipalService implements PrincipalService {
         }
 
         // Add roles for the user as specified in the access control configuration
-        Map<String, TreeSet<String>> userRoles = accessControlService.getUserRoles();
-        TreeSet<String> roles = userRoles.get(user.getId().toString());
+        Map<String, TreeSet<String>> usersAndRoles = accessControlService.getUserRoles();
+        TreeSet<String> roles = usersAndRoles.get(user.getId().toString());
         if (roles == null || roles.isEmpty()) {
             log.warn("No roles found for user: {}", user.getUserName());
             return izgPrincipal;

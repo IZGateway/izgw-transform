@@ -8,6 +8,7 @@ import gov.cdc.izgateway.xform.model.AccessControl;
 import gov.cdc.izgateway.xform.repository.XformRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -24,6 +25,9 @@ import java.util.*;
 public class AccessControlService  extends GenericService<AccessControl> implements IAccessControlService {
     private final AccessControlRegistry registry;
 
+    @Value("${server.hostname:dev.izgateway.org}")
+    private String serverName;
+
     @Autowired
     public AccessControlService(XformRepository<AccessControl> repo, AccessControlRegistry registry) {
         super(repo);
@@ -37,9 +41,11 @@ public class AccessControlService  extends GenericService<AccessControl> impleme
     }
 
     // TODO: PCahill - discuss ... we don't need the user parameter because the request context has the current user
-    //       and their roles.
-    //       Should we update the interface to allow a checkAccess method that doesn't require a user parameter?
+    //       and their roles. Should we update the interface to allow a checkAccess method that doesn't require
+    //       a user parameter?
     @Override
+    // TODO PCAHILL - from Code Review - we don't need to call this, instead we can call whatever it is that we need.
+    // don't make any changes to the overridden method.
     public Boolean checkAccess(String user, String method, String path) {
         List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);
 
@@ -60,7 +66,7 @@ public class AccessControlService  extends GenericService<AccessControl> impleme
 
     @Override
     public String getServerName() {
-        return "";
+        return serverName;
     }
 
     @Override
@@ -122,8 +128,3 @@ public class AccessControlService  extends GenericService<AccessControl> impleme
     }
 
 }
-// TODO: PCahill create a JWT role mapping service that will map the JWT roles to the xform roles.
-// TODO: Where to store the actual user?
-// TODO: Compare and align access control valve
-// TODO: PCahill - make sure org override works
-// TODO: PCahill - make sure roles are cleared after request

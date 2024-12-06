@@ -14,6 +14,7 @@ import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.soap.message.HasCredentials;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.xform.camel.constants.EndpointUris;
 import gov.cdc.izgateway.xform.context.IZGXformContext;
 import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
@@ -53,7 +54,7 @@ import java.util.UUID;
 @RequestMapping("/IISHubService")
 @Lazy(false)
 @Slf4j
-public class HubController extends SoapControllerBase {
+public class HubController extends BaseController /*SoapControllerBase*/ {
     private final ProducerTemplate producerTemplate;
     private final OrganizationService organizationService;
     private final IAccessControlService accessControlService;
@@ -70,7 +71,7 @@ public class HubController extends SoapControllerBase {
             IAccessControlService accessControlService
     ) {
         // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
-        super(mshService, SoapMessage.IIS2014_NS, "cdc-iis-hub.wsdl", Arrays.asList(SoapMessage.HUB_NS, SoapMessage.IIS2014_NS));
+        super(mshService, SoapMessage.IIS2014_NS, "cdc-iis.wsdl", Arrays.asList(SoapMessage.IIS2014_NS), producerTemplate, organizationService, accessControlService);
         this.producerTemplate = producerTemplate;
         this.organizationService = organizationService;
         this.accessControlService = accessControlService;
@@ -103,57 +104,11 @@ public class HubController extends SoapControllerBase {
         return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
     }
 
-    private Organization getOrganization(String commonName) throws Fault {
-        if (commonName == null) {
-            // If there is no common name, then the organization can be determined by the x-xform-organization header.
-            return checkOrganizationOverride(null);
-        } else {
-            Organization organization = organizationService.getOrganizationByCommonName(commonName);
-            return checkOrganizationOverride(organization);
-        }
-    }
-
-    /**
-     * In some scenarios such as testing, it is desirable that the incoming request use a different Organization
-     * than the one related to the client-side certificate.  If the request is from an admin, then the incoming
-     * request is checked for an x-xform-organization header.  If the header is present, the organization is set to
-     * this header value.
-     *
-     * @param organization
-     * @return
-     * @throws Fault
-     */
-    private Organization checkOrganizationOverride(Organization organization) throws Fault {
-        if (RequestContext.getRoles().contains(Roles.ADMIN) &&
-                RequestContext.getHttpHeaders() != null &&
-                RequestContext.getHttpHeaders().containsKey("x-xform-organization")) {
-            String orgId = RequestContext.getHttpHeaders().get("x-xform-organization").get(0);
-            Organization organizationOverride = organizationService.getObject(UUID.fromString(orgId));
-            if (organizationOverride == null) {
-                throw new HubControllerFault("Organization not found for organizationId: " + orgId);
-            }
-            return organizationOverride;
-        }
-
-        if (organization == null) {
-            throw new HubControllerFault("Organization could not be determined.");
-        }
-
-        return organization;
-    }
-
-    private IZGXformContext createXformContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
-        ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage);
-        serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
-
-        return new IZGXformContext(serviceContext, submitSingleMessage);
-    }
-
-    private ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+    protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         try {
             return new ServiceContext(organization,
-                    "izgts:IISHubService",
-                    "izghub:IISHubService",
+                    EndpointUris.IZGTS_IISHubService,
+                    EndpointUris.IZGHUB_IISHubService,
                     DataType.HL7V2,
                     submitSingleMessage.getFacilityID(),
                     submitSingleMessage.getHl7Message());
@@ -161,6 +116,65 @@ public class HubController extends SoapControllerBase {
             throw new HubControllerFault(e.getMessage());
         }
     }
+
+//    private Organization getOrganization(String commonName) throws Fault {
+//        if (commonName == null) {
+//            // If there is no common name, then the organization can be determined by the x-xform-organization header.
+//            return checkOrganizationOverride(null);
+//        } else {
+//            Organization organization = organizationService.getOrganizationByCommonName(commonName);
+//            return checkOrganizationOverride(organization);
+//        }
+//    }
+
+//    /**
+//     * In some scenarios such as testing, it is desirable that the incoming request use a different Organization
+//     * than the one related to the client-side certificate.  If the request is from an admin, then the incoming
+//     * request is checked for an x-xform-organization header.  If the header is present, the organization is set to
+//     * this header value.
+//     *
+//     * @param organization
+//     * @return
+//     * @throws Fault
+//     */
+//    private Organization checkOrganizationOverride(Organization organization) throws Fault {
+//        if (RequestContext.getRoles().contains(Roles.ADMIN) &&
+//                RequestContext.getHttpHeaders() != null &&
+//                RequestContext.getHttpHeaders().containsKey("x-xform-organization")) {
+//            String orgId = RequestContext.getHttpHeaders().get("x-xform-organization").get(0);
+//            Organization organizationOverride = organizationService.getObject(UUID.fromString(orgId));
+//            if (organizationOverride == null) {
+//                throw new HubControllerFault("Organization not found for organizationId: " + orgId);
+//            }
+//            return organizationOverride;
+//        }
+//
+//        if (organization == null) {
+//            throw new HubControllerFault("Organization could not be determined.");
+//        }
+//
+//        return organization;
+//    }
+
+//    private IZGXformContext createXformContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+//        ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage);
+//        serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
+//
+//        return new IZGXformContext(serviceContext, submitSingleMessage);
+//    }
+//
+//    private ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+//        try {
+//            return new ServiceContext(organization,
+//                    "izgts:IISHubService",
+//                    "izghub:IISHubService",
+//                    DataType.HL7V2,
+//                    submitSingleMessage.getFacilityID(),
+//                    submitSingleMessage.getHl7Message());
+//        } catch (HL7Exception e) {
+//            throw new HubControllerFault(e.getMessage());
+//        }
+//    }
 
     @Override
     protected IDestination getDestination(String destinationId) throws UnknownDestinationFault {

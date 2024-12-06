@@ -14,6 +14,7 @@ import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.enums.DataFlowDirection;
 import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
 import gov.cdc.izgateway.xform.model.Organization;
+import gov.cdc.izgateway.xform.security.Roles;
 import gov.cdc.izgateway.xform.services.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelExecutionException;
@@ -77,9 +78,8 @@ public abstract class BaseController extends SoapControllerBase {
     }
 
     protected Organization checkOrganizationOverride(Organization organization) throws Fault {
-        // TODO Paul - add this back in to the if statement:
-        //        && accessControlService.isUserInRole(organization.getId(), XformAccessControlService.ADMIN_ROLE)
         if (RequestContext.getHttpHeaders() != null
+                && RequestContext.getPrincipal().getRoles().contains(Roles.ADMIN)
                 && RequestContext.getHttpHeaders().containsKey("x-xform-organization")) {
 
             Map<String, List<String>> headers = RequestContext.getHttpHeaders();
