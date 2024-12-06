@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "7d9920eb-d345-47aa-b532-f061e5514e99",
+		"_postman_id": "6ec96c7c-f232-422d-8473-28447044f032",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/AustinM~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-7d9920eb-d345-47aa-b532-f061e5514e99?action=share&source=collection_link&creator=2729094"
+		"_exporter_id": "28864196"
 	},
 	"item": [
 		{
@@ -458,97 +457,97 @@
 					},
 					"response": []
 				},
-              {
-                "name": "TS_TC_06 QBP RESPONSE MSH-7 CDC-WSDL",
-                "event": [
-                  {
-                    "listen": "test",
-                    "script": {
-                      "exec": [
-                        "const xml2js = require('xml2js');\r",
-                        "\r",
-                        "pm.test(\"Status code is 200\", function () {\r",
-                        "    pm.response.to.have.status(200);\r",
-                        "});\r",
-                        "\r",
-                        "pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
-                        "    var response = utils.removeNS(xml2Json(responseBody));\r",
-                        "    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-                        "    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
-                        "\r",
-                        "\r",
-                        "});\r",
-                        "\r",
-                        "pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
-                        "    var response = utils.removeNS(xml2Json(responseBody));\r",
-                        "    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
-                        "    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
-                        "\r",
-                        "});\r",
-                        "\r",
-                        "utils.testForPHIInLogs(pm);\r",
-                        "utils.testSLA(pm, LONG_SLA);\r",
-                        "\r",
-                        "\r",
-                        ""
-                      ],
-                      "type": "text/javascript",
-                      "packages": {}
-                    }
-                  },
-                  {
-                    "listen": "prerequest",
-                    "script": {
-                      "exec": [
-                        "utils.setup(pm);"
-                      ],
-                      "type": "text/javascript",
-                      "packages": {}
-                    }
-                  }
-                ],
-                "protocolProfileBehavior": {
-                  "disabledSystemHeaders": {
-                    "host": true
-                  }
-                },
-                "request": {
-                  "method": "POST",
-                  "header": [
-                    {
-                      "key": "Host",
-                      "value": "{{hostHeader}}",
-                      "type": "text"
-                    },
-                    {
-                      "key": "Content-Type",
-                      "value": "application/xml",
-                      "type": "text"
-                    },
-                    {
-                      "key": "x-xform-organization",
-                      "value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-                      "type": "text"
-                    }
-                  ],
-                  "body": {
-                    "mode": "raw",
-                    "raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <wsa:Action>urn:cdc:iisb:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn:SubmitSingleMessageRequest>\r\n      <urn:Username>duser</urn:Username>\r\n      <urn:Password>dpassword</urn:Password>\r\n      <urn:Hl7Message>{{GoodMessageLF}}</urn:Hl7Message>\r\n    </urn:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>\r\n"
-                  },
-                  "url": {
-                    "raw": "{{protocol}}://{{host}}:{{port}}/IISService",
-                    "protocol": "{{protocol}}",
-                    "host": [
-                      "{{host}}"
-                    ],
-                    "port": "{{port}}",
-                    "path": [
-                      "IISService"
-                    ]
-                  }
-                },
-                "response": []
-              }
+				{
+					"name": "TS_TC_06 QBP RESPONSE MSH-7 CDC-WSDL",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const xml2js = require('xml2js');\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
+									"    var response = utils.removeNS(xml2Json(responseBody));\r",
+									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
+									"\r",
+									"\r",
+									"});\r",
+									"\r",
+									"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
+									"    var response = utils.removeNS(xml2Json(responseBody));\r",
+									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
+									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
+									"\r",
+									"});\r",
+									"\r",
+									"utils.testForPHIInLogs(pm);\r",
+									"utils.testSLA(pm, LONG_SLA);\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"utils.setup(pm);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"host": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Host",
+								"value": "{{hostHeader}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/xml",
+								"type": "text"
+							},
+							{
+								"key": "x-xform-organization",
+								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <wsa:Action>urn:cdc:iisb:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn:SubmitSingleMessageRequest>\r\n      <urn:Username>duser</urn:Username>\r\n      <urn:Password>dpassword</urn:Password>\r\n      <urn:Hl7Message>{{GoodMessageLF}}</urn:Hl7Message>\r\n    </urn:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>\r\n"
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/IISService",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"IISService"
+							]
+						}
+					},
+					"response": []
+				}
 			]
 		},
 		{
@@ -1271,6 +1270,220 @@
 										"{{host}}"
 									],
 									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"pipelines"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "100000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Pipelines with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Check to see if the 2 active Pipelines we added in 3 previous steps are in the response",
+											"let response = pm.response.json();",
+											"let found0 = false;",
+											"let found1 = false;",
+											"for (var i = 0; i < response[\"data\"].length; i++) {",
+											"    if (response[\"data\"][i].id == pm.collectionVariables.get(\"id0\")) {",
+											"        found0 = true;",
+											"    } else if (response[\"data\"][i].id == pm.collectionVariables.get(\"id1\")) {",
+											"        found1 = true;",
+											"    }",
+											"}",
+											"",
+											"pm.test(\"Found New Pipeline0\", function() {",
+											"    pm.expect(found0).to.be.true;",
+											"});",
+											"",
+											"pm.test(\"Found New Pipeline1\", function() {",
+											"    pm.expect(found1).to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:9082/api/v1/pipelines?limit=100000",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "9082",
+									"path": [
+										"api",
+										"v1",
+										"pipelines"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "100000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Pipelines with JWT no roles",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 401 Unauthorized code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(401);",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwtNoRoles}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://{{host}}:9082/api/v1/pipelines?limit=100000",
+									"protocol": "http",
+									"host": [
+										"{{host}}"
+									],
+									"port": "9082",
 									"path": [
 										"api",
 										"v1",
@@ -7051,6 +7264,30 @@
 					"pm.collectionVariables.set(\"GoodMessageVXULF\", goodRequestVXU.replace(\"\\r\", \"\\n\"))",
 					"pm.collectionVariables.set(\"GoodMessageVXUCRLF\", goodRequestVXU.replace(\"\\r\", \"\\r\\n\"))",
 					"",
+					"var validJwt = {",
+					"  \"iss\": \"theIssuer\",",
+					"  \"sub\": \"sampleSubject\",",
+					"  \"aud\": \"theAudience\",",
+					"  \"jti\": \"jwt-id-001\",",
+					"  \"scope\": \"scope1 pipeline-reader\",",
+					"  \"groups\": [",
+					"    \"BusinessAnalyst\",",
+					"    \"Group2\",",
+					"    \"Group3\"",
+					"  ]",
+					"};",
+					"pm.collectionVariables.set(\"validJwt\", JSON.stringify(validJwt));",
+					"",
+					"var validJwtNoRoles = {",
+					"  \"iss\": \"theIssuer\",",
+					"  \"sub\": \"sampleSubject\",",
+					"  \"aud\": \"theAudience\",",
+					"  \"jti\": \"jwt-id-001\",",
+					"  \"scope\": \"\",",
+					"  \"groups\": []",
+					"};",
+					"pm.collectionVariables.set(\"validJwtNoRoles\", JSON.stringify(validJwtNoRoles));",
+					"",
 					"var tooLarge = goodResponse.replace('&|', \"&amp;|\");",
 					"var last;",
 					"var maxLength = 65536;",
@@ -8237,6 +8474,14 @@
 		},
 		{
 			"key": "hex1b",
+			"value": ""
+		},
+		{
+			"key": "validJwt",
+			"value": ""
+		},
+		{
+			"key": "validJwtNoRoles",
 			"value": ""
 		}
 	]

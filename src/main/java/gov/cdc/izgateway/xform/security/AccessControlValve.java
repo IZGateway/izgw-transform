@@ -1,24 +1,18 @@
 package gov.cdc.izgateway.xform.security;
 
-import gov.cdc.izgateway.service.IAccessControlService;
-import gov.cdc.izgateway.xform.services.OrganizationService;
-import gov.cdc.izgateway.utils.X500Utils;
+import gov.cdc.izgateway.xform.services.AccessControlService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
-import java.security.cert.X509Certificate;
 
 /**
  * Performs access control checks.
@@ -27,10 +21,10 @@ import java.security.cert.X509Certificate;
 @Component("xformValveAccessControl")
 @Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class AccessControlValve extends ValveBase {
-    private final IAccessControlService accessControlService;
+    private final AccessControlService accessControlService;
 
     @Autowired
-    public AccessControlValve(IAccessControlService accessControlService) {
+    public AccessControlValve(AccessControlService accessControlService) {
         this.accessControlService = accessControlService;
     }
 
@@ -43,8 +37,7 @@ public class AccessControlValve extends ValveBase {
 
     public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
         String path = req.getRequestURI();
-
-        if ( Boolean.FALSE.equals(accessControlService.checkAccess("Talk through this during review", req.getMethod(), path)) ) {
+        if ( Boolean.FALSE.equals(accessControlService.checkAccess(req.getMethod(), path)) ) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         } else {

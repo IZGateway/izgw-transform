@@ -2,7 +2,6 @@ package gov.cdc.izgateway.xform.endpoints.hub;
 
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.logging.RequestContext;
-import gov.cdc.izgateway.service.IAccessControlService;
 import gov.cdc.izgateway.service.IMessageHeaderService;
 import gov.cdc.izgateway.soap.SoapControllerBase;
 import gov.cdc.izgateway.soap.fault.Fault;
@@ -15,6 +14,7 @@ import gov.cdc.izgateway.xform.enums.DataFlowDirection;
 import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
 import gov.cdc.izgateway.xform.model.Organization;
 import gov.cdc.izgateway.xform.security.Roles;
+import gov.cdc.izgateway.xform.services.AccessControlService;
 import gov.cdc.izgateway.xform.services.OrganizationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelExecutionException;
@@ -30,7 +30,7 @@ import java.util.UUID;
 public abstract class BaseController extends SoapControllerBase {
     protected final ProducerTemplate producerTemplate;
     protected final OrganizationService organizationService;
-    protected final IAccessControlService accessControlService;
+    protected final AccessControlService accessControlService;
 
     protected BaseController(
             IMessageHeaderService mshService,
@@ -39,7 +39,7 @@ public abstract class BaseController extends SoapControllerBase {
             List<String> additionalNamespaces,
             ProducerTemplate producerTemplate,
             OrganizationService organizationService,
-            IAccessControlService accessControlService
+            AccessControlService accessControlService
     ) {
         super(mshService, namespace, wsdl, additionalNamespaces);
         this.producerTemplate = producerTemplate;

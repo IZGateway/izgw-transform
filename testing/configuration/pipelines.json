@@ -109,7 +109,7 @@
       "comparisonValue" : "VXU"
     } ]
   } ]
-},{
+}, {
   "pipelineName" : "Starfleet Medical Systems to Nebula Health Network Pipeline",
   "id" : "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
   "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
@@ -267,6 +267,15 @@
   "description" : "Empty Pipeline for Cosmic Ray Immunization Center (localhost)",
   "inboundEndpoint" : "izgts:IISHubService",
   "outboundEndpoint" : "izghub:IISHubService",
+  "active" : true,
+  "pipes" : [ ]
+}, {
+  "pipelineName" : "Balanced regional hierarchy",
+  "id" : "08ddcc59-cd1c-4643-803a-51d6b328f32f",
+  "organizationId" : "9c03e809-e298-4437-87e5-7a8cefb153bb",
+  "description" : null,
+  "inboundEndpoint" : "User-friendly eco-centric pricing structure)",
+  "outboundEndpoint" : "Progressive impactful paradigm)",
   "active" : true,
   "pipes" : [ ]
 } ]

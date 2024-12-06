@@ -36,7 +36,6 @@ public class Destination implements IDestination {
     private String destType;
     private String jurisdictionName;
     private String jurisdictionDesc;
-    private boolean isAzure = false;
 
     @Override
     public IDestination safeCopy() {

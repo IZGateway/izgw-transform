@@ -1,17 +1,11 @@
 package gov.cdc.izgateway.xform.services;
 
-import gov.cdc.izgateway.logging.RequestContext;
-import gov.cdc.izgateway.model.IAccessControl;
-import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.security.principal.GroupToRoleMapper;
-import gov.cdc.izgateway.service.IAccessControlService;
-import gov.cdc.izgateway.xform.model.AccessControl;
 import gov.cdc.izgateway.xform.model.GroupRoleMapping;
 import gov.cdc.izgateway.xform.repository.XformRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.*;
 
@@ -35,8 +29,8 @@ public class GroupRoleMappingService extends GenericService<GroupRoleMapping> im
 
     /**
      * For the given groups, it returns the roles that are mapped to the groups.
-     * @param groups
-     * @return
+     * @param groups The groups to map to roles
+     * @return The roles that are mapped from the groups
      */
     @Override
     public Set<String> mapGroupsToRoles(Set<String> groups) {

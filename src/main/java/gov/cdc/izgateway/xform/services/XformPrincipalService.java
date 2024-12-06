@@ -6,7 +6,6 @@ import gov.cdc.izgateway.principal.provider.JwtPrincipalProvider;
 import gov.cdc.izgateway.security.IzgPrincipal;
 import gov.cdc.izgateway.security.UnauthenticatedPrincipal;
 import gov.cdc.izgateway.security.service.PrincipalService;
-import gov.cdc.izgateway.service.IAccessControlService;
 import gov.cdc.izgateway.xform.model.User;
 import gov.cdc.izgateway.xform.security.Roles;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,13 +25,13 @@ public class XformPrincipalService implements PrincipalService {
 
     private final CertificatePrincipalProvider certificatePrincipalProvider;
     private final JwtPrincipalProvider jwtPrincipalProvider;
-    private final IAccessControlService accessControlService;
+    private final AccessControlService accessControlService;
     private final UserService userService;
     private final List<String> localHostIps = Arrays.asList(HostInfo.LOCALHOST_IP4, "0:0:0:0:0:0:0:1", HostInfo.LOCALHOST_IP6);
     private final GroupRoleMappingService groupRoleMappingService;
 
     @Autowired
-    public XformPrincipalService(IAccessControlService accessControlService,
+    public XformPrincipalService(AccessControlService accessControlService,
                                  CertificatePrincipalProvider certificatePrincipalProvider,
                                  JwtPrincipalProvider jwtPrincipalProvider,
                                  UserService userService,
