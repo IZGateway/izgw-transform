@@ -20,7 +20,7 @@ xform:
     group-role-mapping: testing/configuration/group-role-mapping.json
   access-control-enabled: ${XFORM_ACCESS_CONTROL_ENABLED:false}
 jwt:
-  shared-secret: ${TS_JWT_SECRET:}
+  shared-secret: ${XFORM_JWT_SECRET:}
 
 spring:
   autoconfigure:
