@@ -35,6 +35,7 @@ public class XformApplicationController {
     @ApiResponse(responseCode = "200", description = "Success",
             content = @Content(mediaType = "text/plain")
     )
+    @RolesAllowed({"admin"})
     @GetMapping({"/build", "/build.txt"})
     public String getBuild() {
         return Application.getPage(Application.BUILD);

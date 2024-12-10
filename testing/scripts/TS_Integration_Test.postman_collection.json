@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "6ec96c7c-f232-422d-8473-28447044f032",
+		"_postman_id": "a4797069-8cc4-4966-8002-6aef2c691e66",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28864196"
+		"_exporter_id": "2729094",
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-a4797069-8cc4-4966-8002-6aef2c691e66?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -1380,12 +1381,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://{{host}}:9082/api/v1/pipelines?limit=100000",
-									"protocol": "http",
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/pipelines?limit=100000",
+									"protocol": "{{no_cert_protocol}}",
 									"host": [
-										"{{host}}"
+										"{{no_cert_host}}"
 									],
-									"port": "9082",
+									"port": "{{no_cert_port}}",
 									"path": [
 										"api",
 										"v1",
@@ -1478,12 +1479,12 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "http://{{host}}:9082/api/v1/pipelines?limit=100000",
-									"protocol": "http",
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/pipelines?limit=100000",
+									"protocol": "{{no_cert_protocol}}",
 									"host": [
-										"{{host}}"
+										"{{no_cert_host}}"
 									],
-									"port": "9082",
+									"port": "{{no_cert_port}}",
 									"path": [
 										"api",
 										"v1",
@@ -8461,6 +8462,14 @@
 			"value": ""
 		},
 		{
+			"key": "validJwt",
+			"value": ""
+		},
+		{
+			"key": "validJwtNoRoles",
+			"value": ""
+		},
+		{
 			"key": "TooLargeMessage",
 			"value": ""
 		},
@@ -8474,14 +8483,6 @@
 		},
 		{
 			"key": "hex1b",
-			"value": ""
-		},
-		{
-			"key": "validJwt",
-			"value": ""
-		},
-		{
-			"key": "validJwtNoRoles",
 			"value": ""
 		}
 	]
