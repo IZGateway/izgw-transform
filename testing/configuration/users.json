@@ -16,5 +16,11 @@
     "userName": "bharris.testing.izgateway.org",
     "organizationId": "a9bc153a-d400-42e7-8e74-2e7d8b2e1481",
     "active": true
+  },
+  {
+    "id": "7ae8e29b-aca6-4795-8de6-1183236e56b6",
+    "userName": "ppatel.testing.izgateway.org",
+    "organizationId": "8c905096-c79c-4351-86a7-1d6b7da5ec44",
+    "active": true
   }
 ]
