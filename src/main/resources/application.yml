@@ -16,7 +16,11 @@ xform:
     mappings: testing/configuration/mappings.json
     access-control: testing/configuration/access-control.json
     operation-precondition-fields: testing/configuration/operation-precondition-fields.json
+    users: testing/configuration/users.json
+    group-role-mapping: testing/configuration/group-role-mapping.json
   access-control-enabled: ${XFORM_ACCESS_CONTROL_ENABLED:false}
+jwt:
+  shared-secret: ${XFORM_JWT_SECRET:}
 
 spring:
   autoconfigure:
@@ -82,7 +86,7 @@ server:
   local-port: 9082
   ssl:
     enabled: true
-    client-auth: need
+    client-auth: want
     enabled-protocols:
       - TLSv1.2
       - TLSv1.3
@@ -158,12 +162,13 @@ logging:
     gov:
       cdc:
         izgateway:
-          transformation: ${LOGGING_LEVEL:INFO}
+          xform: ${LOGGING_LEVEL:INFO}
           security:
             AccessControlRegistry: INFO
             AccessControlInterceptor: INFO
             client:
               ClientSecurityInterceptor: INFO
+            principal: ${LOGGING_LEVEL:INFO}
             server:
               ServerSecurityInterceptor: INFO
     org:

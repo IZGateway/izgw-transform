@@ -3,12 +3,16 @@ package gov.cdc.izgateway.xform;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.xform.model.*;
+import gov.cdc.izgateway.xform.security.Roles;
 import gov.cdc.izgateway.xform.services.*;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Log
 @RestController
+@Lazy(false)
 public class ApiController {
     private final OrganizationService organizationService;
     private final PipelineService pipelineService;
@@ -42,7 +47,8 @@ public class ApiController {
             MappingService mappingService,
             PreconditionService preconditionService,
             OperationService operationService,
-            OperationPreconditionFieldService operationPreconditionFieldService
+            OperationPreconditionFieldService operationPreconditionFieldService,
+            AccessControlRegistry registry
     ) {
         this.organizationService = organizationService;
         this.pipelineService = pipelineService;
@@ -51,8 +57,10 @@ public class ApiController {
         this.preconditionService = preconditionService;
         this.operationService = operationService;
         this.operationPreconditionFieldService = operationPreconditionFieldService;
+        registry.register(this);
     }
 
+    @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/pipelines/{uuid}")
     public ResponseEntity<Pipeline> getPipelineByUUID(@PathVariable UUID uuid) {
         Pipeline entity = pipelineService.getObject(uuid);
@@ -62,6 +70,7 @@ public class ApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.PIPELINE_WRITER})
     @PutMapping("/api/v1/pipelines/{uuid}")
     public ResponseEntity<Pipeline> updatePipeline(@PathVariable UUID uuid, @RequestBody Pipeline updatedPipeline) {
         updatedPipeline.setId(uuid);
@@ -69,6 +78,7 @@ public class ApiController {
         return new ResponseEntity<>(updatedPipeline, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping("/api/v1/solutions/{uuid}")
     public ResponseEntity<Solution> getSolutionByUUID(@PathVariable UUID uuid) {
         Solution entity = solutionService.getObject(uuid);
@@ -78,6 +88,7 @@ public class ApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.SOLUTION_WRITER})
     @PutMapping("/api/v1/solutions/{uuid}")
     public ResponseEntity<Solution> updateSolution(@PathVariable UUID uuid, @RequestBody Solution updatedSolution) {
         updatedSolution.setId(uuid);
@@ -85,6 +96,7 @@ public class ApiController {
         return new ResponseEntity<>(updatedSolution, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.ORGANIZATION_READER})
     @GetMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> getOrganizationByUUID(@PathVariable UUID uuid) {
         Organization entity = organizationService.getObject(uuid);
@@ -94,6 +106,7 @@ public class ApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.ORGANIZATION_WRITER})
     @PutMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> updateOrganization(@PathVariable UUID uuid, @RequestBody Organization updatedOrganization) {
         updatedOrganization.setId(uuid);
@@ -101,6 +114,8 @@ public class ApiController {
         return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
     }
 
+    // TODO - Paul to look at AccessControl as it works with groups too.
+    @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/pipelines")
     public ResponseEntity<String> getPipelinesList(
             @RequestParam(required = false) String nextCursor,
@@ -116,6 +131,7 @@ public class ApiController {
         }
     }
 
+    @RolesAllowed({Roles.ORGANIZATION_READER})
     @GetMapping("/api/v1/organizations")
     public ResponseEntity<String> getOrganizationsList(
             @RequestParam(required = false) String nextCursor,
@@ -131,6 +147,7 @@ public class ApiController {
         }
     }
 
+    @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping("/api/v1/solutions")
     public ResponseEntity<String> getSolutionsList(
             @RequestParam(required = false) String nextCursor,
@@ -146,6 +163,7 @@ public class ApiController {
         }
     }
 
+    @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping("/api/v1/mappings")
     public ResponseEntity<String> getMappingsList(
             @RequestParam(required = false) String nextCursor,
@@ -161,6 +179,7 @@ public class ApiController {
         }
     }
 
+    @RolesAllowed({Roles.PIPELINE_WRITER})
     @PostMapping("/api/v1/pipelines")
     public ResponseEntity<Pipeline> createPipeline(
             @Valid @RequestBody() Pipeline pipeline
@@ -169,6 +188,7 @@ public class ApiController {
         return new ResponseEntity<>(pipeline, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.ORGANIZATION_WRITER})
     @PostMapping("/api/v1/organizations")
     public ResponseEntity<Organization> createOrganization(
             @Valid @RequestBody() Organization organization
@@ -177,6 +197,7 @@ public class ApiController {
         return new ResponseEntity<>(organization, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.SOLUTION_WRITER})
     @PostMapping("/api/v1/solutions")
     public ResponseEntity<Solution> createSolution(
             @Valid @RequestBody() Solution solution
@@ -185,6 +206,7 @@ public class ApiController {
         return new ResponseEntity<>(solution, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.PIPELINE_DELETER})
     @DeleteMapping("/api/v1/pipelines/{uuid}")
     public ResponseEntity<Pipeline> deletePipeline(
             @PathVariable UUID uuid
@@ -198,6 +220,7 @@ public class ApiController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @RolesAllowed({Roles.SOLUTION_DELETER})
     @DeleteMapping("/api/v1/solutions/{uuid}")
     public ResponseEntity<Solution> deleteSolution(
             @PathVariable UUID uuid
@@ -211,6 +234,7 @@ public class ApiController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @RolesAllowed({Roles.ORGANIZATION_DELETER})
     @DeleteMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> deleteOrganization(
             @PathVariable UUID uuid
@@ -223,6 +247,7 @@ public class ApiController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping("/api/v1/operations/available")
     public ResponseEntity<List<OperationInfo>> getAvailableOperationList() {
         try {
@@ -233,6 +258,7 @@ public class ApiController {
         }
     }
 
+    @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/preconditions/available")
     public ResponseEntity<List<PreconditionInfo>> getAvailablePreconditionList() {
         try {
@@ -243,6 +269,7 @@ public class ApiController {
         }
     }
 
+    @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping(
             {
                     "/api/v1/{fieldType}/fields"
@@ -272,6 +299,7 @@ public class ApiController {
         }
     }
 
+    @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping("/api/v1/fields/{uuid}")
     public ResponseEntity<Object> getFieldByUUID(
             @PathVariable UUID uuid
@@ -285,6 +313,7 @@ public class ApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.SOLUTION_WRITER})
     @PutMapping("/api/v1/fields/{uuid}")
     public ResponseEntity<Object> updateField(
             @PathVariable UUID uuid,
@@ -295,6 +324,7 @@ public class ApiController {
         return new ResponseEntity<>(updatedPreconditionField, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.SOLUTION_WRITER})
     @PostMapping("/api/v1/fields")
     public ResponseEntity<OperationPreconditionField> createField(
             @Valid @RequestBody() OperationPreconditionField operationPreconditionField
@@ -303,6 +333,7 @@ public class ApiController {
         return new ResponseEntity<>(operationPreconditionField, HttpStatus.OK);
     }
 
+    @RolesAllowed({Roles.SOLUTION_DELETER})
     @DeleteMapping("/api/v1/fields/{uuid}")
     public ResponseEntity<OperationPreconditionField> deleteFieldByUUID(
             @PathVariable UUID uuid

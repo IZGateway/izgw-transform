@@ -11,11 +11,11 @@ import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
 import gov.cdc.izgateway.xform.context.IZGXformContext;
 import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.enums.DataFlowDirection;
-import gov.cdc.izgateway.xform.enums.DataType;
 import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
 import gov.cdc.izgateway.xform.model.Organization;
+import gov.cdc.izgateway.xform.security.Roles;
+import gov.cdc.izgateway.xform.services.AccessControlService;
 import gov.cdc.izgateway.xform.services.OrganizationService;
-import gov.cdc.izgateway.xform.services.XformAccessControlService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
@@ -30,7 +30,7 @@ import java.util.UUID;
 public abstract class BaseController extends SoapControllerBase {
     protected final ProducerTemplate producerTemplate;
     protected final OrganizationService organizationService;
-    protected final XformAccessControlService accessControlService;
+    protected final AccessControlService accessControlService;
 
     protected BaseController(
             IMessageHeaderService mshService,
@@ -39,7 +39,7 @@ public abstract class BaseController extends SoapControllerBase {
             List<String> additionalNamespaces,
             ProducerTemplate producerTemplate,
             OrganizationService organizationService,
-            XformAccessControlService accessControlService
+            AccessControlService accessControlService
     ) {
         super(mshService, namespace, wsdl, additionalNamespaces);
         this.producerTemplate = producerTemplate;
@@ -79,8 +79,8 @@ public abstract class BaseController extends SoapControllerBase {
 
     protected Organization checkOrganizationOverride(Organization organization) throws Fault {
         if (RequestContext.getHttpHeaders() != null
-                && RequestContext.getHttpHeaders().containsKey("x-xform-organization")
-                && accessControlService.isUserInRole(organization.getId(), XformAccessControlService.ADMIN_ROLE)) {
+                && RequestContext.getPrincipal().getRoles().contains(Roles.ADMIN)
+                && RequestContext.getHttpHeaders().containsKey("x-xform-organization")) {
 
             Map<String, List<String>> headers = RequestContext.getHttpHeaders();
             String orgId = headers.get("x-xform-organization").get(0);

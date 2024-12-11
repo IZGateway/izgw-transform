@@ -69,13 +69,13 @@
   "active" : true,
   "commonName" : "tbd"
 }, {
-  "organizationName" : "Nova Prime Medical Research",
-  "id" : "8c905096-c79c-4351-86a7-1d6b7da5ec44",
-  "active" : true,
-  "commonName" : "tbd"
-}, {
   "organizationName" : "Pulsar Point Clinics (UI)",
   "id" : "11d32c29-b91a-455f-931e-591cb8ee4f51",
   "active" : true,
   "commonName" : "preprod-cc.phiz-project.org"
+}, {
+  "organizationName" : "Nova Prime Medical Research",
+  "id" : "8c905096-c79c-4351-86a7-1d6b7da5ec44",
+  "active" : true,
+  "commonName" : "ppatel.testing.izgateway.org"
 } ]

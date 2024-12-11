@@ -1,0 +1,29 @@
+[
+  {
+    "id": "fe65c254-eeee-4d41-a81c-187847a10dd0",
+    "groupName": "Admin",
+    "active": true,
+    "roles": [
+      "pipeline-reader",
+      "pipeline-writer",
+      "pipeline-deleter",
+      "solution-reader",
+      "solution-writer",
+      "solution-deleter",
+      "organization-reader",
+      "organization-writer",
+      "organization-deleter"
+    ]
+  },
+  {
+    "id": "fe65c254-bbbb-4d41-a81c-187847a10dd0",
+    "groupName": "BusinessAnalyst",
+    "active": true,
+    "roles": [
+      "pipeline-reader",
+      "pipeline-writer",
+      "pipeline-deleter",
+      "organization-reader"
+    ]
+  }
+]
