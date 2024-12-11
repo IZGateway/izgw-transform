@@ -70,5 +70,23 @@
       "solution-writer",
       "solution-deleter"
     ]
+  },
+  {
+    "id": "fd97881d-7c37-474a-8a14-6d038a7fbc8c",
+    "userId": "8556e4a3-743a-4e71-9971-6d8e2d679ed6",
+    "active": true,
+    "roles": [
+      "admin",
+      "xform-sender",
+      "pipeline-reader",
+      "pipeline-writer",
+      "pipeline-deleter",
+      "organization-reader",
+      "organization-writer",
+      "organization-deleter",
+      "solution-reader",
+      "solution-writer",
+      "solution-deleter"
+    ]
   }
 ]
