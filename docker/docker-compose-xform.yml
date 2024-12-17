@@ -1,24 +1,29 @@
 version: '3.1'
 services:
   xform:
-    image: izgw-transform:latest
+    image: izgw-transform:xform-0.4.0-202412171410
     container_name: xform
     ports:
       - '444:444'
     environment:
       COMMON_PASS: ${COMMON_PASS}
       XFORM_DESTINATION_HUB_URI: ${XFORM_DESTINATION_HUB_URI}
+      ELASTIC_API_KEY: ${ELASTIC_API_KEY}
       XFORM_SERVER_PORT: ${XFORM_SERVER_PORT}
+      XFORM_JWT_SECRET: ${XFORM_JWT_SECRET}
       XFORM_CONFIGURATIONS_ORGANIZATIONS: /configuration/organizations.json
       XFORM_CONFIGURATIONS_PIPELINES: /configuration/pipelines.json
       XFORM_CONFIGURATIONS_SOLUTIONS: /configuration/solutions.json
       XFORM_CONFIGURATIONS_MAPPINGS: /configuration/mappings.json
       XFORM_CONFIGURATIONS_ACCESS-CONTROL: /configuration/access-control.json
       XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS: /configuration/operation-precondition-fields.json
+      XFORM_CONFIGURATIONS_USERS: /configuration/users.json
+      XFORM_CONFIGURATIONS_GROUP-ROLE-MAPPING: /configuration/group-role-mapping.json
       XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE: /ssl/server_keystore.bcfks
       XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE: /ssl/server_keystore.bcfks
       XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE: /ssl/server_keystore.bcfks
       XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE: /ssl/client_keystore.bcfks
+      LOGGING_LEVEL: DEBUG
     volumes:
       - type: bind
         source: ${SSL_SOURCE}
