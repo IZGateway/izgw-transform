@@ -1,9 +1,6 @@
 package gov.cdc.izgateway.xform.services;
 
-import gov.cdc.izgateway.logging.RequestContext;
-import gov.cdc.izgateway.logging.markers.Markers2;
-import gov.cdc.izgateway.xform.logging.CrudEventLogger;
-import gov.cdc.izgateway.xform.logging.XformApiCrudDetail;
+import gov.cdc.izgateway.xform.logging.ApiEventLogger;
 //import gov.cdc.izgateway.xform.logging.XformApiLogDetail;
 import gov.cdc.izgateway.xform.model.BaseModel;
 import gov.cdc.izgateway.xform.repository.XformRepository;
@@ -25,7 +22,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     @Override
     public T getObject(UUID id) {
         T existing = repo.getEntity(id);
-        CrudEventLogger.logReadEvent(existing);
+        ApiEventLogger.logReadEvent(existing);
 
         return existing;
     }
@@ -33,7 +30,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     @Override
     public List<T> getList() {
         ArrayList<T> list = new ArrayList<>(repo.getEntitySet());
-        CrudEventLogger.logReadEvent(list);
+        ApiEventLogger.logReadEvent(list);
         return list;
     }
 
@@ -47,7 +44,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
 
         repo.updateEntity(obj);
 
-        CrudEventLogger.logUpdateEvent(obj, existing);
+        ApiEventLogger.logUpdateEvent(obj, existing);
     }
 
     @Override
@@ -60,7 +57,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
 
         repo.createEntity(obj);
 
-        CrudEventLogger.logCreateEvent(obj);
+        ApiEventLogger.logCreateEvent(obj);
     }
 
     @Override
@@ -71,14 +68,6 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
         }
         repo.deleteEntity(id);
 
-        CrudEventLogger.logDeleteEvent(solution);
+        ApiEventLogger.logDeleteEvent(solution);
     }
-
-//    private void logIt(T obj, T existing) {
-//        XformApiCrudDetail data = new XformApiCrudDetail();
-//        data.setEventId(RequestContext.getEventId());
-//        data.setExistingData(existing);
-//        data.setNewData(obj);
-//        log.info(Markers2.append("crudLog", data), "Sample update log message!");
-//    }
 }

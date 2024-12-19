@@ -8,36 +8,36 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 @Slf4j
-public class CrudEventLogger {
+public class ApiEventLogger {
 
     public static <T> void logReadEvent(T data) {
-        logCrudEvent("READ", getClassName(data), getId(data),  null, null);
+        logApiEvent("READ", getClassName(data), getId(data),  null, null);
     }
 
     public static <T> void logReadEvent(List<T> data) {
         if (data != null && !data.isEmpty()) {
-            logCrudEvent("READ", getClassName(data.get(0)), null, null, null);
+            logApiEvent("READ", getClassName(data.get(0)), null, null, null);
         }
     }
 
     public static <T> void logDeleteEvent(T dataToDelete) {
-        logCrudEvent("DELETE", getClassName(dataToDelete), getId(dataToDelete), null, dataToDelete);
+        logApiEvent("DELETE", getClassName(dataToDelete), getId(dataToDelete), null, dataToDelete);
     }
 
     public static <T> void logCreateEvent(T newData) {
-        logCrudEvent("CREATE", getClassName(newData), getId(newData), newData, null);
+        logApiEvent("CREATE", getClassName(newData), getId(newData), newData, null);
     }
 
     public static <T> void logUpdateEvent(T newData, T existingData) {
-        logCrudEvent("UPDATE", getClassName(newData), getId(newData), newData, existingData);
+        logApiEvent("UPDATE", getClassName(newData), getId(newData), newData, existingData);
     }
 
-    private static <T> void logCrudEvent(String eventDescription, String objectName, String objectId, T newData, T existingData) {
-        if ( XformRequestContext.isCrudLoggingDisabled() ) {
+    private static <T> void logApiEvent(String eventDescription, String objectName, String objectId, T newData, T existingData) {
+        if ( XformRequestContext.isApiLoggingDisabled() ) {
             return;
         }
 
-        XformApiCrudDetail data = new XformApiCrudDetail();
+        XformApiDetail data = new XformApiDetail();
         data.setEventId(RequestContext.getEventId());
         data.setOldData(existingData);
         data.setNewData(newData);
@@ -58,6 +58,6 @@ public class CrudEventLogger {
         return data == null ? null: ((BaseModel)data).getId().toString();
     }
 
-    private CrudEventLogger() {
+    private ApiEventLogger() {
     }
 }
