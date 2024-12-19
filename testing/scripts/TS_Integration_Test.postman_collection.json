@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "da3917f1-3607-4810-b541-31d3e677d854",
+		"_postman_id": "d6c9c438-f003-40b1-ace9-518df0030333",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "28864196"
@@ -1506,7 +1506,10 @@
 													"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 													"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
 													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-													"})",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'CREATE');",
+													"",
 													""
 												],
 												"type": "text/javascript",
@@ -1622,7 +1625,10 @@
 													"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 													"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
 													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-													"})"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'READ');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -1907,7 +1913,10 @@
 													"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 													"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
 													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-													"})"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'UPDATE');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -2210,7 +2219,10 @@
 												"exec": [
 													"pm.test(\"returns 204 NO CONTENT code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(204);",
-													"});"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'DELETE');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -4218,7 +4230,10 @@
 											"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 											"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-											"})",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'CREATE');",
+											"",
 											""
 										],
 										"type": "text/javascript",
@@ -4289,7 +4304,10 @@
 											"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 											"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-											"})"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'READ');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -4335,7 +4353,10 @@
 										"exec": [
 											"pm.test(\"returns 404 NOT FOUND code\", function() {",
 											"    pm.expect(pm.response.code).to.equal(404);",
-											"});"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'READ');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -4381,7 +4402,10 @@
 										"exec": [
 											"pm.test(\"returns 409 CONFLICT code\", function() {",
 											"    pm.expect(pm.response.code = 409);",
-											"});"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'CREATE');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -4439,7 +4463,10 @@
 											"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 											"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-											"})"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'UPDATE');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -4494,7 +4521,10 @@
 										"exec": [
 											"pm.test(\"returns 204 NO CONTENT code\", function() {",
 											"    pm.expect(pm.response.code).to.equal(204);",
-											"});"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'DELETE');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -4540,7 +4570,8 @@
 										"exec": [
 											"pm.test(\"returns 404 NOT FOUND code\", function() {",
 											"    pm.expect(pm.response.code).to.equal(404);",
-											"});"
+											"});",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -4882,7 +4913,11 @@
 											"",
 											"pm.test(\"Found New Pipeline1\", function() {",
 											"    pm.expect(found1).to.be.true;",
-											"});"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'READ');",
+											"",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -5767,7 +5802,10 @@
 													"    pm.expect(response.description).to.equal(pm.collectionVariables.get(\"currentDescription\"));",
 													"    pm.expect(response.version).to.equal(pm.collectionVariables.get(\"currentVersion\"));",
 													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-													"})",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'CREATE');",
+													"",
 													""
 												],
 												"type": "text/javascript",
@@ -5868,7 +5906,10 @@
 													"    pm.expect(response.version).to.equal(pm.collectionVariables.get(\"currentVersion\"));",
 													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 													"}",
-													")"
+													");",
+													"",
+													"utils.testForApiLog(pm, 'READ');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -6260,7 +6301,10 @@
 													"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 													"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
 													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-													"})"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'UPDATE');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -6563,7 +6607,10 @@
 												"exec": [
 													"pm.test(\"returns 204 NO CONTENT code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(204);",
-													"});"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'DELETE');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -8477,7 +8524,10 @@
 											"    pm.expect(response.description).to.equal(pm.collectionVariables.get(\"currentDescription\"));",
 											"    pm.expect(response.version).to.equal(pm.collectionVariables.get(\"currentVersion\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-											"})",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'CREATE');",
+											"",
 											""
 										],
 										"type": "text/javascript",
@@ -8533,7 +8583,10 @@
 											"    pm.expect(response.version).to.equal(pm.collectionVariables.get(\"currentVersion\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 											"}",
-											")"
+											");",
+											"",
+											"utils.testForApiLog(pm, 'READ');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -8693,7 +8746,10 @@
 											"    pm.expect(response.inboundEndpoint).to.equal(pm.collectionVariables.get(\"currentInboundEndpoint\"));",
 											"    pm.expect(response.outboundEndpoint).to.equal(pm.collectionVariables.get(\"currentOutboundEndpoint\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-											"})"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'UPDATE');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -8748,7 +8804,10 @@
 										"exec": [
 											"pm.test(\"returns 204 NO CONTENT code\", function() {",
 											"    pm.expect(pm.response.code).to.equal(204);",
-											"});"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'DELETE');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -10009,7 +10068,10 @@
 													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentCommonName\"));",
-													"})",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'CREATE');",
+													"",
 													""
 												],
 												"type": "text/javascript",
@@ -10109,7 +10171,10 @@
 													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentCommonName\"));",
 													"}",
-													")"
+													");",
+													"",
+													"utils.testForApiLog(pm, 'READ');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -10499,7 +10564,10 @@
 													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentCommonName\"));",
-													"})"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'UPDATE');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -10705,7 +10773,10 @@
 												"exec": [
 													"pm.test(\"returns 204 NO CONTENT code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(204);",
-													"});"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'DELETE');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -12711,7 +12782,10 @@
 											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 											"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentCommonName\"));",
-											"})",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'CREATE');",
+											"",
 											""
 										],
 										"type": "text/javascript",
@@ -12766,7 +12840,10 @@
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 											"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentCommonName\"));",
 											"}",
-											")"
+											");",
+											"",
+											"utils.testForApiLog(pm, 'READ');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -12924,7 +13001,10 @@
 											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 											"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentCommonName\"));",
-											"})"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'UPDATE');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -12979,7 +13059,10 @@
 										"exec": [
 											"pm.test(\"returns 204 NO CONTENT code\", function() {",
 											"    pm.expect(pm.response.code).to.equal(204);",
-											"});"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'DELETE');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -14431,7 +14514,10 @@
 															"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
 															"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
 															"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
-															"})",
+															"});",
+															"",
+															"utils.testForApiLog(pm, 'CREATE');",
+															"",
 															""
 														],
 														"type": "text/javascript",
@@ -14543,7 +14629,10 @@
 															"",
 															"pm.test(\"DID NOT Find forPrecondition = false\", function() {",
 															"    pm.expect(foundForPreconditionFalse).to.be.false;",
-															"});"
+															"});",
+															"",
+															"utils.testForApiLog(pm, 'READ');",
+															""
 														],
 														"type": "text/javascript",
 														"packages": {}
@@ -14640,7 +14729,10 @@
 														"exec": [
 															"pm.test(\"returns 204 NO CONTENT code\", function() {",
 															"    pm.expect(pm.response.code).to.equal(204);",
-															"});"
+															"});",
+															"",
+															"utils.testForApiLog(pm, 'DELETE');",
+															""
 														],
 														"type": "text/javascript",
 														"packages": {}
@@ -14866,7 +14958,10 @@
 													"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
 													"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
 													"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
-													"})",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'CREATE');",
+													"",
 													""
 												],
 												"type": "text/javascript",
@@ -14933,7 +15028,10 @@
 													"",
 													"pm.test(\"DID NOT Find forPrecondition = false\", function() {",
 													"    pm.expect(foundForPreconditionFalse).to.be.false;",
-													"});"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'READ');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -14985,7 +15083,10 @@
 												"exec": [
 													"pm.test(\"returns 204 NO CONTENT code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(204);",
-													"});"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'DELETE');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -15406,7 +15507,10 @@
 															"// Test to ensure no extra methods are present",
 															"pm.test(\"No extra methods present\", function() {",
 															"    pm.expect(response.length).to.equal(expectedMethods.length);",
-															"});"
+															"});",
+															"",
+															"utils.testForApiLog(pm, 'READ');",
+															""
 														],
 														"type": "text/javascript",
 														"packages": {}
@@ -15635,7 +15739,10 @@
 													"// Test to ensure no extra methods are present",
 													"pm.test(\"No extra methods present\", function() {",
 													"    pm.expect(response.length).to.equal(expectedMethods.length);",
-													"});"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'READ');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -16698,7 +16805,10 @@
 													"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
 													"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
 													"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
-													"})",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'CREATE');",
+													"",
 													""
 												],
 												"type": "text/javascript",
@@ -16800,7 +16910,10 @@
 													"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
 													"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
 													"}",
-													")"
+													");",
+													"",
+													"utils.testForApiLog(pm, 'READ');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -17297,7 +17410,10 @@
 													"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
 													"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
 													"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
-													"})"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'UPDATE');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -17600,7 +17716,10 @@
 												"exec": [
 													"pm.test(\"returns 204 NO CONTENT code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(204);",
-													"});"
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'DELETE');",
+													""
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -19533,7 +19652,10 @@
 											"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
 											"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
 											"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
-											"})",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'CREATE');",
+											"",
 											""
 										],
 										"type": "text/javascript",
@@ -19590,7 +19712,10 @@
 											"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
 											"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
 											"}",
-											")"
+											");",
+											"",
+											"utils.testForApiLog(pm, 'READ');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -19750,7 +19875,10 @@
 											"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
 											"    pm.expect(response.forPrecondition) == pm.collectionVariables.get(\"currentForPrecondition\");",
 											"    pm.expect(response.forOperation) == pm.collectionVariables.get(\"currentForOperation\");",
-											"})"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'UPDATE');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -19805,7 +19933,10 @@
 										"exec": [
 											"pm.test(\"returns 204 NO CONTENT code\", function() {",
 											"    pm.expect(pm.response.code).to.equal(204);",
-											"});"
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'DELETE');",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -22395,6 +22526,42 @@
 					"",
 					"            pm.test('Logs created from this request do not contain PHI', function () {",
 					"                pm.expect(isPHIPresent).to.be.false;",
+					"            });",
+					"",
+					"",
+					"        });",
+					"}",
+					",",
+					"    testForApiLog: function (pm, method) {",
+					"        // Test to determine if logs have PHI",
+					"        pm.sendRequest({",
+					"            url: 'https://' + pm.environment.get('host') + ':' + pm.environment.get('port') + '/rest/logs', ",
+					"            method: 'GET'",
+					"        }, function (err, res) {",
+					"            if (err) {",
+					"                console.error(err);",
+					"                pm.test(\"Error has occurred.\", function () {",
+					"                    pm.expect(err.errno).to.equal('0');",
+					"                });",
+					"                return;",
+					"            }",
+					"",
+					"            var jsonResponse = res.json();",
+					"",
+					"            pm.test(\"Log status is OK\", function () {",
+					"                pm.expect(res.status).to.equal('OK');",
+					"            });",
+					"",
+					"            // Check apiLog to see if one with the desired 'method' is found",
+					"            let methodFound = false;",
+					"            jsonResponse.forEach(item => {",
+					"                if (item.hasOwnProperty('apiLog') && item.apiLog.method == method) {",
+					"                    methodFound = true;",
+					"                }",
+					"            });",
+					"",
+					"            pm.test('API CRUD method is found', function () {",
+					"                pm.expect(methodFound).to.be.true;",
 					"            });",
 					"",
 					"",
