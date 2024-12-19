@@ -3,7 +3,7 @@ package gov.cdc.izgateway.xform.logging;
 import lombok.Data;
 
 @Data
-public class XformApiCrudDetail {
+public class XformApiDetail {
     private String eventId;
     private String userName;
     private String object;

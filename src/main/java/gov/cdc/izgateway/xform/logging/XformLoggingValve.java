@@ -40,8 +40,8 @@ public class XformLoggingValve extends LoggingValveBase {
             if (!isLogged(req.getRequestURI())) {
                 RequestContext.disableTransactionDataLogging();
             }
-            if (!isLogEnabledForCrudApi(req.getRequestURI())) {
-                XformRequestContext.disableCrudLogging();
+            if (!isLogEnabledForApi(req.getRequestURI())) {
+                XformRequestContext.disableApiLogging();
             }
             handleSpecificInvoke(req, resp, t.getSource());
         } catch (Exception e) {
@@ -69,7 +69,7 @@ public class XformLoggingValve extends LoggingValveBase {
                 requestURI.startsWith("/IISService");
     }
 
-    protected boolean isLogEnabledForCrudApi(String requestURI) {
+    protected boolean isLogEnabledForApi(String requestURI) {
         return requestURI.startsWith("/api");
     }
 }
