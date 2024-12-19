@@ -1,7 +1,6 @@
 package gov.cdc.izgateway.xform.services;
 
 import gov.cdc.izgateway.xform.logging.ApiEventLogger;
-//import gov.cdc.izgateway.xform.logging.XformApiLogDetail;
 import gov.cdc.izgateway.xform.model.BaseModel;
 import gov.cdc.izgateway.xform.repository.XformRepository;
 import lombok.extern.slf4j.Slf4j;
