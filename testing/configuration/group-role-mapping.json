@@ -25,5 +25,32 @@
       "pipeline-deleter",
       "organization-reader"
     ]
+  },
+  {
+    "id": "351e3df6-bfd0-4440-ab24-b5a6fdd1f417",
+    "groupName": "IZG Transformation Admin",
+    "active": true,
+    "roles": [
+      "pipeline-reader",
+      "pipeline-writer",
+      "pipeline-deleter",
+      "solution-reader",
+      "solution-writer",
+      "solution-deleter",
+      "organization-reader",
+      "organization-writer",
+      "organization-deleter"
+    ]
+  },
+  {
+    "id": "99facbab-0841-482e-b4a7-496ba8397a43",
+    "groupName": "IZG Operations",
+    "active": true,
+    "roles": [
+      "pipeline-reader",
+      "pipeline-writer",
+      "pipeline-deleter",
+      "organization-reader"
+    ]
   }
 ]
