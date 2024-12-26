@@ -820,6 +820,253 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "TS_TC_07 FHIR Query Returns Data with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"pm.test(\"verify type is Bundle\", function() {",
+											"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+											"});",
+											"",
+											"pm.test(\"Verify Entry length is 4\", function() {",
+											"    pm.expect(response.entry.length).to.equal(4);",
+											"});",
+											"",
+											"pm.test(\"Verify Immunization Code\", function() {",
+											"    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+											"});",
+											"",
+											"pm.test(\"Verify Vaccine Code\", function() {",
+											"    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "patient.given",
+											"value": "{{fhirPatientGiven}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.family",
+											"value": "{{fhirPateintFamily}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.birthdate",
+											"value": "{{fhirPatientDOB}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"fhir",
+										"dev",
+										"Immunization"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_08 FHIR Query Returns No Data with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"pm.test(\"verify type is Bundle\", function() {",
+											"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+											"});",
+											"",
+											"pm.test(\"Verify Entry length is 2\", function() {",
+											"    pm.expect(response.entry.length).to.equal(2);",
+											"});",
+											"",
+											"pm.test(\"Verify NF is returned indicating no data found\", function() {",
+											"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "patient.given",
+											"value": "Nogiven",
+											"type": "text"
+										},
+										{
+											"key": "patient.family",
+											"value": "Nofamily",
+											"type": "text"
+										},
+										{
+											"key": "patient.birthdate",
+											"value": "1900-01-01",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"fhir",
+										"dev",
+										"Immunization"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
