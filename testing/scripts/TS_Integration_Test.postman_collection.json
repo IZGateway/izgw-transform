@@ -1361,6 +1361,163 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "TS_TC_07 FHIR Query Returns Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let response = pm.response.json();",
+									"pm.test(\"verify type is Bundle\", function() {",
+									"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+									"});",
+									"",
+									"pm.test(\"Verify Entry length is 4\", function() {",
+									"    pm.expect(response.entry.length).to.equal(4);",
+									"});",
+									"",
+									"pm.test(\"Verify Immunization Code\", function() {",
+									"    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+									"});",
+									"",
+									"pm.test(\"Verify Vaccine Code\", function() {",
+									"    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "patient.given",
+									"value": "{{fhirPatientGiven}}",
+									"type": "text"
+								},
+								{
+									"key": "patient.family",
+									"value": "{{fhirPateintFamily}}",
+									"type": "text"
+								},
+								{
+									"key": "patient.birthdate",
+									"value": "{{fhirPatientDOB}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"fhir",
+								"dev",
+								"Immunization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TS_TC_07 FHIR Query Returns No Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let response = pm.response.json();",
+									"pm.test(\"verify type is Bundle\", function() {",
+									"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+									"});",
+									"",
+									"pm.test(\"Verify Entry length is 2\", function() {",
+									"    pm.expect(response.entry.length).to.equal(2);",
+									"});",
+									"",
+									"pm.test(\"Verify NF is returned indicating no data found\", function() {",
+									"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "patient.given",
+									"value": "Nogiven",
+									"type": "text"
+								},
+								{
+									"key": "patient.family",
+									"value": "Nofamily",
+									"type": "text"
+								},
+								{
+									"key": "patient.birthdate",
+									"value": "1900-01-01",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"fhir",
+								"dev",
+								"Immunization"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -22112,6 +22269,11 @@
 					"};",
 					"pm.collectionVariables.set(\"validJwtNoRoles\", JSON.stringify(validJwtNoRoles));",
 					"",
+					"// FHIR Tests",
+					"pm.collectionVariables.set(\"fhirPatientGiven\", \"MarnyAIRA\");",
+					"pm.collectionVariables.set(\"fhirPatientFamily\", \"CuyahogaAIRA\");",
+					"pm.collectionVariables.set(\"fhirPatientDOB\", \"1960-05-07\");",
+					"",
 					"var tooLarge = goodResponse.replace('&|', \"&amp;|\");",
 					"var last;",
 					"var maxLength = 65536;",
@@ -23390,6 +23552,18 @@
 		},
 		{
 			"key": "createdMapping",
+			"value": ""
+		},
+		{
+			"key": "fhirPatientGiven",
+			"value": ""
+		},
+		{
+			"key": "fhirPatientFamily",
+			"value": ""
+		},
+		{
+			"key": "fhirPatientDOB",
 			"value": ""
 		}
 	]

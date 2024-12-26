@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.endpoints.fhir;
 
+import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import gov.cdc.izgw.v2tofhir.datatype.HumanNameParser;
 import gov.cdc.izgw.v2tofhir.segment.PIDParser;
@@ -47,6 +48,7 @@ import org.hl7.fhir.r4.model.StringType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -126,6 +128,7 @@ import lombok.extern.slf4j.Slf4j;
 @RolesAllowed({Roles.SOAP, Roles.ADMIN})
 @RequestMapping("/fhir")
 @Slf4j
+@Lazy(false)
 public class FhirController {
 
 	/**
@@ -157,9 +160,10 @@ public class FhirController {
 	 * @param hub	The hub controller to talk to.
 	 * @param config The configuration for the converter
 	 */
-	public FhirController(@Autowired HubController hub, FhirConfiguration config) {
+	public FhirController(@Autowired HubController hub, FhirConfiguration config, AccessControlRegistry registry) {
 		this.hub = hub;
 		this.config = config;
+        registry.register(this);
 	}
 	
     /**
