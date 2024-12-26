@@ -1443,7 +1443,7 @@
 					"response": []
 				},
 				{
-					"name": "TS_TC_07 FHIR Query Returns No Data",
+					"name": "TS_TC_08 FHIR Query Returns No Data",
 					"event": [
 						{
 							"listen": "test",
