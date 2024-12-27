@@ -40,8 +40,8 @@
       "method" : "set",
       "id" : "c995f9f1-7cca-4b01-a1fa-1087a35d5502",
       "order" : 0,
-      "destinationField" : "/MSH-7-1",
-      "setValue" : "MSH 7 NEW VALUE"
+      "destinationField" : "/MSH-22-1",
+      "setValue" : "MSH 22 NEW VALUE 4"
     } ]
   } ]
 }, {
@@ -118,8 +118,8 @@
       "method" : "set",
       "id" : "ef3eb737-0cf2-44cc-8608-84e7017e5c27",
       "order" : 0,
-      "destinationField" : "/MSX-7-1",
-      "setValue" : "MSH 7 NEW VALUE"
+      "destinationField" : "/MSX-22-1",
+      "setValue" : "MSH 22 NEW VALUE"
     } ]
   } ]
 }, {
@@ -170,7 +170,7 @@
   "responseOperations" : [ ]
 }, {
   "id" : "bf3326fe-ab52-4d6c-b37f-7db5f1769c4c",
-  "solutionName" : "POSTMAN MSH-7-1 Response Transformer - DO NOT DELETE",
+  "solutionName" : "POSTMAN MSH-19-1 Response Transformer - DO NOT DELETE",
   "description" : "Used in Postman Tests",
   "version" : "1.0",
   "active" : true,
@@ -184,8 +184,8 @@
       "method" : "set",
       "id" : "6f750e31-3b60-49bc-a01e-1c2d8b84e3db",
       "order" : 0,
-      "destinationField" : "/MSH-7-1",
-      "setValue" : "MSH 7 NEW VALUE"
+      "destinationField" : "/MSH-19-1",
+      "setValue" : "MSH 19 NEW VALUE"
     } ]
   } ]
 }, {

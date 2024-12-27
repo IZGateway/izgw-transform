@@ -9,6 +9,11 @@
   "active" : true,
   "commonName" : "pcahill.testing.izgateway.org"
 }, {
+  "organizationName" : "Starfleet Medical Systems",
+  "id" : "0d15449b-fb08-4013-8985-20c148b353fe",
+  "active" : true,
+  "commonName" : "sampleSubject"
+}, {
   "organizationName" : "Cosmic Ray Immunization Center (localhost)",
   "id" : "a10bb561-5d7b-4ec7-84c5-b6fa73efe562",
   "active" : true,

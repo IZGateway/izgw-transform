@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d6c9c438-f003-40b1-ace9-518df0030333",
+		"_postman_id": "ceb75421-eb48-40f2-a4e5-3c3ec8b1bfff",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "28864196"
@@ -25,10 +25,10 @@
 											"    pm.response.to.have.status(200);\r",
 											"});\r",
 											"\r",
-											"pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
+											"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
 											"    var response = utils.removeNS(xml2Json(responseBody));\r",
 											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
 											"\r",
 											"\r",
 											"});\r",
@@ -698,10 +698,10 @@
 											"    pm.response.to.have.status(200);\r",
 											"});\r",
 											"\r",
-											"pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
+											"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
 											"    var response = utils.removeNS(xml2Json(responseBody));\r",
 											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
 											"\r",
 											"\r",
 											"});\r",
@@ -820,6 +820,253 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "TS_TC_07 FHIR Query Returns Data with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"pm.test(\"verify type is Bundle\", function() {",
+											"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+											"});",
+											"",
+											"pm.test(\"Verify Entry length is 4\", function() {",
+											"    pm.expect(response.entry.length).to.equal(4);",
+											"});",
+											"",
+											"pm.test(\"Verify Immunization Code\", function() {",
+											"    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+											"});",
+											"",
+											"pm.test(\"Verify Vaccine Code\", function() {",
+											"    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "patient.given",
+											"value": "{{fhirPatientGiven}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.family",
+											"value": "{{fhirPateintFamily}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.birthdate",
+											"value": "{{fhirPatientDOB}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"fhir",
+										"dev",
+										"Immunization"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_08 FHIR Query Returns No Data with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"pm.test(\"verify type is Bundle\", function() {",
+											"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+											"});",
+											"",
+											"pm.test(\"Verify Entry length is 2\", function() {",
+											"    pm.expect(response.entry.length).to.equal(2);",
+											"});",
+											"",
+											"pm.test(\"Verify NF is returned indicating no data found\", function() {",
+											"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "patient.given",
+											"value": "Nogiven",
+											"type": "text"
+										},
+										{
+											"key": "patient.family",
+											"value": "Nofamily",
+											"type": "text"
+										},
+										{
+											"key": "patient.birthdate",
+											"value": "1900-01-01",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"fhir",
+										"dev",
+										"Immunization"
+									]
+								}
+							},
+							"response": []
 						}
 					]
 				},
@@ -836,10 +1083,10 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
+									"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
 									"    var response = utils.removeNS(xml2Json(responseBody));\r",
 									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
+									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
 									"\r",
 									"\r",
 									"});\r",
@@ -1284,10 +1531,10 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
+									"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
 									"    var response = utils.removeNS(xml2Json(responseBody));\r",
 									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
+									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
 									"\r",
 									"\r",
 									"});\r",
@@ -1357,6 +1604,163 @@
 							"port": "{{port}}",
 							"path": [
 								"IISService"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TS_TC_07 FHIR Query Returns Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let response = pm.response.json();",
+									"pm.test(\"verify type is Bundle\", function() {",
+									"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+									"});",
+									"",
+									"pm.test(\"Verify Entry length is 4\", function() {",
+									"    pm.expect(response.entry.length).to.equal(4);",
+									"});",
+									"",
+									"pm.test(\"Verify Immunization Code\", function() {",
+									"    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+									"});",
+									"",
+									"pm.test(\"Verify Vaccine Code\", function() {",
+									"    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "patient.given",
+									"value": "{{fhirPatientGiven}}",
+									"type": "text"
+								},
+								{
+									"key": "patient.family",
+									"value": "{{fhirPateintFamily}}",
+									"type": "text"
+								},
+								{
+									"key": "patient.birthdate",
+									"value": "{{fhirPatientDOB}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"fhir",
+								"dev",
+								"Immunization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TS_TC_08 FHIR Query Returns No Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let response = pm.response.json();",
+									"pm.test(\"verify type is Bundle\", function() {",
+									"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+									"});",
+									"",
+									"pm.test(\"Verify Entry length is 2\", function() {",
+									"    pm.expect(response.entry.length).to.equal(2);",
+									"});",
+									"",
+									"pm.test(\"Verify NF is returned indicating no data found\", function() {",
+									"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+									"});",
+									"",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "patient.given",
+									"value": "Nogiven",
+									"type": "text"
+								},
+								{
+									"key": "patient.family",
+									"value": "Nofamily",
+									"type": "text"
+								},
+								{
+									"key": "patient.birthdate",
+									"value": "1900-01-01",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"fhir",
+								"dev",
+								"Immunization"
 							]
 						}
 					},
@@ -22112,6 +22516,11 @@
 					"};",
 					"pm.collectionVariables.set(\"validJwtNoRoles\", JSON.stringify(validJwtNoRoles));",
 					"",
+					"// FHIR Tests",
+					"pm.collectionVariables.set(\"fhirPatientGiven\", \"MarnyAIRA\");",
+					"pm.collectionVariables.set(\"fhirPatientFamily\", \"CuyahogaAIRA\");",
+					"pm.collectionVariables.set(\"fhirPatientDOB\", \"1960-05-07\");",
+					"",
 					"var tooLarge = goodResponse.replace('&|', \"&amp;|\");",
 					"var last;",
 					"var maxLength = 65536;",
@@ -23345,51 +23754,15 @@
 			"value": ""
 		},
 		{
-			"key": "currentName",
+			"key": "fhirPatientGiven",
 			"value": ""
 		},
 		{
-			"key": "currentId",
+			"key": "fhirPatientFamily",
 			"value": ""
 		},
 		{
-			"key": "currentOrganizationId",
-			"value": ""
-		},
-		{
-			"key": "currentInboundEndpoint",
-			"value": ""
-		},
-		{
-			"key": "currentOutboundEndpoint",
-			"value": ""
-		},
-		{
-			"key": "currentActive",
-			"value": ""
-		},
-		{
-			"key": "createdPipeline",
-			"value": ""
-		},
-		{
-			"key": "currentCodeSystem",
-			"value": ""
-		},
-		{
-			"key": "currentCode",
-			"value": ""
-		},
-		{
-			"key": "currentTargetCodeSystem",
-			"value": ""
-		},
-		{
-			"key": "currentTargetCode",
-			"value": ""
-		},
-		{
-			"key": "createdMapping",
+			"key": "fhirPatientDOB",
 			"value": ""
 		}
 	]
