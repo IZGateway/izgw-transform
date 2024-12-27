@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d6c9c438-f003-40b1-ace9-518df0030333",
+		"_postman_id": "ceb75421-eb48-40f2-a4e5-3c3ec8b1bfff",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "28864196"
@@ -25,10 +25,10 @@
 											"    pm.response.to.have.status(200);\r",
 											"});\r",
 											"\r",
-											"pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
+											"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
 											"    var response = utils.removeNS(xml2Json(responseBody));\r",
 											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
 											"\r",
 											"\r",
 											"});\r",
@@ -698,10 +698,10 @@
 											"    pm.response.to.have.status(200);\r",
 											"});\r",
 											"\r",
-											"pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
+											"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
 											"    var response = utils.removeNS(xml2Json(responseBody));\r",
 											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
 											"\r",
 											"\r",
 											"});\r",
@@ -1083,10 +1083,10 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
+									"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
 									"    var response = utils.removeNS(xml2Json(responseBody));\r",
 									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
+									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
 									"\r",
 									"\r",
 									"});\r",
@@ -1531,10 +1531,10 @@
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"MSH-7 in the response message has been transformed\", function () {\r",
+									"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
 									"    var response = utils.removeNS(xml2Json(responseBody));\r",
 									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('MSH 7 NEW VALUE');\r",
+									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
 									"\r",
 									"\r",
 									"});\r",
@@ -23751,54 +23751,6 @@
 		},
 		{
 			"key": "hex1b",
-			"value": ""
-		},
-		{
-			"key": "currentName",
-			"value": ""
-		},
-		{
-			"key": "currentId",
-			"value": ""
-		},
-		{
-			"key": "currentOrganizationId",
-			"value": ""
-		},
-		{
-			"key": "currentInboundEndpoint",
-			"value": ""
-		},
-		{
-			"key": "currentOutboundEndpoint",
-			"value": ""
-		},
-		{
-			"key": "currentActive",
-			"value": ""
-		},
-		{
-			"key": "createdPipeline",
-			"value": ""
-		},
-		{
-			"key": "currentCodeSystem",
-			"value": ""
-		},
-		{
-			"key": "currentCode",
-			"value": ""
-		},
-		{
-			"key": "currentTargetCodeSystem",
-			"value": ""
-		},
-		{
-			"key": "currentTargetCode",
-			"value": ""
-		},
-		{
-			"key": "createdMapping",
 			"value": ""
 		},
 		{
