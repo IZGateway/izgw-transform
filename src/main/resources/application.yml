@@ -23,6 +23,7 @@ jwt:
   provider: ${XFORM_JWT_PROVIDER:shared-secret}
   shared-secret: ${XFORM_JWT_SECRET:}
   jwk-set-uri: ${XFORM_JWT_URI:}
+  user-permissions-claim: ${XFORM_JWT_USER_PERMISSIONS_CLAIM:}
 
 spring:
   autoconfigure:
