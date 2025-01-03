@@ -1,7 +1,7 @@
 version: '3.1'
 services:
   xform:
-    image: izgw-transform:xform-0.4.0-202412171410
+    image: izgw-transform:latest
     container_name: xform
     ports:
       - '444:444'
@@ -32,4 +32,8 @@ services:
         source: ${CONFIG_SOURCE}
         target: /configuration
     networks:
-      - izgw-network
+      - izg-shared-network
+
+networks:
+  izg-shared-network:
+    external: true

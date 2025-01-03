@@ -14,7 +14,7 @@ services:
       - ./data:/docker-entrypoint-initdb.d
     restart: always
     networks:
-      - izgw-network
+      - izg-shared-network
   phiz:
     depends_on:
       - phizmysql
@@ -39,4 +39,7 @@ services:
         source: "${SSL_SOURCE}"
         target: /usr/share/izgateway/conf/ssl
     networks:
-      - izgw-network
+      - izg-shared-network
+networks:
+  izg-shared-network:
+    external: true
