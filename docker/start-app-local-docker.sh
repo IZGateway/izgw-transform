@@ -11,4 +11,4 @@ else
 fi
 
 # Run docker-compose
-docker-compose -f docker-compose-hub.yml -f docker-compose-xform.yml up -d
+docker-compose -f docker-compose.local.yml up -d
