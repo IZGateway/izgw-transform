@@ -18,7 +18,6 @@ xform:
     operation-precondition-fields: testing/configuration/operation-precondition-fields.json
     users: testing/configuration/users.json
     group-role-mapping: testing/configuration/group-role-mapping.json
-  access-control-enabled: ${XFORM_ACCESS_CONTROL_ENABLED:false}
 jwt:
   provider: ${XFORM_JWT_PROVIDER:shared-secret}
   shared-secret: ${XFORM_JWT_SECRET:}
