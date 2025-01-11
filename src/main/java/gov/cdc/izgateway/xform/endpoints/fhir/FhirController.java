@@ -1,6 +1,5 @@
 package gov.cdc.izgateway.xform.endpoints.fhir;
 
-import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
 import gov.cdc.izgw.v2tofhir.datatype.HumanNameParser;
 import gov.cdc.izgw.v2tofhir.segment.PIDParser;
@@ -48,7 +47,6 @@ import org.hl7.fhir.r4.model.StringType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -128,7 +126,6 @@ import lombok.extern.slf4j.Slf4j;
 @RolesAllowed({Roles.SOAP, Roles.ADMIN})
 @RequestMapping("/fhir")
 @Slf4j
-@Lazy(false)
 public class FhirController {
 
 	/**
@@ -160,10 +157,9 @@ public class FhirController {
 	 * @param hub	The hub controller to talk to.
 	 * @param config The configuration for the converter
 	 */
-	public FhirController(@Autowired HubController hub, FhirConfiguration config, AccessControlRegistry registry) {
+	public FhirController(@Autowired HubController hub, FhirConfiguration config) {
 		this.hub = hub;
 		this.config = config;
-        registry.register(this);
 	}
 	
     /**
@@ -194,11 +190,9 @@ public class FhirController {
     @ApiResponse(
         responseCode = "200",
         description = "The request completed normally",
-        content = {
-        	@Content(mediaType = "application/json"),
-        	@Content(mediaType = "application/xml"),
-        	@Content(mediaType = "application/yml")
-        }
+        content = {@Content(
+                mediaType = "application/xml"
+        )}
     )
     @ApiResponse(
     	responseCode = "400",
@@ -257,11 +251,9 @@ public class FhirController {
     @ApiResponse(
             responseCode = "200",
             description = "The request completed normally",
-    		content = {
-    	        	@Content(mediaType = "application/json"),
-    	        	@Content(mediaType = "application/xml"),
-    	        	@Content(mediaType = "application/yml")
-    	        }
+            content = {@Content(
+                    mediaType = "application/xml"
+            )}
     )
     @ApiResponse(
     	responseCode = "404",
@@ -314,23 +306,19 @@ public class FhirController {
     	Identifier ident = new Identifier().setSystem(idParts[isPatient ? 0 : 2]).setValue(idParts[isPatient ? 1 : 3]);
 		
 		RequestWithModifiableParameters wrapper = new RequestWithModifiableParameters(req);
-    	wrapper.addParameter(isPatient ? Patient.SP_IDENTIFIER : IzQuery.PATIENT_LIST, idParts[0] + "|" + idParts[1]);
-    	ResponseEntity<Bundle> res = processQuery(wrapper, destinationId);
-		Bundle b = res.getBody();
-		if (b == null) {
-			// Technically this is an error.
-			return notFound(id);
-		}
-		Resource resource = b.getEntry().stream()
+    	wrapper.addParameter(IzQuery.PATIENT_LIST, idParts[0] + "|" + idParts[1]);
+		Bundle b = processQuery(wrapper, destinationId).getBody();
+
+		Resource res = b.getEntry().stream()
 			.map(e -> e.getResource())
 			.filter(r -> resourceType.equals(r.fhirType()) && ident.equalsShallow(getIdentifier(r)))
 			.findFirst()
 			.orElse(null);
 		
-		if (resource == null) {
+		if (res == null) {
 			return notFound(id);
 		}
-		return new ResponseEntity<>(resource, res.getHeaders(), HttpStatus.OK);
+		return new ResponseEntity<>(res, HttpStatus.OK);
     }
     
     /**
@@ -354,7 +342,7 @@ public class FhirController {
             responseCode = "200",
             description = "The request completed normally",
             content = {@Content(
-                    mediaType = "application/xml"
+                    mediaType = "application/json"
             )}
     )
     @ApiResponse(
@@ -373,12 +361,12 @@ public class FhirController {
     		RequestMethod.HEAD	// Used with SMART and other auth mechanisms.
     	},
         produces = {
+           	"application/yaml",
+        	"application/json", 
+        	"application/xml",
         	"application/fhir+xml", 
         	"application/fhir+json", 
         	"application/fhir+yaml",
-        	"application/xml",
-        	"application/json", 
-        	"application/yaml",
         	"text/xml"
     	}
     )
@@ -490,11 +478,13 @@ public class FhirController {
 		}
 	}
 
+
 	private static void setBirthDateParameters(RequestWithModifiableParameters wrapper, Patient patient) {
 		if (patient.hasBirthDate()) {
 			DateParam birthDate = new DateParam();
 			birthDate.setValue(patient.getBirthDate());
-			wrapper.addParameter(Patient.SP_BIRTHDATE, birthDate.getValueAsQueryToken(null));
+			String value = StringUtils.substringBefore(birthDate.getValueAsQueryToken(null), "T");
+			wrapper.addParameter(Patient.SP_BIRTHDATE, value);
 		}
 		if (patient.hasMultipleBirth()) {
 			PrimitiveType<?> pt = (PrimitiveType<?>) patient.getMultipleBirth();
@@ -655,9 +645,10 @@ public class FhirController {
 		
 		// Update the bundle type to searchset from message.
 		bundle.setType(BundleType.SEARCHSET);
-		String requested = StringUtils.substringAfterLast(req.getRequestURI(), "/fhir/");
-		requested = StringUtils.substringBefore(StringUtils.substringAfter(requested, "/"), "/");
-		
+		String requested = StringUtils.substringAfterLast(req.getRequestURI(), "/");
+		if ("$match".equals(requested)) {
+			requested = "Patient";
+		}
 		List<Resource> resources = new ArrayList<>();
 		preFilter(bundle, includes, revIncludes, requested, resources);
 		
