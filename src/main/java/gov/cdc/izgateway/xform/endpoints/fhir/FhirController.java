@@ -194,9 +194,11 @@ public class FhirController {
     @ApiResponse(
         responseCode = "200",
         description = "The request completed normally",
-        content = {@Content(
-                mediaType = "application/xml"
-        )}
+        content = {
+        	@Content(mediaType = "application/json"),
+        	@Content(mediaType = "application/xml"),
+        	@Content(mediaType = "application/yml")
+        }
     )
     @ApiResponse(
     	responseCode = "400",
@@ -255,9 +257,11 @@ public class FhirController {
     @ApiResponse(
             responseCode = "200",
             description = "The request completed normally",
-            content = {@Content(
-                    mediaType = "application/xml"
-            )}
+    		content = {
+    	        	@Content(mediaType = "application/json"),
+    	        	@Content(mediaType = "application/xml"),
+    	        	@Content(mediaType = "application/yml")
+    	        }
     )
     @ApiResponse(
     	responseCode = "404",
@@ -310,19 +314,23 @@ public class FhirController {
     	Identifier ident = new Identifier().setSystem(idParts[isPatient ? 0 : 2]).setValue(idParts[isPatient ? 1 : 3]);
 		
 		RequestWithModifiableParameters wrapper = new RequestWithModifiableParameters(req);
-    	wrapper.addParameter(IzQuery.PATIENT_LIST, idParts[0] + "|" + idParts[1]);
-		Bundle b = processQuery(wrapper, destinationId).getBody();
-
-		Resource res = b.getEntry().stream()
+    	wrapper.addParameter(isPatient ? Patient.SP_IDENTIFIER : IzQuery.PATIENT_LIST, idParts[0] + "|" + idParts[1]);
+    	ResponseEntity<Bundle> res = processQuery(wrapper, destinationId);
+		Bundle b = res.getBody();
+		if (b == null) {
+			// Technically this is an error.
+			return notFound(id);
+		}
+		Resource resource = b.getEntry().stream()
 			.map(e -> e.getResource())
 			.filter(r -> resourceType.equals(r.fhirType()) && ident.equalsShallow(getIdentifier(r)))
 			.findFirst()
 			.orElse(null);
 		
-		if (res == null) {
+		if (resource == null) {
 			return notFound(id);
 		}
-		return new ResponseEntity<>(res, HttpStatus.OK);
+		return new ResponseEntity<>(resource, res.getHeaders(), HttpStatus.OK);
     }
     
     /**
@@ -647,7 +655,8 @@ public class FhirController {
 		
 		// Update the bundle type to searchset from message.
 		bundle.setType(BundleType.SEARCHSET);
-		String requested = StringUtils.substringAfterLast(req.getRequestURI(), "/");
+		String requested = StringUtils.substringAfterLast(req.getRequestURI(), "/fhir/");
+		requested = StringUtils.substringBefore(StringUtils.substringAfter(requested, "/"), "/");
 		
 		List<Resource> resources = new ArrayList<>();
 		preFilter(bundle, includes, revIncludes, requested, resources);
