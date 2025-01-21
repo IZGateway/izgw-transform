@@ -1,13 +1,14 @@
 version: '3.1'
 services:
   xform:
-    image: izgw-transform:xform-0.4.0-202412171410
+    image: izgw-transform:latest
     container_name: xform
     ports:
       - '444:444'
     environment:
       COMMON_PASS: ${COMMON_PASS}
       XFORM_DESTINATION_HUB_URI: ${XFORM_DESTINATION_HUB_URI}
+      XFORM_IIS_DESTINATION: ${XFORM_IIS_DESTINATION}
       ELASTIC_API_KEY: ${ELASTIC_API_KEY}
       XFORM_SERVER_PORT: ${XFORM_SERVER_PORT}
       XFORM_JWT_SECRET: ${XFORM_JWT_SECRET}
@@ -23,7 +24,8 @@ services:
       XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE: /ssl/server_keystore.bcfks
       XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE: /ssl/server_keystore.bcfks
       XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE: /ssl/client_keystore.bcfks
-      LOGGING_LEVEL: DEBUG
+      xform.allow-delete-via-api: true
+      LOGGING_LEVEL: ${LOGGING_LEVEL}
     volumes:
       - type: bind
         source: ${SSL_SOURCE}
@@ -32,4 +34,8 @@ services:
         source: ${CONFIG_SOURCE}
         target: /configuration
     networks:
-      - izgw-network
+      - izg-shared-network
+
+networks:
+  izg-shared-network:
+    external: true
