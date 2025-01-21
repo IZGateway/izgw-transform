@@ -22,6 +22,8 @@
 		<project.build.finalName>${project.artifactId}-${project.version}-${timestamp}</project.build.finalName>
 		<image.tag>${project.build.finalName}</image.tag>
 		<buildno>${timestamp}</buildno>
+		<logback.version>1.5.16</logback.version>
+		<spring-framework.version>6.2.0</spring-framework.version>
 	</properties>
 	<repositories>
 		<repository>
