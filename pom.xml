@@ -191,7 +191,7 @@
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>izgw-core</artifactId>
-			<version>2.1.7-izgw-core-SNAPSHOT</version>
+			<version>2.1.8-izgw-core-SNAPSHOT</version>
 		</dependency>
 		<!--
 		 izgw-core 2.1.2 pulls in org.springframework.boot:spring-boot-starter-security:jar:3.3.4
