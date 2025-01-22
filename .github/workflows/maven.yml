@@ -206,5 +206,4 @@ jobs:
         run: |
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:izgw-transform_${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:izgw-transform_${{env.IMAGE_BRANCH_TAG}}
-          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:izgw-transform_latest
           docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
