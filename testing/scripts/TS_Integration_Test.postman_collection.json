@@ -921,7 +921,7 @@
 										},
 										{
 											"key": "patient.family",
-											"value": "{{fhirPateintFamily}}",
+											"value": "{{fhirPatientFamily}}",
 											"type": "text"
 										},
 										{
@@ -1664,7 +1664,7 @@
 								},
 								{
 									"key": "patient.family",
-									"value": "{{fhirPateintFamily}}",
+									"value": "{{fhirPatientFamily}}",
 									"type": "text"
 								},
 								{
