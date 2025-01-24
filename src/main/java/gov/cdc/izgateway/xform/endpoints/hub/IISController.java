@@ -1,42 +1,30 @@
 package gov.cdc.izgateway.xform.endpoints.hub;
 
 import ca.uhn.hl7v2.HL7Exception;
-import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.security.Roles;
 import gov.cdc.izgateway.service.IMessageHeaderService;
-import gov.cdc.izgateway.soap.SoapControllerBase;
 import gov.cdc.izgateway.soap.fault.Fault;
 import gov.cdc.izgateway.soap.fault.SecurityFault;
-import gov.cdc.izgateway.soap.message.HasCredentials;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
 import gov.cdc.izgateway.xform.camel.constants.EndpointUris;
-import gov.cdc.izgateway.xform.context.IZGXformContext;
 import gov.cdc.izgateway.xform.context.ServiceContext;
-import gov.cdc.izgateway.xform.enums.DataFlowDirection;
 import gov.cdc.izgateway.xform.enums.DataType;
-import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
-import gov.cdc.izgateway.xform.model.Organization;
+import gov.cdc.izgateway.xform.services.AccessControlService;
 import gov.cdc.izgateway.xform.services.OrganizationService;
-import gov.cdc.izgateway.xform.services.XformAccessControlService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.camel.CamelExecutionException;
 import org.apache.camel.ProducerTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -50,7 +38,7 @@ public class IISController extends BaseController {
             AccessControlRegistry registry,
             ProducerTemplate producerTemplate,
             OrganizationService organizationService,
-            XformAccessControlService accessControlService
+            AccessControlService accessControlService
     ) {
         super(mshService, SoapMessage.IIS2014_NS, "cdc-iis.wsdl", Arrays.asList(SoapMessage.IIS2014_NS), producerTemplate, organizationService, accessControlService);
         registry.register(this);

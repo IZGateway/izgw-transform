@@ -51,7 +51,7 @@ For the purposes of our example later in this document we will name this file cl
 
 ### Configuration Files
 
-The Transformation Service relies on six configuration files at this time: Organization, Pipelines, Solutions, Mapping, Access Control, and Operation/Precondition Fields. These
+The Transformation Service relies on eight configuration files at this time: Organization, Pipelines, Solutions, Mapping, Access Control, Operation/Precondition Fields, Users, and Group to Role Mappings. These
 ultimately determine the changes that will happen to data as it travels through the Transformation Service but also _who_ can access API's.
 
 You may download example configurations from the repository as described here:
@@ -62,6 +62,8 @@ You may download example configurations from the repository as described here:
 * Mappings &rarr; [mappings.json](/testing/configuration/mappings.json)
 * Access Control &rarr; [access-control.json](/testing/configuration/access-control.json)
 * Operation/Precondition Fields &rarr; [operation-precondition-fields.json](/testing/configuration/operation-precondition-fields.json)
+* Users &rarr; [users.json](/testing/configuration/users.json)
+* Group Role Mappings &rarr; [group-role-mapping.json](/testing/configuration/group-role-mapping.json)
 
 You'll need to have these files located in a place that can be accessed by the running Docker container. For our example
 let's say we put these in a /izgw-xform/configuration directory. This local directory will be mapped into the running
@@ -76,50 +78,58 @@ The necessary environment variables for the configuration files:
 * XFORM_CONFIGURATIONS_MAPPINGS
 * XFORM_CONFIGURATIONS_ACCESS-CONTROL
 * XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS
+* XFORM_CONFIGURATIONS_USERS
+* XFORM_CONFIGURATIONS_GROUP-ROLE-MAPPING
 
 ## Running Transformation Service Locally via Docker
 
-To run the image we need to set a few environment variables used by the running container. Those are:
+To run the image, we need to set a few environment variables used by the running container. Those are:
 
 * XFORM_CONFIGURATIONS_ORGANIZATIONS
     * This specifies the name and location on the running container of the configuration for Organizations. For our
-      example we will look for the organizations.json in the /configuration folder. So we would set this to
-      /configuration/organizations.json.
+       example, we will look for organizations.json in the /configuration folder. So we would set this to
+      /configuration/organizations.json
 * XFORM_CONFIGURATIONS_PIPELINES
-    * This specifies the name and location on the running container of the configuration for Pipelines. For our example
-      we will look for the pipelines.json in the /configuration folder. So we would set this to
-      /configuration/pipelines.json.
+    * This specifies the name and location on the running container of the configuration for Pipelines. For our example, 
+      we will look for pipelines.json in the /configuration folder. So we would set this to
+      /configuration/pipelines.json
 * XFORM_CONFIGURATIONS_SOLUTIONS
-    * This specifies the name and location on the running container of the configuration for Solutions. For our example
-      we will look for the solutions.json in the /configuration folder. So we would set this to
-      /configuration/solutions.json.
+    * This specifies the name and location on the running container of the configuration for Solutions. For our example, 
+      we will look for solutions.json in the /configuration folder. So we would set this to
+      /configuration/solutions.json
 * XFORM_CONFIGURATIONS_MAPPINGS
-    * This specifies the name and location on the running container of the configuration for Mappings. For our example
-      we will look for the mappings.json in the /configuration folder. So we would set this to
-      /configuration/mappings.json.
+    * This specifies the name and location on the running container of the configuration for Mappings. For our example, 
+      we will look for mappings.json in the /configuration folder. So we would set this to
+      /configuration/mappings.json
 * XFORM_CONFIGURATIONS_ACCESS-CONTROL
-    * This specifies the name and location on the running container of the configuration for access control. For our example
-      we will look for the access-control.json in the /configuration folder. So we would set this to
-      /configuration/access-control.json.
+    * This specifies the name and location on the running container of the configuration for access control. For our example, 
+      we will look for access-control.json in the /configuration folder. So we would set this to
+      /configuration/access-control.json
 * XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS
-    * This specifies the name and the location on the running container of the configuration for fields available in configuring operations and preconditions.  For our example we will look for the precondition-fields.json in the /configuration folder. So we would set this to /configuration/precondition-fields.json.
+    * This specifies the name and the location on the running container of the configuration for fields available in configuring operations and preconditions.  For our example, we will look for precondition-fields.json in the /configuration folder. So we would set this to /configuration/precondition-fields.json
+* XFORM_CONFIGURATIONS_USERS
+  * This specifies the name and location on the running container of the configuration for users.  These are known users of the Transformation Service system and tie them to an Organization.  For our example, we will look for users.json file in the /configuration folder. So we would set this to /configuration/users.json
+* XFORM_CONFIGURATIONS_GROUP-ROLE-MAPPING
+  * This specifies the name and location on the running container of the configuration for group to role mappings.  These are Groups necessary for executing different Transformation Service tasks.  This file determines how to map roles that we may receive in a JWT token to Transformation Service groups.  For example, we will look for group-role-mapping.json in the /configuration folder. So we would set this to /configuration/group-role-mapping.json
 * COMMON_PASS
-    * This is the password which is necessary to open the Server Key Store and Client Trust Store files
+    * This is the password that is necessary to open the Server Key Store and Client Trust Store files
 * XFORM_SERVER_PORT
-    * This is the port that we want the Transformation Service to listen on. For our example we will use port 444
+    * This is the port that we want the Transformation Service to listen on. For example, we will use port 444
 * XFORM_DESTINATION_HUB_URI
     * This is the downstream IZ Gateway Hub that we want the Transformation Service to submit messages to. For our
-      example we will use https://dev.izgateway.org/IISHubService
+       example, we will use https://dev.izgateway.org/IISHubService
 * XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE
-    * This specifies the path and file on the running container for the Server Key Store.  For our example we will look for these files in the /ssl directory and the name of the file is server_keystore.bcfks
+    * This specifies the path and file on the running container for the Server Key Store.  For our example, we will look for these files in the /ssl directory and the name of the file is server_keystore.bcfks
 * XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE
   * Same as TS_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE
 * XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE
   * Same as TS_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE
 * XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE
-    * This specifies the path and file on the running container for the Client Key Store.  For our example we will look for these files in the /ssl directory and the name of the file is client_keystore.bcfks
+    * This specifies the path and file on the running container for the Client Key Store.  For our example, we will look for these files in the /ssl directory, and the name of the file is client_keystore.bcfks
+* XFORM_JWT_SECRET
+  * This is only necessary if you are going to execute Transformation Service using JWT authentication.  This would be a shared secret that would be necessary for generating and authentication JWT tokens between a caller and this instance of the Transformation Service.
 
-To run the image we can issue a single docker command as follows:
+To run the image, we can issue a single docker command as follows:
 
 ```bash
 docker run \
@@ -132,6 +142,8 @@ docker run \
 --env=XFORM_CONFIGURATIONS_MAPPINGS=/configuration/mappings.json \
 --env=XFORM_CONFIGURATIONS_ACCESS-CONTROL=/configuration/access-control.json \
 --env=XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS=/configuration/operation-precondition-fields.json \
+--env=XFORM_CONFIGURATIONS_USERS=/configuration/users.json \
+--env=XFORM_CONFIGURATIONS_GROUP-ROLE-MAPPING=/configuration/group-role-mapping.json \
 --env=XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE=/ssl/server_keystore.bcfks \
 --env=XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE=/ssl/server_keystore.bcfks \
 --env=XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE=/ssl/server_keystore.bcfks \

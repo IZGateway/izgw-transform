@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
 	<artifactId>xform</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
 	<name>xform</name>
 	<description>IZ Gateway Xform Service</description>
 	<properties>
@@ -22,6 +22,8 @@
 		<project.build.finalName>${project.artifactId}-${project.version}-${timestamp}</project.build.finalName>
 		<image.tag>${project.build.finalName}</image.tag>
 		<buildno>${timestamp}</buildno>
+		<logback.version>1.5.16</logback.version>
+		<spring-framework.version>6.2.0</spring-framework.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -191,7 +193,7 @@
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>izgw-core</artifactId>
-			<version>2.1.2-izgw-core-SNAPSHOT</version>
+			<version>2.1.8-izgw-core-SNAPSHOT</version>
 		</dependency>
 		<!--
 		 izgw-core 2.1.2 pulls in org.springframework.boot:spring-boot-starter-security:jar:3.3.4
@@ -242,6 +244,7 @@
 		     ca.uhn.hapi.fhir:org.hl7.fhir.convertors:jar:6.1.2.2
 		     ca.uhn.hapi.fhir:org.hl7.fhir.validation:jar:6.1.2.2
 			 Both with CVE-2024-51132, 6.4.0 is fix version
+			 org.fhir:ucum:jar:1.0.8 with CVE-2024-55887, 1.0.9 is fix version
 		-->
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
@@ -258,6 +261,30 @@
 			<artifactId>org.hl7.fhir.validation</artifactId>
 			<version>6.4.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.fhir</groupId>
+			<artifactId>ucum</artifactId>
+			<version>1.0.9</version>
+		</dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.11.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
 	</dependencies>
 	<build>
 		<plugins>

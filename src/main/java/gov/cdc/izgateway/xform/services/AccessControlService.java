@@ -1,99 +1,72 @@
 package gov.cdc.izgateway.xform.services;
 
-import gov.cdc.izgateway.model.IAccessControl;
-import gov.cdc.izgateway.service.IAccessControlService;
+import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.xform.model.AccessControl;
+import gov.cdc.izgateway.xform.repository.XformRepository;
+import gov.cdc.izgateway.xform.security.Roles;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
+import java.util.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-/**
- * The AccessControlService is a placeholder for the IAccessControlService interface.  We will be implementing
- * a simpler repository than the existing DB repository.
- * This class contains no-ops for all methods.
- * Ticket to track this: https://support.izgateway.org/browse/IGDD-1664
- */
+@Slf4j
 @Service
-public class AccessControlService implements IAccessControlService {
-    @Override
-    public String getServerName() {
-        return "";
+public class AccessControlService extends GenericService<AccessControl> {
+    private final AccessControlRegistry registry;
+
+    @Autowired
+    public AccessControlService(XformRepository<AccessControl> repo, AccessControlRegistry registry) {
+        super(repo);
+        this.registry = registry;
     }
 
-    @Override
-    public void refresh() {
-    }
-
-    @Override
-    public Map<String, TreeSet<String>> getUserRoles() {
-        return Map.of();
-    }
-
-    @Override
-    public Map<String, Map<String, Boolean>> getAllowedUsersByGroup() {
-        return Map.of();
-    }
-
-    @Override
-    public Map<String, Map<String, Boolean>> getAllowedRoutesByEvent() {
-        return Map.of();
-    }
-
-    @Override
-    public boolean isUserInRole(String user, String role) {
-        return false;
-    }
-
-    @Override
-    public boolean isUserBlacklisted(String user) {
-        return false;
-    }
-
-    @Override
-    public Map<String, Boolean> getEventMap(String event) {
-        return Map.of();
-    }
-
-    @Override
-    public Set<String> getEventTypes() {
-        return Set.of();
-    }
-
-    @Override
-    public boolean isRouteAllowed(String route, String event) {
-        return false;
-    }
-
-    @Override
-    public void setServerName(String serverName) {
-    }
-
-    @Override
     public List<String> getAllowedRoles(RequestMethod method, String path) {
-        return List.of();
+        List<String> roles = registry.getAllowedRoles(method, path);
+        log.debug("Roles allowed for {} {} are {}", method, path, roles);
+        return roles;
     }
 
-    @Override
-    public Boolean checkAccess(String user, String method, String path) {
-        return null;
+    public Boolean checkAccess(String method, String path) {
+        // If path starts with /swagger, return checkSwaggerAccess, else return checkXformAccess
+        if (path.startsWith("/swagger")) {
+            return checkSwaggerAccess(method, path);
+        } else {
+            return checkXformAccess(method, path);
+        }
     }
 
-    @Override
-    public boolean isMemberOf(String user, String group) {
-        return false;
+    /**
+     * Check if the user has access to the swagger endpoints.  This method is necessary because the swagger
+     * library and endpoints will not register with our AccessControlRegistry.
+     * @param method
+     * @param path
+     * @return true if access is allowed, false if access is denied
+     */
+    public Boolean checkSwaggerAccess(String method, String path) {
+        return path.startsWith("/swagger") && RequestContext.getPrincipal().getRoles().contains(Roles.ADMIN);
     }
 
-    @Override
-    public IAccessControl removeUserFromBlacklist(String user) {
-        return null;
+    /**
+     * Check if the user has access to the xform endpoints.
+     * @param method
+     * @param path
+     * @return true if access is allowed, false if access is denied
+     */
+    public Boolean checkXformAccess(String method, String path) {
+        List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);
+
+        // If RequestContext.getRoles() has one role that matches the roles list, return true
+        return RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);
     }
 
-    @Override
-    public IAccessControl addUserToBlacklist(String user) {
-        return null;
-    }
+    public Map<String, TreeSet<String>> getUserRoles() {
+        Map<String, TreeSet<String>> userRoleMap = new HashMap<>();
+        for (AccessControl ac : repo.getEntitySet()) {
+            userRoleMap.put(ac.getUserId().toString(), new TreeSet<>(List.of(ac.getRoles())));
+        }
 
+        return userRoleMap;
+    }
 }
