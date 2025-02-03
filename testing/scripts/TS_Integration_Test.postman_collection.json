@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "c2b24de5-ec02-4164-8a50-22ac219c9af8",
+		"_postman_id": "a96d55ef-c50a-47d7-a59a-9ea1492e3b8f",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-c2b24de5-ec02-4164-8a50-22ac219c9af8?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-a96d55ef-c50a-47d7-a59a-9ea1492e3b8f?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -1038,17 +1038,17 @@
 									"urlencoded": [
 										{
 											"key": "patient.given",
-											"value": "Nogiven",
+											"value": "{{fhirNoDataPatientGiven}}",
 											"type": "text"
 										},
 										{
 											"key": "patient.family",
-											"value": "Nofamily",
+											"value": "{{fhirNoDataPatientFamily}}",
 											"type": "text"
 										},
 										{
 											"key": "patient.birthdate",
-											"value": "1900-01-01",
+											"value": "{{fhirNoDataPatientDOB}}",
 											"type": "text"
 										}
 									]
@@ -1736,17 +1736,17 @@
 							"urlencoded": [
 								{
 									"key": "patient.given",
-									"value": "Nogiven",
+									"value": "{{fhirNoDataPatientGiven}}",
 									"type": "text"
 								},
 								{
 									"key": "patient.family",
-									"value": "Nofamily",
+									"value": "{{fhirNoDataPatientFamily}}",
 									"type": "text"
 								},
 								{
 									"key": "patient.birthdate",
-									"value": "1900-01-01",
+									"value": "{{fhirNoDataPatientDOB}}",
 									"type": "text"
 								}
 							]
@@ -24880,6 +24880,11 @@
 					"pm.collectionVariables.set(\"fhirPatientFamily\", \"CuyahogaAIRA\");",
 					"pm.collectionVariables.set(\"fhirPatientDOB\", \"1960-05-07\");",
 					"",
+					"// FHIR \"No Data\" Tests",
+					"pm.collectionVariables.set(\"fhirNoDataPatientGiven\", \"NogivenAIRA\");",
+					"pm.collectionVariables.set(\"fhirNoDataPatientFamily\", \"NofamilyAIRA\");",
+					"pm.collectionVariables.set(\"fhirNoDataPatientDOB\", \"1900-01-01\");",
+					"",
 					"var tooLarge = goodResponse.replace('&|', \"&amp;|\");",
 					"var last;",
 					"var maxLength = 65536;",
@@ -26122,6 +26127,18 @@
 		},
 		{
 			"key": "hex1b",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientGiven",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientFamily",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientDOB",
 			"value": ""
 		}
 	]
