@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "a96d55ef-c50a-47d7-a59a-9ea1492e3b8f",
+		"_postman_id": "a2611909-028e-45dd-a9f0-b8e71a9817cc",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-a96d55ef-c50a-47d7-a59a-9ea1492e3b8f?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-a2611909-028e-45dd-a9f0-b8e71a9817cc?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -10318,6 +10318,834 @@
 										"v1",
 										"solutions",
 										"{{id2}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - no id",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).to.equal(\"id: Solution ID is required\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - blank id",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).to.equal(\"id: Solution ID is required\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - invalid id",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).contains(\"JSON parse error: Cannot deserialize value of type `java.util.UUID`\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"not_a_uuid\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - invalid id (digit)",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).contains(\"JSON parse error: Cannot deserialize value of type `java.util.UUID`\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 1234567890,\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - no name",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).to.equal(\"solutionName: Solution name is required\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - blank name",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).to.equal(\"solutionName: Solution name is required\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - no active flag",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).to.equal(\"active: Solution active status is required\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - invalid active flag",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).contains(\"JSON parse error: Cannot deserialize value of type `java.lang.Boolean`\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"active\": \"random_String\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - no requestOperations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).to.equal(\"requestOperations: Request Operations List is required (can be empty)\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"active\": {{currentActive}},\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"responseOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - null requestOperations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).to.equal(\"requestOperations: Request Operations List is required (can be empty)\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"active\": {{currentActive}},\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"requestOperations\": null,\n    \"responseOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - no responseOperations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).to.equal(\"responseOperations: Response Operations List is required (can be empty)\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"active\": {{currentActive}},\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"requestOperations\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create - null responseOperations",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Returns Bad Request\", function() {",
+											"    pm.expect(pm.response.code).to.equal(400);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdEntity\", savedData);",
+											"",
+											"pm.test(\"Error Message Check\", function() {",
+											"    pm.expect(response.message).to.equal(\"responseOperations: Response Operations List is required (can be empty)\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"active\": {{currentActive}},\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"requestOperations\": [],\n    \"responseOperations\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"solutions"
 									]
 								}
 							},
@@ -26139,6 +26967,30 @@
 		},
 		{
 			"key": "fhirNoDataPatientDOB",
+			"value": ""
+		},
+		{
+			"key": "currentName",
+			"value": ""
+		},
+		{
+			"key": "currentId",
+			"value": ""
+		},
+		{
+			"key": "currentDescription",
+			"value": ""
+		},
+		{
+			"key": "currentVersion",
+			"value": ""
+		},
+		{
+			"key": "currentActive",
+			"value": ""
+		},
+		{
+			"key": "createdEntity",
 			"value": ""
 		}
 	]
