@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.model;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -31,8 +32,11 @@ public class Solution implements BaseModel {
     private Boolean active;
 
     @NotNull(message = "Request Operations List is required (can be empty)")
+    @Valid
     private List<SolutionOperation> requestOperations;
+
     @NotNull(message = "Response Operations List is required (can be empty)")
+    @Valid
     private List<SolutionOperation> responseOperations;
 
 }
