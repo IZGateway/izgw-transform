@@ -14,4 +14,19 @@ import gov.cdc.izgateway.xform.context.ServiceContext;
 })
 public interface Precondition {
     boolean evaluate(ServiceContext context);
+
+    /**
+     * Used, currently, in validation of Preconditions sent to the API to create
+     * Solutions.  See PreconditionValidation
+     * @return String the method name of this Precondition via JsonSubTypes
+     */
+    default String getMethod() {
+        JsonSubTypes.Type[] types = Precondition.class.getAnnotation(JsonSubTypes.class).value();
+        for (JsonSubTypes.Type type : types) {
+            if (type.value().equals(this.getClass())) {
+                return type.name();
+            }
+        }
+        throw new IllegalArgumentException("Unknown precondition type: " + this.getClass().getName());
+    }
 }

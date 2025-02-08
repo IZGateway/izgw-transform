@@ -246,6 +246,8 @@ public class ApiController {
     public ResponseEntity<Solution> createSolution(
             @Valid @RequestBody() Solution solution
     ) {
+
+        //preconditionValidation.validateSolutionPreconditions(solution);
         solutionService.create(solution);
         return new ResponseEntity<>(solution, HttpStatus.OK);
     }
