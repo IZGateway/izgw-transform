@@ -10398,6 +10398,895 @@
 									]
 								},
 								{
+									"name": "Invalid Precondition Tests",
+									"item": [
+										{
+											"name": "Equal - missing id",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].id: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].id: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"equals\",\n                    \"dataPath\": \"{{$randomCompanyName}}\",\n                    \"comparisonValue\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"equals\",\n                    \"dataPath\": \"{{$randomCompanyName}}\",\n                    \"comparisonValue\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Equal - missing dataPath",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].dataPath: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].dataPath: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"equals\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"comparisonValue\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"equals\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"comparisonValue\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Equal - missing comparisonValue",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].comparisonValue: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].comparisonValue: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"equals\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"dataPath\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"equals\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"dataPath\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Not Equal - missing id",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].id: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].id: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"not_equals\",\n                    \"dataPath\": \"{{$randomCompanyName}}\",\n                    \"comparisonValue\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"not_equals\",\n                    \"dataPath\": \"{{$randomCompanyName}}\",\n                    \"comparisonValue\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Not Equal - missing dataPath",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].dataPath: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].dataPath: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"not_equals\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"comparisonValue\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"not_equals\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"comparisonValue\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Not Equal - missing comparisonValue",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].comparisonValue: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].comparisonValue: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"not_equals\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"dataPath\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"not_equals\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"dataPath\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Exists - missing id",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].id: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].id: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"exists\",\n                    \"dataPath\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"exists\",\n                    \"dataPath\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Exists - missing dataPath",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].dataPath: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].dataPath: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"exists\",\n                    \"id\": \"{{$randomUUID}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"exists\",\n                    \"id\": \"{{$randomUUID}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Not Exists - missing id",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].id: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].id: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"not_exists\",\n                    \"dataPath\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"not_exists\",\n                    \"dataPath\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Not Exists - missing dataPath",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].dataPath: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].dataPath: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"not_exists\",\n                    \"id\": \"{{$randomUUID}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"not_exists\",\n                    \"id\": \"{{$randomUUID}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Regex Match - missing id",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].id: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].id: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"regex_match\",\n                    \"dataPath\": \"{{$randomCompanyName}}\",\n                    \"regex\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"regex_match\",\n                    \"dataPath\": \"{{$randomCompanyName}}\",\n                    \"regex\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Regex Match - missing dataPath",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].dataPath: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].dataPath: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"regex_match\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"regex\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"regex_match\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"regex\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Regex Match - missing regex",
+											"event": [
+												{
+													"listen": "prerequest",
+													"script": {
+														"exec": [
+															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+															"pm.collectionVariables.set(\"currentDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+															"pm.collectionVariables.set(\"currentVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												},
+												{
+													"listen": "test",
+													"script": {
+														"exec": [
+															"pm.test(\"Returns Bad Request\", function() {",
+															"    pm.expect(pm.response.code).to.equal(400);",
+															"});",
+															"",
+															"let response = pm.response.json();",
+															"let savedData = JSON.stringify(response);",
+															"",
+															"pm.test(\"Error Message Check\", function() {",
+															"    pm.expect(response.message).contains(\"requestOperations[0].preconditions[0].regex: required and cannot be empty\");",
+															"    pm.expect(response.message).contains(\"responseOperations[0].preconditions[0].regex: required and cannot be empty\");",
+															"});",
+															"",
+															""
+														],
+														"type": "text/javascript",
+														"packages": {}
+													}
+												}
+											],
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"solutionName\": \"{{currentName}}\",\n    \"description\": \"{{currentDescription}}\",\n    \"version\": \"{{currentVersion}}\",\n    \"active\": {{currentActive}},\n    \"requestOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"regex_match\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"dataPath\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ],\n    \"responseOperations\": [\n        {\n            \"operationList\": [],\n            \"preconditions\": [\n                {\n                    \"method\": \"regex_match\",\n                    \"id\": \"{{$randomUUID}}\",\n                    \"dataPath\": \"{{$randomCompanyName}}\"\n                }\n            ]\n        }\n    ]\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+													"protocol": "{{protocol}}",
+													"host": [
+														"{{host}}"
+													],
+													"port": "{{port}}",
+													"path": [
+														"api",
+														"v1",
+														"solutions"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
 									"name": "Create - no id",
 									"event": [
 										{
@@ -28891,6 +29780,26 @@
 		},
 		{
 			"key": "fhirNoDataPatientDOB",
+			"value": ""
+		},
+		{
+			"key": "currentName",
+			"value": ""
+		},
+		{
+			"key": "currentId",
+			"value": ""
+		},
+		{
+			"key": "currentDescription",
+			"value": ""
+		},
+		{
+			"key": "currentVersion",
+			"value": ""
+		},
+		{
+			"key": "currentActive",
 			"value": ""
 		}
 	]
