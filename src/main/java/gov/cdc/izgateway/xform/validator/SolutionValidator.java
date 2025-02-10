@@ -1,26 +1,29 @@
 package gov.cdc.izgateway.xform.validator;
 
+import gov.cdc.izgateway.xform.model.PreconditionInfo;
 import gov.cdc.izgateway.xform.model.Solution;
 import gov.cdc.izgateway.xform.model.SolutionOperation;
 import gov.cdc.izgateway.xform.preconditions.Precondition;
-import gov.cdc.izgateway.xform.validation.PreconditionValidation;
+import gov.cdc.izgateway.xform.services.PreconditionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * TODO - look at @NonNullApi warnings
  */
 @Component
-public class SolutionPreconditionValidator implements Validator {
-    private final PreconditionValidation preconditionValidation;
+public class SolutionValidator implements Validator {
+    private final PreconditionService preconditionService;
 
     @Autowired
-    public SolutionPreconditionValidator(PreconditionValidation preconditionValidation) {
-        this.preconditionValidation = preconditionValidation;
+    public SolutionValidator(PreconditionService preconditionService) {
+        this.preconditionService = preconditionService;
     }
 
     @Override
@@ -47,7 +50,7 @@ public class SolutionPreconditionValidator implements Validator {
             if (operation.getPreconditions() != null) {
                 for (int j = 0; j < operation.getPreconditions().size(); j++) {
                     Precondition precondition = operation.getPreconditions().get(j);
-                    if (!preconditionValidation.isValidPrecondition(precondition)) {
+                    if (!isValidPrecondition(precondition)) {
                         String path = String.format("%s[%d].preconditions[%d]", field, i, j);
                         errors.rejectValue(path, "invalid.precondition",
                                 "Invalid precondition method: " + precondition.getMethod());
@@ -55,5 +58,15 @@ public class SolutionPreconditionValidator implements Validator {
                 }
             }
         }
+    }
+
+    private boolean isValidPrecondition(Precondition precondition) {
+        return getValidPreconditionMethods().contains(precondition.getMethod());
+    }
+
+    private Set<String> getValidPreconditionMethods() {
+        return preconditionService.getList().stream()
+                .map(PreconditionInfo::getMethod)
+                .collect(Collectors.toSet());
     }
 }

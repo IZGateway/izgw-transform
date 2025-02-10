@@ -17,7 +17,7 @@ public interface Precondition {
 
     /**
      * Used, currently, in validation of Preconditions sent to the API to create
-     * Solutions.  See PreconditionValidation
+     * Solutions.  See SolutionValidator
      * @return String the method name of this Precondition via JsonSubTypes
      */
     default String getMethod() {
