@@ -13,6 +13,7 @@ public class TestUtils {
 
     public static Copy getCopyOperation(String sourceField, String destinationField) {
         Copy copyBase = new Copy();
+        copyBase.setOrder(0);
         copyBase.setSourceField(sourceField);
         copyBase.setDestinationField(destinationField);
         return copyBase;
@@ -20,6 +21,7 @@ public class TestUtils {
 
     public static Set getSetOperation(String destinationField, String setValue) {
         Set setBase = new Set();
+        setBase.setOrder(0);
         setBase.setDestinationField(destinationField);
         setBase.setSetValue(setValue);
         return setBase;
@@ -27,6 +29,7 @@ public class TestUtils {
 
     public static RegexReplace getRegexOperation(String sourceField, String regex, String replacement) {
         RegexReplace regexBase = new RegexReplace();
+        regexBase.setOrder(0);
         regexBase.setField(sourceField);
         regexBase.setRegex(regex);
         regexBase.setReplacement(replacement);
