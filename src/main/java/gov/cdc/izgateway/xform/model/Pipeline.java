@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.model;
 
+import gov.cdc.izgateway.xform.validation.ValidOrganization;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,8 +20,8 @@ public class Pipeline implements BaseModel {
     @NotNull(message = "Pipeline ID is required")
     private UUID id;
 
-    // TODO - verify organization is in the system
     @NotNull(message = "Organization ID is required")
+    @ValidOrganization(message = "Organization ID must reference an existing and active organization")
     private UUID organizationId;
 
     private String description;
