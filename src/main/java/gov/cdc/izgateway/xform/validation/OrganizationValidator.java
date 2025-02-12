@@ -29,11 +29,25 @@ public class OrganizationValidator implements ConstraintValidator<ValidOrganizat
 
         // If organization not found via ID is not valid
         if (organization == null) {
+            context
+                    .disableDefaultConstraintViolation(); // we want to override the default validation message
+            context
+                    .buildConstraintViolationWithTemplate("Organization not found with ID " + organizationId)
+                    .addConstraintViolation();
             return false;
         }
 
         // We know the organization exists, return the active setting
         // If active then it's valid.  If in-active, then we consider in-valid.
-        return organization.getActive();
+        if (organization.getActive().equals(false)) {
+            context
+                    .disableDefaultConstraintViolation(); // we want to override the default validation message
+            context
+                    .buildConstraintViolationWithTemplate("Organization with ID " + organizationId + " is NOT active")
+                    .addConstraintViolation();
+            return false;
+        } else {
+            return true;
+        }
     }
 }
