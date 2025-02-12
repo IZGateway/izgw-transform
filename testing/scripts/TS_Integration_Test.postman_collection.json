@@ -1779,6 +1779,140 @@
 							"name": "JWT",
 							"item": [
 								{
+									"name": "Create Test Solution",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentSolutionName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentSolutionId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentSolutionDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentSolutionVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+													"pm.collectionVariables.set(\"currentSolutionActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentSolutionId\"));",
+													"    pm.expect(response.solutionName).to.equal(pm.collectionVariables.get(\"currentSolutionName\"));",
+													"    pm.expect(response.description).to.equal(pm.collectionVariables.get(\"currentSolutionDescription\"));",
+													"    pm.expect(response.version).to.equal(pm.collectionVariables.get(\"currentSolutionVersion\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentSolutionActive\");",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"{{currentSolutionId}}\",\n    \"solutionName\": \"{{currentSolutionName}}\",\n    \"description\": \"{{currentSolutionDescription}}\",\n    \"version\": \"{{currentSolutionVersion}}\",\n    \"active\": {{currentSolutionActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"solutions"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Test Organization",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentOrgActive\", true);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
+													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
+													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"organizations"
+											]
+										}
+									},
+									"response": []
+								},
+								{
 									"name": "Create Pipeline with JWT No Roles",
 									"event": [
 										{
@@ -1805,7 +1939,7 @@
 												"exec": [
 													"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
 													"pm.collectionVariables.set(\"currentInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"pm.collectionVariables.set(\"currentOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
@@ -1927,7 +2061,7 @@
 												"exec": [
 													"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
 													"pm.collectionVariables.set(\"currentInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"pm.collectionVariables.set(\"currentOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
@@ -2821,7 +2955,7 @@
 												"exec": [
 													"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
 													"pm.collectionVariables.set(\"currentInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"pm.collectionVariables.set(\"currentOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
@@ -2928,7 +3062,7 @@
 													"let pipelineNumber = 0;",
 													"pm.collectionVariables.set(\"name\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"id\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.collectionVariables.get(\"currentOrgId\"));",
 													"pm.collectionVariables.set(\"inboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"pm.collectionVariables.set(\"outboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"",
@@ -3045,7 +3179,7 @@
 													"let pipelineNumber = 1;",
 													"pm.collectionVariables.set(\"name\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"id\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.collectionVariables.get(\"currentOrgId\"));",
 													"pm.collectionVariables.set(\"inboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"pm.collectionVariables.set(\"outboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"",
@@ -3162,7 +3296,7 @@
 													"let pipelineNumber = 2;",
 													"pm.collectionVariables.set(\"name\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"id\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.collectionVariables.get(\"currentOrgId\"));",
 													"pm.collectionVariables.set(\"inboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"pm.collectionVariables.set(\"outboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 													"",
@@ -4526,9 +4660,7 @@
 												"exec": [
 													"pm.test(\"returns 204 NO CONTENT code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(204);",
-													"});",
-													"",
-													"pm.collectionVariables.clear();"
+													"});"
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -4609,8 +4741,875 @@
 										}
 									},
 									"response": []
+								},
+								{
+									"name": "Delete Test Organization",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/{{currentOrgId}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"organizations",
+												"{{currentOrgId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Test Solution",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});",
+													"",
+													"pm.collectionVariables.clear();"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{currentSolutionId}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"solutions",
+												"{{currentSolutionId}}"
+											]
+										}
+									},
+									"response": []
 								}
 							]
+						},
+						{
+							"name": "Invalid Payload Tests",
+							"item": [
+								{
+									"name": "Create Test Solution",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentSolutionName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentSolutionId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentSolutionDescription\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentSolutionVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));",
+													"pm.collectionVariables.set(\"currentSolutionActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentSolutionId\"));",
+													"    pm.expect(response.solutionName).to.equal(pm.collectionVariables.get(\"currentSolutionName\"));",
+													"    pm.expect(response.description).to.equal(pm.collectionVariables.get(\"currentSolutionDescription\"));",
+													"    pm.expect(response.version).to.equal(pm.collectionVariables.get(\"currentSolutionVersion\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentSolutionActive\");",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"{{currentSolutionId}}\",\n    \"solutionName\": \"{{currentSolutionName}}\",\n    \"description\": \"{{currentSolutionDescription}}\",\n    \"version\": \"{{currentSolutionVersion}}\",\n    \"active\": {{currentSolutionActive}},\n    \"requestOperations\": [],\n    \"responseOperations\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"solutions"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Test Organization",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentOrgActive\", true);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
+													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
+													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"organizations"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Pipeline - Bad Org",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"organizationId: Organization not found with ID \" + pm.collectionVariables.get(\"currentPipelineOrganizationId\"));",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentPipelineName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"pipelineName\": \"{{currentPipelineName}}\",\n    \"id\": \"{{currentPipelineId}}\",\n    \"organizationId\": \"{{currentPipelineOrganizationId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentPipelineInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentPipelineOutboundEndpoint}}\",\n    \"active\": {{currentPipelineActive}},\n    \"pipes\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"pipelines"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Pipeline - Missing ID",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"id: Pipeline ID is required\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentPipelineName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"pipelineName\": \"{{currentPipelineName}}\",\n    \"id\": \"\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentPipelineInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentPipelineOutboundEndpoint}}\",\n    \"active\": {{currentPipelineActive}},\n    \"pipes\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"pipelines"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Pipeline - Missing Name",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"pipelineName: Pipeline name is required\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentPipelineName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"pipelineName\": \"\",\n    \"id\": \"{{currentPipelineId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentPipelineInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentPipelineOutboundEndpoint}}\",\n    \"active\": {{currentPipelineActive}},\n    \"pipes\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"pipelines"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Pipeline - Missing Endpoints",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).contains(\"outboundEndpoint: Outbound endpoint is required\");",
+													"    pm.expect(response.message).contains(\"inboundEndpoint: Inbound endpoint is required\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentPipelineName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"pipelineName\": \"{{currentPipelineName}}\",\n    \"id\": \"{{currentPipelineId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"\",\n    \"outboundEndpoint\": \"\",\n    \"active\": {{currentPipelineActive}},\n    \"pipes\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"pipelines"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Pipeline - Missing Pipes",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"pipes: Pipes List is required (can be empty)\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentPipelineName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"pipelineName\": \"{{currentPipelineName}}\",\n    \"id\": \"{{currentPipelineId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentPipelineInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentPipelineOutboundEndpoint}}\",\n    \"active\": {{currentPipelineActive}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"pipelines"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Pipeline - Solution Doesn't Exist",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"pipes[0]: Solution not found with ID \" + pm.collectionVariables.get(\"currentPipeSolutionId\") + \" and version \" + pm.collectionVariables.get(\"currentPipeSolutionVersion\"));",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentPipelineName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+													"pm.collectionVariables.set(\"currentPipeSolutionId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipeSolutionVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"pipelineName\": \"{{currentPipelineName}}\",\n    \"id\": \"{{currentPipelineId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentPipelineInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentPipelineOutboundEndpoint}}\",\n    \"active\": {{currentPipelineActive}},\n    \"pipes\": [\n        {\n            \"id\": \"{{$randomUUID}}\",\n            \"solutionId\": \"{{currentPipeSolutionId}}\",\n            \"solutionVersion\": \"{{currentPipeSolutionVersion}}\",\n            \"preconditions\": []\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"pipelines"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Pipeline - Solution Version Invalid",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"pipes[0]: Solution not found with ID \" + pm.collectionVariables.get(\"currentSolutionId\") + \" and version \" + pm.collectionVariables.get(\"currentPipeSolutionVersion\"));",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentPipelineName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipelineInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
+													"pm.collectionVariables.set(\"currentPipelineActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+													"pm.collectionVariables.set(\"currentPipeSolutionId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentPipeSolutionVersion\", pm.variables.replaceIn(\"{{$randomPrice}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"pipelineName\": \"{{currentPipelineName}}\",\n    \"id\": \"{{currentPipelineId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"description\": null,\n    \"inboundEndpoint\": \"{{currentPipelineInboundEndpoint}}\",\n    \"outboundEndpoint\": \"{{currentPipelineOutboundEndpoint}}\",\n    \"active\": {{currentPipelineActive}},\n    \"pipes\": [\n        {\n            \"id\": \"{{$randomUUID}}\",\n            \"solutionId\": \"{{currentSolutionId}}\",\n            \"solutionVersion\": \"{{currentPipeSolutionVersion}}\",\n            \"preconditions\": []\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/pipelines",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"pipelines"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Test Organization",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/{{currentOrgId}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"organizations",
+												"{{currentOrgId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Test Solution",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});",
+													"",
+													"pm.collectionVariables.clear();"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/solutions/{{currentSolutionId}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"solutions",
+												"{{currentSolutionId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Create Test Organization",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentOrgActive\", true);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"",
+											"pm.test(\"created object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
+											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
+											"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"organizations"
+									]
+								}
+							},
+							"response": []
 						},
 						{
 							"name": "Create Pipeline - Net New",
@@ -4651,10 +5650,12 @@
 										"exec": [
 											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-											"pm.collectionVariables.set(\"currentOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
 											"pm.collectionVariables.set(\"currentInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 											"pm.collectionVariables.set(\"currentOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
-											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"",
+											""
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -5034,7 +6035,7 @@
 										"exec": [
 											"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-											"pm.collectionVariables.set(\"currentOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
 											"pm.collectionVariables.set(\"currentInboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 											"pm.collectionVariables.set(\"currentOutboundEndpoint\", pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
@@ -5096,7 +6097,7 @@
 											"let pipelineNumber = 0;",
 											"pm.collectionVariables.set(\"name\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"pm.collectionVariables.set(\"id\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-											"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.collectionVariables.get(\"currentOrgId\"));",
 											"pm.collectionVariables.set(\"inboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 											"pm.collectionVariables.set(\"outboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 											"",
@@ -5168,7 +6169,7 @@
 											"let pipelineNumber = 1;",
 											"pm.collectionVariables.set(\"name\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"pm.collectionVariables.set(\"id\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-											"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.collectionVariables.get(\"currentOrgId\"));",
 											"pm.collectionVariables.set(\"inboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 											"pm.collectionVariables.set(\"outboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 											"",
@@ -5240,7 +6241,7 @@
 											"let pipelineNumber = 2;",
 											"pm.collectionVariables.set(\"name\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"pm.collectionVariables.set(\"id\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-											"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"organizationId\" + pipelineNumber, pm.collectionVariables.get(\"currentOrgId\"));",
 											"pm.collectionVariables.set(\"inboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 											"pm.collectionVariables.set(\"outboundEndpoint\" + pipelineNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}})\"));",
 											"",
@@ -6015,9 +7016,7 @@
 										"exec": [
 											"pm.test(\"returns 204 NO CONTENT code\", function() {",
 											"    pm.expect(pm.response.code).to.equal(204);",
-											"});",
-											"",
-											"pm.collectionVariables.clear();"
+											"});"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -6053,8 +7052,57 @@
 								}
 							},
 							"response": []
+						},
+						{
+							"name": "Delete Test Organization",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});",
+											"",
+											"pm.collectionVariables.clear();"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/{{currentOrgId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"{{currentOrgId}}"
+									]
+								}
+							},
+							"response": []
 						}
-					]
+					],
+					"description": "<u><b>NOTE</b></u>\n\nWe create a \"Test Solution\" and \"Test Organization\" in different folders under Pipeline. This is because as we have added referential integrity checks on fields in Pipelines... randomly generating UUID's for things like Organization and Solution ID's will result in errors.\n\nSo where in the past you may have seen 'currentOrganizationId' generated in a pre-script as a random UUID, it may now pull from the Test Organization."
 				},
 				{
 					"name": "Solutions",
@@ -26097,12 +27145,12 @@
 							}
 						],
 						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/health",
-							"protocol": "{{protocol}}",
+							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/health",
+							"protocol": "{{no_cert_protocol}}",
 							"host": [
-								"{{host}}"
+								"{{no_cert_host}}"
 							],
-							"port": "{{port}}",
+							"port": "{{no_cert_port}}",
 							"path": [
 								"health"
 							]
@@ -29755,6 +30803,18 @@
 			"value": ""
 		},
 		{
+			"key": "fhirNoDataPatientGiven",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientFamily",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientDOB",
+			"value": ""
+		},
+		{
 			"key": "TooLargeMessage",
 			"value": ""
 		},
@@ -29768,38 +30828,6 @@
 		},
 		{
 			"key": "hex1b",
-			"value": ""
-		},
-		{
-			"key": "fhirNoDataPatientGiven",
-			"value": ""
-		},
-		{
-			"key": "fhirNoDataPatientFamily",
-			"value": ""
-		},
-		{
-			"key": "fhirNoDataPatientDOB",
-			"value": ""
-		},
-		{
-			"key": "currentName",
-			"value": ""
-		},
-		{
-			"key": "currentId",
-			"value": ""
-		},
-		{
-			"key": "currentDescription",
-			"value": ""
-		},
-		{
-			"key": "currentVersion",
-			"value": ""
-		},
-		{
-			"key": "currentActive",
 			"value": ""
 		}
 	]
