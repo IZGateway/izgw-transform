@@ -5,6 +5,7 @@ import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.enums.DataType;
 import gov.cdc.izgateway.xform.logging.advice.Advisable;
 import gov.cdc.izgateway.xform.logging.advice.Transformable;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,8 +17,11 @@ import java.util.regex.Pattern;
 @Getter
 @Setter
 public class RegexMatch implements Precondition, Advisable, Transformable {
+    @NotNull(message = "required and cannot be empty")
     private UUID id;
+    @NotNull(message = "required and cannot be empty")
     private String dataPath;
+    @NotNull(message = "required and cannot be empty")
     private String regex;
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RegexMatch.class);

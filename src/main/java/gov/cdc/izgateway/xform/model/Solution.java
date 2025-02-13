@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.model;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -22,12 +23,20 @@ public class Solution implements BaseModel {
     @NotBlank(message = "Solution version is required")
     private String version;
 
-    @NotNull(message = "Organization active status is required")
+    /**
+     * FYI - Jackson will do things like the number 1 sets to true.
+     * The number 0 sets to false.
+     * But also any non-zero number sets to true.
+     */
+    @NotNull(message = "Solution active status is required")
     private Boolean active;
 
     @NotNull(message = "Request Operations List is required (can be empty)")
+    @Valid
     private List<SolutionOperation> requestOperations;
+
     @NotNull(message = "Response Operations List is required (can be empty)")
+    @Valid
     private List<SolutionOperation> responseOperations;
 
 }

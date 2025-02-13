@@ -91,7 +91,7 @@ public class ApiController {
 
     @RolesAllowed({Roles.SOLUTION_WRITER})
     @PutMapping("/api/v1/solutions/{uuid}")
-    public ResponseEntity<Solution> updateSolution(@PathVariable UUID uuid, @RequestBody Solution updatedSolution) {
+    public ResponseEntity<Solution> updateSolution(@PathVariable UUID uuid, @Valid @RequestBody Solution updatedSolution) {
         updatedSolution.setId(uuid);
         solutionService.update(updatedSolution);
         return new ResponseEntity<>(updatedSolution, HttpStatus.OK);
