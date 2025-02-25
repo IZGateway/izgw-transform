@@ -92,15 +92,18 @@ public class FhirConverter implements HttpMessageConverter<Resource> {
 		MediaType mediaType = null;
 		
 		BufferedInputStream bis = IOUtils.buffer(inputMessage.getBody());
-		if (StringUtils.isBlank(contentType)) {
-			mediaType = guessMediaType(bis);
+		if (contentType == null || contentType.contains("json")) {
+			mediaType = MediaType.APPLICATION_JSON;
+		} else if (contentType.contains("xml")) {
+			mediaType = MediaType.APPLICATION_XML; 
+		} else if (contentType.contains("yaml")) {
+			mediaType = YAML;
 		} else {
-			mediaType = new MediaType(contentType);
-			// Simplify it.
-			mediaType = new MediaType(mediaType.getType(), mediaType.getType());
+			mediaType = guessMediaType(bis);
 		}
+	
 		parser = selectParser(mediaType);
-		return parser.parseResource(clazz, bis);
+		return (Resource) parser.parseResource(bis);
 	}
 
 	/**
