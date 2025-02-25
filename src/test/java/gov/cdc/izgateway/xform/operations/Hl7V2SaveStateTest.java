@@ -25,6 +25,7 @@ class Hl7V2SaveStateTest {
         ServiceContext context = new ServiceContext(UUID.randomUUID(),"","", DataType.HL7V2, "", TestMessage1());
 
         SaveState baseSaveState = new SaveState();
+        baseSaveState.setOrder(0);
         baseSaveState.setField(field);
         baseSaveState.setKey(key);
 

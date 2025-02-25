@@ -9,6 +9,11 @@
   "active" : true,
   "commonName" : "pcahill.testing.izgateway.org"
 }, {
+  "organizationName" : "Starfleet Medical Systems",
+  "id" : "0d15449b-fb08-4013-8985-20c148b353fe",
+  "active" : true,
+  "commonName" : "sampleSubject"
+}, {
   "organizationName" : "Cosmic Ray Immunization Center (localhost)",
   "id" : "a10bb561-5d7b-4ec7-84c5-b6fa73efe562",
   "active" : true,
@@ -69,13 +74,13 @@
   "active" : true,
   "commonName" : "tbd"
 }, {
-  "organizationName" : "Nova Prime Medical Research",
-  "id" : "8c905096-c79c-4351-86a7-1d6b7da5ec44",
-  "active" : true,
-  "commonName" : "tbd"
-}, {
   "organizationName" : "Pulsar Point Clinics (UI)",
   "id" : "11d32c29-b91a-455f-931e-591cb8ee4f51",
   "active" : true,
   "commonName" : "preprod-cc.phiz-project.org"
+}, {
+  "organizationName" : "Nova Prime Medical Research",
+  "id" : "8c905096-c79c-4351-86a7-1d6b7da5ec44",
+  "active" : true,
+  "commonName" : "ppatel.testing.izgateway.org"
 } ]

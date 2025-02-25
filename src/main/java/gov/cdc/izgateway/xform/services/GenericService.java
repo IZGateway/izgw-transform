@@ -1,12 +1,15 @@
 package gov.cdc.izgateway.xform.services;
 
+import gov.cdc.izgateway.xform.logging.ApiEventLogger;
 import gov.cdc.izgateway.xform.model.BaseModel;
 import gov.cdc.izgateway.xform.repository.XformRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
+@Slf4j
 public abstract class GenericService<T extends BaseModel> implements XformService<T> {
 
     protected final XformRepository<T> repo;
@@ -17,12 +20,17 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
 
     @Override
     public T getObject(UUID id) {
-        return repo.getEntity(id);
+        T existing = repo.getEntity(id);
+        ApiEventLogger.logReadEvent(existing);
+
+        return existing;
     }
 
     @Override
     public List<T> getList() {
-        return new ArrayList<>(repo.getEntitySet());
+        ArrayList<T> list = new ArrayList<>(repo.getEntitySet());
+        ApiEventLogger.logReadEvent(list);
+        return list;
     }
 
     @Override
@@ -34,6 +42,8 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
         }
 
         repo.updateEntity(obj);
+
+        ApiEventLogger.logUpdateEvent(obj, existing);
     }
 
     @Override
@@ -45,6 +55,8 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
         }
 
         repo.createEntity(obj);
+
+        ApiEventLogger.logCreateEvent(obj);
     }
 
     @Override
@@ -54,6 +66,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found");
         }
         repo.deleteEntity(id);
-    }
 
+        ApiEventLogger.logDeleteEvent(solution);
+    }
 }

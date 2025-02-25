@@ -47,6 +47,11 @@ public class EndpointStatusRepository implements gov.cdc.izgateway.repository.En
     }
 
     @Override
+    public void resetCircuitBreakers() {
+
+    }
+
+    @Override
     public IEndpointStatus newEndpointStatus() {
         return status;
     }
