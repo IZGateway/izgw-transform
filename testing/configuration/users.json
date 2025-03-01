@@ -28,5 +28,12 @@
     "userName": "preprod-cc.phiz-project.org",
     "organizationId": "11d32c29-b91a-455f-931e-591cb8ee4f51",
     "active": true
+  },
+  {
+    "id": "18d0c708-23b6-4a45-a3f5-96570535678c",
+    "userName": "kboone.testing.izgateway.org",
+    "organizationId": "03adf8af-c182-4ad6-8707-f62efdebf96e",
+    "active": true
   }
+  
 ]
