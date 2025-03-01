@@ -49,9 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -159,6 +157,7 @@ public class FhirController {
 	 * needs to know where the hub is.
 	 * @param hub	The hub controller to talk to.
 	 * @param config The configuration for the converter
+	 * @param registry The Access Control Registry
 	 */
 	public FhirController(@Autowired HubController hub, FhirConfiguration config, AccessControlRegistry registry) {
 		this.hub = hub;
@@ -608,7 +607,7 @@ public class FhirController {
 				Bundle b = convertResponseToFHIR(response);
 				adjustIdentifiers(b);
 				filter(b, req);
-				return new ResponseEntity<>(b, getHeader(req), HttpStatus.OK);
+				return new ResponseEntity<>(b, ContentUtils.getHeaders(req), HttpStatus.OK);
 			}
 			
 			throw new ServiceConfigurationError(
@@ -912,54 +911,7 @@ public class FhirController {
 		headers.setTo("http://www.w3.org/2005/08/addressing/anonymous");
 	}
 
-    /**
-     * This enables content negotiation for the FhirController
-     * @param req	The HttpServletRequest used to determine acceptable content types
-     * @return	An HttpHeaders with the Content-Type header set appropriately.
-     */
-    private HttpHeaders getHeader(HttpServletRequest req) {
-		HttpHeaders h = new HttpHeaders();
-		String accept = req.getParameter("_format");
-		if (accept == null) {
-			accept = req.getHeader(HttpHeaders.ACCEPT);
-		}
-		String contentType = null;
-		if (accept == null || "json".equals(accept)) {
-			contentType = "application/json";
-		} else if ("xml".equals(accept)) {	
-			contentType = "application/xml";
-		} else if ("yaml".equals(accept)) {	
-			contentType = "application/yaml";
-		} else {
-			String[] types = accept.toLowerCase().split(",");
-			Arrays.sort(types, this::compareByQvalue);
-			for (String type: types) {
-				String t = StringUtils.substringBefore(type, ";");
-				MediaType match = 
-						FhirConverter.FHIR_MEDIA_TYPES
-							.stream()
-							.filter(m -> t.startsWith(m.toString()))
-							.findFirst().orElse(null);
-				if (match != null) {
-					contentType = match.toString();
-					break;
-				}
-			}
-			if (contentType == null) {
-				contentType = "application/json";
-			}
-		}
-		h.add(HttpHeaders.CONTENT_TYPE, contentType);
-		return h;
-	}
-    
-    private int compareByQvalue(String m1, String m2) {
-    	String q1 = StringUtils.defaultIfEmpty(StringUtils.substringAfter(m1, "q="),"1");
-    	String q2 = StringUtils.defaultIfEmpty(StringUtils.substringAfter(m2, "q="),"1");
-    	return q2.compareTo(q1);
-    }
-
-	@ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<OperationOutcome> handleException(HttpServletRequest req, IllegalArgumentException iex) {
     	OperationOutcome oo = new OperationOutcome();
 		oo.addIssue()
@@ -968,7 +920,7 @@ public class FhirController {
 			.addExpression(null)
 			.setDiagnostics(iex.getMessage());
 		
-    	return new ResponseEntity<>(oo, getHeader(req), HttpStatus.BAD_REQUEST);
+    	return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.BAD_REQUEST);
     }
     
     @ExceptionHandler(HL7Exception.class)
@@ -979,7 +931,7 @@ public class FhirController {
 			.setSeverity(IssueSeverity.FATAL)
 			.addExpression(null)
 			.setDiagnostics(hex.getMessage());  
-    	return new ResponseEntity<>(oo, getHeader(req), HttpStatus.INTERNAL_SERVER_ERROR);
+    	return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(FaultException.class)
@@ -1019,7 +971,7 @@ public class FhirController {
     	// Give them the Original text of the fault if it is present.
     	fex.setOriginalText(issue);
     	
-    	return new ResponseEntity<>(oo, getHeader(req), retry != null ? retry.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR);
+    	return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), retry != null ? retry.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(UnexpectedException.class)
