@@ -3,7 +3,17 @@ package gov.cdc.izgateway.xform.endpoints.fhir;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ServiceConfigurationError;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 import org.hl7.fhir.r4.model.Attachment;
@@ -57,7 +67,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Lazy(false)
 public class ModernizationController {
-
+	Transformer transformer = loadCdaTransformer();
+	
+	private static Transformer loadCdaTransformer() {
+		TransformerFactory factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
+		try {
+			return factory.newTransformer(new StreamSource(ModernizationController.class.getClassLoader().getResourceAsStream("fhir2cda.xslt")));
+		} catch (TransformerConfigurationException e) {
+			throw new ServiceConfigurationError("Cannot load fhir2cda.xslt", e);
+		}
+	}
 	/**
 	 * Conversion input
 	 * @author Audacious Inquiry
@@ -214,6 +233,8 @@ public class ModernizationController {
     	case ContentUtils.HL7V2_XML_VALUE:
     		r = convertToV2XML(r);
     		break;
+    	default:
+    		break;
     	}
     	return new ResponseEntity<>(r, headers, HttpStatus.OK);
     }
@@ -233,6 +254,18 @@ public class ModernizationController {
 	}
 	
 	private Binary convertToCDA(Resource r) {
+		String content = ContentUtils.FHIR_XML_PARSER.encodeResourceToString(r);
+		try (StringWriter sw = new StringWriter()){
+			transformer.transform(new StreamSource(new StringReader(content)), new StreamResult(sw));
+			Binary b = new Binary();
+			b.setContentType(ContentUtils.CDA_VALUE);
+			b.setData(sw.toString().getBytes(StandardCharsets.UTF_8));
+			return b;
+		} catch (TransformerException e) {
+			
+		} catch (IOException e1) {
+			// Ignore IO Exceptions on close, we are working with Strings, there should be none
+		}
 		return null;
 	}
 	private Binary convertToV2Text(Resource r) {
