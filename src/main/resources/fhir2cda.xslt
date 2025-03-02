@@ -4,6 +4,7 @@
     xmlns:cda="urn:hl7:v3" xmlns:sdtc="urn:hl7-org:sdtc" xmlns:fhir="http://hl7.org/fhir"
     xmlns:f='functions'
     exclude-result-prefixes="xs fhir cda">
+    <xsl:include href="cdacodes.xslt"/>
     <xsl:param name="OID">2.16.840.1.113883.3.3081.9999</xsl:param>
     <xsl:output indent="yes"/>
     <xsl:template match="/fhir:Bundle">
@@ -24,7 +25,52 @@
             <languageCode code="en-US"/>
             <xsl:apply-templates select="/fhir:Bundle/fhir:entry/fhir:resource/fhir:Patient"
                 mode="recordTarget"/>
+            <author typeCode="AUT" contextControlCode="OP">
+                <time value="20130717114446.302-0500"/>
+                <assignedAuthor classCode="ASSIGNED">
+                    <id nullFlavor="NI"/>
+                    <addr nullFlavor="NI"/>
+                    <telecom nullFlavor="NI"/>
+                    <assignedAuthoringDevice>
+                        <manufacturerModelName>Audacious Inquiry</manufacturerModelName>
+                        <softwareName>Modernization C-CDA Generator</softwareName>
+                    </assignedAuthoringDevice>
+                </assignedAuthor>
+            </author>
+            <custodian typeCode="CST">
+                <assignedCustodian classCode="ASSIGNED">
+                    <representedCustodianOrganization classCode="ORG" determinerCode="INSTANCE">
+                        <id root="{$OID}.2"/>
+                        <name>Audacious Inquiry</name>
+                    </representedCustodianOrganization>
+                </assignedCustodian>
+            </custodian>
+            <documentationOf typeCode="DOC">
+                <serviceEvent classCode="PCPR" moodCode="EVN">
+                    <xsl:apply-templates select="//fhir:Encounter/fhir:period" mode="effectiveTime"/>
+                    <xsl:for-each select="//fhir:Encounter/fhir:participant[fhir:type/fhir:coding/fhir:system/@value = 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType']">
+                        <performer typeCode="PRF">
+                            <!-- Get the practitioner -->
+                            <xsl:variable name="pract" select="f:getPractitioner(fhir:individual)"/>
+                            <xsl:apply-templates select="f:getPractitioner(fhir:individual)" mode="assignedEntity"/>
+                        </performer>
+                    </xsl:for-each>
+                </serviceEvent>
+            </documentationOf>
+            <xsl:apply-templates select="/fhir:Bundle/fhir:entry/fhir:resource/fhir:Encounter" mode="encounter"/>
         </ClinicalDocument>
+    </xsl:template>
+    <xsl:template match="fhir:Practitioner" mode="assignedEntity">
+        <assignedEntity classCode="ASSIGNED">
+            <xsl:apply-templates select="fhir:identifier" mode="id"/>
+            <xsl:apply-templates select="fhir:address" mode="address"/>
+            <xsl:apply-templates select="fhir:telecom" mode="telecom"/>
+            <xsl:if test="fhir:name">
+                <assignedPerson>
+                    <xsl:apply-templates select="fhir:name" mode="personName"/>
+                </assignedPerson>
+            </xsl:if>
+        </assignedEntity>
     </xsl:template>
     <xsl:template match="@value" mode="dateTime">
         <xsl:attribute name='value'>
@@ -130,18 +176,11 @@
                         </languageCommunication>
                     </xsl:for-each>
                 </patient>
-                <providerOrganization>
-                    <id root="2.16.840.1.113883.1.13.99999"/>
-                    <name>Local Community Hospital Organization</name>
-                    <telecom use="WP" value="tel:(555) 555-1010"/>
-                    <addr use="WP">
-                        <streetAddressLine>4000 Hospital Dr.</streetAddressLine>
-                        <city>Portland</city>
-                        <state>OR</state>
-                        <postalCode>97005- </postalCode>
-                        <country>US</country>
-                    </addr>
-                </providerOrganization>
+                <xsl:if test="fhir:managingOrganization">
+                    <providerOrganization>
+                        <xsl:apply-templates select='fhir:managingOrganization' mode='organization'/>
+                    </providerOrganization>
+                </xsl:if>
             </patientRole>
         </recordTarget>
     </xsl:template>
@@ -267,15 +306,114 @@
                 <xsl:otherwise>
                     <xsl:attribute name="root">2.16.840.1.113883.3.3081.99999</xsl:attribute>
                     <xsl:attribute name="extension">
-                        <xsl:value-of select="fhir:system/@value"/>
-                        <xsl:text>#</xsl:text>
+                        <xsl:if test="fhir:system/@value">
+                            <xsl:value-of select="fhir:system/@value"/>
+                            <xsl:text>#</xsl:text>
+                        </xsl:if>
                         <xsl:value-of select="fhir:value/@value"/>
                     </xsl:attribute>
                 </xsl:otherwise>
             </xsl:choose>
         </id>
     </xsl:template>
-    
+    <xsl:template match="fhir:managingOrganization" mode="organization">
+        <xsl:variable name='id' select="replace(fhir:reference/@value, '^.*/', '')"/>
+        <xsl:variable name='org' select="/fhir:Bundle/fhir:entry/fhir:resource/fhir:Organization[@id = $id]"/>
+        <xsl:choose>
+            <xsl:when test="$org">
+                <xsl:apply-templates select="$org/fhir:identifier" mode="id"/>
+                <xsl:if test="$org/fhir:name">
+                    <name><xsl:value-of select="$org/fhir:name/@value"/></name>
+                </xsl:if>
+                <xsl:apply-templates select="$org/fhir:address" mode="address"/>
+                <xsl:apply-templates select="$org/fhir:telecom" mode="telecom"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:if test="fhir:identifier/fhir:value/@value">
+                    <xsl:apply-templates select="fhir:identifier" mode="id"/>
+                </xsl:if> 
+                <xsl:if test="fhir:display/@value">
+                   <name><xsl:value-of select="fhir:display/@value"/></name>
+               </xsl:if>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="fhir:Encounter" mode="encounter">
+        <componentOf>
+            <encompassingEncounter>
+                <xsl:apply-templates select="fhir:identifier" mode="id"/>
+                <xsl:apply-templates select="fhir:class" mode="code"/>
+                <xsl:apply-templates select="fhir:type/fhir:coding" mode="code"/>
+                <xsl:apply-templates select="fhir:period" mode="effectiveTime"/>
+                <xsl:for-each select="fhir:participant">
+                    <xsl:if test="fhir:type/fhir:coding/fhir:system/@value = 'http://terminology.hl7.org/CodeSystem/v3-ParticipationType'">
+                        <encounterParticipant typeCode="{fhir:type/fhir:coding/fhir:code/@value}">
+                            <xsl:apply-templates select="f:getPractitioner(fhir:individual)" mode="assignedEntity"/>
+                        </encounterParticipant>
+                    </xsl:if>
+                </xsl:for-each>
+            </encompassingEncounter>
+        </componentOf>
+    </xsl:template>
+    <xsl:template match="fhir:period" mode="effectiveTime">
+        <effectiveTime>
+            <xsl:if test="fhir:start/@value">
+                <low>
+                    <xsl:apply-templates select="fhir:start/@value" mode='dateTime'/>
+                </low>
+            </xsl:if>
+            <xsl:if test="not(fhir:start/@value)">
+                <low nullFlavor="NI"/>
+            </xsl:if>
+            <xsl:if test="fhir:end/@value">
+                <high>
+                    <xsl:apply-templates select="fhir:end/@value" mode='dateTime'/>
+                </high>
+            </xsl:if>
+            <xsl:if test="not(fhir:end/@value)">
+                <high nullFlavor="NI"/>
+            </xsl:if>
+        </effectiveTime>
+    </xsl:template>
+    <xsl:template match="*" mode="code">
+            <code>
+                <xsl:if test="fhir:code/@value">
+                    <xsl:attribute name="code" select="fhir:code/@value"/>
+                </xsl:if>
+                <xsl:if test="not(fhir:code/@value)">
+                    <xsl:attribute name="nullFlavor">NI</xsl:attribute>
+                </xsl:if>
+                <xsl:if test="fhir:display/@value">
+                    <xsl:attribute name="displayName" select="fhir:display/@value"/>
+                </xsl:if>
+                <xsl:apply-templates select="fhir:system" mode="codeSystem"/>
+                <xsl:variable name="system" select="fhir:system/@value"/>
+                <xsl:variable name='codeSystem'>
+                    <xsl:choose>
+                        <xsl:when test="starts-with($system, 'urn:oid:')">
+                            <xsl:variable name="root" select="substring($system, 8)"/>
+                            <xsl:copy-of select="$HL7_CODE_MAP/codeSystems/codeSystem[@system=$root]"/>
+                        </xsl:when>
+                        <xsl:when test="starts-with($system, 'urn:uuid:')">
+                            <xsl:variable name='uuid' select="translate(substring(fhir:system/@value, 9),'-','')"/>
+                            <codeSystem root='2.25.{f:hexToDec($uuid)}' codeSystemName="$system"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:copy-of select="$HL7_CODE_MAP/codeSystems/codeSystem[@system=$system]"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
+                <xsl:if test='$codeSystem/codeSystem/@root'>
+                    <xsl:attribute name="codeSystem" select="$codeSystem/codeSystem/@root"/>
+                </xsl:if>
+                <xsl:if test='$codeSystem/codeSystem/@codeSystemName'>
+                    <xsl:attribute name="codeSystemName" select="$codeSystem/codeSystem/@codeSystemName"/>
+                </xsl:if>
+                <xsl:if test='not($codeSystem/codeSystem/@codeSystemName)'>
+                    <xsl:attribute name="codeSystemName" select="fhir:system/@value"/>
+                </xsl:if>
+            </code>
+    </xsl:template>
     <xsl:function name="f:hexToDec">
         <xsl:param name="hex"/>
         <xsl:variable name="dec"
@@ -302,5 +440,26 @@
             then 1e0
             else $base * f:power($base, $exp - 1)"
         />
+    </xsl:function>
+    
+    <xsl:function name='f:getPractitioner'>
+        <xsl:param name='ref'/>
+        <xsl:variable name='id' select="replace($ref/fhir:reference/@value, '^.*/', '')"/>
+        <xsl:variable name='pract' select="$ref/ancestor::fhir:Bundle//fhir:Practitioner[fhir:id/@value = $id]"/>
+        <xsl:choose>
+            <xsl:when test="$pract">
+                <xsl:message select="'Got Here'"/>
+                <xsl:sequence select="$pract"/>            
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable name='role' select="$ref/ancestor::fhir:Bundle//fhir:PractitionerRole[fhir:id/@value = $id]"/>
+                <xsl:if test='$role'>
+                    <xsl:sequence select="f:getPractitioner($role)"/>                   
+                </xsl:if>
+                <xsl:if test='not($role)'>
+                    <xsl:sequence/>                   
+                </xsl:if>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:function>
 </xsl:stylesheet>
