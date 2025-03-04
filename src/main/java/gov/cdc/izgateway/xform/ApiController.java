@@ -73,7 +73,7 @@ public class ApiController {
 
     @RolesAllowed({Roles.PIPELINE_WRITER})
     @PutMapping("/api/v1/pipelines/{uuid}")
-    public ResponseEntity<Pipeline> updatePipeline(@PathVariable UUID uuid, @RequestBody Pipeline updatedPipeline) {
+    public ResponseEntity<Pipeline> updatePipeline(@PathVariable UUID uuid, @Valid @RequestBody Pipeline updatedPipeline) {
         updatedPipeline.setId(uuid);
         pipelineService.update(updatedPipeline);
         return new ResponseEntity<>(updatedPipeline, HttpStatus.OK);
@@ -91,7 +91,7 @@ public class ApiController {
 
     @RolesAllowed({Roles.SOLUTION_WRITER})
     @PutMapping("/api/v1/solutions/{uuid}")
-    public ResponseEntity<Solution> updateSolution(@PathVariable UUID uuid, @RequestBody Solution updatedSolution) {
+    public ResponseEntity<Solution> updateSolution(@PathVariable UUID uuid, @Valid @RequestBody Solution updatedSolution) {
         updatedSolution.setId(uuid);
         solutionService.update(updatedSolution);
         return new ResponseEntity<>(updatedSolution, HttpStatus.OK);
