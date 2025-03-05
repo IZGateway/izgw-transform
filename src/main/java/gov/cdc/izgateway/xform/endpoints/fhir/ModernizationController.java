@@ -67,7 +67,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Lazy(false)
 public class ModernizationController {
-	Transformer transformer = loadCdaTransformer();
+	
 	
 	private static Transformer loadCdaTransformer() {
 		TransformerFactory factory = TransformerFactory.newInstance("net.sf.saxon.TransformerFactoryImpl", null);
@@ -256,13 +256,14 @@ public class ModernizationController {
 	private Binary convertToCDA(Resource r) {
 		String content = ContentUtils.FHIR_XML_PARSER.encodeResourceToString(r);
 		try (StringWriter sw = new StringWriter()){
+			Transformer transformer = loadCdaTransformer();
 			transformer.transform(new StreamSource(new StringReader(content)), new StreamResult(sw));
 			Binary b = new Binary();
 			b.setContentType(ContentUtils.CDA_VALUE);
 			b.setData(sw.toString().getBytes(StandardCharsets.UTF_8));
 			return b;
 		} catch (TransformerException e) {
-			
+			// TODO: Figure this out
 		} catch (IOException e1) {
 			// Ignore IO Exceptions on close, we are working with Strings, there should be none
 		}
