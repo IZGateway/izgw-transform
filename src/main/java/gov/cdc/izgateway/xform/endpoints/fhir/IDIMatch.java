@@ -2,6 +2,7 @@ package gov.cdc.izgateway.xform.endpoints.fhir;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -49,10 +50,10 @@ public class IDIMatch {
 	public static final double GOOD_SCORE = 0.60;
 	
 	/** Code Systems used for ID types in IDIMatch */ 
-	public static final List<String> ID_SYSTEMS = Arrays.asList(
+	public static final List<String> ID_SYSTEMS = Collections.unmodifiableList(Arrays.asList(
 		"http://terminology.hl7.org/CodeSystem/v2-0203", 
 		"http://hl7.org/fhir/us/identity-matching/CodeSystem/Identity-Identifier-cs"
-	);
+	));
 	// It's all static.
 	private IDIMatch() {}
 	
@@ -194,18 +195,19 @@ public class IDIMatch {
 		boolean match = stringsMatch(searchFirst, foundFirst);
 		if (match) {
 			return true;
-		} else if (search.size() == 1 && found.size() == 1) {
+		}
+		
+		if (search.size() == 1 && found.size() == 1) {
 			return false;
 		}
+		
 		// There's more than one given name and the first names don't match.
 		// Compare the first given name against the second given name.
 		if (found.size() > 1 && stringsMatch(searchFirst, found.get(1).asStringValue())) {
 			return true;
 		}
-		if (search.size() > 1 && stringsMatch(search.get(1).asStringValue(), foundFirst)) {
-			return true;
-		}
-		return false;
+		
+		return (search.size() > 1 && stringsMatch(search.get(1).asStringValue(), foundFirst));
 	}
 	
 	/**
@@ -305,13 +307,18 @@ public class IDIMatch {
 		return false;
 	}
 
+	/**
+	 * See if the found addresses match the searched for address.
+	 * 
+	 * @param search The address being searched for
+	 * @param found	The address or addresses found
+	 * @return True if the address matches
+	 */
 	public static boolean doesAddressMatch(List<Address> search, List<Address> found) {
 		for (Address s: search) {
 			for (Address f: found) {
-				if (s.hasCountry() && f.hasCountry()) {
-					if (!countriesMatch(s.getCountry(), f.getCountry())) {
-						continue;
-					}
+				if (s.hasCountry() && f.hasCountry() && !countriesMatch(s.getCountry(), f.getCountry())) {
+					continue;
 				}
 				if (!s.hasLine() || s.getLine().isEmpty() || !f.hasLine() || f.getLine().isEmpty()) {
 					// Not a match on address
@@ -485,6 +492,7 @@ public class IDIMatch {
 	 * and scoring according to the FHIR Interoperable and Digital Identity Patient Matching guide.
 	 *  
 	 * @param b	The bundle to score
+	 * @param search The patient being searched for
 	 * @param onlyCertainMatches if true, include only certain matches (score > 0.9)
 	 * @param onlySingleMatch  if (true, include the top scoring match)
 	 * @see <a href="https://hl7.org/fhir/us/identity-matching/2024SEP/patient-matching.html#scoring-matches--responders-system-match-output-quality-score">Scoring Matches</a>
@@ -495,103 +503,99 @@ public class IDIMatch {
 			if (!(r instanceof Patient p)) {
 				continue;
 			}
-			boolean mpiMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), "MR", "SR");
-			if (mpiMatch) {
-				setScore(entry, BEST_SCORE);
-				continue;
-			} 
-			// Responder's MRN/MPI or known digital identifier
-			boolean idMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), "DL", "PPN", "MB");
-			boolean nameMatch = doesNameMatch(search.getName(), p.getName());
-			if (!nameMatch) {
-				// Everything else requires a name match on at least first and last name.
-				continue;
-			}
-			if (idMatch) {
-				/* First Name & Last Name & Driver's License Number and Issuing US State
-				 * First Name & Last Name & Passport Number and Issuing Country
-				 * First Name & Last Name & Insurance Member Identifier and Payer ID
-				 */
-				setScore(entry, BEST_SCORE);
-				continue;
-			}
-			
-			boolean subscriberMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), "SN");
-			boolean ssnMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), "SS", "SB");
-			boolean dobMatch = doesDobMatch(search.getBirthDate(), p.getBirthDate());
-			if (dobMatch && (subscriberMatch || ssnMatch)) {
-				/* First Name & Last Name & Date of Birth & Insurance Subscriber Identifier and Payer ID
-				 * First Name & Last Name & Date of Birth & Social Security Number
-				 */
-				setScore(entry, BEST_SCORE);
-				continue;
-			} else if (subscriberMatch) {
-				/* First Name & Last Name & Insurance Subscriber Identifier and Payer ID */
-				setScore(entry, SUPERIOR_SCORE);
-				continue;
-			}
-			if (!dobMatch) {
-				// Everything else below requires dobMatch.
-				continue;
-			}
-			
-			boolean addressMatch = doesAddressMatch(search.getAddress(), p.getAddress());
-			if (addressMatch) {
-				/* First Name & Last Name & Date of Birth & Address line & Zip (first 5)
-				 * First Name & Last Name & Date of Birth & Address line & City & State
-				 */
-				setScore(entry, SUPERIOR_SCORE);
-				continue;
-			}
-			boolean emailMatch = doesTelecomMatch(search.getTelecom(), p.getTelecom(), ContactPoint.ContactPointSystem.EMAIL);
-			if (emailMatch) {
-				/* First Name & Last Name & Date of Birth & email */
-				setScore(entry, SUPERIOR_SCORE);
-				continue;
-			}
-			boolean phoneMatch = doesTelecomMatch(search.getTelecom(), p.getTelecom(), ContactPoint.ContactPointSystem.PHONE);
-			if (phoneMatch) {
-				/* First Name & Last Name & Date of Birth & phone
-				 * First Name & Last Name & Date of Birth & Sex (Assigned at Birth) & Phone
-				 * NOTE: Former subsumes latter 
-				 */
-				setScore(entry, VERY_GOOD_SCORE);
-				continue;
-			}
-			
-			boolean genderMatch = Objects.equal(search.getGender(), p.getGender());
-			if (!genderMatch) {
-		 	 	/* First Name & Last Name & Date of Birth */
-				setScore(entry, GOOD_SCORE);
-			}
-
-			// At this stage, name, dob and gender match, so score is at least GOOD.
-			// It gets to VERY_GOOD if Last 4 of SSN, Phone, Zip or Middle name matches.
-			/* First Name & Last Name & Date of Birth & Sex (Assigned at Birth) & SSN (last 4) */
-			boolean ssn4Match = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), "SSN4", "SS");
-			if (ssn4Match) {
-				setScore(entry, VERY_GOOD_SCORE);
-				continue;
-			}
-			/* First Name & Last Name & Date of Birth & Sex (Assigned at Birth) & Zip (first 5) */
-			boolean zipMatch = doesZipMatch(search.getAddress(), p.getAddress());
-			if (zipMatch) {
-				setScore(entry, VERY_GOOD_SCORE);
-				continue;
-			}
-			boolean middleNameMatch = doMiddleNamesMatch(search.getName(), p.getName());
-			if (middleNameMatch) {
-				/* First Name & Last Name & Date of Birth & Sex (Assigned at Birth) & Middle Name */
-				setScore(entry, VERY_GOOD_SCORE);
-				continue;
-			}
-				
+			getScore(search, entry, p);
 	 	 	/* First Name & Last Name & Date of Birth & Sex (Assigned at Birth)
 	 	 	 * First Name & Last Name & Date of Birth & Sex (Assigned at Birth) & Middle Name (initial)
 	 	 	 * NOTE: First one subsumes later ones.
 	 	 	 */
 			setScore(entry, GOOD_SCORE);
 		}
+	}
+
+	private static double getScore(Patient search, BundleEntryComponent entry, Patient p) {
+		boolean mpiMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), "MR", "SR");
+		if (mpiMatch) {
+			return BEST_SCORE;
+		} 
+		// Responder's MRN/MPI or known digital identifier
+		boolean idMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), "DL", "PPN", "MB");
+		boolean nameMatch = doesNameMatch(search.getName(), p.getName());
+		if (!nameMatch) {
+			// Everything else requires a name match on at least first and last name.
+			return 0.0;
+		}
+		if (idMatch) {
+			/* First Name & Last Name & Driver's License Number and Issuing US State
+			 * First Name & Last Name & Passport Number and Issuing Country
+			 * First Name & Last Name & Insurance Member Identifier and Payer ID
+			 */
+			return BEST_SCORE;
+		}
+		
+		boolean subscriberMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), "SN");
+		boolean ssnMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), "SS", "SB");
+		boolean dobMatch = doesDobMatch(search.getBirthDate(), p.getBirthDate());
+		if (dobMatch && (subscriberMatch || ssnMatch)) {
+			/* First Name & Last Name & Date of Birth & Insurance Subscriber Identifier and Payer ID
+			 * First Name & Last Name & Date of Birth & Social Security Number
+			 */
+			return BEST_SCORE;
+		} 
+		
+		if (subscriberMatch) {
+			/* First Name & Last Name & Insurance Subscriber Identifier and Payer ID */
+			return SUPERIOR_SCORE;
+		}
+		if (!dobMatch) {
+			return 0.0;
+		}
+		
+		boolean addressMatch = doesAddressMatch(search.getAddress(), p.getAddress());
+		if (addressMatch) {
+			/* First Name & Last Name & Date of Birth & Address line & Zip (first 5)
+			 * First Name & Last Name & Date of Birth & Address line & City & State
+			 */
+			return SUPERIOR_SCORE;
+		}
+		boolean emailMatch = doesTelecomMatch(search.getTelecom(), p.getTelecom(), ContactPoint.ContactPointSystem.EMAIL);
+		if (emailMatch) {
+			/* First Name & Last Name & Date of Birth & email */
+			return SUPERIOR_SCORE;
+		}
+		boolean phoneMatch = doesTelecomMatch(search.getTelecom(), p.getTelecom(), ContactPoint.ContactPointSystem.PHONE);
+		if (phoneMatch) {
+			/* First Name & Last Name & Date of Birth & phone
+			 * First Name & Last Name & Date of Birth & Sex (Assigned at Birth) & Phone
+			 * NOTE: Former subsumes latter 
+			 */
+			return VERY_GOOD_SCORE;
+		}
+		
+		boolean genderMatch = Objects.equal(search.getGender(), p.getGender());
+		double score = 0.0;
+		if (!genderMatch) {
+		 	/* First Name & Last Name & Date of Birth */
+			score = GOOD_SCORE;
+		}
+
+		// At this stage, name, dob and gender match, so score is at least GOOD.
+		// It gets to VERY_GOOD if Last 4 of SSN, Phone, Zip or Middle name matches.
+		/* First Name & Last Name & Date of Birth & Sex (Assigned at Birth) & SSN (last 4) */
+		boolean ssn4Match = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), "SSN4", "SS");
+		if (ssn4Match) {
+			return VERY_GOOD_SCORE;
+		}
+		/* First Name & Last Name & Date of Birth & Sex (Assigned at Birth) & Zip (first 5) */
+		boolean zipMatch = doesZipMatch(search.getAddress(), p.getAddress());
+		if (zipMatch) {
+			return VERY_GOOD_SCORE;
+		}
+		boolean middleNameMatch = doMiddleNamesMatch(search.getName(), p.getName());
+		if (middleNameMatch) {
+			/* First Name & Last Name & Date of Birth & Sex (Assigned at Birth) & Middle Name */
+			return VERY_GOOD_SCORE;
+		}
+		return score;
 	}
 
 	private static void setScore(BundleEntryComponent entry, double d) {
