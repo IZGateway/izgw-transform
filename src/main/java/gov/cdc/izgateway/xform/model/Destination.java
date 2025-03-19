@@ -41,4 +41,13 @@ public class Destination implements IDestination {
     public IDestination safeCopy() {
         return null;
     }
+
+    @Override
+    public Date getPassExpiry() {
+        return null;
+    }
+
+    @Override
+    public void setPassExpiry(Date expiry) {
+    }
 }
