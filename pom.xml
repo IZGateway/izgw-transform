@@ -23,7 +23,7 @@
 		<image.tag>${project.build.finalName}</image.tag>
 		<buildno>${timestamp}</buildno>
 		<logback.version>1.5.16</logback.version>
-		<camel.version>4.4.1</camel.version>
+		<camel.version>4.10.2</camel.version>
 	</properties>
 	<repositories>
 		<repository>
