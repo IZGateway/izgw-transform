@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
 	<artifactId>xform</artifactId>
-    <version>0.6.0</version>
+    <version>0.6.1</version>
 	<name>xform</name>
 	<description>IZ Gateway Xform Service</description>
 	<properties>
@@ -23,7 +23,7 @@
 		<image.tag>${project.build.finalName}</image.tag>
 		<buildno>${timestamp}</buildno>
 		<logback.version>1.5.16</logback.version>
-		<spring-framework.version>6.2.0</spring-framework.version>
+		<camel.version>4.4.1</camel.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -119,32 +119,32 @@
 		<dependency>
 			<groupId>org.apache.camel.springboot</groupId>
 			<artifactId>camel-spring-boot-starter</artifactId>
-			<version>4.4.1</version>
+			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-core</artifactId>
-			<version>4.4.1</version>
+			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-mllp</artifactId>
-			<version>4.4.1</version>
+			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-stream</artifactId>
-			<version>4.4.1</version>
+			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-hl7</artifactId>
-			<version>4.4.1</version>
+			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.camel</groupId>
 			<artifactId>camel-http</artifactId>
-			<version>4.4.1</version>
+			<version>${camel.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
