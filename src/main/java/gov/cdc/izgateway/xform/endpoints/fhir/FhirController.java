@@ -6,7 +6,6 @@ import gov.cdc.izgw.v2tofhir.datatype.HumanNameParser;
 import gov.cdc.izgw.v2tofhir.segment.PIDParser;
 import gov.cdc.izgw.v2tofhir.utils.QBPUtils;
 import gov.cdc.izgw.v2tofhir.utils.ContentUtils;
-import gov.cdc.izgw.v2tofhir.utils.FhirConverter;
 import gov.cdc.izgw.v2tofhir.utils.FhirIdCodec;
 import gov.cdc.izgw.v2tofhir.utils.IzQuery;
 import gov.cdc.izgw.v2tofhir.utils.ParserUtils;
