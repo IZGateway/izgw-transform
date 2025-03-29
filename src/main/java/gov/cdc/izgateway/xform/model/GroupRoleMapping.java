@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.model;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,12 +10,12 @@ import java.util.UUID;
 @Getter
 @Setter
 public class GroupRoleMapping implements BaseModel {
-    @NotNull(message = "ID is required")
+    @NotNull(message = "GroupRoleMapping - ID is required")
     private UUID id;
-    @NotNull(message = "Group name is required")
+    @NotBlank(message = "GroupRoleMapping - Name is required")
     private String groupName;
-    @NotNull(message = "Group role mapping active status is required")
+    @NotNull(message = "GroupRoleMapping - Active status is required")
     private Boolean active;
-    @NotNull(message = "Group role mapping roles are required")
+    @NotNull(message = "GroupRoleMapping - Roles are required")
     private String[] roles;
 }
