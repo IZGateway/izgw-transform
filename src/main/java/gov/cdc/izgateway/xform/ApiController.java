@@ -24,8 +24,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-// TODO - Austin discuss this huge constructor w/ team. Suggest lombok @RequiredArgsConstructor
-
 @Log
 @RestController
 @Lazy(false)
