@@ -24,7 +24,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-
 @Log
 @RestController
 @Lazy(false)
@@ -36,6 +35,7 @@ public class ApiController {
     private final PreconditionService preconditionService;
     private final OperationService operationService;
     private final OperationPreconditionFieldService operationPreconditionFieldService;
+    private final GroupRoleMappingService groupRoleMappingService;
 
     @Value("${xform.allow-delete-via-api}")
     private Boolean allowDelete;
@@ -49,6 +49,7 @@ public class ApiController {
             PreconditionService preconditionService,
             OperationService operationService,
             OperationPreconditionFieldService operationPreconditionFieldService,
+            GroupRoleMappingService groupRoleMappingService,
             AccessControlRegistry registry
     ) {
         this.organizationService = organizationService;
@@ -58,6 +59,7 @@ public class ApiController {
         this.preconditionService = preconditionService;
         this.operationService = operationService;
         this.operationPreconditionFieldService = operationPreconditionFieldService;
+        this.groupRoleMappingService = groupRoleMappingService;
         registry.register(this);
     }
 
@@ -180,7 +182,66 @@ public class ApiController {
         }
     }
 
-    @RolesAllowed({Roles.SOLUTION_READER})
+    @RolesAllowed({Roles.ADMIN})
+    @GetMapping("/api/v1/group-role-mappings")
+    public ResponseEntity<String> getGroupRoleMappingList(
+            @RequestParam(required = false) String nextCursor,
+            @RequestParam(required = false) String prevCursor,
+            @RequestParam(defaultValue = "false") Boolean includeInactive,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        try {
+            return processList(groupRoleMappingService.getList(), nextCursor, prevCursor, includeInactive, limit);
+        } catch (JsonProcessingException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @GetMapping("/api/v1/group-role-mappings/{uuid}")
+    public ResponseEntity<GroupRoleMapping> getGroupRoleMappingByUUID(@PathVariable UUID uuid) {
+        GroupRoleMapping entity = groupRoleMappingService.getObject(uuid);
+        if (entity == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(entity, HttpStatus.OK);
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @PutMapping("/api/v1/group-role-mappings/{uuid}")
+    public ResponseEntity<GroupRoleMapping> updateGroupRoleMapping(
+            @PathVariable UUID uuid,
+            @RequestBody @Valid GroupRoleMapping updatedGroupRoleMapping
+    ) {
+        updatedGroupRoleMapping.setId(uuid);
+        groupRoleMappingService.update(updatedGroupRoleMapping);
+        return new ResponseEntity<>(updatedGroupRoleMapping, HttpStatus.OK);
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @PostMapping("/api/v1/group-role-mappings")
+    public ResponseEntity<GroupRoleMapping> createGroupRoleMapping(
+            @Valid @RequestBody() GroupRoleMapping groupRoleMapping
+    ) {
+        groupRoleMappingService.create(groupRoleMapping);
+        return new ResponseEntity<>(groupRoleMapping, HttpStatus.OK);
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @DeleteMapping("/api/v1/group-role-mappings/{uuid}")
+    public ResponseEntity<Solution> deleteGroupRoleMapping(
+            @PathVariable UUID uuid
+    ) {
+        if (Boolean.FALSE.equals(allowDelete)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        groupRoleMappingService.delete(uuid);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+        @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping("/api/v1/mappings/{uuid}")
     public ResponseEntity<Mapping> getMappingByUUID(@PathVariable UUID uuid) {
         Mapping entity = mappingService.getObject(uuid);
