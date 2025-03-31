@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "a2611909-028e-45dd-a9f0-b8e71a9817cc",
+		"_postman_id": "a6b0f5b7-5220-4ab3-b9b8-56a2e9f02292",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-a2611909-028e-45dd-a9f0-b8e71a9817cc?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-a6b0f5b7-5220-4ab3-b9b8-56a2e9f02292?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -20146,6 +20146,1228 @@
 					]
 				},
 				{
+					"name": "Group / Role Mappings",
+					"item": [
+						{
+							"name": "JWT",
+							"item": [
+								{
+									"name": "Get Group/Role Mappings w/ JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"At least one result returned\", function() {",
+													"    pm.expect(response[\"data\"].length).to.be.gt(0);",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/group-role-mappings?limit=100000",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "100000"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Group/Role Mapping - Net New w/ JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let savedData = JSON.stringify(response);",
+													"",
+													"pm.collectionVariables.set(\"createdGroupRoleMapping\", savedData);",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+													"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
+													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'CREATE');",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentGroupName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"groupName\": \"{{currentGroupName}}\",\n    \"active\": {{currentActive}},\n    \"roles\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/group-role-mappings",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Group/Role Mapping - Existing w/ JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"// Fields should match object created in previous \"Create\" \"Net New\" step",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"gotten object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+													"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
+													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'READ');",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/group-role-mappings/{{currentId}}",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings",
+												"{{currentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Group/Role - Existing w/ JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let savedData = JSON.stringify(response);",
+													"",
+													"pm.collectionVariables.set(\"createdGroupRoleMapping\", savedData);",
+													"",
+													"pm.test(\"updated object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+													"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
+													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'UPDATE');",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{{createdGroupRoleMapping}}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/group-role-mappings/{{currentId}}",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings",
+												"{{currentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Mapping - Existing w/ JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'DELETE');",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/group-role-mappings/{{currentId}}",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings",
+												"{{currentId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Invalid Payload Tests",
+							"item": [
+								{
+									"name": "Blank Id",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"id: GroupRoleMapping - ID is required\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"\",\n    \"groupName\": \"Whatever\",\n    \"active\": true,\n    \"roles\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "No Group Name",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"groupName: GroupRoleMapping - Name is required\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"94d601d7-a1bb-43fb-9ee8-080eec1e8da8\",\n    \"active\": true,\n    \"roles\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Blank Group Name",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"groupName: GroupRoleMapping - Name is required\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"94d601d7-a1bb-43fb-9ee8-080eec1e8da8\",\n    \"groupName\": \"\",\n    \"active\": true,\n    \"roles\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "No Active Status",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"active: GroupRoleMapping - Active status is required\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"94d601d7-a1bb-43fb-9ee8-080eec1e8da8\",\n    \"groupName\": \"Whatever\",\n    \"roles\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Invalid Active Status",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.contain(\"JSON parse error\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"94d601d7-a1bb-43fb-9ee8-080eec1e8da8\",\n    \"groupName\": \"Whatever\",\n    \"active\": \"boop\",\n    \"roles\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "No Roles",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.equal(\"roles: GroupRoleMapping - Roles are required\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"94d601d7-a1bb-43fb-9ee8-080eec1e8da8\",\n    \"groupName\": \"Whatever\",\n    \"active\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Get Group/Role Mappings",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"",
+											"pm.test(\"At least one result returned\", function() {",
+											"    pm.expect(response[\"data\"].length).to.be.gt(0);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings?limit=100000",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"group-role-mappings"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "100000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Group/Role Mapping - Net New",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdGroupRoleMapping\", savedData);",
+											"",
+											"pm.test(\"created object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
+											"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'CREATE');",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentGroupName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"groupName\": \"{{currentGroupName}}\",\n    \"active\": {{currentActive}},\n    \"roles\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"group-role-mappings"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Group/Role Mapping - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Fields should match object created in previous \"Create\" \"Net New\" step",
+											"let response = pm.response.json();",
+											"",
+											"pm.test(\"gotten object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
+											"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'READ');",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"group-role-mappings",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Group/Role - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdGroupRoleMapping\", savedData);",
+											"",
+											"pm.test(\"updated object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
+											"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'UPDATE');",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{createdGroupRoleMapping}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"group-role-mappings",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Mapping - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'DELETE');",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"group-role-mappings",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Preconditions",
 					"item": [
 						{
@@ -27153,6 +28375,272 @@
 							"port": "{{no_cert_port}}",
 							"path": [
 								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Swagger api-doc",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"returns 200 OK code\", function() {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/swagger/api-docs",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"swagger",
+								"api-docs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Swagger api-doc with JWT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"returns 200 OK code\", function() {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "jwt",
+							"jwt": [
+								{
+									"key": "payload",
+									"value": "{{validJwt}}",
+									"type": "string"
+								},
+								{
+									"key": "secret",
+									"value": "{{jwtSharedSecret}}",
+									"type": "string"
+								},
+								{
+									"key": "isSecretBase64Encoded",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "algorithm",
+									"value": "HS256",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "Bearer",
+									"type": "string"
+								},
+								{
+									"key": "queryParamKey",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "header",
+									"value": "{}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/swagger/api-docs",
+							"protocol": "{{no_cert_protocol}}",
+							"host": [
+								"{{no_cert_host}}"
+							],
+							"port": "{{no_cert_port}}",
+							"path": [
+								"swagger",
+								"api-docs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Swagger UI",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"returns 200 OK code\", function() {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"// Parse the HTML response",
+									"const responseText = pm.response.text();",
+									"",
+									"// Check if the response contains \"<title>Swagger UI</title>\"",
+									"const titleRegex = /<title>(.*?)<\\/title>/;",
+									"const titleMatch = responseText.match(titleRegex);",
+									"",
+									"if (titleMatch && titleMatch[1] === \"Swagger UI\") {",
+									"    pm.test(\"Swagger UI title check\", function() {",
+									"        pm.expect(true).to.be.true;",
+									"    });",
+									"} else {",
+									"    pm.test(\"Swagger UI title check\", function() {",
+									"        pm.expect(false).to.be.true;",
+									"        console.log(\"Actual title: \" + (titleMatch ? titleMatch[1] : \"No title found\"));",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{protocol}}://{{host}}:{{port}}/swagger/swagger-ui/index.html",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{port}}",
+							"path": [
+								"swagger",
+								"swagger-ui",
+								"index.html"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Swagger UI with JWT",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"returns 200 OK code\", function() {",
+									"    pm.expect(pm.response.code).to.equal(200);",
+									"});",
+									"",
+									"// Parse the HTML response",
+									"const responseText = pm.response.text();",
+									"",
+									"// Check if the response contains \"<title>Swagger UI</title>\"",
+									"const titleRegex = /<title>(.*?)<\\/title>/;",
+									"const titleMatch = responseText.match(titleRegex);",
+									"",
+									"if (titleMatch && titleMatch[1] === \"Swagger UI\") {",
+									"    pm.test(\"Swagger UI title check\", function() {",
+									"        pm.expect(true).to.be.true;",
+									"    });",
+									"} else {",
+									"    pm.test(\"Swagger UI title check\", function() {",
+									"        pm.expect(false).to.be.true;",
+									"        console.log(\"Actual title: \" + (titleMatch ? titleMatch[1] : \"No title found\"));",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "jwt",
+							"jwt": [
+								{
+									"key": "payload",
+									"value": "{{validJwt}}",
+									"type": "string"
+								},
+								{
+									"key": "secret",
+									"value": "{{jwtSharedSecret}}",
+									"type": "string"
+								},
+								{
+									"key": "isSecretBase64Encoded",
+									"value": false,
+									"type": "boolean"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "algorithm",
+									"value": "HS256",
+									"type": "string"
+								},
+								{
+									"key": "headerPrefix",
+									"value": "Bearer",
+									"type": "string"
+								},
+								{
+									"key": "queryParamKey",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "header",
+									"value": "{}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/swagger/swagger-ui/index.html",
+							"protocol": "{{no_cert_protocol}}",
+							"host": [
+								"{{no_cert_host}}"
+							],
+							"port": "{{no_cert_port}}",
+							"path": [
+								"swagger",
+								"swagger-ui",
+								"index.html"
 							]
 						}
 					},
