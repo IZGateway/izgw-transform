@@ -36,6 +36,7 @@ public class ApiController {
     private final OperationService operationService;
     private final OperationPreconditionFieldService operationPreconditionFieldService;
     private final GroupRoleMappingService groupRoleMappingService;
+    private final UserService userService;
     private final AccessControlService accessControlService;
 
     @Value("${xform.allow-delete-via-api}")
@@ -52,6 +53,7 @@ public class ApiController {
             OperationPreconditionFieldService operationPreconditionFieldService,
             GroupRoleMappingService groupRoleMappingService,
             AccessControlService accessControlService,
+            UserService userService,
             AccessControlRegistry registry
     ) {
         this.organizationService = organizationService;
@@ -63,6 +65,7 @@ public class ApiController {
         this.operationPreconditionFieldService = operationPreconditionFieldService;
         this.groupRoleMappingService = groupRoleMappingService;
         this.accessControlService = accessControlService;
+        this.userService = userService;
         registry.register(this);
     }
 
@@ -216,6 +219,22 @@ public class ApiController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    @RolesAllowed({Roles.ADMIN})
+    @GetMapping("/api/v1/users")
+    public ResponseEntity<String> getUsersList(
+            @RequestParam(required = false) String nextCursor,
+            @RequestParam(required = false) String prevCursor,
+            @RequestParam(defaultValue = "false") Boolean includeInactive,
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        try {
+            return processList(userService.getList(), nextCursor, prevCursor, includeInactive, limit);
+        } catch (JsonProcessingException e) {
+            log.log(Level.SEVERE, e.getMessage(), e);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @RolesAllowed({Roles.ADMIN})
     @GetMapping("/api/v1/group-role-mappings/{uuid}")
@@ -300,6 +319,49 @@ public class ApiController {
         }
 
         accessControlService.delete(uuid);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    
+    @RolesAllowed({Roles.ADMIN})
+    @GetMapping("/api/v1/users/{uuid}")
+    public ResponseEntity<User> getUserByUUID(@PathVariable UUID uuid) {
+        User entity = userService.getObject(uuid);
+        if (entity == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(entity, HttpStatus.OK);
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @PutMapping("/api/v1/users/{uuid}")
+    public ResponseEntity<User> updateUser(
+            @PathVariable UUID uuid,
+            @RequestBody @Valid User updatedUser
+    ) {
+        updatedUser.setId(uuid);
+        userService.update(updatedUser);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @PostMapping("/api/v1/users")
+    public ResponseEntity<User> createUser(
+            @Valid @RequestBody() User user
+    ) {
+        userService.create(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @DeleteMapping("/api/v1/users/{uuid}")
+    public ResponseEntity<User> deleteUser(
+            @PathVariable UUID uuid
+    ) {
+        if (Boolean.FALSE.equals(allowDelete)) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        userService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
