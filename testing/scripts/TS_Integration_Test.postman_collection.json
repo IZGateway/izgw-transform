@@ -22982,8 +22982,7 @@
 												"exec": [
 													"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentOrgActive\", true);"
+													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));"
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -23002,7 +23001,6 @@
 													"pm.test(\"created object fields match\", function() {",
 													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
 													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
-													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
 													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
 													"});"
 												],
@@ -23061,7 +23059,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
+											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -23104,7 +23102,6 @@
 													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentUserId\"));",
 													"    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"currentUserName\"));",
 													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
-													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
 													"});",
 													"",
 													"utils.testForApiLog(pm, 'CREATE');",
@@ -23121,8 +23118,7 @@
 												"exec": [
 													"pm.collectionVariables.set(\"currentUserId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 													"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
-													"pm.collectionVariables.set(\"currentUserName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+													"pm.collectionVariables.set(\"currentUserName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));"
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -23179,7 +23175,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"userName\": \"{{currentUserName}}\",\n    \"id\": \"{{currentUserId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": {{currentActive}}\n}",
+											"raw": "{\n    \"userName\": \"{{currentUserName}}\",\n    \"id\": \"{{currentUserId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -23931,8 +23927,7 @@
 												"exec": [
 													"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentOrgActive\", true);"
+													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));"
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -23951,7 +23946,6 @@
 													"pm.test(\"created object fields match\", function() {",
 													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
 													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
-													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
 													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
 													"});"
 												],
@@ -23965,7 +23959,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
+											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -24008,7 +24002,6 @@
 													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentUserId\"));",
 													"    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"currentUserName\"));",
 													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
-													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
 													"});",
 													"",
 													"utils.testForApiLog(pm, 'CREATE');",
@@ -24025,8 +24018,7 @@
 												"exec": [
 													"pm.collectionVariables.set(\"currentUserId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 													"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
-													"pm.collectionVariables.set(\"currentUserName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+													"pm.collectionVariables.set(\"currentUserName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));"
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -24038,7 +24030,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"userName\": \"{{currentUserName}}\",\n    \"id\": \"{{currentUserId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": {{currentActive}}\n}",
+											"raw": "{\n    \"userName\": \"{{currentUserName}}\",\n    \"id\": \"{{currentUserId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -24540,8 +24532,7 @@
 										"exec": [
 											"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 											"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-											"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-											"pm.collectionVariables.set(\"currentOrgActive\", true);"
+											"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -24560,7 +24551,6 @@
 											"pm.test(\"created object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
 											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
-											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
 											"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
 											"});"
 										],
@@ -24574,7 +24564,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
+									"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : true\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -24617,7 +24607,6 @@
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentUserId\"));",
 											"    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"currentUserName\"));",
 											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
-											"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
 											"});",
 											"",
 											"utils.testForApiLog(pm, 'CREATE');",
@@ -24634,8 +24623,7 @@
 										"exec": [
 											"pm.collectionVariables.set(\"currentUserId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 											"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
-											"pm.collectionVariables.set(\"currentUserName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+											"pm.collectionVariables.set(\"currentUserName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -24647,7 +24635,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"userName\": \"{{currentUserName}}\",\n    \"id\": \"{{currentUserId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": {{currentActive}}\n}",
+									"raw": "{\n    \"userName\": \"{{currentUserName}}\",\n    \"id\": \"{{currentUserId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": true\n}",
 									"options": {
 										"raw": {
 											"language": "json"
