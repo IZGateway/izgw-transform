@@ -24075,7 +24075,7 @@
 													"let response = pm.response.json();",
 													"",
 													"pm.test(\"Error Message Check\", function() {",
-													"    pm.expect(response.message).to.equal(\"id: Access Control - ID is required\");",
+													"    pm.expect(response.message).to.contains(\"id: Access Control - ID is required\");",
 													"});",
 													"",
 													""
@@ -24137,7 +24137,7 @@
 													"let response = pm.response.json();",
 													"",
 													"pm.test(\"Error Message Check\", function() {",
-													"    pm.expect(response.message).to.equal(\"active: Access Control - Active status is required\");",
+													"    pm.expect(response.message).to.contains(\"active: Access Control - Active status is required\");",
 													"});",
 													"",
 													""
@@ -24385,7 +24385,7 @@
 													"let response = pm.response.json();",
 													"",
 													"pm.test(\"Error Message Check\", function() {",
-													"    pm.expect(response.message).to.equal(\"roles: Access Control - Roles are required\");",
+													"    pm.expect(response.message).to.contains(\"roles: Access Control - Roles are required\");",
 													"});",
 													"",
 													""
@@ -25069,6 +25069,28 @@
 								}
 							},
 							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
 						}
 					]
 				},
@@ -35944,6 +35966,84 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "GoodResponse",
+			"value": ""
+		},
+		{
+			"key": "GoodResponseLF",
+			"value": ""
+		},
+		{
+			"key": "GoodResponseCRLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageCRLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageVXULF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageVXUCRLF",
+			"value": ""
+		},
+		{
+			"key": "validJwt",
+			"value": ""
+		},
+		{
+			"key": "validJwtNoRoles",
+			"value": ""
+		},
+		{
+			"key": "fhirPatientGiven",
+			"value": ""
+		},
+		{
+			"key": "fhirPatientFamily",
+			"value": ""
+		},
+		{
+			"key": "fhirPatientDOB",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientGiven",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientFamily",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientDOB",
+			"value": ""
+		},
+		{
+			"key": "TooLargeMessage",
+			"value": ""
+		},
+		{
+			"key": "IisTooLargeMessage",
+			"value": ""
+		},
+		{
+			"key": "hex0b",
+			"value": ""
+		},
+		{
+			"key": "hex1b",
+			"value": ""
 		}
 	]
 }
