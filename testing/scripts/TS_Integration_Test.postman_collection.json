@@ -22974,7 +22974,236 @@
 							"name": "JWT",
 							"item": [
 								{
-									"name": "Get Group/Role Mappings w/ JWT",
+									"name": "Create Temp Organization w/ JWT",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentOrgActive\", true);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
+													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
+													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/organizations",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"organizations"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Temp User w/ JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let savedData = JSON.stringify(response);",
+													"",
+													"pm.collectionVariables.set(\"createdUser\", savedData);",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentUserId\"));",
+													"    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"currentUserName\"));",
+													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
+													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'CREATE');",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentUserId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
+													"pm.collectionVariables.set(\"currentUserName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"userName\": \"{{currentUserName}}\",\n    \"id\": \"{{currentUserId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": {{currentActive}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/users",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"users"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Access Control Listing w/ JWT",
 									"event": [
 										{
 											"listen": "test",
@@ -23055,7 +23284,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/group-role-mappings?limit=100000",
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/access-controls?limit=100000",
 											"protocol": "{{no_cert_protocol}}",
 											"host": [
 												"{{no_cert_host}}"
@@ -23064,7 +23293,7 @@
 											"path": [
 												"api",
 												"v1",
-												"group-role-mappings"
+												"access-controls"
 											],
 											"query": [
 												{
@@ -23077,7 +23306,7 @@
 									"response": []
 								},
 								{
-									"name": "Create Group/Role Mapping - Net New w/ JWT",
+									"name": "Create Access Control - Net New w/ JWT",
 									"event": [
 										{
 											"listen": "test",
@@ -23090,11 +23319,11 @@
 													"let response = pm.response.json();",
 													"let savedData = JSON.stringify(response);",
 													"",
-													"pm.collectionVariables.set(\"createdGroupRoleMapping\", savedData);",
+													"pm.collectionVariables.set(\"createdAccessControl\", savedData);",
 													"",
 													"pm.test(\"created object fields match\", function() {",
 													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-													"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
+													"    pm.expect(response.userId).to.equal(pm.collectionVariables.get(\"currentUserId\"));",
 													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
 													"});",
 													"",
@@ -23111,7 +23340,6 @@
 											"script": {
 												"exec": [
 													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentGroupName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
 												],
 												"type": "text/javascript",
@@ -23169,7 +23397,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"groupName\": \"{{currentGroupName}}\",\n    \"active\": {{currentActive}},\n    \"roles\": []\n}",
+											"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"userId\": \"{{currentUserId}}\",\n    \"active\": {{currentActive}},\n    \"roles\": []\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -23177,7 +23405,7 @@
 											}
 										},
 										"url": {
-											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/group-role-mappings",
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/access-controls",
 											"protocol": "{{no_cert_protocol}}",
 											"host": [
 												"{{no_cert_host}}"
@@ -23186,14 +23414,14 @@
 											"path": [
 												"api",
 												"v1",
-												"group-role-mappings"
+												"access-controls"
 											]
 										}
 									},
 									"response": []
 								},
 								{
-									"name": "Get Group/Role Mapping - Existing w/ JWT",
+									"name": "Get Access Control - Existing w/ JWT",
 									"event": [
 										{
 											"listen": "test",
@@ -23279,7 +23507,7 @@
 										"method": "GET",
 										"header": [],
 										"url": {
-											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/group-role-mappings/{{currentId}}",
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/access-controls/{{currentId}}",
 											"protocol": "{{no_cert_protocol}}",
 											"host": [
 												"{{no_cert_host}}"
@@ -23288,7 +23516,7 @@
 											"path": [
 												"api",
 												"v1",
-												"group-role-mappings",
+												"access-controls",
 												"{{currentId}}"
 											]
 										}
@@ -23296,7 +23524,7 @@
 									"response": []
 								},
 								{
-									"name": "Update Group/Role - Existing w/ JWT",
+									"name": "Update Access Control - Existing w/ JWT",
 									"event": [
 										{
 											"listen": "test",
@@ -23313,7 +23541,7 @@
 													"",
 													"pm.test(\"updated object fields match\", function() {",
 													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-													"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
+													"    pm.expect(response.userId).to.equal(pm.collectionVariables.get(\"currentUserId\"));",
 													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
 													"});",
 													"",
@@ -23385,7 +23613,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{{createdGroupRoleMapping}}",
+											"raw": "{{createdAccessControl}}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -23393,7 +23621,7 @@
 											}
 										},
 										"url": {
-											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/group-role-mappings/{{currentId}}",
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/access-controls/{{currentId}}",
 											"protocol": "{{no_cert_protocol}}",
 											"host": [
 												"{{no_cert_host}}"
@@ -23402,7 +23630,7 @@
 											"path": [
 												"api",
 												"v1",
-												"group-role-mappings",
+												"access-controls",
 												"{{currentId}}"
 											]
 										}
@@ -23410,7 +23638,7 @@
 									"response": []
 								},
 								{
-									"name": "Delete Mapping - Existing w/ JWT",
+									"name": "Delete Access Control - Existing w/ JWT",
 									"event": [
 										{
 											"listen": "test",
@@ -23487,7 +23715,7 @@
 										"method": "DELETE",
 										"header": [],
 										"url": {
-											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/group-role-mappings/{{currentId}}",
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/access-controls/{{currentId}}",
 											"protocol": "{{no_cert_protocol}}",
 											"host": [
 												"{{no_cert_host}}"
@@ -23496,8 +23724,194 @@
 											"path": [
 												"api",
 												"v1",
-												"group-role-mappings",
+												"access-controls",
 												"{{currentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Temp User w/ JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'DELETE');"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/users/{{currentUserId}}",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"{{currentUserId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Temp Organization w/ JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});",
+													"",
+													"pm.collectionVariables.clear();"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/organizations/{{currentOrgId}}",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"organizations",
+												"{{currentOrgId}}"
 											]
 										}
 									},
@@ -23508,6 +23922,145 @@
 						{
 							"name": "Invalid Payload Tests",
 							"item": [
+								{
+									"name": "Create Temp Organization",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentOrgActive\", true);"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
+													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
+													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
+													"});"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"organizations"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Temp User",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let savedData = JSON.stringify(response);",
+													"",
+													"pm.collectionVariables.set(\"createdUser\", savedData);",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentUserId\"));",
+													"    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"currentUserName\"));",
+													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
+													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'CREATE');",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentUserId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
+													"pm.collectionVariables.set(\"currentUserName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"userName\": \"{{currentUserName}}\",\n    \"id\": \"{{currentUserId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": {{currentActive}}\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"users"
+											]
+										}
+									},
+									"response": []
+								},
 								{
 									"name": "Blank Id",
 									"event": [
@@ -23522,7 +24075,7 @@
 													"let response = pm.response.json();",
 													"",
 													"pm.test(\"Error Message Check\", function() {",
-													"    pm.expect(response.message).to.equal(\"id: GroupRoleMapping - ID is required\");",
+													"    pm.expect(response.message).to.equal(\"id: Access Control - ID is required\");",
 													"});",
 													"",
 													""
@@ -23547,7 +24100,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"\",\n    \"groupName\": \"Whatever\",\n    \"active\": true,\n    \"roles\": []\n}",
+											"raw": "{\n    \"id\": \"\",\n    \"userId\": \"{{currentUserId}}\",\n    \"active\": true,\n    \"roles\": []\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -23555,7 +24108,7 @@
 											}
 										},
 										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls",
 											"protocol": "{{protocol}}",
 											"host": [
 												"{{host}}"
@@ -23564,131 +24117,7 @@
 											"path": [
 												"api",
 												"v1",
-												"group-role-mappings"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "No Group Name",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Validate HTTP Status\", function() {",
-													"    pm.expect(pm.response.code).to.equal(400);",
-													"});",
-													"",
-													"let response = pm.response.json();",
-													"",
-													"pm.test(\"Error Message Check\", function() {",
-													"    pm.expect(response.message).to.equal(\"groupName: GroupRoleMapping - Name is required\");",
-													"});",
-													"",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"id\": \"94d601d7-a1bb-43fb-9ee8-080eec1e8da8\",\n    \"active\": true,\n    \"roles\": []\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
-											"protocol": "{{protocol}}",
-											"host": [
-												"{{host}}"
-											],
-											"port": "{{port}}",
-											"path": [
-												"api",
-												"v1",
-												"group-role-mappings"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Blank Group Name",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"Validate HTTP Status\", function() {",
-													"    pm.expect(pm.response.code).to.equal(400);",
-													"});",
-													"",
-													"let response = pm.response.json();",
-													"",
-													"pm.test(\"Error Message Check\", function() {",
-													"    pm.expect(response.message).to.equal(\"groupName: GroupRoleMapping - Name is required\");",
-													"});",
-													"",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"id\": \"94d601d7-a1bb-43fb-9ee8-080eec1e8da8\",\n    \"groupName\": \"\",\n    \"active\": true,\n    \"roles\": []\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
-											"protocol": "{{protocol}}",
-											"host": [
-												"{{host}}"
-											],
-											"port": "{{port}}",
-											"path": [
-												"api",
-												"v1",
-												"group-role-mappings"
+												"access-controls"
 											]
 										}
 									},
@@ -23708,7 +24137,7 @@
 													"let response = pm.response.json();",
 													"",
 													"pm.test(\"Error Message Check\", function() {",
-													"    pm.expect(response.message).to.equal(\"active: GroupRoleMapping - Active status is required\");",
+													"    pm.expect(response.message).to.equal(\"active: Access Control - Active status is required\");",
 													"});",
 													"",
 													""
@@ -23733,7 +24162,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"94d601d7-a1bb-43fb-9ee8-080eec1e8da8\",\n    \"groupName\": \"Whatever\",\n    \"roles\": []\n}",
+											"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"{{currentUserId}}\",\n    \"roles\": []\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -23741,7 +24170,7 @@
 											}
 										},
 										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls",
 											"protocol": "{{protocol}}",
 											"host": [
 												"{{host}}"
@@ -23750,7 +24179,131 @@
 											"path": [
 												"api",
 												"v1",
-												"group-role-mappings"
+												"access-controls"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "No User",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.contains(\"userId: Access Control - User is required\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"active\": true,\n    \"roles\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"access-controls"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Non-Existent User",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.contains(\"userId: User not found with ID\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"f499f37c-e5da-472e-8386-0dc84adbc5b7\",\n    \"active\": true,\n    \"roles\": []\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"access-controls"
 											]
 										}
 									},
@@ -23795,7 +24348,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"94d601d7-a1bb-43fb-9ee8-080eec1e8da8\",\n    \"groupName\": \"Whatever\",\n    \"active\": \"boop\",\n    \"roles\": []\n}",
+											"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"{{currentUserId}}\",\n    \"active\": \"boop\",\n    \"roles\": []\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -23803,7 +24356,7 @@
 											}
 										},
 										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls",
 											"protocol": "{{protocol}}",
 											"host": [
 												"{{host}}"
@@ -23812,7 +24365,7 @@
 											"path": [
 												"api",
 												"v1",
-												"group-role-mappings"
+												"access-controls"
 											]
 										}
 									},
@@ -23832,7 +24385,7 @@
 													"let response = pm.response.json();",
 													"",
 													"pm.test(\"Error Message Check\", function() {",
-													"    pm.expect(response.message).to.equal(\"roles: GroupRoleMapping - Roles are required\");",
+													"    pm.expect(response.message).to.equal(\"roles: Access Control - Roles are required\");",
 													"});",
 													"",
 													""
@@ -23857,7 +24410,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"94d601d7-a1bb-43fb-9ee8-080eec1e8da8\",\n    \"groupName\": \"Whatever\",\n    \"active\": true\n}",
+											"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"{{currentUserId}}\",\n    \"active\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -23865,7 +24418,7 @@
 											}
 										},
 										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls",
 											"protocol": "{{protocol}}",
 											"host": [
 												"{{host}}"
@@ -23874,13 +24427,248 @@
 											"path": [
 												"api",
 												"v1",
-												"group-role-mappings"
+												"access-controls"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Temp User",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'DELETE');"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users/{{currentUserId}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"users",
+												"{{currentUserId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Temp Organization",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});",
+													"",
+													"pm.collectionVariables.clear();"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/{{currentOrgId}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"organizations",
+												"{{currentOrgId}}"
 											]
 										}
 									},
 									"response": []
 								}
 							]
+						},
+						{
+							"name": "Create Temp Organization",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentOrgActive\", true);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"",
+											"pm.test(\"created object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
+											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
+											"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"organizations"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Temp User",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdUser\", savedData);",
+											"",
+											"pm.test(\"created object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentUserId\"));",
+											"    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"currentUserName\"));",
+											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
+											"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'CREATE');",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentUserId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentOrganizationId\", pm.collectionVariables.get(\"currentOrgId\"));",
+											"pm.collectionVariables.set(\"currentUserName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"userName\": \"{{currentUserName}}\",\n    \"id\": \"{{currentUserId}}\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": {{currentActive}}\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"users"
+									]
+								}
+							},
+							"response": []
 						},
 						{
 							"name": "Get Access Control Listing",
@@ -23975,7 +24763,6 @@
 									"script": {
 										"exec": [
 											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-											"pm.collectionVariables.set(\"currentUserId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
 										],
 										"type": "text/javascript",
@@ -24012,7 +24799,7 @@
 							"response": []
 						},
 						{
-							"name": "Get Group/Role Mapping - Existing",
+							"name": "Get Access Control - Existing",
 							"event": [
 								{
 									"listen": "test",
@@ -24053,7 +24840,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings/{{currentId}}",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls/{{currentId}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{host}}"
@@ -24062,7 +24849,7 @@
 									"path": [
 										"api",
 										"v1",
-										"group-role-mappings",
+										"access-controls",
 										"{{currentId}}"
 									]
 								}
@@ -24070,7 +24857,7 @@
 							"response": []
 						},
 						{
-							"name": "Update Group/Role - Existing",
+							"name": "Update Access Control - Existing",
 							"event": [
 								{
 									"listen": "test",
@@ -24087,7 +24874,7 @@
 											"",
 											"pm.test(\"updated object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
+											"    pm.expect(response.userId).to.equal(pm.collectionVariables.get(\"currentUserId\"));",
 											"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
 											"});",
 											"",
@@ -24114,7 +24901,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{{createdGroupRoleMapping}}",
+									"raw": "{{createdAccessControl}}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -24122,7 +24909,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings/{{currentId}}",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls/{{currentId}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{host}}"
@@ -24131,7 +24918,7 @@
 									"path": [
 										"api",
 										"v1",
-										"group-role-mappings",
+										"access-controls",
 										"{{currentId}}"
 									]
 								}
@@ -24139,7 +24926,7 @@
 							"response": []
 						},
 						{
-							"name": "Delete Mapping - Existing",
+							"name": "Delete Access Control - Existing",
 							"event": [
 								{
 									"listen": "test",
@@ -24171,7 +24958,7 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings/{{currentId}}",
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls/{{currentId}}",
 									"protocol": "{{protocol}}",
 									"host": [
 										"{{host}}"
@@ -24180,8 +24967,104 @@
 									"path": [
 										"api",
 										"v1",
-										"group-role-mappings",
+										"access-controls",
 										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Temp User",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'DELETE');"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users/{{currentUserId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"{{currentUserId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Temp Organization",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});",
+											"",
+											"pm.collectionVariables.clear();"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/{{currentOrgId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"organizations",
+										"{{currentOrgId}}"
 									]
 								}
 							},
