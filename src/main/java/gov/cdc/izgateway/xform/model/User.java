@@ -17,7 +17,7 @@ public class User implements BaseModel {
     @NotNull(message = "User - ID is required")
     private UUID id;
 
-    @NotNull(message = "User - ID is required")
+    @NotNull(message = "User - Organization is required")
     @ValidOrganization(message = "Organization ID must reference an existing and active organization")
     private UUID organizationId;
 
