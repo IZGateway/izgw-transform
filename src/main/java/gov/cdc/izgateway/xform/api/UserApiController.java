@@ -9,7 +9,6 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +23,6 @@ import java.util.logging.Level;
 public class UserApiController extends BaseApiController {
 
     private final UserService userService;
-
-    @Value("${xform.allow-delete-via-api}")
-    private Boolean allowDelete;
 
     @Autowired
     public UserApiController(
@@ -82,19 +78,6 @@ public class UserApiController extends BaseApiController {
     ) {
         userService.create(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
-    }
-
-    @RolesAllowed({Roles.ADMIN})
-    @DeleteMapping("/api/v1/users/{uuid}")
-    public ResponseEntity<User> deleteUser(
-            @PathVariable UUID uuid
-    ) {
-        if (Boolean.FALSE.equals(allowDelete)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        userService.delete(uuid);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }
