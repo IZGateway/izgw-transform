@@ -231,7 +231,7 @@
 			<artifactId>aspectjweaver</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>cdc.gov.izgw</groupId>
+			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>v2tofhir</artifactId>
 			<version>1.0.0-v2tofhir-SNAPSHOT</version>
 		</dependency>
