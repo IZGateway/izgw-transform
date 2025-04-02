@@ -1,5 +1,11 @@
 [
   {
+    "id": "4f5b1f8e-6c7d-4a9b-8e3f-2d7c6b5a9e4d",
+    "userName": "kboone.testing.izgateway.org",
+    "organizationId": "f56a10cc-bf37-4257-bba7-44dcf376dc3e",
+    "active": true
+  },
+  {
     "id": "8c942339-e10d-418f-8898-d8e73388198c",
     "userName": "pcahill.testing.izgateway.org",
     "organizationId": "0d15449b-fb08-4013-8985-20c148b353fe",

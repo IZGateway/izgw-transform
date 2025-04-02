@@ -1,5 +1,23 @@
 [
   {
+    "id": "b8a2c7e9-5d6f-4e3c-9b2a-1d7e8f3c5b9d",
+    "userId": "4f5b1f8e-6c7d-4a9b-8e3f-2d7c6b5a9e4d",
+    "active": true,
+    "roles": [
+      "admin",
+      "xform-sender",
+      "pipeline-reader",
+      "pipeline-writer",
+      "pipeline-deleter",
+      "organization-reader",
+      "organization-writer",
+      "organization-deleter",
+      "solution-reader",
+      "solution-writer",
+      "solution-deleter"
+    ]
+  },
+  {
     "id": "d50994c7-5c6d-441b-aa08-12be7509923e",
     "userId": "8c942339-e10d-418f-8898-d8e73388198c",
     "active": true,

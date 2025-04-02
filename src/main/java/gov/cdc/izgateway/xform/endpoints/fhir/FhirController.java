@@ -355,7 +355,7 @@ public class FhirController {
             responseCode = "200",
             description = "The request completed normally",
             content = {@Content(
-                    mediaType = "application/xml"
+                    mediaType = "application/json"
             )}
     )
     @ApiResponse(
@@ -374,12 +374,12 @@ public class FhirController {
     		RequestMethod.HEAD	// Used with SMART and other auth mechanisms.
     	},
         produces = {
+           	"application/yaml",
+        	"application/json", 
+        	"application/xml",
         	"application/fhir+xml", 
         	"application/fhir+json", 
         	"application/fhir+yaml",
-        	"application/xml",
-        	"application/json", 
-        	"application/yaml",
         	"text/xml"
     	}
     )
@@ -491,11 +491,13 @@ public class FhirController {
 		}
 	}
 
+
 	private static void setBirthDateParameters(RequestWithModifiableParameters wrapper, Patient patient) {
 		if (patient.hasBirthDate()) {
 			DateParam birthDate = new DateParam();
 			birthDate.setValue(patient.getBirthDate());
-			wrapper.addParameter(Patient.SP_BIRTHDATE, birthDate.getValueAsQueryToken(null));
+			String value = StringUtils.substringBefore(birthDate.getValueAsQueryToken(null), "T");
+			wrapper.addParameter(Patient.SP_BIRTHDATE, value);
 		}
 		if (patient.hasMultipleBirth()) {
 			PrimitiveType<?> pt = (PrimitiveType<?>) patient.getMultipleBirth();
@@ -656,10 +658,12 @@ public class FhirController {
 		
 		// Update the bundle type to searchset from message.
 		bundle.setType(BundleType.SEARCHSET);
-		String requested = StringUtils.substringAfterLast(req.getRequestURI(), "/fhir/");
-		requested = StringUtils.substringBefore(StringUtils.substringAfter(requested, "/"), "/");
-		
-		List<Resource> resources = new ArrayList<>();
+		String requested = StringUtils.substringAfterLast(req.getRequestURI(), "/");
+		if ("$match".equals(requested)) {
+			requested = "Patient";
+		}
+
+    List<Resource> resources = new ArrayList<>();
 		preFilter(bundle, includes, revIncludes, requested, resources);
 		
 		markIncludedResources(includes, revIncludes, resources);
