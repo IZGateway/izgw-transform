@@ -12,7 +12,7 @@ import java.util.TreeMap;
 
 import gov.cdc.izgateway.common.HealthService;
 import gov.cdc.izgateway.soap.net.SoapMessageConverter;
-import gov.cdc.izgateway.xform.endpoints.fhir.FhirConverter;
+import gov.cdc.izgw.v2tofhir.utils.FhirConverter;
 
 import gov.cdc.izgateway.utils.SystemUtils;
 import org.apache.catalina.connector.Connector;
