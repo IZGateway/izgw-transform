@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "e1dca4ce-72df-47ae-8710-569b9556610d",
+		"_postman_id": "3bb964d7-b500-4f08-a590-acf13a254ab0",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "940288",
-		"_collection_link": "https://cloudy-sunset-429868.postman.co/workspace/IZ-Gateway~a583eb4f-68db-4044-b8cf-d251024eca35/collection/940288-e1dca4ce-72df-47ae-8710-569b9556610d?action=share&source=collection_link&creator=940288"
+		"_exporter_id": "2729094",
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-3bb964d7-b500-4f08-a590-acf13a254ab0?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -21065,22 +21065,15 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"returns success code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(200);",
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
 													"});",
 													"",
 													"let response = pm.response.json();",
-													"let savedData = JSON.stringify(response);",
 													"",
-													"pm.collectionVariables.set(\"createdGroupRoleMapping\", savedData);",
-													"",
-													"pm.test(\"created object fields match\", function() {",
-													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-													"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
-													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.contains(\"Roles [super-user] do not come from the set\");",
 													"});",
-													"",
-													"utils.testForApiLog(pm, 'CREATE');",
 													"",
 													""
 												],
@@ -21136,22 +21129,16 @@
 											"listen": "test",
 											"script": {
 												"exec": [
-													"pm.test(\"returns success code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(200);",
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
 													"});",
 													"",
 													"let response = pm.response.json();",
-													"let savedData = JSON.stringify(response);",
 													"",
-													"pm.collectionVariables.set(\"createdGroupRoleMapping\", savedData);",
-													"",
-													"pm.test(\"updated object fields match\", function() {",
-													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-													"    pm.expect(response.groupName).to.equal(pm.collectionVariables.get(\"currentGroupName\"));",
-													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"currentActive\") === \"true\");",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.contains(\"Roles [invalid] do not come from the set\");",
 													"});",
 													"",
-													"utils.testForApiLog(pm, 'UPDATE');",
 													""
 												],
 												"type": "text/javascript",
@@ -34030,22 +34017,6 @@
 		},
 		{
 			"key": "hex1b",
-			"value": ""
-		},
-		{
-			"key": "currentId",
-			"value": ""
-		},
-		{
-			"key": "currentGroupName",
-			"value": ""
-		},
-		{
-			"key": "currentActive",
-			"value": ""
-		},
-		{
-			"key": "createdGroupRoleMapping",
 			"value": ""
 		}
 	]
