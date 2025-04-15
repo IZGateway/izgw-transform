@@ -1,5 +1,9 @@
 package gov.cdc.izgateway.xform.security;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class Roles {
     // Supported roles
     public static final String ADMIN = "admin";
@@ -17,8 +21,20 @@ public class Roles {
     public static final String SOLUTION_WRITER = "solution-writer";
     public static final String SOLUTION_DELETER = "solution-deleter";
 
-    // Header to indicate that request from localhost should not be treated as an admin
+    /** Header to indicate that request from localhost should not be treated as an admin */
     public static final String NOT_ADMIN_HEADER = "X-Not-Admin";
 
+    /** 
+     * A list of all roles to enable validation of role names
+     * in model elements.
+     */
+    public static final List<String> ALL_ROLES = Collections.unmodifiableList(
+    	Arrays.asList(
+    		ADMIN, XFORM_SENDING_SYSTEM, 
+    		PIPELINE_READER, PIPELINE_WRITER, PIPELINE_DELETER,
+    		ORGANIZATION_READER, ORGANIZATION_WRITER, ORGANIZATION_DELETER,
+    		SOLUTION_READER, SOLUTION_WRITER, SOLUTION_DELETER
+    	)
+    );
     private Roles() {}
 }

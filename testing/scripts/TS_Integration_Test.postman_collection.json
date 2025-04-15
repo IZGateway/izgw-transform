@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "385eea5b-de2e-4c4b-bd1e-8a3037a6627a",
+		"_postman_id": "3bb964d7-b500-4f08-a590-acf13a254ab0",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-385eea5b-de2e-4c4b-bd1e-8a3037a6627a?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-3bb964d7-b500-4f08-a590-acf13a254ab0?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -21053,6 +21053,133 @@
 												"api",
 												"v1",
 												"group-role-mappings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Group w/ Invalid Role Mapping - Net New",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.contains(\"Roles [super-user] do not come from the set\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentGroupName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"01963564-7673-7953-bafe-7ef4a0921724\",\n    \"groupName\": \"Test Group with Invalid Roles\",\n    \"active\": true,\n    \"roles\": [\n        \"super-user\",\n        \"organization-reader\",\n        \"organization-writer\",\n        \"pipeline-deleter\",\n        \"pipeline-reader\",\n        \"pipeline-writer\",\n        \"solution-deleter\",\n        \"solution-reader\",\n        \"solution-writer\"\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Group w/ Invalid Role - Existing",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"Validate HTTP Status\", function() {",
+													"    pm.expect(pm.response.code).to.equal(400);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"Error Message Check\", function() {",
+													"    pm.expect(response.message).to.contains(\"Roles [invalid] do not come from the set\");",
+													"});",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id\": \"a3c729dd-4f0e-48c7-a6a6-18c66f8cba93\",\r\n    \"groupName\": \"Xform Solutions Engineer\",\r\n    \"active\": true,\r\n    \"roles\": [\r\n        \"invalid\",\r\n        \"organization-reader\",\r\n        \"organization-writer\",\r\n        \"pipeline-deleter\",\r\n        \"pipeline-reader\",\r\n        \"pipeline-writer\",\r\n        \"solution-deleter\",\r\n        \"solution-reader\",\r\n        \"solution-writer\"\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/group-role-mappings/{{currentId}}",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"group-role-mappings",
+												"{{currentId}}"
 											]
 										}
 									},
