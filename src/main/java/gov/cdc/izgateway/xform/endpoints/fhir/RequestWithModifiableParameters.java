@@ -20,96 +20,96 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
  * @author Audacious Inquiry
  */
 public class RequestWithModifiableParameters extends HttpServletRequestWrapper {
-	Map<String, List<String>> map;
+    Map<String, List<String>> map;
 
-	RequestWithModifiableParameters(HttpServletRequest req) {
-		super(req);
-		map = initParameterMap(req);
-	}
+    RequestWithModifiableParameters(HttpServletRequest req) {
+        super(req);
+        map = initParameterMap(req);
+    }
 
-	private static Map<String, List<String>> initParameterMap(HttpServletRequest req) {
-		Map<String, List<String>> m = new LinkedHashMap<>();
-		for (Map.Entry<String, String[]> e: req.getParameterMap().entrySet()) {
-			List<String> l = new ArrayList<>();
-			l.addAll(Arrays.asList(e.getValue()));
-			m.put(e.getKey(), l);
-		}
-		return m;
-	}
+    private static Map<String, List<String>> initParameterMap(HttpServletRequest req) {
+        Map<String, List<String>> m = new LinkedHashMap<>();
+        for (Map.Entry<String, String[]> e: req.getParameterMap().entrySet()) {
+            List<String> l = new ArrayList<>();
+            l.addAll(Arrays.asList(e.getValue()));
+            m.put(e.getKey(), l);
+        }
+        return m;
+    }
 
-	/**
-	 * Add a new value the named parameter.  If the named parameter doesn't 
-	 * exist, it will be created.
-	 *  
-	 * @param name	The parameter name.
-	 * @param value	The parameter value.
-	 */
-	public void addParameter(String name, String value) {
-		List<String> l = map.computeIfAbsent(name, k -> new ArrayList<>());
-		l.add(value);
-	}
-	
-	/**
-	 * Remove all parameters for the given parameter.
-	 * @param name	The parameter
-	 * @return	The values for this parameter.
-	 */
-	public List<String> removeParameters(String name) {
-		return map.remove(name);
-	}
-	
-	/**
-	 * Remove the specified value for the named parameter.
-	 * @param name	The parameter name
-	 * @param value	The value to remove
-	 * @return	true if the value existed.
-	 */
-	public boolean removeParameter(String name, String value) {
-		List<String> l = map.get(name);
-		if (l != null) {
-			return l.remove(value);
-		}
-		return false;
-	}
-	
-	@Override
-	public String getParameter(String name) {
-		List<String> l = map.get(name);
-		return l == null || l.size() == 0 ? null : l.get(0); 
-	}
+    /**
+     * Add a new value the named parameter.  If the named parameter doesn't 
+     * exist, it will be created.
+     *  
+     * @param name    The parameter name.
+     * @param value    The parameter value.
+     */
+    public void addParameter(String name, String value) {
+        List<String> l = map.computeIfAbsent(name, k -> new ArrayList<>());
+        l.add(value);
+    }
+    
+    /**
+     * Remove all parameters for the given parameter.
+     * @param name    The parameter
+     * @return    The values for this parameter.
+     */
+    public List<String> removeParameters(String name) {
+        return map.remove(name);
+    }
+    
+    /**
+     * Remove the specified value for the named parameter.
+     * @param name    The parameter name
+     * @param value    The value to remove
+     * @return    true if the value existed.
+     */
+    public boolean removeParameter(String name, String value) {
+        List<String> l = map.get(name);
+        if (l != null) {
+            return l.remove(value);
+        }
+        return false;
+    }
+    
+    @Override
+    public String getParameter(String name) {
+        List<String> l = map.get(name);
+        return l == null || l.isEmpty() ? null : l.get(0); 
+    }
 
-	/**
-	 * Get the parameter map in list form.
-	 * @return The parameter map in list form instead of array form.
-	 */
-	public Map<String, List<String>> getParameters() {
-		return Collections.unmodifiableMap(map);
-	}
-	
-	@Override
-	public Map<String, String[]> getParameterMap() {
-		Map<String, String[]> result = new LinkedHashMap<>();
-		for (Map.Entry<String, List<String>> e: map.entrySet()) {
-			result.put(e.getKey(), e.getValue().toArray(new String[0]));
-		}
-		return result;
-	}
+    /**
+     * Get the parameter map in list form.
+     * @return The parameter map in list form instead of array form.
+     */
+    public Map<String, List<String>> getParameters() {
+        return Collections.unmodifiableMap(map);
+    }
+    
+    @Override
+    public Map<String, String[]> getParameterMap() {
+        Map<String, String[]> result = new LinkedHashMap<>();
+        for (Map.Entry<String, List<String>> e: map.entrySet()) {
+            result.put(e.getKey(), e.getValue().toArray(new String[0]));
+        }
+        return result;
+    }
 
-	@Override
-	public Enumeration<String> getParameterNames() {
-		return Collections.enumeration(map.keySet());
-	}
+    @Override
+    public Enumeration<String> getParameterNames() {
+        return Collections.enumeration(map.keySet());
+    }
 
-	@Override
-	public String[] getParameterValues(String name) {
-		List<String> l = map.get(name);
-		return l == null ? null : l.toArray(new String[0]);
-	}
+    @Override
+    public String[] getParameterValues(String name) {
+        List<String> l = map.get(name);
+        return l == null ? null : l.toArray(new String[0]);
+    }
 
-	/**
-	 * Reset all parameters.
-	 */
-	public void resetParameters() {
-		map.clear();
-	}
+    /**
+     * Reset all parameters.
+     */
+    public void resetParameters() {
+        map.clear();
+    }
 }
