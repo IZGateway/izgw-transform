@@ -66,6 +66,7 @@ import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.DataTypeException;
 import ca.uhn.hl7v2.model.v251.message.QBP_Q11;
+import ca.uhn.hl7v2.model.v251.segment.MSH;
 import gov.cdc.izgateway.common.HasDestinationUri;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.info.SourceInfo;
@@ -587,7 +588,7 @@ public class FhirController {
             request.setHl7Message(qbp.encode());
             setWsaHeaders(request, qbp);
             
-            // Submit the message.
+            // Submit the message. 
             ResponseEntity<?> entity = hub.submitSoapRequest(request, null);
             
             // Return the response
@@ -632,11 +633,20 @@ public class FhirController {
 	}
 
 	private void setMSHValues(QBP_Q11 qbp) throws DataTypeException {
-		/* These should be set in the pipeline configuration once the message has been forwarded. */
-		QBPUtils.setSendingApplication(qbp, config.getSendingApplication());
-		QBPUtils.setSendingFacility(qbp, config.getSendingFacility());
+		/* These value should be adjusted in the pipeline configuration once the message has been forwarded. */
+		QBPUtils.setSendingApplication(qbp, RequestContext.getPrincipal().getName());
+		QBPUtils.setSendingFacility(qbp, RequestContext.getPrincipal().getOrganization());
 		QBPUtils.setReceivingApplication(qbp, config.getReceivingApplication());
 		QBPUtils.setReceivingFacility(qbp, config.getReceivingFacility());
+		// These are fixed values that should normally be used for a query message
+		MSH msh = qbp.getMSH();
+		// Some destinations may require a value of "T" in the onboarding environment, but
+		// all use "P" in production, and most use "P" elsewhere. Set the most useful value
+		// understanding that this can be adjused by the transformation service.
+		msh.getProcessingID().getProcessingID().setValue("P");
+		// These are appropriate values for any endpoint connecting to IZGW
+		msh.getApplicationAcknowledgmentType().setValue("AL");
+		msh.getAcceptAcknowledgmentType().setValue("ER");
 	}
     
     /**
