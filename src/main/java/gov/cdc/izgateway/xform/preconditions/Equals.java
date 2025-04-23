@@ -8,14 +8,17 @@ import gov.cdc.izgateway.xform.logging.advice.Transformable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 import java.util.UUID;
 
 import gov.cdc.izgateway.xform.constants.XformConstants;
 
+
 @Getter
 @Setter
+@Slf4j
 public class Equals implements Precondition, Advisable, Transformable {
     @NotNull(message = "required and cannot be empty")
     private UUID id;
@@ -23,8 +26,6 @@ public class Equals implements Precondition, Advisable, Transformable {
     private String dataPath;
     @NotNull(message = "required and cannot be empty")
     private String comparisonValue;
-
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Equals.class);
 
     protected Equals() {
 
