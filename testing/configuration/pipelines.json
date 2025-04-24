@@ -314,4 +314,13 @@
   "outboundEndpoint" : "User-friendly homogeneous moratorium)",
   "active" : false,
   "pipes" : [ ]
+}, {
+  "pipelineName" : "Switchable even-keeled architecture",
+  "id" : "59860f14-c027-4754-9177-4934ed2928c7",
+  "organizationId" : "1be42412-2208-4f2a-b568-083b931368ba",
+  "description" : null,
+  "inboundEndpoint" : "Monitored radical process improvement)",
+  "outboundEndpoint" : "Adaptive static circuit)",
+  "active" : true,
+  "pipes" : [ ]
 } ]
