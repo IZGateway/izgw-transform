@@ -18,22 +18,18 @@ import java.util.UUID;
 
 @Service
 public class PipelineService extends GenericService<Pipeline>{
-    private final UserService userService;
 
     @Autowired
-    public PipelineService(XformRepository<Pipeline> repo, UserService userService) {
+    public PipelineService(XformRepository<Pipeline> repo) {
         super(repo);
-        this.userService = userService;
     }
 
     @Override
     public List<Pipeline> getList() {
-        Set<UUID> allowedOrgIds = getAllowedOrganizationIds();
-
         ArrayList<Pipeline> list = new ArrayList<>(repo.getEntitySet());
 
         // Filter the pipelines based on the allowed organization IDs
-        list.removeIf(pipeline -> !allowedOrgIds.contains(pipeline.getOrganizationId()));
+        list.removeIf(pipeline -> !getAllowedOrganizationIds().contains(pipeline.getOrganizationId()));
         ApiEventLogger.logReadEvent(list);
 
         return list;
@@ -48,8 +44,7 @@ public class PipelineService extends GenericService<Pipeline>{
         }
 
         // Check if the pipeline's organization ID is in the allowed organization IDs
-        Set<UUID> allowedOrgIds = getAllowedOrganizationIds();
-        if (!allowedOrgIds.contains(existing.getOrganizationId())) {
+        if (!getAllowedOrganizationIds().contains(existing.getOrganizationId())) {
             return null;
         }
 
@@ -67,8 +62,7 @@ public class PipelineService extends GenericService<Pipeline>{
         }
 
         // Check if the pipeline's organization ID is in the allowed organization IDs
-        Set<UUID> allowedOrgIds = getAllowedOrganizationIds();
-        if (!allowedOrgIds.contains(obj.getOrganizationId())) {
+        if (!getAllowedOrganizationIds().contains(obj.getOrganizationId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to create this pipeline");
         }
 
@@ -85,8 +79,7 @@ public class PipelineService extends GenericService<Pipeline>{
         }
 
         // Check if the pipeline's organization ID is in the allowed organization IDs
-        Set<UUID> allowedOrgIds = getAllowedOrganizationIds();
-        if (!allowedOrgIds.contains(solution.getOrganizationId())) {
+        if (!getAllowedOrganizationIds().contains(solution.getOrganizationId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this pipeline");
         }
 
@@ -105,12 +98,11 @@ public class PipelineService extends GenericService<Pipeline>{
                 ).findFirst().orElse(null);
     }
 
+    /*
+     * This method is used to get the allowed organization IDs from the XformPrincipal.
+     * It retrieves the principal from the request context and returns the allowed organization IDs.
+     */
     private Set<UUID> getAllowedOrganizationIds() {
-//        // Retrieve the current user's allowed organization IDs
-//        String userName = RequestContext.getPrincipal().getName();
-//        User user = userService.getUserByUserName(userName);
-//        return user.getOrganizationIds();
-        XformPrincipal principal = (XformPrincipal) RequestContext.getPrincipal();
-        return principal.getAllowedOrganizationIds();
+        return ((XformPrincipal) RequestContext.getPrincipal()).getAllowedOrganizationIds();
     }
 }

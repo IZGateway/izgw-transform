@@ -287,4 +287,31 @@
   "outboundEndpoint" : "Triple-buffered zero administration flexibility)",
   "active" : true,
   "pipes" : [ ]
+}, {
+  "pipelineName" : "Balanced bi-directional data-warehouse",
+  "id" : "90265f6c-eeb3-4efb-a641-6232f3f25d09",
+  "organizationId" : "1be42412-2208-4f2a-b568-083b931368ba",
+  "description" : null,
+  "inboundEndpoint" : "Synergistic reciprocal budgetary management)",
+  "outboundEndpoint" : "User-friendly homogeneous moratorium)",
+  "active" : false,
+  "pipes" : [ ]
+}, {
+  "pipelineName" : "A Balanced bi-directional data-warehouse",
+  "id" : "80265f6c-eeb3-4efb-a641-6232f3f25d09",
+  "organizationId" : "1be42412-2208-4f2a-b568-083b931368ba",
+  "description" : null,
+  "inboundEndpoint" : "Synergistic reciprocal budgetary management)",
+  "outboundEndpoint" : "User-friendly homogeneous moratorium)",
+  "active" : false,
+  "pipes" : [ ]
+}, {
+  "pipelineName" : "B Balanced bi-directional data-warehouse",
+  "id" : "70265f6c-eeb3-4efb-a641-6232f3f25d09",
+  "organizationId" : "1be42412-2208-4f2a-b568-083b931368ba",
+  "description" : null,
+  "inboundEndpoint" : "Synergistic reciprocal budgetary management)",
+  "outboundEndpoint" : "User-friendly homogeneous moratorium)",
+  "active" : false,
+  "pipes" : [ ]
 } ]
