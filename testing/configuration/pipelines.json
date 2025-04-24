@@ -278,4 +278,13 @@
   "outboundEndpoint" : "Progressive impactful paradigm)",
   "active" : true,
   "pipes" : [ ]
+}, {
+  "pipelineName" : "Secured responsive info-mediaries",
+  "id" : "bb3290aa-2979-4312-a989-18f85ef435ef",
+  "organizationId" : "1be42412-2208-4f2a-b568-083b931368ba",
+  "description" : null,
+  "inboundEndpoint" : "Mandatory bifurcated circuit)",
+  "outboundEndpoint" : "Triple-buffered zero administration flexibility)",
+  "active" : true,
+  "pipes" : [ ]
 } ]

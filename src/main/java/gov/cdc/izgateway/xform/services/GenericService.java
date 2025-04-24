@@ -21,6 +21,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     @Override
     public T getObject(UUID id) {
         T existing = repo.getEntity(id);
+
         ApiEventLogger.logReadEvent(existing);
 
         return existing;
@@ -35,7 +36,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
 
     @Override
     public void update(T obj) {
-        T existing = repo.getEntity(obj.getId());
+        T existing = getObject(obj.getId());
 
         if (existing == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found");
@@ -48,7 +49,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
 
     @Override
     public void create(T obj) {
-        T existing = repo.getEntity(obj.getId());
+        T existing = getObject(obj.getId());
 
         if (existing != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Item already exists");

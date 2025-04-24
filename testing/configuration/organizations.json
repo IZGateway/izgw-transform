@@ -39,11 +39,6 @@
   "active" : true,
   "commonName" : "xpcahill.testing.izgateway.org"
 }, {
-  "organizationName" : "Lunar Colony Health Alliance",
-  "id" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
-  "active" : true,
-  "commonName" : "use override"
-}, {
   "organizationName" : "Comet Tail Pharmacy Chain",
   "id" : "6d531709-6911-463f-9ee8-5fd704f22b24",
   "active" : true,
@@ -88,4 +83,19 @@
   "id" : "03adf8af-c182-4ad6-8707-f62efdebf96e",
   "active" : true,
   "commonName" : "kboone.testing.izgateway.org"
+}, {
+  "organizationName" : "Customizable interactive middleware",
+  "id" : "334d1bc3-4454-44c6-940f-e9749d429bef",
+  "active" : true,
+  "commonName" : "Innovative actuating superstructure"
+}, {
+  "organizationName" : "Paul test",
+  "id" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
+  "active" : true,
+  "commonName" : "Innovative actuating superstructure"
+}, {
+  "organizationName" : "Customizable intangible adapter",
+  "id" : "1be42412-2208-4f2a-b568-083b931368ba",
+  "active" : true,
+  "commonName" : "Programmable bifurcated Graphical User Interface"
 } ]
