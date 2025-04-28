@@ -13,11 +13,11 @@ import java.util.UUID;
 @Component
 public class OrganizationsValidator implements ConstraintValidator<ValidOrganizations, Set<UUID>> {
 
-    private final OrganizationService organizationService;
+    private final OrganizationValidationService validationService;
 
     @Autowired
-    public OrganizationsValidator(OrganizationService organizationService) {
-        this.organizationService = organizationService;
+    public OrganizationsValidator(OrganizationValidationService validationService) {
+        this.validationService = validationService;
     }
 
     @Override
@@ -27,42 +27,11 @@ public class OrganizationsValidator implements ConstraintValidator<ValidOrganiza
         }
 
         for (UUID organizationId : organizationIds) {
-            if (!isValid(organizationId, context)) {
+            if (!validationService.validateOrganization(organizationId, context)) {
                 return false;
             }
         }
 
         return true;
-    }
-
-    public boolean isValid(UUID organizationId, ConstraintValidatorContext context) {
-        if (organizationId == null) {
-            return false;
-        }
-
-        Organization organization = organizationService.getObject(organizationId);
-
-        // If organization not found via ID is not valid
-        if (organization == null) {
-            context
-                    .disableDefaultConstraintViolation(); // we want to override the default validation message
-            context
-                    .buildConstraintViolationWithTemplate("Organization not found with ID " + organizationId)
-                    .addConstraintViolation();
-            return false;
-        }
-
-        // We know the organization exists, return the active setting
-        // If active then it's valid.  If in-active, then we consider in-valid.
-        if (organization.getActive().equals(false)) {
-            context
-                    .disableDefaultConstraintViolation(); // we want to override the default validation message
-            context
-                    .buildConstraintViolationWithTemplate("Organization with ID " + organizationId + " is NOT active")
-                    .addConstraintViolation();
-            return false;
-        } else {
-            return true;
-        }
     }
 }
