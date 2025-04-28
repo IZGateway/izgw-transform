@@ -287,4 +287,76 @@
   "active" : true,
   "requestOperations" : [ ],
   "responseOperations" : [ ]
+}, {
+  "id" : "c108064b-9679-4812-8b22-c79279ce8e84",
+  "solutionName" : "Profound scalable synergy",
+  "description" : "Polarised cohesive emulation",
+  "version" : "152.58",
+  "active" : false,
+  "requestOperations" : [ ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "72ba2273-05af-4729-b545-cc709e45ac6e",
+  "solutionName" : "Team-oriented neutral data-warehouse",
+  "description" : "Focused zero administration encryption",
+  "version" : "998.09",
+  "active" : true,
+  "requestOperations" : [ ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "c6dcc5ed-41b3-4347-b369-88edd44bf0ff",
+  "solutionName" : "Future-proofed heuristic system engine",
+  "description" : "Innovative bifurcated portal",
+  "version" : "182.08",
+  "active" : true,
+  "requestOperations" : [ ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "4002363c-2b1d-4a46-83ba-337f9a479e3a",
+  "solutionName" : "Advanced fresh-thinking info-mediaries",
+  "description" : "Monitored contextually-based portal",
+  "version" : "7.38",
+  "active" : false,
+  "requestOperations" : [ ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "f86992a8-d3e7-4e48-8031-01e0b02eed7f",
+  "solutionName" : "{{currentName}}",
+  "description" : "{{currentDescription}}",
+  "version" : "{{currentVersion}}",
+  "active" : true,
+  "requestOperations" : [ ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "6f932cb4-829c-41af-8207-2ed96a7187d6",
+  "solutionName" : "Versatile incremental core",
+  "description" : "Enterprise-wide grid-enabled complexity",
+  "version" : "49.53",
+  "active" : false,
+  "requestOperations" : [ ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "14870d39-5293-4ef8-8256-99cceec738d7",
+  "solutionName" : "Advanced directional open architecture",
+  "description" : "Virtual homogeneous ability",
+  "version" : "564.54",
+  "active" : false,
+  "requestOperations" : [ ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "dc1ad6d8-476d-45c7-9eec-bb2e081617c8",
+  "solutionName" : "Ameliorated background adapter",
+  "description" : "Seamless cohesive firmware",
+  "version" : "115.31",
+  "active" : true,
+  "requestOperations" : [ ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "432c8656-a8ce-4ea5-bdab-f4988f88e381",
+  "solutionName" : "Cross-group leading edge parallelism",
+  "description" : "Synergized well-modulated process improvement",
+  "version" : "155.65",
+  "active" : true,
+  "requestOperations" : [ ],
+  "responseOperations" : [ ]
 } ]

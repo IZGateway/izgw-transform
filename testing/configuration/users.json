@@ -8,7 +8,7 @@
   {
     "id": "8c942339-e10d-418f-8898-d8e73388198c",
     "userName": "pcahill.testing.izgateway.org",
-    "organizationIds": ["0d15449b-fb08-4013-8985-20c148b353fe"],
+    "organizationIds": ["0d15449b-fb08-4013-8985-20c148b353fe","d339cd15-2e57-4456-94b6-1e14f079a0de", "1be42412-2208-4f2a-b568-083b931368ba"],
     "active": true
   },
   {
@@ -44,7 +44,7 @@
   {
     "id": "d3f29c8e-5b6a-4c8b-9e2f-1a3b5c7d8e9f",
     "userName": "sampleSubject",
-    "organizationIds": ["d339cd15-2e57-4456-94b6-1e14f079a0de", "1be42412-2208-4f2a-b568-083b931368ba"],
+    "organizationIds": ["d339cd15-2e57-4456-94b6-1e14f079a0de", "1be42412-2208-4f2a-b568-083b931368ba", "0d15449b-fb08-4013-8985-20c148b353fe"],
     "active": true
   }
 ]

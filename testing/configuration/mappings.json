@@ -30,4 +30,20 @@
   "code" : "UNKNOWN",
   "targetCodeSystem" : "CDCREC",
   "targetCode" : "NEWCODE3"
+}, {
+  "id" : "a6110ec9-64e4-4287-af82-8fb8a2cf09dc",
+  "active" : false,
+  "organizationId" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
+  "codeSystem" : "Front-line intangible help-desk",
+  "code" : "1234-5",
+  "targetCodeSystem" : "Focused real-time workforce",
+  "targetCode" : "9876-0"
+}, {
+  "id" : "f65c374a-7d4d-4f59-8451-8b4a6d828b08",
+  "active" : true,
+  "organizationId" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
+  "codeSystem" : "Centralized heuristic system engine",
+  "code" : "1234-5",
+  "targetCodeSystem" : "Business-focused asynchronous project",
+  "targetCode" : "9876-0"
 } ]

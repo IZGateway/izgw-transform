@@ -63,10 +63,14 @@ public class XformPrincipalService implements PrincipalService {
             addRolesIfFromLocalhost(izgPrincipal, request);
         }
 
-        XformPrincipal xformPrincipal = new XformPrincipal(izgPrincipal);
-        User user = userService.getUserByUserName(xformPrincipal.getName());
-        xformPrincipal.setAllowedOrganizationIds(user.getOrganizationIds());
-        return xformPrincipal;
+        if ( izgPrincipal instanceof UnauthenticatedPrincipal ) {
+            return izgPrincipal;
+        } else {
+            XformPrincipal xformPrincipal = new XformPrincipal(izgPrincipal);
+            User user = userService.getUserByUserName(xformPrincipal.getName());
+            xformPrincipal.setAllowedOrganizationIds(user.getOrganizationIds());
+            return xformPrincipal;
+        }
     }
 
 

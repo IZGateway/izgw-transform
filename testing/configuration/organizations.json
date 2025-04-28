@@ -89,13 +89,18 @@
   "active" : true,
   "commonName" : "Innovative actuating superstructure"
 }, {
-  "organizationName" : "Paul test",
+  "organizationName" : "Organization for Postman Tests",
   "id" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
   "active" : true,
-  "commonName" : "Innovative actuating superstructure"
+  "commonName" : "Common Name"
 }, {
   "organizationName" : "Customizable intangible adapter",
   "id" : "1be42412-2208-4f2a-b568-083b931368ba",
   "active" : true,
   "commonName" : "Programmable bifurcated Graphical User Interface"
+}, {
+  "organizationName" : "Face to face leading edge success",
+  "id" : "412f1ba0-afe1-42fa-9c3d-37f715e5e8f3",
+  "active" : true,
+  "commonName" : "Ergonomic modular toolset"
 } ]

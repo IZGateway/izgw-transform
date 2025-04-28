@@ -9,13 +9,13 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class Mapping implements BaseModel {
+public class Mapping implements BaseModel, OrganizationAware {
     @NotNull(message = "Mapping ID is required")
     private UUID id;
     @NotNull(message = "Mapping active status is required")
     private Boolean active;
-    @NotBlank(message = "Organization ID is required")
-    private String organizationId;
+    @NotNull(message = "Organization ID is required")
+    private UUID organizationId;
     @NotNull(message = "Code system is required")
     private String codeSystem;
     @NotNull(message = "Code is required")

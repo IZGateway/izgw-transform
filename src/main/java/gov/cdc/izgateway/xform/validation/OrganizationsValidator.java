@@ -11,16 +11,30 @@ import java.util.Set;
 import java.util.UUID;
 
 @Component
-public class OrganizationValidator implements ConstraintValidator<ValidOrganization, UUID> {
-    
+public class OrganizationsValidator implements ConstraintValidator<ValidOrganizations, Set<UUID>> {
+
     private final OrganizationService organizationService;
 
     @Autowired
-    public OrganizationValidator(OrganizationService organizationService) {
+    public OrganizationsValidator(OrganizationService organizationService) {
         this.organizationService = organizationService;
     }
 
     @Override
+    public boolean isValid(Set<UUID> organizationIds, ConstraintValidatorContext context) {
+        if (organizationIds == null || organizationIds.isEmpty()) {
+            return false;
+        }
+
+        for (UUID organizationId : organizationIds) {
+            if (!isValid(organizationId, context)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public boolean isValid(UUID organizationId, ConstraintValidatorContext context) {
         if (organizationId == null) {
             return false;
