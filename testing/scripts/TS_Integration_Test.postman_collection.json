@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "3bb964d7-b500-4f08-a590-acf13a254ab0",
+		"_postman_id": "7e655961-7390-4087-8477-ab40a0be4454",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-3bb964d7-b500-4f08-a590-acf13a254ab0?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-7e655961-7390-4087-8477-ab40a0be4454?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -1224,7 +1224,7 @@
 							},
 							{
 								"key": "x-xform-organization",
-								"value": "0d15449b-fb08-4013-8985-20c148b353fe",
+								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
 								"type": "text"
 							}
 						],
@@ -1841,72 +1841,6 @@
 												"api",
 												"v1",
 												"solutions"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Create Test Organization",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentOrgActive\", true);"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns success code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(200);",
-													"});",
-													"",
-													"let response = pm.response.json();",
-													"",
-													"pm.test(\"created object fields match\", function() {",
-													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
-													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
-													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
-													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
-													"});"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
-											"protocol": "{{protocol}}",
-											"host": [
-												"{{host}}"
-											],
-											"port": "{{port}}",
-											"path": [
-												"api",
-												"v1",
-												"organizations"
 											]
 										}
 									},
@@ -4743,52 +4677,6 @@
 									"response": []
 								},
 								{
-									"name": "Delete Test Organization",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns 204 NO CONTENT code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(204);",
-													"});"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "DELETE",
-										"header": [],
-										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/{{currentOrgId}}",
-											"protocol": "{{protocol}}",
-											"host": [
-												"{{host}}"
-											],
-											"port": "{{port}}",
-											"path": [
-												"api",
-												"v1",
-												"organizations",
-												"{{currentOrgId}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Delete Test Solution",
 									"event": [
 										{
@@ -4904,72 +4792,6 @@
 												"api",
 												"v1",
 												"solutions"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Create Test Organization",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentOrgActive\", true);"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns success code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(200);",
-													"});",
-													"",
-													"let response = pm.response.json();",
-													"",
-													"pm.test(\"created object fields match\", function() {",
-													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
-													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
-													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
-													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
-													"});"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
-											"protocol": "{{protocol}}",
-											"host": [
-												"{{host}}"
-											],
-											"port": "{{port}}",
-											"path": [
-												"api",
-												"v1",
-												"organizations"
 											]
 										}
 									},
@@ -5450,52 +5272,6 @@
 									"response": []
 								},
 								{
-									"name": "Delete Test Organization",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns 204 NO CONTENT code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(204);",
-													"});"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "DELETE",
-										"header": [],
-										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/{{currentOrgId}}",
-											"protocol": "{{protocol}}",
-											"host": [
-												"{{host}}"
-											],
-											"port": "{{port}}",
-											"path": [
-												"api",
-												"v1",
-												"organizations",
-												"{{currentOrgId}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Delete Test Solution",
 									"event": [
 										{
@@ -5544,72 +5320,6 @@
 									"response": []
 								}
 							]
-						},
-						{
-							"name": "Create Test Organization",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-											"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-											"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-											"pm.collectionVariables.set(\"currentOrgActive\", true);"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"returns success code\", function() {",
-											"    pm.expect(pm.response.code).to.equal(200);",
-											"});",
-											"",
-											"let response = pm.response.json();",
-											"",
-											"pm.test(\"created object fields match\", function() {",
-											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
-											"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
-											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
-											"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
-											"});"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
-									"protocol": "{{protocol}}",
-									"host": [
-										"{{host}}"
-									],
-									"port": "{{port}}",
-									"path": [
-										"api",
-										"v1",
-										"organizations"
-									]
-								}
-							},
-							"response": []
 						},
 						{
 							"name": "Create Pipeline - Net New",
@@ -7016,7 +6726,9 @@
 										"exec": [
 											"pm.test(\"returns 204 NO CONTENT code\", function() {",
 											"    pm.expect(pm.response.code).to.equal(204);",
-											"});"
+											"});",
+											"",
+											"pm.collectionVariables.clear();"
 										],
 										"type": "text/javascript",
 										"packages": {}
@@ -7052,57 +6764,34 @@
 								}
 							},
 							"response": []
-						},
-						{
-							"name": "Delete Test Organization",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"returns 204 NO CONTENT code\", function() {",
-											"    pm.expect(pm.response.code).to.equal(204);",
-											"});",
-											"",
-											"pm.collectionVariables.clear();"
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/{{currentOrgId}}",
-									"protocol": "{{protocol}}",
-									"host": [
-										"{{host}}"
-									],
-									"port": "{{port}}",
-									"path": [
-										"api",
-										"v1",
-										"organizations",
-										"{{currentOrgId}}"
-									]
-								}
-							},
-							"response": []
 						}
 					],
-					"description": "<u><b>NOTE</b></u>\n\nWe create a \"Test Solution\" and \"Test Organization\" in different folders under Pipeline. This is because as we have added referential integrity checks on fields in Pipelines... randomly generating UUID's for things like Organization and Solution ID's will result in errors.\n\nSo where in the past you may have seen 'currentOrganizationId' generated in a pre-script as a random UUID, it may now pull from the Test Organization."
+					"description": "<u><b>NOTE</b></u>\n\nWe create a \"Test Solution\" and \"Test Organization\" in different folders under Pipeline. This is because as we have added referential integrity checks on fields in Pipelines... randomly generating UUID's for things like Organization and Solution ID's will result in errors.\n\nSo where in the past you may have seen 'currentOrganizationId' generated in a pre-script as a random UUID, it may now pull from the Test Organization.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									"//pm.collectionVariables.set(\"currentOrgName\", \"Organization for Postman Tests\"));",
+									"//pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+									"pm.collectionVariables.set(\"currentOrgId\", \"d339cd15-2e57-4456-94b6-1e14f079a0de\");",
+									"pm.collectionVariables.set(\"currentOrgActive\", true);"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
 				},
 				{
 					"name": "Solutions",
@@ -15015,6 +14704,908 @@
 					]
 				},
 				{
+					"name": "Mappings",
+					"item": [
+						{
+							"name": "JWT",
+							"item": [
+								{
+									"name": "Get Mappings with JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"// Check to see if the 2 active we added in 3 previous steps are in the response",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"At least one result returned\", function() {",
+													"    pm.expect(response[\"data\"].length).to.be.gt(0);",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/mappings?limit=100000",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"mappings"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "100000"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Mapping - Net New with JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let savedData = JSON.stringify(response);",
+													"",
+													"pm.collectionVariables.set(\"createdMapping\", savedData);",
+													"",
+													"pm.test(\"created object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
+													"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
+													"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
+													"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
+													"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'CREATE');",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+													"pm.collectionVariables.set(\"currentCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentCode\", \"1234-5\");",
+													"pm.collectionVariables.set(\"currentTargetCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+													"pm.collectionVariables.set(\"currentTargetCode\", \"9876-0\");",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"active\": {{currentActive}},\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"codeSystem\": \"{{currentCodeSystem}}\",\n    \"code\": \"{{currentCode}}\",\n    \"targetCodeSystem\": \"{{currentTargetCodeSystem}}\",\n    \"targetCode\": \"{{currentTargetCode}}\"\n}\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/mappings",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"mappings"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Mapping - Existing with JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"// Fields should match object created in previous \"Create Pipeline - Net New\" step",
+													"let response = pm.response.json();",
+													"",
+													"pm.test(\"gotten object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
+													"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
+													"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
+													"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
+													"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'READ');",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/mappings/{{currentId}}",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"mappings",
+												"{{currentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Mapping - Existing with JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns success code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let savedData = JSON.stringify(response);",
+													"",
+													"pm.collectionVariables.set(\"createdMapping\", savedData);",
+													"",
+													"pm.test(\"updated object fields match\", function() {",
+													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
+													"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
+													"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
+													"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
+													"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
+													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'UPDATE');",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{{createdMapping}}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/mappings/{{currentId}}",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"mappings",
+												"{{currentId}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Mapping - Existing with JWT",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 204 NO CONTENT code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(204);",
+													"});",
+													"",
+													"utils.testForApiLog(pm, 'DELETE');",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "jwt",
+											"jwt": [
+												{
+													"key": "payload",
+													"value": "{{validJwt}}",
+													"type": "string"
+												},
+												{
+													"key": "secret",
+													"value": "{{jwtSharedSecret}}",
+													"type": "string"
+												},
+												{
+													"key": "isSecretBase64Encoded",
+													"value": false,
+													"type": "boolean"
+												},
+												{
+													"key": "algorithm",
+													"value": "HS256",
+													"type": "string"
+												},
+												{
+													"key": "addTokenTo",
+													"value": "header",
+													"type": "string"
+												},
+												{
+													"key": "headerPrefix",
+													"value": "Bearer",
+													"type": "string"
+												},
+												{
+													"key": "queryParamKey",
+													"value": "token",
+													"type": "string"
+												},
+												{
+													"key": "header",
+													"value": "{}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/mappings/{{currentId}}",
+											"protocol": "{{no_cert_protocol}}",
+											"host": [
+												"{{no_cert_host}}"
+											],
+											"port": "{{no_cert_port}}",
+											"path": [
+												"api",
+												"v1",
+												"mappings",
+												"{{currentId}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Get Mappings",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Check to see if the 2 active we added in 3 previous steps are in the response",
+											"let response = pm.response.json();",
+											"",
+											"pm.test(\"At least one result returned\", function() {",
+											"    pm.expect(response[\"data\"].length).to.be.gt(0);",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings?limit=100000",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"mappings"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "100000"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Mapping - Net New",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdMapping\", savedData);",
+											"",
+											"pm.test(\"created object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
+											"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
+											"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
+											"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
+											"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'CREATE');",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
+											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+											"pm.collectionVariables.set(\"currentCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentCode\", \"1234-5\");",
+											"pm.collectionVariables.set(\"currentTargetCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+											"pm.collectionVariables.set(\"currentTargetCode\", \"9876-0\");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"active\": {{currentActive}},\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"codeSystem\": \"{{currentCodeSystem}}\",\n    \"code\": \"{{currentCode}}\",\n    \"targetCodeSystem\": \"{{currentTargetCodeSystem}}\",\n    \"targetCode\": \"{{currentTargetCode}}\"\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"mappings"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Mapping - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 200 OK code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"// Fields should match object created in previous \"Create Pipeline - Net New\" step",
+											"let response = pm.response.json();",
+											"",
+											"pm.test(\"gotten object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
+											"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
+											"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
+											"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
+											"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'READ');",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"mappings",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Mapping - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns success code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"let savedData = JSON.stringify(response);",
+											"",
+											"pm.collectionVariables.set(\"createdMapping\", savedData);",
+											"",
+											"pm.test(\"updated object fields match\", function() {",
+											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
+											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
+											"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
+											"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
+											"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
+											"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
+											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'UPDATE');",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{createdMapping}}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"mappings",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Mapping - Existing",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"returns 204 NO CONTENT code\", function() {",
+											"    pm.expect(pm.response.code).to.equal(204);",
+											"});",
+											"",
+											"utils.testForApiLog(pm, 'DELETE');",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings/{{currentId}}",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"api",
+										"v1",
+										"mappings",
+										"{{currentId}}"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									"pm.collectionVariables.set(\"currentOrganizationId\", \"d339cd15-2e57-4456-94b6-1e14f079a0de\");",
+									"pm.collectionVariables.set(\"currentOrgActive\", true);"
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"packages": {},
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				},
+				{
 					"name": "Organizations",
 					"item": [
 						{
@@ -19265,887 +19856,6 @@
 					]
 				},
 				{
-					"name": "Mappings",
-					"item": [
-						{
-							"name": "JWT",
-							"item": [
-								{
-									"name": "Get Mappings with JWT",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns 200 OK code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(200);",
-													"});",
-													"",
-													"// Check to see if the 2 active we added in 3 previous steps are in the response",
-													"let response = pm.response.json();",
-													"",
-													"pm.test(\"At least one result returned\", function() {",
-													"    pm.expect(response[\"data\"].length).to.be.gt(0);",
-													"});",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "jwt",
-											"jwt": [
-												{
-													"key": "payload",
-													"value": "{{validJwt}}",
-													"type": "string"
-												},
-												{
-													"key": "secret",
-													"value": "{{jwtSharedSecret}}",
-													"type": "string"
-												},
-												{
-													"key": "isSecretBase64Encoded",
-													"value": false,
-													"type": "boolean"
-												},
-												{
-													"key": "algorithm",
-													"value": "HS256",
-													"type": "string"
-												},
-												{
-													"key": "addTokenTo",
-													"value": "header",
-													"type": "string"
-												},
-												{
-													"key": "headerPrefix",
-													"value": "Bearer",
-													"type": "string"
-												},
-												{
-													"key": "queryParamKey",
-													"value": "token",
-													"type": "string"
-												},
-												{
-													"key": "header",
-													"value": "{}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/mappings?limit=100000",
-											"protocol": "{{no_cert_protocol}}",
-											"host": [
-												"{{no_cert_host}}"
-											],
-											"port": "{{no_cert_port}}",
-											"path": [
-												"api",
-												"v1",
-												"mappings"
-											],
-											"query": [
-												{
-													"key": "limit",
-													"value": "100000"
-												}
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Create Mapping - Net New with JWT",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns success code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(200);",
-													"});",
-													"",
-													"let response = pm.response.json();",
-													"let savedData = JSON.stringify(response);",
-													"",
-													"pm.collectionVariables.set(\"createdMapping\", savedData);",
-													"",
-													"pm.test(\"created object fields match\", function() {",
-													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
-													"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
-													"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
-													"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
-													"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
-													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-													"});",
-													"",
-													"utils.testForApiLog(pm, 'CREATE');",
-													"",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
-													"pm.collectionVariables.set(\"currentCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentCode\", \"1234-5\");",
-													"pm.collectionVariables.set(\"currentTargetCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentTargetCode\", \"9876-0\");",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "jwt",
-											"jwt": [
-												{
-													"key": "payload",
-													"value": "{{validJwt}}",
-													"type": "string"
-												},
-												{
-													"key": "secret",
-													"value": "{{jwtSharedSecret}}",
-													"type": "string"
-												},
-												{
-													"key": "isSecretBase64Encoded",
-													"value": false,
-													"type": "boolean"
-												},
-												{
-													"key": "algorithm",
-													"value": "HS256",
-													"type": "string"
-												},
-												{
-													"key": "addTokenTo",
-													"value": "header",
-													"type": "string"
-												},
-												{
-													"key": "headerPrefix",
-													"value": "Bearer",
-													"type": "string"
-												},
-												{
-													"key": "queryParamKey",
-													"value": "token",
-													"type": "string"
-												},
-												{
-													"key": "header",
-													"value": "{}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"active\": {{currentActive}},\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"codeSystem\": \"{{currentCodeSystem}}\",\n    \"code\": \"{{currentCode}}\",\n    \"targetCodeSystem\": \"{{currentTargetCodeSystem}}\",\n    \"targetCode\": \"{{currentTargetCode}}\"\n}\n",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/mappings",
-											"protocol": "{{no_cert_protocol}}",
-											"host": [
-												"{{no_cert_host}}"
-											],
-											"port": "{{no_cert_port}}",
-											"path": [
-												"api",
-												"v1",
-												"mappings"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Get Mapping - Existing with JWT",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns 200 OK code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(200);",
-													"});",
-													"",
-													"// Fields should match object created in previous \"Create Pipeline - Net New\" step",
-													"let response = pm.response.json();",
-													"",
-													"pm.test(\"gotten object fields match\", function() {",
-													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
-													"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
-													"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
-													"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
-													"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
-													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-													"});",
-													"",
-													"utils.testForApiLog(pm, 'READ');",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "jwt",
-											"jwt": [
-												{
-													"key": "payload",
-													"value": "{{validJwt}}",
-													"type": "string"
-												},
-												{
-													"key": "secret",
-													"value": "{{jwtSharedSecret}}",
-													"type": "string"
-												},
-												{
-													"key": "isSecretBase64Encoded",
-													"value": false,
-													"type": "boolean"
-												},
-												{
-													"key": "algorithm",
-													"value": "HS256",
-													"type": "string"
-												},
-												{
-													"key": "addTokenTo",
-													"value": "header",
-													"type": "string"
-												},
-												{
-													"key": "headerPrefix",
-													"value": "Bearer",
-													"type": "string"
-												},
-												{
-													"key": "queryParamKey",
-													"value": "token",
-													"type": "string"
-												},
-												{
-													"key": "header",
-													"value": "{}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "GET",
-										"header": [],
-										"url": {
-											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/mappings/{{currentId}}",
-											"protocol": "{{no_cert_protocol}}",
-											"host": [
-												"{{no_cert_host}}"
-											],
-											"port": "{{no_cert_port}}",
-											"path": [
-												"api",
-												"v1",
-												"mappings",
-												"{{currentId}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Update Mapping - Existing with JWT",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns success code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(200);",
-													"});",
-													"",
-													"let response = pm.response.json();",
-													"let savedData = JSON.stringify(response);",
-													"",
-													"pm.collectionVariables.set(\"createdMapping\", savedData);",
-													"",
-													"pm.test(\"updated object fields match\", function() {",
-													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
-													"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
-													"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
-													"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
-													"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
-													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-													"});",
-													"",
-													"utils.testForApiLog(pm, 'UPDATE');",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "jwt",
-											"jwt": [
-												{
-													"key": "payload",
-													"value": "{{validJwt}}",
-													"type": "string"
-												},
-												{
-													"key": "secret",
-													"value": "{{jwtSharedSecret}}",
-													"type": "string"
-												},
-												{
-													"key": "isSecretBase64Encoded",
-													"value": false,
-													"type": "boolean"
-												},
-												{
-													"key": "algorithm",
-													"value": "HS256",
-													"type": "string"
-												},
-												{
-													"key": "addTokenTo",
-													"value": "header",
-													"type": "string"
-												},
-												{
-													"key": "headerPrefix",
-													"value": "Bearer",
-													"type": "string"
-												},
-												{
-													"key": "queryParamKey",
-													"value": "token",
-													"type": "string"
-												},
-												{
-													"key": "header",
-													"value": "{}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "PUT",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{{createdMapping}}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/mappings/{{currentId}}",
-											"protocol": "{{no_cert_protocol}}",
-											"host": [
-												"{{no_cert_host}}"
-											],
-											"port": "{{no_cert_port}}",
-											"path": [
-												"api",
-												"v1",
-												"mappings",
-												"{{currentId}}"
-											]
-										}
-									},
-									"response": []
-								},
-								{
-									"name": "Delete Mapping - Existing with JWT",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns 204 NO CONTENT code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(204);",
-													"});",
-													"",
-													"utils.testForApiLog(pm, 'DELETE');",
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"auth": {
-											"type": "jwt",
-											"jwt": [
-												{
-													"key": "payload",
-													"value": "{{validJwt}}",
-													"type": "string"
-												},
-												{
-													"key": "secret",
-													"value": "{{jwtSharedSecret}}",
-													"type": "string"
-												},
-												{
-													"key": "isSecretBase64Encoded",
-													"value": false,
-													"type": "boolean"
-												},
-												{
-													"key": "algorithm",
-													"value": "HS256",
-													"type": "string"
-												},
-												{
-													"key": "addTokenTo",
-													"value": "header",
-													"type": "string"
-												},
-												{
-													"key": "headerPrefix",
-													"value": "Bearer",
-													"type": "string"
-												},
-												{
-													"key": "queryParamKey",
-													"value": "token",
-													"type": "string"
-												},
-												{
-													"key": "header",
-													"value": "{}",
-													"type": "string"
-												}
-											]
-										},
-										"method": "DELETE",
-										"header": [],
-										"url": {
-											"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/mappings/{{currentId}}",
-											"protocol": "{{no_cert_protocol}}",
-											"host": [
-												"{{no_cert_host}}"
-											],
-											"port": "{{no_cert_port}}",
-											"path": [
-												"api",
-												"v1",
-												"mappings",
-												"{{currentId}}"
-											]
-										}
-									},
-									"response": []
-								}
-							]
-						},
-						{
-							"name": "Get Mappings",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"returns 200 OK code\", function() {",
-											"    pm.expect(pm.response.code).to.equal(200);",
-											"});",
-											"",
-											"// Check to see if the 2 active we added in 3 previous steps are in the response",
-											"let response = pm.response.json();",
-											"",
-											"pm.test(\"At least one result returned\", function() {",
-											"    pm.expect(response[\"data\"].length).to.be.gt(0);",
-											"});",
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings?limit=100000",
-									"protocol": "{{protocol}}",
-									"host": [
-										"{{host}}"
-									],
-									"port": "{{port}}",
-									"path": [
-										"api",
-										"v1",
-										"mappings"
-									],
-									"query": [
-										{
-											"key": "limit",
-											"value": "100000"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Create Mapping - Net New",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"returns success code\", function() {",
-											"    pm.expect(pm.response.code).to.equal(200);",
-											"});",
-											"",
-											"let response = pm.response.json();",
-											"let savedData = JSON.stringify(response);",
-											"",
-											"pm.collectionVariables.set(\"createdMapping\", savedData);",
-											"",
-											"pm.test(\"created object fields match\", function() {",
-											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
-											"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
-											"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
-											"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
-											"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
-											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-											"});",
-											"",
-											"utils.testForApiLog(pm, 'CREATE');",
-											"",
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-											"pm.collectionVariables.set(\"currentOrganizationId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-											"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
-											"pm.collectionVariables.set(\"currentCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-											"pm.collectionVariables.set(\"currentCode\", \"1234-5\");",
-											"pm.collectionVariables.set(\"currentTargetCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-											"pm.collectionVariables.set(\"currentTargetCode\", \"9876-0\");",
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"id\": \"{{currentId}}\",\n    \"active\": {{currentActive}},\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"codeSystem\": \"{{currentCodeSystem}}\",\n    \"code\": \"{{currentCode}}\",\n    \"targetCodeSystem\": \"{{currentTargetCodeSystem}}\",\n    \"targetCode\": \"{{currentTargetCode}}\"\n}\n",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings",
-									"protocol": "{{protocol}}",
-									"host": [
-										"{{host}}"
-									],
-									"port": "{{port}}",
-									"path": [
-										"api",
-										"v1",
-										"mappings"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Get Mapping - Existing",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"returns 200 OK code\", function() {",
-											"    pm.expect(pm.response.code).to.equal(200);",
-											"});",
-											"",
-											"// Fields should match object created in previous \"Create Pipeline - Net New\" step",
-											"let response = pm.response.json();",
-											"",
-											"pm.test(\"gotten object fields match\", function() {",
-											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
-											"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
-											"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
-											"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
-											"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
-											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-											"});",
-											"",
-											"utils.testForApiLog(pm, 'READ');",
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings/{{currentId}}",
-									"protocol": "{{protocol}}",
-									"host": [
-										"{{host}}"
-									],
-									"port": "{{port}}",
-									"path": [
-										"api",
-										"v1",
-										"mappings",
-										"{{currentId}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Update Mapping - Existing",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"returns success code\", function() {",
-											"    pm.expect(pm.response.code).to.equal(200);",
-											"});",
-											"",
-											"let response = pm.response.json();",
-											"let savedData = JSON.stringify(response);",
-											"",
-											"pm.collectionVariables.set(\"createdMapping\", savedData);",
-											"",
-											"pm.test(\"updated object fields match\", function() {",
-											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
-											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"currentOrganizationId\"));",
-											"    pm.expect(response.codeSystem).to.equal(pm.collectionVariables.get(\"currentCodeSystem\"));",
-											"    pm.expect(response.code).to.equal(pm.collectionVariables.get(\"currentCode\"));",
-											"    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
-											"    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
-											"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
-											"});",
-											"",
-											"utils.testForApiLog(pm, 'UPDATE');",
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{{createdMapping}}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings/{{currentId}}",
-									"protocol": "{{protocol}}",
-									"host": [
-										"{{host}}"
-									],
-									"port": "{{port}}",
-									"path": [
-										"api",
-										"v1",
-										"mappings",
-										"{{currentId}}"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "Delete Mapping - Existing",
-							"event": [
-								{
-									"listen": "test",
-									"script": {
-										"exec": [
-											"pm.test(\"returns 204 NO CONTENT code\", function() {",
-											"    pm.expect(pm.response.code).to.equal(204);",
-											"});",
-											"",
-											"utils.testForApiLog(pm, 'DELETE');",
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								},
-								{
-									"listen": "prerequest",
-									"script": {
-										"exec": [
-											""
-										],
-										"type": "text/javascript",
-										"packages": {}
-									}
-								}
-							],
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings/{{currentId}}",
-									"protocol": "{{protocol}}",
-									"host": [
-										"{{host}}"
-									],
-									"port": "{{port}}",
-									"path": [
-										"api",
-										"v1",
-										"mappings",
-										"{{currentId}}"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
 					"name": "Group / Role Mappings",
 					"item": [
 						{
@@ -21519,7 +21229,15 @@
 													"",
 													"pm.collectionVariables.set(\"existingUserId\", response[\"data\"][0].id);",
 													"pm.collectionVariables.set(\"existingUserName\", response[\"data\"][0].userName);",
-													"pm.collectionVariables.set(\"existingUserOrganizationId\", response[\"data\"][0].organizationId);",
+													"",
+													"let organizationIds = response[\"data\"][0].organizationIds;",
+													"",
+													"// Sort the UUID array - sorting to ensure proper comparison in later tests to ensure the organizationIds are in the same order",
+													"organizationIds.sort();",
+													"",
+													"// Store the sorted array back in the collection variable",
+													"pm.collectionVariables.set(\"existingUserOrganizationIds\", JSON.stringify(organizationIds));",
+													"",
 													"pm.collectionVariables.set(\"existingActive\", response[\"data\"][0].active);"
 												],
 												"type": "text/javascript",
@@ -21620,10 +21338,16 @@
 													"",
 													"let response = pm.response.json();",
 													"",
+													"let existingOrganizationIds = JSON.parse(pm.collectionVariables.get(\"existingUserOrganizationIds\"));",
+													"",
+													"// Sort the UUID array - sorting to ensure proper comparison in later tests to ensure the organizationIds are in the same order",
+													"existingOrganizationIds.sort();",
+													"",
+													"response.organizationIds.sort();",
 													"pm.test(\"gotten object fields match\", function() {",
 													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"existingUserId\"));",
 													"    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"existingUserName\"));",
-													"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"existingUserOrganizationId\"));",
+													"    pm.expect(JSON.stringify(response.organizationIds)).to.equal(JSON.stringify(existingOrganizationIds));",
 													"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"existingActive\"));",
 													"});",
 													"",
@@ -21716,72 +21440,6 @@
 							"name": "Invalid Payload Tests",
 							"item": [
 								{
-									"name": "Create Temp Organization",
-									"event": [
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													"pm.collectionVariables.set(\"currentOrgName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentOrgCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentOrgId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-													"pm.collectionVariables.set(\"currentOrgActive\", true);"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns success code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(200);",
-													"});",
-													"",
-													"let response = pm.response.json();",
-													"",
-													"pm.test(\"created object fields match\", function() {",
-													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentOrgId\"));",
-													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentOrgName\"));",
-													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentOrgActive\");",
-													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentOrgCommonName\"));",
-													"});"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{currentOrgId}}\",\n  \"organizationName\" : \"{{currentOrgName}}\",\n  \"commonName\": \"{{currentOrgCommonName}}\",\n  \"active\" : {{currentOrgActive}}\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations",
-											"protocol": "{{protocol}}",
-											"host": [
-												"{{host}}"
-											],
-											"port": "{{port}}",
-											"path": [
-												"api",
-												"v1",
-												"organizations"
-											]
-										}
-									},
-									"response": []
-								},
-								{
 									"name": "Blank Id",
 									"event": [
 										{
@@ -21820,7 +21478,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"userName\": \"whatever\",\n    \"id\": \"\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": true\n}",
+											"raw": "{\n    \"userName\": \"whatever\",\n    \"id\": \"\",\n    \"organizationIds\": [\"{{currentOrgId}}\"],\n    \"active\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -21882,7 +21540,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": \"9a67a7c1-f743-40f0-84c1-3b4e6af21ed0\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": true\n}",
+											"raw": "{\n    \"id\": \"9a67a7c1-f743-40f0-84c1-3b4e6af21ed0\",\n    \"organizationIds\": [\"{{currentOrgId}}\"],\n    \"active\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -21944,7 +21602,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"userName\": \"\",\n    \"id\": \"9a67a7c1-f743-40f0-84c1-3b4e6af21ed0\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": true\n}",
+											"raw": "{\n    \"userName\": \"\",\n    \"id\": \"9a67a7c1-f743-40f0-84c1-3b4e6af21ed0\",\n    \"organizationIds\": [\"{{currentOrgId}}\"],\n    \"active\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -22006,7 +21664,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"userName\": \"whatever\",\n    \"id\": \"cf200583-555e-4c4e-bd2a-8f9d9626e54c\",\n    \"organizationId\": \"{{currentOrgId}}\"\n}",
+											"raw": "{\n    \"userName\": \"whatever\",\n    \"id\": \"cf200583-555e-4c4e-bd2a-8f9d9626e54c\",\n    \"organizationIds\": [\"{{currentOrgId}}\"]\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -22068,7 +21726,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"userName\": \"whatever\",\n    \"id\": \"cf200583-555e-4c4e-bd2a-8f9d9626e54c\",\n    \"organizationId\": \"{{currentOrgId}}\",\n    \"active\": \"boop\"\n}",
+											"raw": "{\n    \"userName\": \"whatever\",\n    \"id\": \"cf200583-555e-4c4e-bd2a-8f9d9626e54c\",\n    \"organizationIds\": [\"{{currentOrgId}}\"],\n    \"active\": \"boop\"\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -22090,54 +21748,29 @@
 										}
 									},
 									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											"pm.collectionVariables.set(\"currentOrgId\", \"d339cd15-2e57-4456-94b6-1e14f079a0de\");",
+											"pm.collectionVariables.set(\"currentOrgActive\", true);"
+										]
+									}
 								},
 								{
-									"name": "Delete Temp Organization",
-									"event": [
-										{
-											"listen": "test",
-											"script": {
-												"exec": [
-													"pm.test(\"returns 204 NO CONTENT code\", function() {",
-													"    pm.expect(pm.response.code).to.equal(204);",
-													"});",
-													"",
-													"pm.collectionVariables.clear();"
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										},
-										{
-											"listen": "prerequest",
-											"script": {
-												"exec": [
-													""
-												],
-												"type": "text/javascript",
-												"packages": {}
-											}
-										}
-									],
-									"request": {
-										"method": "DELETE",
-										"header": [],
-										"url": {
-											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations/{{currentOrgId}}",
-											"protocol": "{{protocol}}",
-											"host": [
-												"{{host}}"
-											],
-											"port": "{{port}}",
-											"path": [
-												"api",
-												"v1",
-												"organizations",
-												"{{currentOrgId}}"
-											]
-										}
-									},
-									"response": []
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
 								}
 							]
 						},
@@ -22219,10 +21852,16 @@
 											"",
 											"let response = pm.response.json();",
 											"",
+											"let existingOrganizationIds = JSON.parse(pm.collectionVariables.get(\"existingUserOrganizationIds\"));",
+											"",
+											"// Sort the UUID array - sorting to ensure proper comparison in later tests to ensure the organizationIds are in the same order",
+											"existingOrganizationIds.sort();",
+											"",
+											"response.organizationIds.sort();",
 											"pm.test(\"gotten object fields match\", function() {",
 											"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"existingUserId\"));",
 											"    pm.expect(response.userName).to.equal(pm.collectionVariables.get(\"existingUserName\"));",
-											"    pm.expect(response.organizationId).to.equal(pm.collectionVariables.get(\"existingUserOrganizationId\"));",
+											"    pm.expect(JSON.stringify(response.organizationIds)).to.equal(JSON.stringify(existingOrganizationIds));",
 											"    pm.expect(response.active).to.equal(pm.collectionVariables.get(\"existingActive\"));",
 											"});",
 											"",

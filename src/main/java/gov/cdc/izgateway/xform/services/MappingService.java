@@ -17,7 +17,7 @@ public class MappingService extends GenericService<Mapping> {
 
     public Mapping getMapping(UUID organizationId, Code code) {
         return repo.getEntitySet().stream()
-                .filter(m -> m.getOrganizationId().equals(organizationId.toString()) && m.getCodeSystem().equals(code.codeSystem()) && m.getCode().equals(code.code()))
+                .filter(m -> m.getOrganizationId().equals(organizationId) && m.getCodeSystem().equals(code.codeSystem()) && m.getCode().equals(code.code()))
                 .findFirst()
                 .orElse(null);
     }
