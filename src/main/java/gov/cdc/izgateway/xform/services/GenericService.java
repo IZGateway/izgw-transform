@@ -25,7 +25,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     public T getObject(UUID id) {
         T existing = repo.getEntity(id);
 
-        // Check if the pipeline's organization ID is in the allowed organization IDs
+        // Check if the object's organization ID is in the allowed organization IDs
         if (existing instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId())) {
             return null;
         }
@@ -85,7 +85,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
 
         // Check if the organization ID is in the allowed organization IDs
         if (item instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this pipeline");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this object");
         }
 
         repo.deleteEntity(id);
