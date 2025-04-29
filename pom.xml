@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.4</version>
+		<version>3.4.5</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
@@ -166,10 +166,26 @@
 			<artifactId>camel-http</artifactId>
 			<version>${camel.version}</version>
 		</dependency>
+		<!-- NOTE - http client5 is a dependency of camel-http
+		 			latest camel-http is still bringing in 5.4.2
+		 			which has a HIGH CVE. Overriding for now.
+		 			28Apr2025 - ALM
+		 -->
+		<dependency>
+			<groupId>org.apache.httpcomponents.client5</groupId>
+			<artifactId>httpclient5</artifactId>
+			<version>5.4.4</version>
+		</dependency>
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>izgw-core</artifactId>
 			<version>2.2.1-izgw-core-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.mysql</groupId>
+					<artifactId>mysql-connector-j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -549,8 +565,7 @@
                          -->
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
-				<!-- 9.0 line uses NVD API and requires a key, which has flakey response right now -->
-				<version>8.4.3</version>
+				<version>12.1.1</version>
 				<configuration>
 					<!--nvdApiKey>${env.NVDAPIKEY}</nvdApiKey-->
 					<formats>
