@@ -50,7 +50,7 @@ elastic:
 
 v2tofhir:
   sendingApplication: ${SENDING_APPLICATION:FHIR}
-  sendingFacility: ${SENDING_FACILITY:DUFFY}
+  sendingFacility: ${SENDING_FACILITY:DEV}
   receivingApplication: ${RECEIVING_APPLICATION:TEST}
   receivingFacility: ${RECEIVING_FACILITY:MOCK}
   facilityId: ${FACILITY_ID:IZG}

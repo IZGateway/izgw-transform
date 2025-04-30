@@ -8,9 +8,11 @@ import gov.cdc.izgateway.xform.logging.advice.Transformable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
+@Slf4j
 @Getter
 @Setter
 public class Exists implements Precondition, Advisable, Transformable {
@@ -18,8 +20,6 @@ public class Exists implements Precondition, Advisable, Transformable {
     private UUID id;
     @NotNull(message = "required and cannot be empty")
     private String dataPath;
-
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Exists.class);
 
     protected Exists() {
     }

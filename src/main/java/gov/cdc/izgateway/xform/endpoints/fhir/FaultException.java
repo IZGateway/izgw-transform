@@ -16,57 +16,57 @@ import lombok.Getter;
  * provided access to the FaultMessage content.
  */
 class FaultException extends Exception {
-	private static final long serialVersionUID = 1L;
-	@Getter
-	private final FaultMessage fault;
-	/**
-	 * Create a new FaultException from a FaultMessage
-	 * @param fault	The FaultMessage
-	 */
-	public FaultException(FaultMessage fault) {
-		super(getMessage(fault));
-		this.fault = fault;
-	}
-	
-	private static String getMessage(FaultMessage fault) {
-		if (StringUtils.isBlank(fault.getDetail())) {
-			return fault.getSummary();
-		}
-		return fault.getSummary() + ": " + fault.getDetail();
-	}
+    private static final long serialVersionUID = 1L;
+    @Getter
+    private final FaultMessage fault;
+    /**
+     * Create a new FaultException from a FaultMessage
+     * @param fault    The FaultMessage
+     */
+    FaultException(FaultMessage fault) {
+        super(getMessage(fault));
+        this.fault = fault;
+    }
+    
+    private static String getMessage(FaultMessage fault) {
+        if (StringUtils.isBlank(fault.getDetail())) {
+            return fault.getSummary();
+        }
+        return fault.getSummary() + ": " + fault.getDetail();
+    }
 
-	RetryStrategy getRetryCoding() {
-    	try {
-    		return RetryStrategy.valueOf(fault.getRetry());
-    	} catch (Exception ex) {
-    		// Do nothing, we don't recognize the retry code.
-    		// Preferable to suppress this "error" than the one that is being reported by this code
-    		return null;
-    	}
-	}
-	
-	void setOriginalText(OperationOutcomeIssueComponent issue) {
-		String original = fault.getOriginal();
-    	if (StringUtils.isNotBlank(original)) {
-    		issue.getDetails()
-    			.addExtension(
-    				new Extension(
-    					PathUtils.FHIR_EXT_PREFIX + "originalText",
-    					new StringType(original)
-    				)
-    			);
-    	}
-	}
-		
-	void setEventId(OperationOutcomeIssueComponent issue) {
-		// Give them the eventId from the fault
-    	if (StringUtils.isNotEmpty(fault.getEventId())) {
-			issue.addExtension(
-				new Extension(
-					PathUtils.FHIR_EXT_PREFIX + "operationoutcome-message-id",
-					new StringType(fault.getEventId())
-				)
-			);
-    	}
-	}		
+    RetryStrategy getRetryCoding() {
+        try {
+            return RetryStrategy.valueOf(fault.getRetry());
+        } catch (Exception ex) {
+            // Do nothing, we don't recognize the retry code.
+            // Preferable to suppress this "error" than the one that is being reported by this code
+            return null;
+        }
+    }
+    
+    void setOriginalText(OperationOutcomeIssueComponent issue) {
+        String original = fault.getOriginal();
+        if (StringUtils.isNotBlank(original)) {
+            issue.getDetails()
+                .addExtension(
+                    new Extension(
+                        PathUtils.FHIR_EXT_PREFIX + "originalText",
+                        new StringType(original)
+                    )
+                );
+        }
+    }
+        
+    void setEventId(OperationOutcomeIssueComponent issue) {
+        // Give them the eventId from the fault
+        if (StringUtils.isNotEmpty(fault.getEventId())) {
+            issue.addExtension(
+                new Extension(
+                    PathUtils.FHIR_EXT_PREFIX + "operationoutcome-message-id",
+                    new StringType(fault.getEventId())
+                )
+            );
+        }
+    }        
 }

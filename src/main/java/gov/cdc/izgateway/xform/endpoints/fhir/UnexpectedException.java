@@ -7,13 +7,13 @@ package gov.cdc.izgateway.xform.endpoints.fhir;
  * This class enables use of @Ex
  */
 class UnexpectedException extends Exception {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/** 
-	 * Create a new UnexpectedException 
-	 * @param cause	The cause
-	 **/
-	public UnexpectedException(Throwable cause) {
-		super(cause.getMessage(), cause);
-	}
+    /** 
+     * Create a new UnexpectedException 
+     * @param cause The cause
+     **/
+    UnexpectedException(Throwable cause) {
+        super(cause.getMessage(), cause);
+    }
 }

@@ -1,8 +1,11 @@
 package gov.cdc.izgateway.xform.services;
 
+import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.xform.logging.ApiEventLogger;
 import gov.cdc.izgateway.xform.model.BaseModel;
+import gov.cdc.izgateway.xform.model.OrganizationAware;
 import gov.cdc.izgateway.xform.repository.XformRepository;
+import gov.cdc.izgateway.xform.security.XformPrincipal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,6 +24,12 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     @Override
     public T getObject(UUID id) {
         T existing = repo.getEntity(id);
+
+        // Check if the object's organization ID is in the allowed organization IDs
+        if (existing instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId())) {
+            return null;
+        }
+
         ApiEventLogger.logReadEvent(existing);
 
         return existing;
@@ -29,6 +38,9 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     @Override
     public List<T> getList() {
         ArrayList<T> list = new ArrayList<>(repo.getEntitySet());
+
+        list.removeIf(item -> item instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId()));
+
         ApiEventLogger.logReadEvent(list);
         return list;
     }
@@ -54,6 +66,11 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Item already exists");
         }
 
+        // Check if the object's organization ID is in the allowed organization IDs
+        if (obj instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to create this object");
+        }
+
         repo.createEntity(obj);
 
         ApiEventLogger.logCreateEvent(obj);
@@ -61,12 +78,26 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
 
     @Override
     public void delete(UUID id) {
-        T solution = repo.getEntity(id);
-        if (solution == null) {
+        T item = repo.getEntity(id);
+        if (item == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found");
         }
+
+        // Check if the organization ID is in the allowed organization IDs
+        if (item instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this object");
+        }
+
         repo.deleteEntity(id);
 
-        ApiEventLogger.logDeleteEvent(solution);
+        ApiEventLogger.logDeleteEvent(item);
+    }
+
+    /*
+     * This method is used to get the allowed organization IDs from the XformPrincipal.
+     * It retrieves the principal from the request context and returns the allowed organization IDs.
+     */
+    private Set<UUID> getAllowedOrganizationIds() {
+        return ((XformPrincipal) RequestContext.getPrincipal()).getAllowedOrganizationIds();
     }
 }

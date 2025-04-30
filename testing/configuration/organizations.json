@@ -83,4 +83,9 @@
   "id" : "8c905096-c79c-4351-86a7-1d6b7da5ec44",
   "active" : true,
   "commonName" : "ppatel.testing.izgateway.org"
+}, {
+  "organizationName" : "Banzai Institute for Biomedical Engineering",
+  "id" : "03adf8af-c182-4ad6-8707-f62efdebf96e",
+  "active" : true,
+  "commonName" : "kboone.testing.izgateway.org"
 } ]

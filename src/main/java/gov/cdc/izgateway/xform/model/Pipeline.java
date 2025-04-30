@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class Pipeline implements BaseModel {
+public class Pipeline implements BaseModel, OrganizationAware {
 
     @NotBlank(message = "Pipeline name is required")
     private String pipelineName;

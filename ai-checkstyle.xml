@@ -10,7 +10,10 @@
 -->
 <module name="Checker">
   <property name="severity" value="warning"/>
+  <property name="tabWidth" value="4"/>
+  <module name="SuppressWarningsFilter" />
   <module name="TreeWalker">
+    <module name="SuppressWarningsHolder" />
     <!--
     <module name="JavadocStyle">
       <property name="checkEmptyJavadoc" value="false"/>
