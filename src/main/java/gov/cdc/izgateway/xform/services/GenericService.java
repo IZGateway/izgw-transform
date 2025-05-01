@@ -60,15 +60,18 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
 
     @Override
     public void create(T obj) {
-        T existing = repo.getEntity(obj.getId());
-
-        if (existing != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Item already exists");
-        }
 
         // Check if the object's organization ID is in the allowed organization IDs
         if (obj instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to create this object");
+        }
+
+        UUID newId = UUID.randomUUID();
+        obj.setId(newId);
+
+        // Check for duplicates, fields to use will be set by object type
+        if (isDuplicate(obj)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Item already exists");
         }
 
         repo.createEntity(obj);
@@ -99,5 +102,15 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
      */
     private Set<UUID> getAllowedOrganizationIds() {
         return ((XformPrincipal) RequestContext.getPrincipal()).getAllowedOrganizationIds();
+    }
+
+    /**
+     * Check if the object would be a duplicate.
+     * This needs to be overridden by subclasses for their specific needs.
+     * @param obj The object to check for duplication
+     * @return true if the object would be a duplicate, false otherwise
+     */
+    protected boolean isDuplicate(T obj) {
+        return false;
     }
 }
