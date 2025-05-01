@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "7e655961-7390-4087-8477-ab40a0be4454",
+		"_postman_id": "69248502-001c-41cb-9ee0-5f7511a3d926",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-7e655961-7390-4087-8477-ab40a0be4454?action=share&source=collection_link&creator=2729094"
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-69248502-001c-41cb-9ee0-5f7511a3d926?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -4464,9 +4464,11 @@
 												"exec": [
 													"pm.collectionVariables.clear();",
 													"",
+													"// IGDD-1991 - .Xform Service no longer accepts and uses ID's for objects",
+													"// passed in by the caller. It generates its own, so we no longer genereate",
+													"// a random UUID.",
 													"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"currentCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
 												],
 												"type": "text/javascript",
@@ -4485,9 +4487,9 @@
 													"let savedData = JSON.stringify(response);",
 													"",
 													"pm.collectionVariables.set(\"createdEntity\", savedData);",
+													"pm.collectionVariables.set(\"currentId\", response.id);",
 													"",
 													"pm.test(\"created object fields match\", function() {",
-													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
 													"    pm.expect(response.organizationName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 													"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 													"    pm.expect(response.commonName).to.equal(pm.collectionVariables.get(\"currentCommonName\"));",
@@ -4507,7 +4509,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"organizationName\" : \"{{currentName}}\",\n  \"commonName\": \"{{currentCommonName}}\",\n  \"active\" : {{currentActive}}\n}",
+											"raw": "{\n  \"organizationName\" : \"{{currentName}}\",\n  \"commonName\": \"{{currentCommonName}}\",\n  \"active\" : {{currentActive}}\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -4666,7 +4668,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"organizationName\" : \"{{currentName}}\",\n  \"commonName\": \"{{currentCommonName}}\",\n  \"active\" : {{currentActive}}\n}",
+											"raw": "{\n  \"organizationName\" : \"{{currentName}}\",\n  \"commonName\": \"{{currentCommonName}}\",\n  \"active\" : {{currentActive}}\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -4921,7 +4923,10 @@
 													"pm.test(\"returns success code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(200);",
 													"});",
-													""
+													"",
+													"let response = pm.response.json();",
+													"let entityNumber = 0",
+													"pm.collectionVariables.set(\"id\" + entityNumber, response.id);"
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -4933,15 +4938,12 @@
 												"exec": [
 													"let entityNumber = 0;",
 													"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 													"pm.collectionVariables.set(\"commonName\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"",
 													"pm.collectionVariables.unset(\"thisName\");",
-													"pm.collectionVariables.unset(\"thisId\");",
 													"pm.collectionVariables.unset(\"thisCommonName\");",
 													"",
 													"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
-													"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
 													"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"commonName\" + entityNumber));",
 													""
 												],
@@ -4955,7 +4957,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": true\n}",
+											"raw": "{\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -4988,7 +4990,10 @@
 													"pm.test(\"returns success code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(200);",
 													"});",
-													""
+													"",
+													"let response = pm.response.json();",
+													"let entityNumber = 1",
+													"pm.collectionVariables.set(\"id\" + entityNumber, response.id);"
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -5000,15 +5005,12 @@
 												"exec": [
 													"let entityNumber = 1;",
 													"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 													"pm.collectionVariables.set(\"commonName\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"",
 													"pm.collectionVariables.unset(\"thisName\");",
-													"pm.collectionVariables.unset(\"thisId\");",
 													"pm.collectionVariables.unset(\"thisCommonName\");",
 													"",
 													"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
-													"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
 													"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"commonName\" + entityNumber));",
 													""
 												],
@@ -5022,7 +5024,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": true\n}",
+											"raw": "{\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -5055,7 +5057,10 @@
 													"pm.test(\"returns success code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(200);",
 													"});",
-													""
+													"",
+													"let response = pm.response.json();",
+													"let entityNumber = 2",
+													"pm.collectionVariables.set(\"id\" + entityNumber, response.id);"
 												],
 												"type": "text/javascript",
 												"packages": {}
@@ -5067,15 +5072,12 @@
 												"exec": [
 													"let entityNumber = 2;",
 													"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 													"pm.collectionVariables.set(\"commonName\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"",
 													"pm.collectionVariables.unset(\"thisName\");",
-													"pm.collectionVariables.unset(\"thisId\");",
 													"pm.collectionVariables.unset(\"thisCommonName\");",
 													"",
 													"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
-													"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
 													"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"commonName\" + entityNumber));",
 													""
 												],
@@ -5089,7 +5091,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": false\n}",
+											"raw": "{\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": false\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -18526,9 +18528,11 @@
 											"listen": "prerequest",
 											"script": {
 												"exec": [
+													"// IGDD-1991 - .Xform Service no longer accepts and uses ID's for objects",
+													"// passed in by the caller. It generates its own, so we no longer genereate",
+													"// a random UUID.",
 													"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"pm.collectionVariables.set(\"currentCommonName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 													"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));"
 												],
 												"type": "text/javascript",
@@ -18547,6 +18551,7 @@
 													"let savedData = JSON.stringify(response);",
 													"",
 													"pm.collectionVariables.set(\"createdEntity\", savedData);",
+													"pm.collectionVariables.set(\"currentId\", response.id);",
 													"",
 													"pm.test(\"created object fields match\", function() {",
 													"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
@@ -18569,7 +18574,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"organizationName\" : \"{{currentName}}\",\n  \"commonName\": \"{{currentCommonName}}\",\n  \"active\" : {{currentActive}}\n}",
+											"raw": "{\n  \"organizationName\" : \"{{currentName}}\",\n  \"commonName\": \"{{currentCommonName}}\",\n  \"active\" : {{currentActive}}\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -18983,6 +18988,10 @@
 													"pm.test(\"returns success code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(200);",
 													"});",
+													"",
+													"let response = pm.response.json();",
+													"let entityNumber = 0",
+													"pm.collectionVariables.set(\"id\" + entityNumber, response.id);",
 													""
 												],
 												"type": "text/javascript",
@@ -18995,15 +19004,12 @@
 												"exec": [
 													"let entityNumber = 0;",
 													"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 													"pm.collectionVariables.set(\"commonName\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"",
 													"pm.collectionVariables.unset(\"thisName\");",
-													"pm.collectionVariables.unset(\"thisId\");",
 													"pm.collectionVariables.unset(\"thisCommonName\");",
 													"",
 													"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
-													"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
 													"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"commonName\" + entityNumber));",
 													""
 												],
@@ -19017,7 +19023,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": true\n}",
+											"raw": "{\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -19050,6 +19056,10 @@
 													"pm.test(\"returns success code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(200);",
 													"});",
+													"",
+													"let response = pm.response.json();",
+													"let entityNumber = 1",
+													"pm.collectionVariables.set(\"id\" + entityNumber, response.id);",
 													""
 												],
 												"type": "text/javascript",
@@ -19062,15 +19072,12 @@
 												"exec": [
 													"let entityNumber = 1;",
 													"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 													"pm.collectionVariables.set(\"commonName\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"",
 													"pm.collectionVariables.unset(\"thisName\");",
-													"pm.collectionVariables.unset(\"thisId\");",
 													"pm.collectionVariables.unset(\"thisCommonName\");",
 													"",
 													"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
-													"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
 													"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"commonName\" + entityNumber));",
 													""
 												],
@@ -19084,7 +19091,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": true\n}",
+											"raw": "{\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -19117,6 +19124,10 @@
 													"pm.test(\"returns success code\", function() {",
 													"    pm.expect(pm.response.code).to.equal(200);",
 													"});",
+													"",
+													"let response = pm.response.json();",
+													"let entityNumber = 2",
+													"pm.collectionVariables.set(\"id\" + entityNumber, response.id);",
 													""
 												],
 												"type": "text/javascript",
@@ -19129,15 +19140,12 @@
 												"exec": [
 													"let entityNumber = 2;",
 													"pm.collectionVariables.set(\"name\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-													"pm.collectionVariables.set(\"id\" + entityNumber, pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 													"pm.collectionVariables.set(\"commonName\" + entityNumber, pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 													"",
 													"pm.collectionVariables.unset(\"thisName\");",
-													"pm.collectionVariables.unset(\"thisId\");",
 													"pm.collectionVariables.unset(\"thisCommonName\");",
 													"",
 													"pm.collectionVariables.set(\"thisName\", pm.collectionVariables.get(\"name\" + entityNumber));",
-													"pm.collectionVariables.set(\"thisId\", pm.collectionVariables.get(\"id\" + entityNumber));",
 													"pm.collectionVariables.set(\"thisCommonName\", pm.collectionVariables.get(\"commonName\" + entityNumber));",
 													""
 												],
@@ -19151,7 +19159,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"id\" : \"{{thisId}}\",\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": false\n}",
+											"raw": "{\n  \"organizationName\" : \"{{thisName}}\",\n  \"commonName\": \"{{thisCommonName}}\",\n  \"active\": false\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -28118,7 +28126,7 @@
 				"oauth2": [
 					{
 						"key": "state",
-						"value": "{{okta_state}}",
+						"value": "{{okta_auth_server}}{{okta_client_id}}{{okta_client_secret}}",
 						"type": "string"
 					},
 					{
@@ -28223,9 +28231,6 @@
 			"script": {
 				"type": "text/javascript",
 				"exec": [
-					"// Used by JWT folder OAuth 2.0 setup to randomly set state variable sent to Okta",
-					"pm.collectionVariables.set(\"okta_state\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
-					"",
 					"// This needs to match the Organziation that we are using for Postman tests",
 					"// !!!!! Any user who needs to run Postman tests will have to have this organization assigned",
 					"pm.collectionVariables.set(\"postmanTestOrganizationId\", \"d339cd15-2e57-4456-94b6-1e14f079a0de\")",
@@ -29432,108 +29437,6 @@
 					""
 				]
 			}
-		}
-	],
-	"variable": [
-		{
-			"key": "okta_state",
-			"value": ""
-		},
-		{
-			"key": "postmanTestOrganizationId",
-			"value": ""
-		},
-		{
-			"key": "GoodResponse",
-			"value": ""
-		},
-		{
-			"key": "GoodResponseLF",
-			"value": ""
-		},
-		{
-			"key": "GoodResponseCRLF",
-			"value": ""
-		},
-		{
-			"key": "GoodMessageLF",
-			"value": ""
-		},
-		{
-			"key": "GoodMessageCRLF",
-			"value": ""
-		},
-		{
-			"key": "GoodMessageVXULF",
-			"value": ""
-		},
-		{
-			"key": "GoodMessageVXUCRLF",
-			"value": ""
-		},
-		{
-			"key": "fhirPatientGiven",
-			"value": ""
-		},
-		{
-			"key": "fhirPatientFamily",
-			"value": ""
-		},
-		{
-			"key": "fhirPatientDOB",
-			"value": ""
-		},
-		{
-			"key": "fhirNoDataPatientGiven",
-			"value": ""
-		},
-		{
-			"key": "fhirNoDataPatientFamily",
-			"value": ""
-		},
-		{
-			"key": "fhirNoDataPatientDOB",
-			"value": ""
-		},
-		{
-			"key": "TooLargeMessage",
-			"value": ""
-		},
-		{
-			"key": "IisTooLargeMessage",
-			"value": ""
-		},
-		{
-			"key": "hex0b",
-			"value": ""
-		},
-		{
-			"key": "hex1b",
-			"value": ""
-		},
-		{
-			"key": "currentOrgId",
-			"value": ""
-		},
-		{
-			"key": "currentOrgActive",
-			"value": ""
-		},
-		{
-			"key": "existingUserId",
-			"value": ""
-		},
-		{
-			"key": "existingUserName",
-			"value": ""
-		},
-		{
-			"key": "existingActive",
-			"value": ""
-		},
-		{
-			"key": "existingUserOrganizationIds",
-			"value": ""
 		}
 	]
 }
