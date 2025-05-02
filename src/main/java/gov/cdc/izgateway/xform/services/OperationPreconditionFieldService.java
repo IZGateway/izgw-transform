@@ -35,4 +35,13 @@ public class OperationPreconditionFieldService extends GenericService<OperationP
         return preconditionFields;
     }
 
+    @Override
+    protected boolean isDuplicate(OperationPreconditionField operationPreconditionField) {
+        return repo.getEntitySet().stream().anyMatch(
+          opf -> opf.getDataPath().equalsIgnoreCase(operationPreconditionField.getDataPath()) &&
+                  opf.getFieldName().equalsIgnoreCase(operationPreconditionField.getFieldName())
+        );
+    }
+
+
 }

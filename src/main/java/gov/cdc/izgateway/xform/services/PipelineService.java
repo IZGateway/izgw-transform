@@ -23,4 +23,14 @@ public class PipelineService extends GenericService<Pipeline>{
                                 && p.getOutboundEndpoint().equals(outboundEndpoint)
                 ).findFirst().orElse(null);
     }
+
+    @Override
+    protected boolean isDuplicate(Pipeline pipeline) {
+        return repo.getEntitySet().stream().anyMatch(p ->
+                p.getOrganizationId().equals(pipeline.getOrganizationId()) &&
+                        p.getInboundEndpoint().equalsIgnoreCase(pipeline.getInboundEndpoint()) &&
+                        p.getOutboundEndpoint().equalsIgnoreCase(pipeline.getOutboundEndpoint())
+        );
+    }
+
 }

@@ -110,7 +110,5 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
      * @param obj The object to check for duplication
      * @return true if the object would be a duplicate, false otherwise
      */
-    protected boolean isDuplicate(T obj) {
-        return false;
-    }
+    protected abstract boolean isDuplicate(T obj);
 }

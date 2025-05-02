@@ -17,7 +17,6 @@ public class User implements BaseModel {
     @NotBlank(message = "User - Name is required")
     private String userName;
 
-    @NotNull(message = "User - ID is required")
     private UUID id;
 
     @NotNull(message = "User - Organization is required")
