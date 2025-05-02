@@ -770,23 +770,22 @@
 									"name": "Invalid Payload Tests",
 									"item": [
 										{
-											"name": "Get Example User",
+											"name": "Get Existing",
 											"event": [
 												{
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"returns 200 OK code\", function() {",
+															"pm.test(\"Validate HTTP Status\", function() {",
 															"    pm.expect(pm.response.code).to.equal(200);",
 															"});",
 															"",
+															"// Pulling a random, existiing access control",
+															"// Saving the userId associated with it",
+															"// To use to attempt to add a new access control with the same userId",
+															"// IGDD-1991 should make this fail",
 															"let response = pm.response.json();",
-															"",
-															"pm.test(\"At least one result returned\", function() {",
-															"    pm.expect(response[\"data\"].length).to.be.gt(0);",
-															"});",
-															"",
-															"pm.collectionVariables.set(\"exampleUserId\", response[\"data\"][0].id);"
+															"pm.collectionVariables.set(\"existingUserId\", response[\"data\"][0].userId);"
 														],
 														"type": "text/javascript",
 														"packages": {}
@@ -804,13 +803,10 @@
 												}
 											],
 											"request": {
-												"auth": {
-													"type": "noauth"
-												},
 												"method": "GET",
 												"header": [],
 												"url": {
-													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/users?limit=1",
+													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls?limit=1",
 													"protocol": "{{protocol}}",
 													"host": [
 														"{{host}}"
@@ -819,7 +815,7 @@
 													"path": [
 														"api",
 														"v1",
-														"users"
+														"access-controls"
 													],
 													"query": [
 														{
@@ -832,20 +828,20 @@
 											"response": []
 										},
 										{
-											"name": "Blank Id",
+											"name": "Existing User",
 											"event": [
 												{
 													"listen": "test",
 													"script": {
 														"exec": [
 															"pm.test(\"Validate HTTP Status\", function() {",
-															"    pm.expect(pm.response.code).to.equal(400);",
+															"    pm.expect(pm.response.code).to.equal(409);",
 															"});",
 															"",
 															"let response = pm.response.json();",
 															"",
 															"pm.test(\"Error Message Check\", function() {",
-															"    pm.expect(response.message).to.contains(\"id: Access Control - ID is required\");",
+															"    pm.expect(response.message).to.contains(\"Item already exists\");",
 															"});",
 															"",
 															""
@@ -870,69 +866,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"id\": \"\",\n    \"userId\": \"{{exampleUserId}}\",\n    \"active\": true,\n    \"roles\": []\n}",
-													"options": {
-														"raw": {
-															"language": "json"
-														}
-													}
-												},
-												"url": {
-													"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/access-controls",
-													"protocol": "{{protocol}}",
-													"host": [
-														"{{host}}"
-													],
-													"port": "{{port}}",
-													"path": [
-														"api",
-														"v1",
-														"access-controls"
-													]
-												}
-											},
-											"response": []
-										},
-										{
-											"name": "No Active Status",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"pm.test(\"Validate HTTP Status\", function() {",
-															"    pm.expect(pm.response.code).to.equal(400);",
-															"});",
-															"",
-															"let response = pm.response.json();",
-															"",
-															"pm.test(\"Error Message Check\", function() {",
-															"    pm.expect(response.message).to.contains(\"active: Access Control - Active status is required\");",
-															"});",
-															"",
-															""
-														],
-														"type": "text/javascript",
-														"packages": {}
-													}
-												},
-												{
-													"listen": "prerequest",
-													"script": {
-														"exec": [
-															""
-														],
-														"type": "text/javascript",
-														"packages": {}
-													}
-												}
-											],
-											"request": {
-												"method": "POST",
-												"header": [],
-												"body": {
-													"mode": "raw",
-													"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"{{exampleUserId}}\",\n    \"roles\": []\n}",
+													"raw": "{\n    \"userId\": \"{{existingUserId}}\",\n    \"active\": true,\n    \"roles\": []\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -994,7 +928,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"active\": true,\n    \"roles\": []\n}",
+													"raw": "{\n    \"active\": true,\n    \"roles\": []\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -1056,7 +990,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"f499f37c-e5da-472e-8386-0dc84adbc5b7\",\n    \"active\": true,\n    \"roles\": []\n}",
+													"raw": "{\n    \"userId\": \"f499f37c-e5da-472e-8386-0dc84adbc5b7\",\n    \"active\": true,\n    \"roles\": []\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -1118,7 +1052,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"{{exampleUserId}}\",\n    \"active\": \"boop\",\n    \"roles\": []\n}",
+													"raw": "{\n    \"userId\": \"{{exampleUserId}}\",\n    \"active\": \"boop\",\n    \"roles\": []\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -1180,7 +1114,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"{{exampleUserId}}\",\n    \"active\": true\n}",
+													"raw": "{\n    \"userId\": \"{{existingUserId}}\",\n    \"active\": true\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -14974,29 +14908,28 @@
 					"name": "API Tests (JWT)",
 					"item": [
 						{
-							"name": "Access Control (JWT)",
+							"name": "Access Control Copy (JWT)",
 							"item": [
 								{
 									"name": "Invalid Payload Tests (JWT)",
 									"item": [
 										{
-											"name": "Get Example User",
+											"name": "Get Existing w/ JWT",
 											"event": [
 												{
 													"listen": "test",
 													"script": {
 														"exec": [
-															"pm.test(\"returns 200 OK code\", function() {",
+															"pm.test(\"Validate HTTP Status\", function() {",
 															"    pm.expect(pm.response.code).to.equal(200);",
 															"});",
 															"",
+															"// Pulling a random, existiing access control",
+															"// Saving the userId associated with it",
+															"// To use to attempt to add a new access control with the same userId",
+															"// IGDD-1991 should make this fail",
 															"let response = pm.response.json();",
-															"",
-															"pm.test(\"At least one result returned\", function() {",
-															"    pm.expect(response[\"data\"].length).to.be.gt(0);",
-															"});",
-															"",
-															"pm.collectionVariables.set(\"exampleUserId\", response[\"data\"][0].id);"
+															"pm.collectionVariables.set(\"existingUserId\", response[\"data\"][0].userId);"
 														],
 														"type": "text/javascript",
 														"packages": {}
@@ -15017,7 +14950,7 @@
 												"method": "GET",
 												"header": [],
 												"url": {
-													"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/users?limit=1",
+													"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/access-controls?limit=1",
 													"protocol": "{{no_cert_protocol}}",
 													"host": [
 														"{{no_cert_host}}"
@@ -15026,7 +14959,7 @@
 													"path": [
 														"api",
 														"v1",
-														"users"
+														"access-controls"
 													],
 													"query": [
 														{
@@ -15039,20 +14972,20 @@
 											"response": []
 										},
 										{
-											"name": "Blank Id",
+											"name": "Existing User w/ JWT",
 											"event": [
 												{
 													"listen": "test",
 													"script": {
 														"exec": [
 															"pm.test(\"Validate HTTP Status\", function() {",
-															"    pm.expect(pm.response.code).to.equal(400);",
+															"    pm.expect(pm.response.code).to.equal(409);",
 															"});",
 															"",
 															"let response = pm.response.json();",
 															"",
 															"pm.test(\"Error Message Check\", function() {",
-															"    pm.expect(response.message).to.contains(\"id: Access Control - ID is required\");",
+															"    pm.expect(response.message).to.contains(\"Item already exists\");",
 															"});",
 															"",
 															""
@@ -15077,7 +15010,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"id\": \"\",\n    \"userId\": \"{{exampleUserId}}\",\n    \"active\": true,\n    \"roles\": []\n}",
+													"raw": "{\n    \"userId\": \"{{existingUserId}}\",\n    \"active\": true,\n    \"roles\": []\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -15101,69 +15034,7 @@
 											"response": []
 										},
 										{
-											"name": "No Active Status",
-											"event": [
-												{
-													"listen": "test",
-													"script": {
-														"exec": [
-															"pm.test(\"Validate HTTP Status\", function() {",
-															"    pm.expect(pm.response.code).to.equal(400);",
-															"});",
-															"",
-															"let response = pm.response.json();",
-															"",
-															"pm.test(\"Error Message Check\", function() {",
-															"    pm.expect(response.message).to.contains(\"active: Access Control - Active status is required\");",
-															"});",
-															"",
-															""
-														],
-														"type": "text/javascript",
-														"packages": {}
-													}
-												},
-												{
-													"listen": "prerequest",
-													"script": {
-														"exec": [
-															""
-														],
-														"type": "text/javascript",
-														"packages": {}
-													}
-												}
-											],
-											"request": {
-												"method": "POST",
-												"header": [],
-												"body": {
-													"mode": "raw",
-													"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"{{exampleUserId}}\",\n    \"roles\": []\n}",
-													"options": {
-														"raw": {
-															"language": "json"
-														}
-													}
-												},
-												"url": {
-													"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/api/v1/access-controls",
-													"protocol": "{{no_cert_protocol}}",
-													"host": [
-														"{{no_cert_host}}"
-													],
-													"port": "{{no_cert_port}}",
-													"path": [
-														"api",
-														"v1",
-														"access-controls"
-													]
-												}
-											},
-											"response": []
-										},
-										{
-											"name": "No User",
+											"name": "No User w/ JWT",
 											"event": [
 												{
 													"listen": "test",
@@ -15201,7 +15072,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"active\": true,\n    \"roles\": []\n}",
+													"raw": "{\n    \"active\": true,\n    \"roles\": []\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -15225,7 +15096,7 @@
 											"response": []
 										},
 										{
-											"name": "Non-Existent User",
+											"name": "Non-Existent User w/ JWT",
 											"event": [
 												{
 													"listen": "test",
@@ -15263,7 +15134,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"f499f37c-e5da-472e-8386-0dc84adbc5b7\",\n    \"active\": true,\n    \"roles\": []\n}",
+													"raw": "{\n    \"userId\": \"f499f37c-e5da-472e-8386-0dc84adbc5b7\",\n    \"active\": true,\n    \"roles\": []\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -15287,7 +15158,7 @@
 											"response": []
 										},
 										{
-											"name": "Invalid Active Status",
+											"name": "Invalid Active Status w/ JWT",
 											"event": [
 												{
 													"listen": "test",
@@ -15325,7 +15196,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"{{exampleUserId}}\",\n    \"active\": \"boop\",\n    \"roles\": []\n}",
+													"raw": "{\n    \"userId\": \"{{exampleUserId}}\",\n    \"active\": \"boop\",\n    \"roles\": []\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -15349,7 +15220,7 @@
 											"response": []
 										},
 										{
-											"name": "No Roles",
+											"name": "No Roles w/ JWT",
 											"event": [
 												{
 													"listen": "test",
@@ -15387,7 +15258,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"id\": \"6df99ccf-0c03-4ae7-81ed-7a381e47fe3b\",\n    \"userId\": \"{{exampleUserId}}\",\n    \"active\": true\n}",
+													"raw": "{\n    \"userId\": \"{{existingUserId}}\",\n    \"active\": true\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -15409,6 +15280,28 @@
 												}
 											},
 											"response": []
+										}
+									],
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"type": "text/javascript",
+												"packages": {},
+												"exec": [
+													""
+												]
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"packages": {},
+												"exec": [
+													""
+												]
+											}
 										}
 									]
 								},
@@ -15530,6 +15423,28 @@
 										}
 									},
 									"response": []
+								}
+							],
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"type": "text/javascript",
+										"packages": {},
+										"exec": [
+											""
+										]
+									}
 								}
 							]
 						},
@@ -28208,7 +28123,15 @@
 						"type": "text/javascript",
 						"packages": {},
 						"exec": [
-							""
+							"// When running tests locally we set this so that we do no get ",
+							"// admin added in XformPrincipalService. If you are coming from ",
+							"// localhost and this IS NOT set, then even without a cert or ",
+							"// JWT you are getting ADMIN added which means you can hit ",
+							"// most all API's.  ",
+							"// You'll think that everything is great with your JWT testing, ",
+							"// but in reality your JWT is expired and the reason a call is",
+							"// working is because you are magically admin.",
+							"pm.request.headers.add(\"X-Not-Admin: X-Not-Admin\");"
 						]
 					}
 				},
@@ -29437,6 +29360,92 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "postmanTestOrganizationId",
+			"value": ""
+		},
+		{
+			"key": "GoodResponse",
+			"value": ""
+		},
+		{
+			"key": "GoodResponseLF",
+			"value": ""
+		},
+		{
+			"key": "GoodResponseCRLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageCRLF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageVXULF",
+			"value": ""
+		},
+		{
+			"key": "GoodMessageVXUCRLF",
+			"value": ""
+		},
+		{
+			"key": "fhirPatientGiven",
+			"value": ""
+		},
+		{
+			"key": "fhirPatientFamily",
+			"value": ""
+		},
+		{
+			"key": "fhirPatientDOB",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientGiven",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientFamily",
+			"value": ""
+		},
+		{
+			"key": "fhirNoDataPatientDOB",
+			"value": ""
+		},
+		{
+			"key": "TooLargeMessage",
+			"value": ""
+		},
+		{
+			"key": "IisTooLargeMessage",
+			"value": ""
+		},
+		{
+			"key": "hex0b",
+			"value": ""
+		},
+		{
+			"key": "hex1b",
+			"value": ""
+		},
+		{
+			"key": "existingAccessControlId",
+			"value": ""
+		},
+		{
+			"key": "existingAccessControlUserId",
+			"value": ""
+		},
+		{
+			"key": "existingAccessControlActive",
+			"value": ""
 		}
 	]
 }
