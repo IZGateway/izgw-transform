@@ -10,6 +10,7 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Log
@@ -22,6 +23,16 @@ public class XformApplicationController {
             AccessControlRegistry registry
     ) {
         registry.register(this);
+    }
+
+    @RolesAllowed({"public"})
+    @GetMapping("/healthy")
+    public ResponseEntity<Boolean> isHealthy() {
+        boolean healthy = HealthService.getHealth().isHealthy();
+        if (!healthy) {
+            return ResponseEntity.status(503).body(false);
+        }
+        return ResponseEntity.ok(true);
     }
 
     @RolesAllowed({"admin"})
