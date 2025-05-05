@@ -59,6 +59,8 @@ public class XformPrincipalService implements PrincipalService {
 
         if (izgPrincipal == null) {
             izgPrincipal = new UnauthenticatedPrincipal();
+            // Move this to the UnauthenticatedPrincipal
+            izgPrincipal.getRoles().add("public");
             // Add admin role for localhost requests, but only for the UnauthenticatedPrincipal
             addRolesIfFromLocalhost(izgPrincipal, request);
         }

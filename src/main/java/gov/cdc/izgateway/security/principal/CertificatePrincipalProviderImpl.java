@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.security.principal;
 
+import gov.cdc.izgateway.logging.markers.Markers2;
 import gov.cdc.izgateway.principal.provider.CertificatePrincipalProvider;
 import gov.cdc.izgateway.security.*;
 import gov.cdc.izgateway.utils.X500Utils;
@@ -11,11 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 import javax.security.auth.x500.X500Principal;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 
 /**
  * This class provides a principal from a certificate
@@ -29,8 +35,8 @@ public class CertificatePrincipalProviderImpl implements CertificatePrincipalPro
     private final CertificateValidator validator;
 
     @Autowired
-    public CertificatePrincipalProviderImpl(ClientTlsSupport clientTlsSupport) {
-        this.validator = new CertificateValidator((X509TrustManager) clientTlsSupport.getTrustManagers()[0]);
+    public CertificatePrincipalProviderImpl(TrustManagerProvider provider) {
+        this.validator = new CertificateValidator(provider.getServerTrustManager());
     }
 
     @Override
@@ -97,6 +103,7 @@ public class CertificatePrincipalProviderImpl implements CertificatePrincipalPro
 
         return principal;
     }
+
 
 }
 
