@@ -4250,7 +4250,6 @@
 															"",
 															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 															"pm.collectionVariables.set(\"currentDataPath\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
 															"pm.collectionVariables.set(\"currentForPrecondition\", true);",
 															"pm.collectionVariables.set(\"currentForOperation\", false);"
@@ -4271,9 +4270,9 @@
 															"let savedData = JSON.stringify(response);",
 															"",
 															"pm.collectionVariables.set(\"createdEntity\", savedData);",
+															"pm.collectionVariables.set(\"currentId\", response.id);",
 															"",
 															"pm.test(\"created object fields match\", function() {",
-															"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
 															"    pm.expect(response.fieldName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 															"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 															"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
@@ -4292,7 +4291,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
+													"raw": "{\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -8207,7 +8206,6 @@
 															"",
 															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 															"pm.collectionVariables.set(\"currentDataPath\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
 															"pm.collectionVariables.set(\"currentForPrecondition\", false);",
 															"pm.collectionVariables.set(\"currentForOperation\", false);"
@@ -8229,8 +8227,9 @@
 															"",
 															"pm.collectionVariables.set(\"createdEntity\", savedData);",
 															"",
+															"pm.collectionVariables.set(\"currentId\", response.id);",
+															"",
 															"pm.test(\"created object fields match\", function() {",
-															"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
 															"    pm.expect(response.fieldName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 															"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 															"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
@@ -8252,7 +8251,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
+													"raw": "{\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -18012,10 +18011,10 @@
 									]
 								},
 								{
-									"name": "Fields",
+									"name": "Fields w/ JWT",
 									"item": [
 										{
-											"name": "Create Precondition Field with JWT",
+											"name": "Create Precondition Field w/ JWT",
 											"event": [
 												{
 													"listen": "prerequest",
@@ -18026,11 +18025,10 @@
 															"    We want to make a call to get precondition/fields and make sure this is NOT there.",
 															"*/",
 															"",
-															"//pm.collectionVariables.clear();",
+															"pm.collectionVariables.clear();",
 															"",
 															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 															"pm.collectionVariables.set(\"currentDataPath\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
 															"pm.collectionVariables.set(\"currentForPrecondition\", true);",
 															"pm.collectionVariables.set(\"currentForOperation\", false);"
@@ -18051,6 +18049,7 @@
 															"let savedData = JSON.stringify(response);",
 															"",
 															"pm.collectionVariables.set(\"createdEntity\", savedData);",
+															"pm.collectionVariables.set(\"currentId\", response.id);",
 															"",
 															"pm.test(\"created object fields match\", function() {",
 															"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
@@ -18072,7 +18071,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
+													"raw": "{\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -18096,7 +18095,7 @@
 											"response": []
 										},
 										{
-											"name": "Get Operation Fields with JWT",
+											"name": "Get Operation Fields w/ JWT",
 											"event": [
 												{
 													"listen": "test",
@@ -18170,7 +18169,7 @@
 											"response": []
 										},
 										{
-											"name": "Delete Precondition Field with JWT",
+											"name": "Delete Precondition Field w/ JWT",
 											"event": [
 												{
 													"listen": "test",
@@ -18214,6 +18213,28 @@
 												}
 											},
 											"response": []
+										}
+									],
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"type": "text/javascript",
+												"packages": {},
+												"exec": [
+													""
+												]
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"type": "text/javascript",
+												"packages": {},
+												"exec": [
+													""
+												]
+											}
 										}
 									]
 								}
@@ -21767,11 +21788,10 @@
 															"    We want to make a call to get precondition/fields and make sure this is NOT there.",
 															"*/",
 															"",
-															"//pm.collectionVariables.clear();",
+															"pm.collectionVariables.clear();",
 															"",
 															"pm.collectionVariables.set(\"currentName\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
 															"pm.collectionVariables.set(\"currentDataPath\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
-															"pm.collectionVariables.set(\"currentId\", pm.variables.replaceIn(\"{{$randomUUID}}\"));",
 															"pm.collectionVariables.set(\"currentActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
 															"pm.collectionVariables.set(\"currentForPrecondition\", false);",
 															"pm.collectionVariables.set(\"currentForOperation\", false);"
@@ -21792,9 +21812,9 @@
 															"let savedData = JSON.stringify(response);",
 															"",
 															"pm.collectionVariables.set(\"createdEntity\", savedData);",
+															"pm.collectionVariables.set(\"currentId\", response.id);",
 															"",
 															"pm.test(\"created object fields match\", function() {",
-															"    pm.expect(response.id).to.equal(pm.collectionVariables.get(\"currentId\"));",
 															"    pm.expect(response.fieldName).to.equal(pm.collectionVariables.get(\"currentName\"));",
 															"    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
 															"    pm.expect(response.dataPath).to.equal(pm.collectionVariables.get(\"currentDataPath\"));",
@@ -21816,7 +21836,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n  \"id\" : \"{{currentId}}\",\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
+													"raw": "{\n  \"fieldName\" : \"{{currentName}}\",\n  \"dataPath\": \"{{currentDataPath}}\",\n  \"active\" : {{currentActive}},\n  \"forPrecondition\": {{currentForPrecondition}},\n  \"forOperation\": {{currentForOperation}}\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -28795,6 +28815,14 @@
 			"value": ""
 		},
 		{
+			"key": "currentOrgId",
+			"value": ""
+		},
+		{
+			"key": "currentOrgActive",
+			"value": ""
+		},
+		{
 			"key": "existingUserId",
 			"value": ""
 		},
@@ -28803,19 +28831,11 @@
 			"value": ""
 		},
 		{
-			"key": "existingActive",
-			"value": ""
-		},
-		{
 			"key": "existingUserOrganizationIds",
 			"value": ""
 		},
 		{
-			"key": "currentOrgId",
-			"value": ""
-		},
-		{
-			"key": "currentOrgActive",
+			"key": "existingActive",
 			"value": ""
 		}
 	]
