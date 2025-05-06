@@ -57,6 +57,11 @@ public class AccessControlService extends GenericService<AccessControl> {
     public Boolean checkXformAccess(String method, String path) {
         List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);
 
+        // Check for public access
+        if (allowedRoles.contains(Roles.ANY)) {
+            return true;
+        }
+
         // If RequestContext.getRoles() has one role that matches the roles list, return true
         return RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);
     }
