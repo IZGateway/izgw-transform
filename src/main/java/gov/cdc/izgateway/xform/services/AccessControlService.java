@@ -58,7 +58,7 @@ public class AccessControlService extends GenericService<AccessControl> {
         List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);
 
         // Check for public access
-        if (allowedRoles.contains(Roles.ANY)) {
+        if (allowedRoles.contains(Roles.PUBLIC_ACCESS)) {
             return true;
         }
 

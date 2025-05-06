@@ -3,7 +3,6 @@ package gov.cdc.izgateway.xform;
 import gov.cdc.izgateway.common.HealthService;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.xform.security.Roles;
-import gov.cdc.izgateway.xform.services.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,7 +25,7 @@ public class XformApplicationController {
         registry.register(this);
     }
 
-    @RolesAllowed({Roles.ANY})
+    @RolesAllowed({Roles.PUBLIC_ACCESS})
     @GetMapping("/healthy")
     public ResponseEntity<Boolean> isHealthy() {
         boolean healthy = HealthService.getHealth().isHealthy();

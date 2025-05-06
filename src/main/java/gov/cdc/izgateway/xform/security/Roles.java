@@ -25,7 +25,7 @@ public class Roles {
     public static final String NOT_ADMIN_HEADER = "X-Not-Admin";
 
     // Special role for public access to an API endpoint.  Health check endpoints use this role.
-    public static final String ANY = "any";
+    public static final String PUBLIC_ACCESS = "public-access";
 
     /**
      * A list of all roles to enable validation of role names
@@ -36,7 +36,7 @@ public class Roles {
     		ADMIN, XFORM_SENDING_SYSTEM, 
     		PIPELINE_READER, PIPELINE_WRITER, PIPELINE_DELETER,
     		ORGANIZATION_READER, ORGANIZATION_WRITER, ORGANIZATION_DELETER,
-    		SOLUTION_READER, SOLUTION_WRITER, SOLUTION_DELETER, ANY
+    		SOLUTION_READER, SOLUTION_WRITER, SOLUTION_DELETER, PUBLIC_ACCESS
     	)
     );
     private Roles() {}
