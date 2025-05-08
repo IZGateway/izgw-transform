@@ -21,5 +21,18 @@ public class MappingService extends GenericService<Mapping> {
                 .findFirst()
                 .orElse(null);
     }
+
+    @Override
+    protected boolean isDuplicate(Mapping mapping) {
+        return repo.getEntitySet().stream()
+                .anyMatch(m ->
+                        m.getOrganizationId().equals(mapping.getOrganizationId()) &&
+                                m.getCodeSystem().equalsIgnoreCase(mapping.getCodeSystem()) &&
+                                m.getCode().equalsIgnoreCase(mapping.getCode()) &&
+                                m.getTargetCodeSystem().equalsIgnoreCase(mapping.getTargetCodeSystem()) &&
+                                m.getTargetCode().equalsIgnoreCase(mapping.getTargetCode())
+                );
+    }
+
 }
 

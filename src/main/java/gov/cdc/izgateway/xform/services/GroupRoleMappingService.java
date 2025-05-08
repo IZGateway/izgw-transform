@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static org.bouncycastle.asn1.x509.X509ObjectIdentifiers.organization;
+
 @Slf4j
 @Service
 public class GroupRoleMappingService extends GenericService<GroupRoleMapping> implements GroupToRoleMapper {
@@ -40,5 +42,14 @@ public class GroupRoleMappingService extends GenericService<GroupRoleMapping> im
         }
         return roles;
     }
+
+    @Override
+    protected boolean isDuplicate(GroupRoleMapping groupRoleMapping) {
+        return repo.getEntitySet().stream()
+                .anyMatch(grp ->
+                        grp.getGroupName().equalsIgnoreCase(groupRoleMapping.getGroupName())
+                );
+    }
+
 }
 

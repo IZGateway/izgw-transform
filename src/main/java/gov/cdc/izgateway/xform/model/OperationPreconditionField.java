@@ -11,7 +11,6 @@ import java.util.UUID;
 @Setter
 public class OperationPreconditionField implements BaseModel {
 
-    @NotNull(message = "Field ID is required")
     private UUID id;
 
     @NotBlank(message = "Field name is required")

@@ -15,7 +15,6 @@ import gov.cdc.izgateway.xform.security.Roles;
 @Getter
 @Setter
 public class GroupRoleMapping implements BaseModel {
-    @NotNull(message = "GroupRoleMapping - ID is required")
     private UUID id;
     @NotBlank(message = "GroupRoleMapping - Name is required")
     private String groupName;

@@ -12,4 +12,12 @@ public class SolutionService extends GenericService<Solution> {
         super(repo);
     }
 
+    @Override
+    protected boolean isDuplicate(Solution solution) {
+        return repo.getEntitySet().stream().anyMatch(s ->
+                        s.getSolutionName().equalsIgnoreCase(solution.getSolutionName()) &&
+                        s.getVersion().equalsIgnoreCase(solution.getVersion())
+        );
+    }
+
 }
