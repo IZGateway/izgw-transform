@@ -46,6 +46,13 @@ public class CertificatePrincipalProviderImpl implements CertificatePrincipalPro
      * @return	The certificate
      */
     private X509Certificate getCertificate(HttpServletRequest request) {
+        // Log all request headers
+        log.info("Request Headers:");
+        request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+            String headerValue = request.getHeader(headerName);
+            log.info("{}: {}", headerName, headerValue);
+        });
+
         X509Certificate cert = getCertificateFromAttribute(request);
         if (cert != null) return cert;
 
