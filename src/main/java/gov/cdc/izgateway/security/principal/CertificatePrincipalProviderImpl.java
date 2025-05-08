@@ -52,7 +52,7 @@ public class CertificatePrincipalProviderImpl implements CertificatePrincipalPro
                     String headerValue = request.getHeader(headerName);
                  log.info("{}: {}", headerName, headerValue);
                });
-        
+
         X509Certificate cert = getCertificateFromAttribute(request);
         if (cert != null) return cert;
 
