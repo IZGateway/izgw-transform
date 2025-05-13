@@ -1,6 +1,6 @@
 [ {
   "id" : "fe65c254-eeee-4d41-a81c-187847a10dd0",
-  "groupName" : "Xform Admin",
+  "groupName" : "Xform Administrators",
   "active" : true,
   "roles" : [ "pipeline-reader", "pipeline-writer", "pipeline-deleter", "solution-reader", "solution-writer", "solution-deleter", "organization-reader", "organization-writer", "organization-deleter", "admin" ]
 }, {

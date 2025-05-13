@@ -17,9 +17,22 @@ public class MappingService extends GenericService<Mapping> {
 
     public Mapping getMapping(UUID organizationId, Code code) {
         return repo.getEntitySet().stream()
-                .filter(m -> m.getOrganizationId().equals(organizationId.toString()) && m.getCodeSystem().equals(code.codeSystem()) && m.getCode().equals(code.code()))
+                .filter(m -> m.getOrganizationId().equals(organizationId) && m.getCodeSystem().equals(code.codeSystem()) && m.getCode().equals(code.code()))
                 .findFirst()
                 .orElse(null);
     }
+
+    @Override
+    protected boolean isDuplicate(Mapping mapping) {
+        return repo.getEntitySet().stream()
+                .anyMatch(m ->
+                        m.getOrganizationId().equals(mapping.getOrganizationId()) &&
+                                m.getCodeSystem().equalsIgnoreCase(mapping.getCodeSystem()) &&
+                                m.getCode().equalsIgnoreCase(mapping.getCode()) &&
+                                m.getTargetCodeSystem().equalsIgnoreCase(mapping.getTargetCodeSystem()) &&
+                                m.getTargetCode().equalsIgnoreCase(mapping.getTargetCode())
+                );
+    }
+
 }
 

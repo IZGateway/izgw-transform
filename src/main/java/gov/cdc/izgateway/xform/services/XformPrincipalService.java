@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.services;
 
+import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.info.HostInfo;
 import gov.cdc.izgateway.principal.provider.CertificatePrincipalProvider;
 import gov.cdc.izgateway.principal.provider.JwtPrincipalProvider;
@@ -8,16 +9,14 @@ import gov.cdc.izgateway.security.UnauthenticatedPrincipal;
 import gov.cdc.izgateway.security.service.PrincipalService;
 import gov.cdc.izgateway.xform.model.User;
 import gov.cdc.izgateway.xform.security.Roles;
+import gov.cdc.izgateway.xform.security.XformPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -64,8 +63,16 @@ public class XformPrincipalService implements PrincipalService {
             addRolesIfFromLocalhost(izgPrincipal, request);
         }
 
-        return izgPrincipal;
+        if ( izgPrincipal instanceof UnauthenticatedPrincipal ) {
+            return izgPrincipal;
+        } else {
+            XformPrincipal xformPrincipal = new XformPrincipal(izgPrincipal);
+            User user = userService.getUserByUserName(xformPrincipal.getName());
+            xformPrincipal.setAllowedOrganizationIds(user.getOrganizationIds());
+            return xformPrincipal;
+        }
     }
+
 
     /**
      * Gets the principal from the JWT in the request.

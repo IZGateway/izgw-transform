@@ -40,5 +40,14 @@ public class GroupRoleMappingService extends GenericService<GroupRoleMapping> im
         }
         return roles;
     }
+
+    @Override
+    protected boolean isDuplicate(GroupRoleMapping groupRoleMapping) {
+        return repo.getEntitySet().stream()
+                .anyMatch(grp ->
+                        grp.getGroupName().equalsIgnoreCase(groupRoleMapping.getGroupName())
+                );
+    }
+
 }
 

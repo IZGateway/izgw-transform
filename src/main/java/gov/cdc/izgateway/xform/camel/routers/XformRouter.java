@@ -79,7 +79,10 @@ public class XformRouter extends RouteBuilder {
      * then be sent back to the caller.
      */
     from(EndpointUris.LOOPBACK_HUB_PIPELINE)
-    	.bean(dataXformService);
+    	.bean(dataXformService)
+    	.process(exchange -> {
+            exchange.setMessage(exchange.getIn()); // Echo the body
+        });
     
     // KY Use case
     from(EndpointUris.DIRECT_IIS_PIPELINE)

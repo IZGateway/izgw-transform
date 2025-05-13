@@ -4,18 +4,18 @@ import gov.cdc.izgateway.xform.model.Pipeline;
 import gov.cdc.izgateway.xform.repository.XformRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.UUID;
 
 @Service
 public class PipelineService extends GenericService<Pipeline>{
+
     @Autowired
     public PipelineService(XformRepository<Pipeline> repo) {
         super(repo);
     }
 
     public Pipeline getPipelineByOrganizationAndEndpoints(UUID organizationId, String inboundEndpoint, String outboundEndpoint) {
-        return repo.getEntitySet()
+        return getList()
                 .stream()
                 .filter(
                         p -> p.getOrganizationId().equals(organizationId)
@@ -23,4 +23,14 @@ public class PipelineService extends GenericService<Pipeline>{
                                 && p.getOutboundEndpoint().equals(outboundEndpoint)
                 ).findFirst().orElse(null);
     }
+
+    @Override
+    protected boolean isDuplicate(Pipeline pipeline) {
+        return repo.getEntitySet().stream().anyMatch(p ->
+                p.getOrganizationId().equals(pipeline.getOrganizationId()) &&
+                        p.getInboundEndpoint().equalsIgnoreCase(pipeline.getInboundEndpoint()) &&
+                        p.getOutboundEndpoint().equalsIgnoreCase(pipeline.getOutboundEndpoint())
+        );
+    }
+
 }

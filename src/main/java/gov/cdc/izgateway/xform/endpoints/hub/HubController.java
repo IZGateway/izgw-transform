@@ -14,6 +14,7 @@ import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
 import gov.cdc.izgateway.xform.camel.constants.EndpointUris;
 import gov.cdc.izgateway.xform.context.IZGXformContext;
 import gov.cdc.izgateway.xform.context.ServiceContext;
+import gov.cdc.izgateway.xform.logging.advice.PipelineAdvice;
 import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
 import gov.cdc.izgateway.xform.model.Destination;
 import gov.cdc.izgateway.xform.model.DestinationId;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -75,26 +77,36 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
         IZGXformContext context = createXformContext(organization, submitSingleMessage);
 
+    	String transformedRequest = null;
+    	boolean isLoopback = false;
         try {
-        	if (RequestContext.getHttpHeaders().get("X-Loopback").stream().anyMatch(v -> v.equalsIgnoreCase("true"))) {
+        	List<String> headers = RequestContext.getHttpHeaders().get("x-loopback");
+        	if (headers != null && headers.stream().anyMatch(v -> v.equalsIgnoreCase("true"))) {
         		producerTemplate.sendBody(EndpointUris.LOOPBACK_HUB_PIPELINE, context);
+        		isLoopback = true;
         	} else {
         		producerTemplate.sendBody(EndpointUris.DIRECT_HUB_PIPELINE, context);
         	}
-
-            if (XformAdviceCollector.getTransactionData().getPipelineAdvice() != null) {
-                if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed())
-                    context.getSubmitSingleMessageResponse().getXformHeader().setTransformedRequest(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());
-                if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isResponseTransformed())
-                    context.getSubmitSingleMessageResponse().getXformHeader().setOriginalResponse(XformAdviceCollector.getTransactionData().getPipelineAdvice().getResponse());
+        	PipelineAdvice advice = XformAdviceCollector.getTransactionData().getPipelineAdvice();
+            if (advice != null) {
+                if (advice.isRequestTransformed())
+                	transformedRequest = advice.getTransformedRequest();
+                    context.getSubmitSingleMessageResponse().getXformHeader().setTransformedRequest(transformedRequest);
+                if (advice.isResponseTransformed())
+                    context.getSubmitSingleMessageResponse().getXformHeader().setOriginalResponse(advice.getResponse());
             }
 
             context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
         } catch (CamelExecutionException | HL7Exception e) {
             throw new HubControllerFault(e.getCause().getMessage());
         }
+        if (isLoopback) {
+        	return new ResponseEntity<>(transformedRequest, HttpStatus.OK);
+        }
 
-        return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
+        return checkResponseEntitySize(
+        	new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK)
+        );
     }
 
     protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {

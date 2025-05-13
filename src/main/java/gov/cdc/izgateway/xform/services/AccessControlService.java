@@ -57,6 +57,11 @@ public class AccessControlService extends GenericService<AccessControl> {
     public Boolean checkXformAccess(String method, String path) {
         List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);
 
+        // Check for public access
+        if (allowedRoles.contains(Roles.PUBLIC_ACCESS)) {
+            return true;
+        }
+
         // If RequestContext.getRoles() has one role that matches the roles list, return true
         return RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);
     }
@@ -68,5 +73,19 @@ public class AccessControlService extends GenericService<AccessControl> {
         }
 
         return userRoleMap;
+    }
+
+    /**
+     * Checks if an access control with the same user id already exists
+     *
+     * @param accessControl The Access Control to check for duplication
+     * @return true if a duplicate exists, false otherwise
+     */
+    @Override
+    protected boolean isDuplicate(AccessControl accessControl) {
+        return repo.getEntitySet().stream()
+                .anyMatch(ac ->
+                        ac.getUserId().equals(accessControl.getUserId())
+                );
     }
 }
