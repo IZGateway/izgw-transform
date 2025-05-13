@@ -12,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Setter
 public class Solution implements BaseModel {
-    @NotNull(message = "Solution ID is required")
+
     private UUID id;
 
     @NotBlank(message = "Solution name is required")

@@ -69,4 +69,18 @@ public class AccessControlService extends GenericService<AccessControl> {
 
         return userRoleMap;
     }
+
+    /**
+     * Checks if an access control with the same user id already exists
+     *
+     * @param accessControl The Access Control to check for duplication
+     * @return true if a duplicate exists, false otherwise
+     */
+    @Override
+    protected boolean isDuplicate(AccessControl accessControl) {
+        return repo.getEntitySet().stream()
+                .anyMatch(ac ->
+                        ac.getUserId().equals(accessControl.getUserId())
+                );
+    }
 }

@@ -237,6 +237,14 @@
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>org.hl7.fhir.convertors</artifactId>
 			<version>6.4.0</version>
+			<exclusions>
+				<!-- sqlite 3.47.2.0 pulled in is caught by
+				     owasp scanner.  Excluding as we do not use SQLite -->
+				<exclusion>
+					<groupId>org.xerial</groupId>
+					<artifactId>sqlite-jdbc</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>

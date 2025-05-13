@@ -16,5 +16,13 @@ public class UserService extends GenericService<User> {
         return repo.getEntitySet().stream().filter(o -> o.getUserName().equals(userName) && Boolean.TRUE.equals(o.getActive())).findFirst().orElse(null);
     }
 
+    @Override
+    protected boolean isDuplicate(User user) {
+        return repo.getEntitySet().stream()
+                .anyMatch(u ->
+                        u.getUserName().equalsIgnoreCase(user.getUserName())
+                );
+    }
+
 }
 

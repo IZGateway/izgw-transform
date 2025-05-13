@@ -11,7 +11,6 @@ import java.util.UUID;
 public class Organization implements BaseModel {
     @NotBlank(message = "Organization name is required")
     private String organizationName;
-    @NotNull(message = "Organization ID is required")
     private UUID id;
     @NotNull(message = "Organization active status is required")
     private Boolean active;
