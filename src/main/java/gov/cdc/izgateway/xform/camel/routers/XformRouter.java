@@ -72,6 +72,15 @@ public class XformRouter extends RouteBuilder {
         .to(EndpointUris.IZGHUB_IISHubService)
         .bean(dataXformService);
 
+    /*
+     * This route will take the incoming message (the IZGHub wsdl
+     * endpoint used for the xform service) and transform it
+     * using the hl7TransformerService. The transformed message will
+     * then be sent back to the caller.
+     */
+    from(EndpointUris.LOOPBACK_HUB_PIPELINE)
+    	.bean(dataXformService);
+    
     // KY Use case
     from(EndpointUris.DIRECT_IIS_PIPELINE)
         .bean(dataXformService)
