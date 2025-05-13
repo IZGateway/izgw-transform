@@ -16,7 +16,7 @@ public class EndpointUris {
     public static final String DIRECT_HUB_PIPELINE = "direct:izghubTransformerPipeline";
     
     /** The URI to place the incoming message onto the Camel route for a loopback */
-    public static final String LOOPBACK_HUB_PIPELINE = "loopback:izghubTransformerPipeline";
+    public static final String LOOPBACK_HUB_PIPELINE = "direct:izghubLoopbackPipeline";
 
     /** The URI to place the incoming message onto the Camel route for IIS pipelines */
     public static final String DIRECT_IIS_PIPELINE = "direct:iisTransformerPipeline";
