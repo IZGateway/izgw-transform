@@ -76,7 +76,11 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
         IZGXformContext context = createXformContext(organization, submitSingleMessage);
 
         try {
-            producerTemplate.sendBody("direct:izghubTransformerPipeline", context);
+        	if (RequestContext.getHttpHeaders().get("X-Loopback").stream().anyMatch(v -> v.equalsIgnoreCase("true"))) {
+        		producerTemplate.sendBody(EndpointUris.LOOPBACK_HUB_PIPELINE, context);
+        	} else {
+        		producerTemplate.sendBody(EndpointUris.DIRECT_HUB_PIPELINE, context);
+        	}
 
             if (XformAdviceCollector.getTransactionData().getPipelineAdvice() != null) {
                 if ( XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed())
