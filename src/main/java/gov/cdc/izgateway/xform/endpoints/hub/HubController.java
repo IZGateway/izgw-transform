@@ -11,6 +11,7 @@ import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
 import gov.cdc.izgateway.soap.message.SoapMessage;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.xform.camel.constants.EndpointUris;
 import gov.cdc.izgateway.xform.context.IZGXformContext;
 import gov.cdc.izgateway.xform.context.ServiceContext;
@@ -18,6 +19,7 @@ import gov.cdc.izgateway.xform.logging.advice.PipelineAdvice;
 import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
 import gov.cdc.izgateway.xform.model.Destination;
 import gov.cdc.izgateway.xform.model.DestinationId;
+import gov.cdc.izgateway.xform.enums.DataFlowDirection;
 import gov.cdc.izgateway.xform.enums.DataType;
 import gov.cdc.izgateway.xform.security.Roles;
 import gov.cdc.izgateway.xform.services.AccessControlService;
@@ -75,41 +77,79 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
         RequestContext.getDestinationInfo().setId(destinationId);
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
+
+        List<String> headers = RequestContext.getHttpHeaders().get("x-loopback");
+        if (headers != null && headers.stream().anyMatch(v -> "true".equalsIgnoreCase(v))) {
+        	return loopbackSingleMessage(submitSingleMessage);
+        }
+        	
         IZGXformContext context = createXformContext(organization, submitSingleMessage);
 
     	String transformedRequest = null;
-    	boolean isLoopback = false;
+    	SubmitSingleMessageResponse response = null;
         try {
-        	List<String> headers = RequestContext.getHttpHeaders().get("x-loopback");
-        	if (headers != null && headers.stream().anyMatch(v -> v.equalsIgnoreCase("true"))) {
-        		producerTemplate.sendBody(EndpointUris.LOOPBACK_HUB_PIPELINE, context);
-        		isLoopback = true;
-        	} else {
-        		producerTemplate.sendBody(EndpointUris.DIRECT_HUB_PIPELINE, context);
-        	}
+    		producerTemplate.sendBody(EndpointUris.DIRECT_HUB_PIPELINE, context);
         	PipelineAdvice advice = XformAdviceCollector.getTransactionData().getPipelineAdvice();
+    		response = context.getSubmitSingleMessageResponse(); 
+        	
             if (advice != null) {
-                if (advice.isRequestTransformed())
+                if (advice.isRequestTransformed()) {
                 	transformedRequest = advice.getTransformedRequest();
-                    context.getSubmitSingleMessageResponse().getXformHeader().setTransformedRequest(transformedRequest);
-                if (advice.isResponseTransformed())
-                    context.getSubmitSingleMessageResponse().getXformHeader().setOriginalResponse(advice.getResponse());
+                	if (response != null) {
+                		response.getXformHeader().setTransformedRequest(transformedRequest);
+                	}
+                }
+                if (response != null && advice.isResponseTransformed()) {
+                	response.getXformHeader().setOriginalResponse(advice.getResponse());
+                }
             }
-
-            context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
+            
+        	response.setHl7Message(context.getServiceContext().getResponseMessage().encode());
         } catch (CamelExecutionException | HL7Exception e) {
             throw new HubControllerFault(e.getCause().getMessage());
         }
-        if (isLoopback) {
-        	return new ResponseEntity<>(transformedRequest, HttpStatus.OK);
-        }
-
-        return checkResponseEntitySize(
-        	new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK)
-        );
+        
+        return checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
     }
 
-    protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+    private ResponseEntity<?> loopbackSingleMessage(SubmitSingleMessageRequest submitSingleMessage) throws Fault  {
+        UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
+    	IZGXformContext context = createXformContext(organization, submitSingleMessage);
+
+    	String transformedRequest = null;
+    	boolean isResponse = submitSingleMessage.getHl7Message().contains("MSA|");
+    	SubmitSingleMessageResponse response = 
+    		new SubmitSingleMessageResponse(submitSingleMessage, getMessageNamespace(), true);
+    	if (isResponse) {
+    		// Setup for the Response Path
+        	response.setHl7Message(submitSingleMessage.getHl7Message());
+    		context.setSubmitSingleMessageResponse(response);
+    		context.getServiceContext().setCurrentDirection(DataFlowDirection.RESPONSE);
+    	}
+    	try {
+    		producerTemplate.sendBody(EndpointUris.LOOPBACK_HUB_PIPELINE, context);
+        	PipelineAdvice advice = XformAdviceCollector.getTransactionData().getPipelineAdvice();
+        	
+            if (advice != null) {
+                if (advice.isRequestTransformed()) {
+                	transformedRequest = advice.getTransformedRequest();
+            		response.getXformHeader().setTransformedRequest(transformedRequest);
+                }
+                if (advice.isResponseTransformed()) {
+                	response.getXformHeader().setOriginalResponse(advice.getResponse());
+                }
+            }
+            if (!isResponse) {
+            	response.setHl7Message(transformedRequest);
+            } 
+        } catch (CamelExecutionException e) {
+            throw new HubControllerFault(e.getCause().getMessage());
+        }
+        
+        return checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
+	}
+
+	protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         try {
             return new ServiceContext(organization,
                     EndpointUris.IZGTS_IISHubService,

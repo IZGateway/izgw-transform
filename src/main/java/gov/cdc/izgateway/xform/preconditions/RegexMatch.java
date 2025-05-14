@@ -13,6 +13,8 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 
 @Getter
 @Setter
@@ -56,7 +58,7 @@ public class RegexMatch implements Precondition, Advisable, Transformable {
         if (this.dataPath.startsWith("state.")) {
             String stateKey = this.dataPath.split("\\.")[1];
             String stateValue = context.getState().get(stateKey);
-            Matcher matcher = getMatcher(stateValue);
+            Matcher matcher = getMatcher(StringUtils.defaultString(stateValue));
             return matcher.matches();
         } else if (context.getDataType().equals(DataType.HL7V2)) {
             return new Hl7v2RegexMatch(this).evaluate(context);
@@ -67,7 +69,7 @@ public class RegexMatch implements Precondition, Advisable, Transformable {
 
     protected Matcher getMatcher(String sourceValue) {
         Pattern pattern = Pattern.compile(this.getRegex());
-        return pattern.matcher(sourceValue);
+        return pattern.matcher(StringUtils.defaultString(sourceValue));
     }
 
     @Override

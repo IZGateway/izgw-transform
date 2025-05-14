@@ -152,17 +152,19 @@
   "version" : "1.0",
   "active" : true,
   "requestOperations" : [ {
-    "preconditions" : [ {
-      "method" : "equals",
-      "id" : "d21c3430-39cc-41e2-9f66-33f7b52e1f56",
-      "dataPath" : "/MSH-9-1",
-      "comparisonValue" : "VXU"
-    } ],
+    "preconditions" : [],
     "operationList" : [ {
       "method" : "regex_replace",
       "id" : "ad5920c1-83fb-4b94-afd7-38b67c9bbcf4",
       "order" : 0,
       "field" : "/PID-11-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "id" : "0196cf96-f9c6-79eb-a11e-a8f6c543c8b5",
+      "order" : 0,
+      "field" : "/QPD-8-5",
       "regex" : "^(\\d{5})(\\d{4})$",
       "replacement" : "$1-$2"
     } ]
