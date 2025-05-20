@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static org.bouncycastle.asn1.x509.X509ObjectIdentifiers.organization;
+
 @Slf4j
 @Service
 public class GroupRoleMappingService extends GenericService<GroupRoleMapping> implements GroupToRoleMapper {
