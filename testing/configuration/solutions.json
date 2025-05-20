@@ -169,7 +169,24 @@
       "replacement" : "$1-$2"
     } ]
   } ],
-  "responseOperations" : [ ]
+  "responseOperations" : [ {
+    "preconditions" : [],
+    "operationList" : [ {
+      "method" : "regex_replace",
+      "id" : "0196d000-655f-7515-a264-2ce60692f74a",
+      "order" : 0,
+      "field" : "/PID-11-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    }, {
+      "method" : "regex_replace",
+      "id" : "0196d000-d133-7899-a646-5833ddb05a09",
+      "order" : 0,
+      "field" : "/QPD-8-5",
+      "regex" : "^(\\d{5})(\\d{4})$",
+      "replacement" : "$1-$2"
+    } ]
+  } ]
 }, {
   "id" : "bf3326fe-ab52-4d6c-b37f-7db5f1769c4c",
   "solutionName" : "POSTMAN MSH-19-1 Response Transformer - DO NOT DELETE",
