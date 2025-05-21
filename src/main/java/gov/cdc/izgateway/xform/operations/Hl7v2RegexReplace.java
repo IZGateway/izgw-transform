@@ -21,20 +21,25 @@ public class Hl7v2RegexReplace extends RegexReplace implements Operation {
 
         try {
             Message message = context.getCurrentMessage();
-
             Terser terser = new Terser(message);
-
-            String sourceValue = terser.get(this.getField());
+            String sourceValue = getField(terser);
             if (sourceValue != null) {
                 String cleanedValue = sourceValue.replaceAll(this.getRegex(), this.getReplacement());
                 terser.set(this.getField(), cleanedValue);
-
                 context.setCurrentMessage(message);
             }
         } catch (HL7Exception ex) {
             throw new OperationException(ex.getMessage(), ex.getCause());
         }
-        
+    }
+    
+    private String getField(Terser terser) {
+        try {
+			return terser.get(this.getField());
+		} catch (HL7Exception e) {
+			// The field does not exist, simply return null.
+			return null;
+		}
     }
 }
 

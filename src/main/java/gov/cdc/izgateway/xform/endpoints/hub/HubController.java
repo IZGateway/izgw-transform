@@ -78,8 +78,7 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
         RequestContext.getDestinationInfo().setId(destinationId);
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
 
-        List<String> headers = RequestContext.getHttpHeaders().get("x-loopback");
-        if (headers != null && headers.stream().anyMatch(v -> "true".equalsIgnoreCase(v))) {
+        if (isLoopback()) {
         	return loopbackSingleMessage(submitSingleMessage);
         }
         	
@@ -112,7 +111,15 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
         return checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
     }
 
-    private ResponseEntity<?> loopbackSingleMessage(SubmitSingleMessageRequest submitSingleMessage) throws Fault  {
+    /**
+     * @return true if this message is requesting loopback processing, false otherwise.
+     */
+    private boolean isLoopback() {
+        List<String> headers = RequestContext.getHttpHeaders().get("x-loopback");
+        return headers != null && headers.stream().anyMatch(v -> "true".equalsIgnoreCase(v));
+	}
+
+	private ResponseEntity<?> loopbackSingleMessage(SubmitSingleMessageRequest submitSingleMessage) throws Fault  {
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
     	IZGXformContext context = createXformContext(organization, submitSingleMessage);
 
