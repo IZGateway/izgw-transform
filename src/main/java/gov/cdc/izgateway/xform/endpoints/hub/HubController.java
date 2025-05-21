@@ -41,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
 @RestController
@@ -76,7 +77,7 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
         IZGXformContext context = createXformContext(organization, submitSingleMessage);
 
         try {
-        	if (RequestContext.getHttpHeaders().get("X-Loopback").stream().anyMatch(v -> v.equalsIgnoreCase("true"))) {
+        	if (RequestContext.getHttpHeaders().getOrDefault("X-Loopback", Collections.emptyList()).stream().anyMatch(v -> v.equalsIgnoreCase("true"))) {
         		producerTemplate.sendBody(EndpointUris.LOOPBACK_HUB_PIPELINE, context);
         	} else {
         		producerTemplate.sendBody(EndpointUris.DIRECT_HUB_PIPELINE, context);
