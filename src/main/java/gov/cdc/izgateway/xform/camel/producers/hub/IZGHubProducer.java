@@ -35,7 +35,7 @@ public class IZGHubProducer extends ProducerBase {
         try {
             context.getSubmitSingleMessageRequest().setHl7Message(context.getServiceContext().getRequestMessage().encode());
         } catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
+            throw new HubControllerFault(e);
         }
 
         SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(destination,

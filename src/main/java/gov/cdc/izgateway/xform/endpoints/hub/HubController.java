@@ -106,7 +106,7 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
             
         	response.setHl7Message(context.getServiceContext().getResponseMessage().encode());
         } catch (CamelExecutionException | HL7Exception e) {
-            throw new HubControllerFault(e.getCause().getMessage());
+            throw new HubControllerFault(e.getCause());
         }
         
         return checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
@@ -143,7 +143,7 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
             	response.setHl7Message(transformedRequest);
             } 
         } catch (CamelExecutionException e) {
-            throw new HubControllerFault(e.getCause().getMessage());
+            throw new HubControllerFault(e.getCause());
         }
         
         return checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
@@ -158,7 +158,7 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
                     submitSingleMessage.getFacilityID(),
                     submitSingleMessage.getHl7Message());
         } catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
+            throw new HubControllerFault(e);
         }
     }
 
