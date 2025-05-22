@@ -31,11 +31,11 @@ public class OrganizationDynamoDBRepository extends GenericDynamoDBRepository<Or
     private static TableSchema<Organization> getTableSchema() {
         return StaticTableSchema.builder(Organization.class)
                 .newItemSupplier(Organization::new)
-                .addAttribute(String.class, a -> a.name("entityName")
+                .addAttribute(String.class, a -> a.name("entityType")
                         .getter(org -> "Organization")
                         .setter((org, val) -> {/* Read-only attribute */})
                         .tags(StaticAttributeTags.primaryPartitionKey()))
-                .addAttribute(String.class, a -> a.name("id")
+                .addAttribute(String.class, a -> a.name("sortKey")
                         .getter(org -> org.getId() != null ? org.getId().toString() : null)
                         .setter((org, val) -> org.setId(val != null ? UUID.fromString(val) : null))
                         .tags(StaticAttributeTags.primarySortKey()))
