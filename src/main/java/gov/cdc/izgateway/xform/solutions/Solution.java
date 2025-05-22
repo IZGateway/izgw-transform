@@ -35,27 +35,15 @@ public class Solution implements Advisable, Transformable {
 
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws SolutionException {
-
-        if (context.getCurrentDirection().equals(DataFlowDirection.REQUEST)) {
-            for (SolutionOperation so : requestOperations) {
-                hasTransformed = true;
-                try {
-                    so.execute(context);
-                } catch (SolutionOperationException e) {
-                    throw new SolutionException(String.format("Failed to execute solution: %s - %s", so.getClass().getSimpleName(), e.getMessage()), e.getCause());
-                }
-            }
-        } else if (context.getCurrentDirection().equals(DataFlowDirection.RESPONSE)) {
-            for (SolutionOperation so : responseOperations) {
-                hasTransformed = true;
-                try {
-                    so.execute(context);
-                } catch (SolutionOperationException e) {
-                    throw new SolutionException(String.format("Failed to execute solution: %s - %s", so.getClass().getSimpleName(), e.getMessage()), e.getCause());
-                }
+    	List<SolutionOperation> source = context.getCurrentDirection().equals(DataFlowDirection.REQUEST) ? requestOperations : responseOperations;
+        for (SolutionOperation so : source) {
+            hasTransformed = true;
+            try {
+                so.execute(context);
+            } catch (SolutionOperationException e) {
+                throw new SolutionException(String.format("Failed to execute solution: %s - %s", so.getClass().getSimpleName(), e.getMessage()), e.getCause());
             }
         }
-
     }
 
     @Override

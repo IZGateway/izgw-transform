@@ -83,7 +83,7 @@ public class IISController extends BaseController {
                     submitSingleMessage.getFacilityID(),
                     submitSingleMessage.getHl7Message());
         } catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
+            throw new HubControllerFault(e);
         }
     }
 

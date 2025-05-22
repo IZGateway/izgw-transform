@@ -3,6 +3,7 @@ package gov.cdc.izgateway.xform.services;
 import gov.cdc.izgateway.xform.annotations.CaptureXformAdvice;
 import gov.cdc.izgateway.xform.configuration.XformConfig;
 import gov.cdc.izgateway.xform.context.ServiceContext;
+import gov.cdc.izgateway.xform.enums.DataFlowDirection;
 import gov.cdc.izgateway.xform.logging.advice.Advisable;
 import gov.cdc.izgateway.xform.logging.advice.Transformable;
 import gov.cdc.izgateway.xform.model.Pipe;
@@ -14,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -43,7 +47,13 @@ public class PipelineRunnerService implements Advisable, Transformable {
             return;
         }
 
-        for (Pipe pipe : pipeline.getPipes()) {
+        List<Pipe> pipes = pipeline.getPipes();
+        // Reverse the direction of pipes processing the response
+        if (DataFlowDirection.RESPONSE.equals(context.getCurrentDirection())) {
+        	pipes = new ArrayList<Pipe>(pipes);
+        	Collections.reverse(pipes);
+        }
+        for (Pipe pipe : pipes) {
             log.trace("Executing Pipe: {}", pipe.getId());
 
             if (Boolean.TRUE.equals(preconditionsPassed(pipe))) {
