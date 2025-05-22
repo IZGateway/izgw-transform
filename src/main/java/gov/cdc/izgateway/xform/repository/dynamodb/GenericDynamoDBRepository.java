@@ -55,7 +55,18 @@ public abstract class GenericDynamoDBRepository<T extends BaseModel> implements 
     @Override
     public Set<T> getEntitySet() {
         try {
-            ScanEnhancedRequest scanRequest = ScanEnhancedRequest.builder().build();
+            // Create a filter expression to only return items with the matching entityType
+            ScanEnhancedRequest scanRequest = ScanEnhancedRequest.builder()
+                    .filterExpression(
+                            software.amazon.awssdk.enhanced.dynamodb.Expression.builder()
+                                    .expression("entityType = :entityType")
+                                    .putExpressionValue(":entityType",
+                                            software.amazon.awssdk.services.dynamodb.model.AttributeValue.builder()
+                                                    .s(getEntityName())
+                                                    .build())
+                                    .build())
+                    .build();
+
             PageIterable<T> results = table.scan(scanRequest);
 
             // Convert the results to a LinkedHashSet
