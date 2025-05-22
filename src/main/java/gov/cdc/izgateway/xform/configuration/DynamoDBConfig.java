@@ -8,6 +8,7 @@ import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import java.net.URI;
 
 @Configuration
 @ConditionalOnProperty(name = "xform.repository.type", havingValue = "dynamodb")
@@ -16,12 +17,20 @@ public class DynamoDBConfig {
     @Value("${xform.repository.dynamodb.region:us-east-1}")
     private String region;
 
+    @Value("${xform.repository.dynamodb.endpoint:}")
+    private String endpoint;
+
     @Bean
     public DynamoDbClient dynamoDbClient() {
-        return DynamoDbClient.builder()
+        var builder = DynamoDbClient.builder()
                 .region(Region.of(region))
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .build();
+                .credentialsProvider(DefaultCredentialsProvider.create());
+
+        if (endpoint != null && !endpoint.isEmpty()) {
+            builder.endpointOverride(URI.create(endpoint));
+        }
+
+        return builder.build();
     }
 
     @Bean

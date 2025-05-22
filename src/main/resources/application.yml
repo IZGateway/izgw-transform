@@ -14,6 +14,8 @@ xform:
     dynamodb:
       # Move region into code See Hub's factory
       region: us-east-1
+      # Endpoint can be set to connect to a local DynamoDB instance (e.g., http://localhost:8000)
+      endpoint: ${XFORM_DYNAMODB_ENDPOINT:}
       organizations-table: izgw-hub
   configurations:
     organizations: testing/configuration/organizations.json
@@ -60,7 +62,7 @@ v2tofhir:
   receivingApplication: ${RECEIVING_APPLICATION:TEST}
   receivingFacility: ${RECEIVING_FACILITY:MOCK}
   facilityId: ${FACILITY_ID:IZG}
-  
+
 management:
   metrics:
     export:
