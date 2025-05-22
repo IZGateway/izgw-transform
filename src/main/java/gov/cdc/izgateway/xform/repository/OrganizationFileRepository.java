@@ -11,7 +11,6 @@ import java.util.LinkedHashSet;
 
 @Repository
 @ConditionalOnProperty(name = "xform.repository.type", havingValue = "file", matchIfMissing = true)
-@Primary
 public class OrganizationFileRepository extends GenericFileRepository<Organization> {
 
     @Value("${xform.configurations.organizations}")

@@ -1,6 +1,8 @@
-package gov.cdc.izgateway.xform.repository;
+package gov.cdc.izgateway.xform.repository.dynamodb;
 
 import gov.cdc.izgateway.xform.model.BaseModel;
+import gov.cdc.izgateway.xform.repository.RepositoryRuntimeException;
+import gov.cdc.izgateway.xform.repository.XformRepository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
