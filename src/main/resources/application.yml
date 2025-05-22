@@ -9,6 +9,12 @@ xform:
       uri: ${XFORM_IIS_DESTINATION:https://localhost/dev/IISService}
       id: ${XFORM_IIS_DESTINATION_ID:iis}
       type: 5
+  repository:
+    type: dynamodb
+    dynamodb:
+      # Move region into code See Hub's factory
+      region: us-east-1
+      organizations-table: izgw-hub
   configurations:
     organizations: testing/configuration/organizations.json
     pipelines: testing/configuration/pipelines.json
