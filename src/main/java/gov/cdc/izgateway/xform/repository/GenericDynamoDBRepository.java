@@ -22,6 +22,13 @@ public abstract class GenericDynamoDBRepository<T extends BaseModel> implements 
     protected final TableSchema<T> tableSchema;
     protected DynamoDbTable<T> table;
 
+    /**
+     * Returns the entity name to be used as the partition key.
+     * This should be implemented by each specific repository.
+     * @return the entity name
+     */
+    protected abstract String getEntityName();
+
     protected GenericDynamoDBRepository(DynamoDbEnhancedClient dynamoDbClient, String tableName, Class<T> entityClass, TableSchema<T> tableSchema) {
         this.dynamoDbClient = dynamoDbClient;
         this.tableName = tableName;
@@ -33,7 +40,10 @@ public abstract class GenericDynamoDBRepository<T extends BaseModel> implements 
     @Override
     public T getEntity(UUID id) {
         try {
-            Key key = Key.builder().partitionValue(id.toString()).build();
+            Key key = Key.builder()
+                    .partitionValue(getEntityName())
+                    .sortValue(id.toString())
+                    .build();
             return table.getItem(key);
         } catch (DynamoDbException e) {
             throw new RepositoryRuntimeException(String.format("Error retrieving entity with ID %s: %s", id, e.getMessage()), e);
@@ -45,7 +55,7 @@ public abstract class GenericDynamoDBRepository<T extends BaseModel> implements 
         try {
             ScanEnhancedRequest scanRequest = ScanEnhancedRequest.builder().build();
             PageIterable<T> results = table.scan(scanRequest);
-            
+
             // Convert the results to a LinkedHashSet
             return results.items().stream()
                     .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -75,7 +85,10 @@ public abstract class GenericDynamoDBRepository<T extends BaseModel> implements 
     @Override
     public void deleteEntity(UUID id) {
         try {
-            Key key = Key.builder().partitionValue(id.toString()).build();
+            Key key = Key.builder()
+                    .partitionValue(getEntityName())
+                    .sortValue(id.toString())
+                    .build();
             table.deleteItem(key);
         } catch (DynamoDbException e) {
             throw new RepositoryRuntimeException(String.format("Error deleting entity with ID %s: %s", id, e.getMessage()), e);

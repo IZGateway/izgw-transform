@@ -17,6 +17,7 @@ xform:
       # Endpoint can be set to connect to a local DynamoDB instance (e.g., http://localhost:8000)
       endpoint: ${XFORM_DYNAMODB_ENDPOINT:}
       organizations-table: izgw-hub
+      table: izgw-hub-2
   configurations:
     organizations: testing/configuration/organizations.json
     pipelines: testing/configuration/pipelines.json
