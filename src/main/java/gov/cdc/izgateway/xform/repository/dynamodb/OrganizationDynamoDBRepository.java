@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.xform.repository;
+package gov.cdc.izgateway.xform.repository.dynamodb;
 
 import gov.cdc.izgateway.xform.model.Organization;
 import org.springframework.beans.factory.annotation.Value;
