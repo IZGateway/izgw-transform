@@ -19,17 +19,26 @@ public class OrganizationDynamoDBRepository extends GenericDynamoDBRepository<Or
 
     public OrganizationDynamoDBRepository(
             DynamoDbEnhancedClient dynamoDbClient,
-            @Value("${xform.repository.dynamodb.organizations-table}") String tableName) {
+            @Value("${xform.repository.dynamodb.table}") String tableName) {
         super(dynamoDbClient, tableName, Organization.class, getTableSchema());
+    }
+
+    @Override
+    protected String getEntityName() {
+        return "Organization";
     }
 
     private static TableSchema<Organization> getTableSchema() {
         return StaticTableSchema.builder(Organization.class)
                 .newItemSupplier(Organization::new)
+                .addAttribute(String.class, a -> a.name("entityName")
+                        .getter(org -> "Organization")
+                        .setter((org, val) -> {/* Read-only attribute */})
+                        .tags(StaticAttributeTags.primaryPartitionKey()))
                 .addAttribute(String.class, a -> a.name("id")
                         .getter(org -> org.getId() != null ? org.getId().toString() : null)
                         .setter((org, val) -> org.setId(val != null ? UUID.fromString(val) : null))
-                        .tags(StaticAttributeTags.primaryPartitionKey()))
+                        .tags(StaticAttributeTags.primarySortKey()))
                 .addAttribute(String.class, a -> a.name("organizationName")
                         .getter(Organization::getOrganizationName)
                         .setter(Organization::setOrganizationName))
