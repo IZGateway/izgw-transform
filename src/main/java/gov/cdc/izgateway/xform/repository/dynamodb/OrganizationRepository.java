@@ -11,9 +11,9 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 @Repository
 @ConditionalOnProperty(name = "xform.repository.type", havingValue = "dynamodb")
 @Primary
-public class OrganizationDynamoDBRepository extends GenericDynamoDBRepository<Organization> {
+public class OrganizationRepository extends GenericDynamoDBRepository<Organization> {
 
-    public OrganizationDynamoDBRepository(
+    public OrganizationRepository(
             DynamoDbEnhancedClient dynamoDbClient,
             @Value("${xform.repository.dynamodb.table}") String tableName) {
         super(dynamoDbClient, tableName, Organization.class, TableSchema.fromBean(Organization.class));

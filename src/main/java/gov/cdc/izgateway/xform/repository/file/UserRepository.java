@@ -1,22 +1,22 @@
 package gov.cdc.izgateway.xform.repository.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import gov.cdc.izgateway.xform.model.GroupRoleMapping;
+import gov.cdc.izgateway.xform.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.util.LinkedHashSet;
 
 @Repository
-public class GroupRoleMappingFileRepository extends GenericFileRepository<GroupRoleMapping> {
+public class UserRepository extends GenericFileRepository<User> {
 
-    @Value("${xform.configurations.group-role-mapping}")
+    @Value("${xform.configurations.users}")
     protected void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
     @Override
-    protected TypeReference<LinkedHashSet<GroupRoleMapping>> getTypeReference() {
+    protected TypeReference<LinkedHashSet<User>> getTypeReference() {
         return new TypeReference<>() {};
     }
 }
