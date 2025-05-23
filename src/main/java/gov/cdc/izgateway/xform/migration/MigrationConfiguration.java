@@ -38,13 +38,9 @@ public class MigrationConfiguration {
             Pipeline.class, pipelines,
             GroupRoleMapping.class, groupRoleMapping,
             Mapping.class, mappings,
-            OperationPreconditionField.class, operationPreconditionFields
-            // Add more entities as they get DynamoDB repositories
-            // Solution.class, solutions,
-            // Mapping.class, mappings,
+            OperationPreconditionField.class, operationPreconditionFields,
+            Solution.class, solutions
             // User.class, users,
-            // GroupRoleMapping.class, groupRoleMapping,
-            // OperationPreconditionField.class, operationPreconditionFields
         );
     }
 }
