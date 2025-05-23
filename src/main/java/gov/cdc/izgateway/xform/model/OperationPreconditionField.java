@@ -4,11 +4,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
 import java.util.UUID;
 
 @Getter
 @Setter
+@DynamoDbBean
 public class OperationPreconditionField extends BaseModel {
 
     private UUID id;
