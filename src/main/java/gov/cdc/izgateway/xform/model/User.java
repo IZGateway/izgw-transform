@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class User implements BaseModel {
+public class User extends BaseModel {
     @NotBlank(message = "User - Name is required")
     private String userName;
 

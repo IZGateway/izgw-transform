@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class Mapping implements BaseModel, OrganizationAware {
+public class Mapping extends BaseModel implements OrganizationAware {
     private UUID id;
     @NotNull(message = "Mapping active status is required")
     private Boolean active;

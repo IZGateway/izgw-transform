@@ -21,7 +21,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @DynamoDbBean
-public class Pipeline implements BaseModel, OrganizationAware {
+public class Pipeline extends BaseModel implements OrganizationAware {
 
     @NotBlank(message = "Pipeline name is required")
     private String pipelineName;
@@ -72,28 +72,6 @@ public class Pipeline implements BaseModel, OrganizationAware {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error deserializing pipes", e);
         }
-    }
-
-    @JsonIgnore
-    @DynamoDbPartitionKey
-    @DynamoDbAttribute("entityType")
-    public String getEntityType() {
-        return getClass().getSimpleName();
-    }
-
-    public void setEntityType(String entityType) {
-        // Read-only attribute
-    }
-
-    @JsonIgnore
-    @DynamoDbSortKey
-    @DynamoDbAttribute("sortKey")
-    public String getSortKey() {
-        return id != null ? id.toString() : null;
-    }
-
-    public void setSortKey(String sortKey) {
-        this.id = sortKey != null ? UUID.fromString(sortKey) : null;
     }
 
 }

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class OperationPreconditionField implements BaseModel {
+public class OperationPreconditionField extends BaseModel {
 
     private UUID id;
 
