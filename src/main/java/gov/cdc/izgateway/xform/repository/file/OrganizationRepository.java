@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 
 @Repository
 @ConditionalOnProperty(name = "xform.repository.type", havingValue = "file", matchIfMissing = true)
-public class OrganizationFileRepository extends GenericFileRepository<Organization> {
+public class OrganizationRepository extends GenericFileRepository<Organization> {
 
     @Value("${xform.configurations.organizations}")
     protected void setFilePath(String filePath) {

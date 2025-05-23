@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.LinkedHashSet;
 
 @Repository
-public class MappingFileRepository extends GenericFileRepository<Mapping> {
+public class MappingRepository extends GenericFileRepository<Mapping> {
 
     @Value("${xform.configurations.mappings}")
     protected void setFilePath(String filePath) {

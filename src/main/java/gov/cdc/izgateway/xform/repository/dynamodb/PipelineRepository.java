@@ -15,9 +15,9 @@ import java.util.UUID;
 @Repository
 @ConditionalOnProperty(name = "xform.repository.type", havingValue = "dynamodb")
 @Primary
-public class PipelineDynamoDBRepository extends GenericDynamoDBRepository<Pipeline> {
+public class PipelineRepository extends GenericDynamoDBRepository<Pipeline> {
 
-    public PipelineDynamoDBRepository(
+    public PipelineRepository(
             DynamoDbEnhancedClient dynamoDbClient,
             @Value("${xform.repository.dynamodb.table}") String tableName) {
         super(dynamoDbClient, tableName, Pipeline.class, getTableSchema());
