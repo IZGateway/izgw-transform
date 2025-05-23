@@ -3,7 +3,6 @@ package gov.cdc.izgateway.xform.repository.dynamodb;
 import gov.cdc.izgateway.xform.model.Pipeline;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
@@ -14,7 +13,6 @@ import java.util.UUID;
 
 @Repository
 @ConditionalOnProperty(name = "xform.repository.type", havingValue = "dynamodb")
-@Primary
 public class PipelineRepository extends GenericDynamoDBRepository<Pipeline> {
 
     public PipelineRepository(
