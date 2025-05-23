@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Migrates Organization entities from file storage to DynamoDB.
+ * Migrates Organizations from file storage to DynamoDB.
  */
 @Slf4j
 @Component
@@ -33,43 +33,38 @@ public class OrganizationMigrator implements EntityMigrator<Organization> {
     }
     
     @Override
-    public MigrationResult migrate() {
-        try {
-            Set<Organization> organizations = fileRepository.getEntitySet();
-            int totalCount = organizations.size();
-            int migratedCount = 0;
-            int skippedCount = 0;
-            
-            log.debug("Found {} organizations in file storage", totalCount);
-            
-            for (Organization org : organizations) {
-                try {
-                    // Check if organization already exists in DynamoDB
-                    Organization existing = dynamoDbRepository.getEntity(org.getId());
-                    if (existing != null) {
-                        log.debug("Organization {} already exists in DynamoDB, skipping", org.getId());
-                        skippedCount++;
-                        continue;
-                    }
-                    
-                    // Migrate the organization
-                    dynamoDbRepository.createEntity(org);
-                    migratedCount++;
-                    log.debug("Migrated organization: {} ({})", org.getOrganizationName(), org.getId());
-                    
-                } catch (Exception e) {
-                    log.warn("Failed to migrate organization {} ({}): {}", 
-                            org.getOrganizationName(), org.getId(), e.getMessage());
-                    // Continue with other organizations
+    public MigrationCounts migrate() {
+        Set<Organization> organizations = fileRepository.getEntitySet();
+        int totalCount = organizations.size();
+        int migratedCount = 0;
+        int skippedCount = 0;
+        
+        log.info("Found {} organizations in file storage", totalCount);
+        
+        for (Organization org : organizations) {
+            try {
+                Organization existing = dynamoDbRepository.getEntity(org.getId());
+                if (existing != null) {
+                    log.info("Organization {} already exists in DynamoDB, skipping", org.getId());
+                    skippedCount++;
+                    continue;
                 }
+                
+                dynamoDbRepository.createEntity(org);
+                migratedCount++;
+                log.info("Migrated organization: {} ({})", org.getOrganizationName(), org.getId());
+                
+            } catch (Exception e) {
+                log.warn("Failed to migrate organization {} ({}): {}", 
+                        org.getOrganizationName(), org.getId(), e.getMessage());
+                // Keep going with other organizations
             }
-            
-            return MigrationResult.success(getEntityName(), totalCount, migratedCount, skippedCount);
-            
-        } catch (Exception e) {
-            log.error("Failed to migrate organizations", e);
-            return MigrationResult.failure(getEntityName(), e);
         }
+        
+        log.info("Successfully migrated {}/{} organizations ({} skipped)",
+                migratedCount, totalCount, skippedCount);
+        
+        return new MigrationCounts(totalCount, migratedCount, skippedCount);
     }
     
     @Override
@@ -79,11 +74,12 @@ public class OrganizationMigrator implements EntityMigrator<Organization> {
     
     @Override
     public String getEntityName() {
-        return "Organization";
+        return Organization.class.getSimpleName();
     }
     
     /**
-     * Temporary file repository for reading organizations during migration.
+     * Temp file repository for reading organizations during migration
+     * Necessary because of dependency injection/configuration Spring constraints
      */
     private static class OrganizationFileRepository extends GenericFileRepository<Organization> {
         
@@ -98,7 +94,8 @@ public class OrganizationMigrator implements EntityMigrator<Organization> {
     }
     
     /**
-     * Temporary DynamoDB repository for writing organizations during migration.
+     * Temp DynamoDB repository for writing organizations during migration
+     * Necessary because of dependency injection/configuration Spring constraints
      */
     private static class OrganizationDynamoDBRepository extends GenericDynamoDBRepository<Organization> {
         
@@ -108,7 +105,7 @@ public class OrganizationMigrator implements EntityMigrator<Organization> {
         
         @Override
         protected String getEntityName() {
-            return "Organization";
+            return Organization.class.getSimpleName();
         }
     }
 }

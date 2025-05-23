@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Service that orchestrates migration of all entity types from file storage to DynamoDB.
+ * Service to migrate entity types from file storage to DynamoDB.
  */
 @Slf4j
 @Service
@@ -21,9 +21,9 @@ public class DataMigrationService {
     }
     
     /**
-     * Executes migration for all registered entity migrators.
+     * Run migration for all existing entity migrators.
      *
-     * @return Overall migration success status
+     * @return Migration success status
      */
     public boolean migrateAll() {
         log.info("Starting data migration for {} entity types", migrators.size());
@@ -34,34 +34,24 @@ public class DataMigrationService {
         int totalSkipped = 0;
         
         for (EntityMigrator<?> migrator : migrators) {
-            log.info("Migrating {} entities...", migrator.getEntityName());
+            log.info("Migrating {}...", migrator.getEntityName());
             
             try {
-                MigrationResult result = migrator.migrate();
-                
-                if (result.isSuccess()) {
-                    log.info("✓ {}", result.getMessage());
-                    totalEntities += result.getTotalCount();
-                    totalMigrated += result.getMigratedCount();
-                    totalSkipped += result.getSkippedCount();
-                } else {
-                    log.error("✗ {}", result.getMessage());
-                    if (result.getError() != null) {
-                        log.error("Migration error details:", result.getError());
-                    }
-                    overallSuccess = false;
-                }
+                MigrationCounts counts = migrator.migrate();
+                totalEntities += counts.total();
+                totalMigrated += counts.migrated();
+                totalSkipped += counts.skipped();
             } catch (Exception e) {
-                log.error("Unexpected error during {} migration: {}", migrator.getEntityName(), e.getMessage(), e);
+                log.error("Failed to migrate {}: {}", migrator.getEntityName(), e.getMessage(), e);
                 overallSuccess = false;
             }
         }
         
         if (overallSuccess) {
-            log.info("✓ Migration completed successfully: {}/{} entities migrated ({} skipped)", 
+            log.info("Migration completed successfully: {}/{} entities migrated ({} skipped)",
                     totalMigrated, totalEntities, totalSkipped);
         } else {
-            log.error("✗ Migration completed with errors");
+            log.error("Migration completed with errors");
         }
         
         return overallSuccess;
