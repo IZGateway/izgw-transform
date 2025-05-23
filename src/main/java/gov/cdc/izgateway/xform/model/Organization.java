@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @DynamoDbBean
-public class Organization implements BaseModel {
+public class Organization extends BaseModel {
     @NotBlank(message = "Organization name is required")
     private String organizationName;
     
@@ -25,27 +25,5 @@ public class Organization implements BaseModel {
     
     @NotNull(message = "Organization common name is required")
     private String commonName;
-
-    @JsonIgnore
-    @DynamoDbPartitionKey
-    @DynamoDbAttribute("entityType")
-    public String getEntityType() {
-        return getClass().getSimpleName();
-    }
-    
-    public void setEntityType(String entityType) {
-        // Read-only attribute
-    }
-
-    @JsonIgnore
-    @DynamoDbSortKey
-    @DynamoDbAttribute("sortKey")
-    public String getSortKey() {
-        return id != null ? id.toString() : null;
-    }
-    
-    public void setSortKey(String sortKey) {
-        this.id = sortKey != null ? UUID.fromString(sortKey) : null;
-    }
 }
 

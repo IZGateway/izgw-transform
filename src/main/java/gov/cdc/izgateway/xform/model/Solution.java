@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class Solution implements BaseModel {
+public class Solution extends BaseModel {
 
     private UUID id;
 
