@@ -7,12 +7,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
 import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
+@DynamoDbBean
 public class User extends BaseModel {
     @NotBlank(message = "User - Name is required")
     private String userName;

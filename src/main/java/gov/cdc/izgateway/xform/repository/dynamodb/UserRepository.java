@@ -1,6 +1,6 @@
 package gov.cdc.izgateway.xform.repository.dynamodb;
 
-import gov.cdc.izgateway.xform.model.Organization;
+import gov.cdc.izgateway.xform.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Repository;
@@ -9,16 +9,16 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
 @Repository
 @ConditionalOnExpression("'${xform.repository.type}'.equals('dynamodb') || '${xform.repository.type}'.equals('migration')")
-public class OrganizationRepository extends GenericDynamoDBRepository<Organization> {
-
-    public OrganizationRepository(
+public class UserRepository extends GenericDynamoDBRepository<User> {
+    public UserRepository(
             DynamoDbEnhancedClient dynamoDbClient,
             @Value("${xform.repository.dynamodb.table}") String tableName) {
-        super(dynamoDbClient, tableName, Organization.class, TableSchema.fromBean(Organization.class));
+        super(dynamoDbClient, tableName, User.class, TableSchema.fromBean(User.class));
     }
 
     @Override
     protected String getEntityName() {
-        return Organization.class.getSimpleName();
+        return User.class.getSimpleName();
     }
+
 }

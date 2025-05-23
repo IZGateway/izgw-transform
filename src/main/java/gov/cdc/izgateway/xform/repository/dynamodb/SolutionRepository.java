@@ -22,7 +22,7 @@ public class SolutionRepository extends GenericDynamoDBRepository<Solution> {
 
     @Override
     protected String getEntityName() {
-        return getClass().getSimpleName();
+        return Solution.class.getSimpleName();
     }
 
     // TODO - look at getting rid of this somehow.

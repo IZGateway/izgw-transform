@@ -18,7 +18,7 @@ public class AccessControlRepository extends GenericDynamoDBRepository<AccessCon
 
     @Override
     protected String getEntityName() {
-        return getClass().getSimpleName();
+        return AccessControl.class.getSimpleName();
     }
 
 }
