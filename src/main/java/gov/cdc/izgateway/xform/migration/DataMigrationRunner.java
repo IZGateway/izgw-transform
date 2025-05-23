@@ -8,7 +8,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
- * ApplicationRunner that executes data migration from file storage to DynamoDB on application startup.
+ * Executes migration from file storage to DynamoDB on application startup
+ * if the repository type is set to 'migration'
  */
 @Slf4j
 @Component
@@ -24,23 +25,22 @@ public class DataMigrationRunner implements ApplicationRunner {
     
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        // Migration is always enabled when repository.type=migration
-        
-        log.info("=== Starting Data Migration from File Storage to DynamoDB ===");
+
+        log.info("Starting Data Migration from File Storage to DynamoDB");
         
         try {
             boolean success = migrationService.migrateAll();
             
             if (success) {
-                log.info("=== Data Migration Completed Successfully ===");
+                log.info("Data Migration Completed Successfully");
                 log.info("IMPORTANT: Set 'xform.repository.type=dynamodb' for future startups to use DynamoDB only");
             } else {
-                log.error("=== Data Migration Completed with Errors ===");
+                log.error("Data Migration Completed with Errors");
                 log.error("Please review the errors above and fix any issues before retrying");
             }
             
         } catch (Exception e) {
-            log.error("=== Data Migration Failed ===", e);
+            log.error("Data Migration Failed", e);
             throw new RuntimeException("Migration failed: " + e.getMessage(), e);
         }
     }
