@@ -35,7 +35,8 @@ public class MigrationConfiguration {
         return Map.of(
             Organization.class, organizations,
             AccessControl.class, accessControl,
-            Pipeline.class, pipelines
+            Pipeline.class, pipelines,
+            GroupRoleMapping.class, groupRoleMapping
             // Add more entities as they get DynamoDB repositories
             // Solution.class, solutions,
             // Mapping.class, mappings,
