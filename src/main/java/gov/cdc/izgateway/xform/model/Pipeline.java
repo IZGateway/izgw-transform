@@ -12,8 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbIgnore;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,6 +46,12 @@ public class Pipeline extends BaseModel implements OrganizationAware {
     @Valid
     private List<Pipe> pipes;
 
+    /*
+     * DynamoDB only has built-in conversion for primitives (String, Integer, etc...)
+     * and simple collections (List<String> for example).
+     * Needed to create the getter/setter to work
+     */
+
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @JsonIgnore
@@ -72,6 +77,11 @@ public class Pipeline extends BaseModel implements OrganizationAware {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Error deserializing pipes", e);
         }
+    }
+
+    @DynamoDbIgnore
+    public List<Pipe> getPipes() {
+        return pipes;
     }
 
 }
