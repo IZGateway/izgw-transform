@@ -2,8 +2,12 @@
 
 TODO - Austin to update this doc
 
+- Pickup w/ Postman Get Field - Existing Prev Cursor
 - Check for existance of DynamoDB table, create if it doesn't exist
 - Make partition and sort key names configurable
+- Remove need for the MigrationConfiguration 
+- Look at adding logging for Operations/Preconditions (it's missed because they override getEntitySet)
+- Sorting of objects returned via getEntitySet? currently file-based is the order its in the file.  DynamoDB is the sortKey which is the UUID of the object.
 
 This package contains the repository layer for the application, which provides data access to the underlying storage.
 
