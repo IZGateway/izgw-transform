@@ -36,7 +36,8 @@ public class MigrationConfiguration {
             Organization.class, organizations,
             AccessControl.class, accessControl,
             Pipeline.class, pipelines,
-            GroupRoleMapping.class, groupRoleMapping
+            GroupRoleMapping.class, groupRoleMapping,
+            Mapping.class, mappings
             // Add more entities as they get DynamoDB repositories
             // Solution.class, solutions,
             // Mapping.class, mappings,
