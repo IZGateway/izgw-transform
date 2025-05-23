@@ -1,5 +1,10 @@
 # Repository Layer
 
+TODO - Austin to update this doc
+
+- Check for existance of DynamoDB table, create if it doesn't exist
+- Make partition and sort key names configurable
+
 This package contains the repository layer for the application, which provides data access to the underlying storage.
 
 ## Storage Options

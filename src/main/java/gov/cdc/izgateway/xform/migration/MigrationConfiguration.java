@@ -39,8 +39,8 @@ public class MigrationConfiguration {
             GroupRoleMapping.class, groupRoleMapping,
             Mapping.class, mappings,
             OperationPreconditionField.class, operationPreconditionFields,
-            Solution.class, solutions
-            // User.class, users,
+            Solution.class, solutions,
+            User.class, users
         );
     }
 }

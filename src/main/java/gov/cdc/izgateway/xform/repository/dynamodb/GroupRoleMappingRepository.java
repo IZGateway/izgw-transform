@@ -20,6 +20,6 @@ public class GroupRoleMappingRepository extends GenericDynamoDBRepository<GroupR
 
     @Override
     protected String getEntityName() {
-        return getClass().getSimpleName();
+        return GroupRoleMapping.class.getSimpleName();
     }
 }

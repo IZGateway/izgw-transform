@@ -23,7 +23,7 @@ public class PipelineRepository extends GenericDynamoDBRepository<Pipeline> {
 
     @Override
     protected String getEntityName() {
-        return "Pipeline";
+        return Pipeline.class.getSimpleName();
     }
 
     // TODO - look at getting rid of this somehow.

@@ -18,7 +18,7 @@ public class OperationPreconditionFieldRepository extends GenericDynamoDBReposit
 
     @Override
     protected String getEntityName() {
-        return getClass().getSimpleName();
+        return OperationPreconditionField.class.getSimpleName();
     }
 
 }
