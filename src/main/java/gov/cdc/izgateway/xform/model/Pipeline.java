@@ -78,8 +78,7 @@ public class Pipeline implements BaseModel, OrganizationAware {
     @DynamoDbPartitionKey
     @DynamoDbAttribute("entityType")
     public String getEntityType() {
-        // TODO - get this via reflection?
-        return "Pipeline";
+        return getClass().getSimpleName();
     }
 
     public void setEntityType(String entityType) {

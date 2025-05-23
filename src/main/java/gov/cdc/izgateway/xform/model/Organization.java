@@ -30,8 +30,7 @@ public class Organization implements BaseModel {
     @DynamoDbPartitionKey
     @DynamoDbAttribute("entityType")
     public String getEntityType() {
-        // TODO - get this via reflection?
-        return "Organization";
+        return getClass().getSimpleName();
     }
     
     public void setEntityType(String entityType) {
