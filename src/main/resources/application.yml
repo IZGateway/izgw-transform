@@ -10,7 +10,7 @@ xform:
       id: ${XFORM_IIS_DESTINATION_ID:iis}
       type: 5
   repository:
-    type: dynamodb
+    type: file
     dynamodb:
       # Move region into code See Hub's factory
       region: us-east-1

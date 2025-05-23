@@ -1,4 +1,4 @@
-package gov.cdc.izgateway.xform.repository;
+package gov.cdc.izgateway.xform.repository.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import gov.cdc.izgateway.xform.model.OperationPreconditionField;
