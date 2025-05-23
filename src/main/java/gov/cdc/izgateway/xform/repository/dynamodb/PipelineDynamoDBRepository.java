@@ -1,18 +1,15 @@
 package gov.cdc.izgateway.xform.repository.dynamodb;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import gov.cdc.izgateway.xform.model.Pipeline;
-import gov.cdc.izgateway.xform.model.Pipe;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.StaticAttributeTags;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.StaticTableSchema;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.StaticAttributeTags;
 
-import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -31,6 +28,10 @@ public class PipelineDynamoDBRepository extends GenericDynamoDBRepository<Pipeli
         return "Pipeline";
     }
 
+    // TODO - look at getting rid of this somehow.
+    // Can't use TableSchema.fromBean(Pipeline.class), similar to Organization
+    // because Pipelines are made up of Pipes which are then made up of
+    // preconditions
     private static TableSchema<Pipeline> getTableSchema() {
         return StaticTableSchema.builder(Pipeline.class)
                 .newItemSupplier(Pipeline::new)
@@ -61,28 +62,8 @@ public class PipelineDynamoDBRepository extends GenericDynamoDBRepository<Pipeli
                         .getter(Pipeline::getActive)
                         .setter(Pipeline::setActive))
                 .addAttribute(String.class, a -> a.name("pipes")
-                        .getter(pipeline -> {
-                            if (pipeline.getPipes() == null) {
-                                return null;
-                            }
-                            try {
-                                return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(pipeline.getPipes());
-                            } catch (Exception e) {
-                                throw new RuntimeException("Error serializing pipes", e);
-                            }
-                        })
-                        .setter((pipeline, val) -> {
-                            if (val == null) {
-                                pipeline.setPipes(null);
-                                return;
-                            }
-                            try {
-                                pipeline.setPipes(new com.fasterxml.jackson.databind.ObjectMapper().readValue(val, 
-                                    new com.fasterxml.jackson.core.type.TypeReference<List<Pipe>>() {}));
-                            } catch (Exception e) {
-                                throw new RuntimeException("Error deserializing pipes", e);
-                            }
-                        }))
+                        .getter(Pipeline::getPipesJson)
+                        .setter(Pipeline::setPipesJson))
                 .build();
     }
 }
