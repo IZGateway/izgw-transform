@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.xform.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import gov.cdc.izgateway.xform.constants.XformConstants;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
@@ -12,9 +13,15 @@ public abstract class BaseModel {
     public abstract void setId(UUID id);
     public abstract Boolean getActive();
 
+    /** The attribute to use for entity type */
+    public static final String ENTITY_TYPE = "entityType";
+    /** The attribute to use for the sort key */
+    public static final String SORT_KEY = "sortKey";
+
+
     @JsonIgnore
     @DynamoDbPartitionKey
-    @DynamoDbAttribute("entityType")
+    @DynamoDbAttribute(ENTITY_TYPE)
     public String getEntityType() {
         return getClass().getSimpleName();
     }
@@ -25,7 +32,7 @@ public abstract class BaseModel {
 
     @JsonIgnore
     @DynamoDbSortKey
-    @DynamoDbAttribute("sortKey")
+    @DynamoDbAttribute(SORT_KEY)
     public String getSortKey() {
         return getId() != null ? getId().toString() : null;
     }
