@@ -3,13 +3,21 @@
 TODO - Austin to update this doc
 
 - Pickup w/ Postman to make sure JWT section works
+- IAM requirements for this to run in AWS (maybe this is already documented for Hub)
 - Look at Hub documentation re: running locally + configuring in AWS re: setting region & credentials
   - Remember for documetation that if running in dynamodb mode that you'll have to set AWS env
-- Make sure that default repository type is file (so no ECS changes needed in APHL for initial deployment)
-- Default table name to izgw-hub in application.yml
-- Check for existance of DynamoDB table, create if it doesn't exist (or just do what Hub does)
 - Look at adding logging for Operations/Preconditions (it's missed because they override getEntitySet)
 - Sorting of objects returned via getEntitySet? currently file-based is the order its in the file.  DynamoDB is the sortKey which is the UUID of the object.
+- Document creation of table
+
+Tests
+
+- local ddb with no tables
+- local ddb with tables, but not configured table
+- remote ddb with tables, but not configured
+- Run Get's for all API endpoints on files
+  - Migrate (local) - run Get's for all API endpoints on ddb and diff (will require jq sort by uuid for both)
+  - 
 
 This package contains the repository layer for the application, which provides data access to the underlying storage.
 
