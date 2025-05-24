@@ -12,15 +12,22 @@ import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.extensions.VersionedRecordExtension;
 import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.ListTablesRequest;
+import software.amazon.awssdk.services.dynamodb.model.ListTablesResponse;
+
 import java.net.URI;
+import java.util.ServiceConfigurationError;
 
 @Configuration
 @ConditionalOnExpression("'${xform.repository.type}'.equals('dynamodb') || '${xform.repository.type}'.equals('migration')")
 @Slf4j
 public class DynamoDBConfig {
 
-    @Value("${xform.repository.dynamodb.endpoint:}")
+    @Value("${xform.repository.dynamodb.endpoint}")
     private String dynamodbEndpoint;
+
+    @Value("${xform.repository.dynamodb.table}")
+    private String dynamodbTable;
 
     @Bean
     public DynamoDbClient dynamoDbClient() {
@@ -37,9 +44,28 @@ public class DynamoDBConfig {
             log.info("DynamoDB Client initialized to {}", dynamodbEndpoint);
         }
 
-        // TODO - add check similar to hub to for tables
+        DynamoDbClient ddbClient = builder.build();
 
-        return builder.build();
+        ListTablesResponse listTablesResponse;
+        try {
+            ListTablesRequest lgtr = ListTablesRequest.builder().build();
+            listTablesResponse = ddbClient.listTables(lgtr);
+        } catch (Exception e) {
+            log.error("Cannot list tables in DynamoDB {}", StringUtils.defaultIfEmpty(dynamodbEndpoint, "AWS"));
+            throw new ServiceConfigurationError("Cannot list tables", e);
+        }
+
+        if (!listTablesResponse.hasTableNames()) {
+            log.error("No tables exist in DynamoDB {}", StringUtils.defaultIfEmpty(dynamodbEndpoint, "AWS"));
+            throw new ServiceConfigurationError("No tables exist in " + StringUtils.defaultIfEmpty(dynamodbEndpoint, "AWS"));
+        }
+
+        if (!listTablesResponse.tableNames().contains(dynamodbTable)) {
+            log.error("Configured table does not exist in DynamoDB: {}", dynamodbTable);
+            throw new ServiceConfigurationError("Configured table does not exist in DynamoDB: " + dynamodbTable);
+        }
+
+        return ddbClient;
     }
 
     @Bean
