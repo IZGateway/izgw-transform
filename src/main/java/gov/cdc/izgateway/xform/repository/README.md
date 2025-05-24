@@ -2,7 +2,8 @@
 
 TODO - Austin to update this doc
 
-- Pickup w/ Postman Get Field - Existing Prev Cursor
+- Pickup w/ Postman to make sure JWT section works
+- AWS region setting, look at hub
 - Check for existance of DynamoDB table, create if it doesn't exist
 - Make partition and sort key names configurable
 - Remove need for the MigrationConfiguration 
