@@ -3,9 +3,11 @@
 TODO - Austin to update this doc
 
 - Pickup w/ Postman to make sure JWT section works
-- AWS region setting, look at hub
-- Check for existance of DynamoDB table, create if it doesn't exist
-- Remove need for the MigrationConfiguration 
+- Look at Hub documentation re: running locally + configuring in AWS re: setting region & credentials
+  - Remember for documetation that if running in dynamodb mode that you'll have to set AWS env
+- Make sure that default repository type is file (so no ECS changes needed in APHL for initial deployment)
+- Default table name to izgw-hub in application.yml
+- Check for existance of DynamoDB table, create if it doesn't exist (or just do what Hub does)
 - Look at adding logging for Operations/Preconditions (it's missed because they override getEntitySet)
 - Sorting of objects returned via getEntitySet? currently file-based is the order its in the file.  DynamoDB is the sortKey which is the UUID of the object.
 
