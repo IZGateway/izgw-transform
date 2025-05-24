@@ -12,8 +12,6 @@ xform:
   repository:
     type: file
     dynamodb:
-      # Move region into code See Hub's factory
-      region: us-east-1
       # Endpoint can be set to connect to a local DynamoDB instance (e.g., http://localhost:8000)
       endpoint: ${XFORM_DYNAMODB_ENDPOINT:}
       table: izgw-hub
