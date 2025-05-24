@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.repository.dynamodb;
 
+import gov.cdc.izgateway.xform.model.BaseModel;
 import gov.cdc.izgateway.xform.model.Pipeline;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -33,11 +34,11 @@ public class PipelineRepository extends GenericDynamoDBRepository<Pipeline> {
     private static TableSchema<Pipeline> getTableSchema() {
         return StaticTableSchema.builder(Pipeline.class)
                 .newItemSupplier(Pipeline::new)
-                .addAttribute(String.class, a -> a.name("entityType")
+                .addAttribute(String.class, a -> a.name(BaseModel.ENTITY_TYPE)
                         .getter(pipeline -> "Pipeline")
                         .setter((pipeline, val) -> {/* Read-only attribute */})
                         .tags(StaticAttributeTags.primaryPartitionKey()))
-                .addAttribute(String.class, a -> a.name("sortKey")
+                .addAttribute(String.class, a -> a.name(BaseModel.SORT_KEY)
                         .getter(pipeline -> pipeline.getId() != null ? pipeline.getId().toString() : null)
                         .setter((pipeline, val) -> pipeline.setId(val != null ? UUID.fromString(val) : null))
                         .tags(StaticAttributeTags.primarySortKey()))

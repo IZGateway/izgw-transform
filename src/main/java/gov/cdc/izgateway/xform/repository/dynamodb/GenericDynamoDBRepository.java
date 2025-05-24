@@ -55,11 +55,12 @@ public abstract class GenericDynamoDBRepository<T extends BaseModel> implements 
     @Override
     public Set<T> getEntitySet() {
         try {
-            // Create a filter expression to only return items with the matching entityType
+            // Create a filter expression to only return items with the matching entity type
+            // The entity type is stored as the partition key
             ScanEnhancedRequest scanRequest = ScanEnhancedRequest.builder()
                     .filterExpression(
                             software.amazon.awssdk.enhanced.dynamodb.Expression.builder()
-                                    .expression("entityType = :entityType")
+                                    .expression(String.format("%s = :entityType", BaseModel.ENTITY_TYPE))
                                     .putExpressionValue(":entityType",
                                             software.amazon.awssdk.services.dynamodb.model.AttributeValue.builder()
                                                     .s(getEntityName())

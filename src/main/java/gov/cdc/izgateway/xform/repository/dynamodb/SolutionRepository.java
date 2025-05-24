@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.repository.dynamodb;
 
+import gov.cdc.izgateway.xform.model.BaseModel;
 import gov.cdc.izgateway.xform.model.Solution;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Repository
 @ConditionalOnExpression("'${xform.repository.type}'.equals('dynamodb') || '${xform.repository.type}'.equals('migration')")
 public class SolutionRepository extends GenericDynamoDBRepository<Solution> {
+
     public SolutionRepository(
             DynamoDbEnhancedClient dynamoDbClient,
             @Value("${xform.repository.dynamodb.table}") String tableName) {
@@ -32,11 +34,11 @@ public class SolutionRepository extends GenericDynamoDBRepository<Solution> {
     private static TableSchema<Solution> getTableSchema() {
         return StaticTableSchema.builder(Solution.class)
                 .newItemSupplier(Solution::new)
-                .addAttribute(String.class, a -> a.name("entityType")
+                .addAttribute(String.class, a -> a.name(BaseModel.ENTITY_TYPE)
                         .getter(solution -> "Solution")
                         .setter((solution, val) -> {/* Read-only attribute */})
                         .tags(StaticAttributeTags.primaryPartitionKey()))
-                .addAttribute(String.class, a -> a.name("sortKey")
+                .addAttribute(String.class, a -> a.name(BaseModel.SORT_KEY)
                         .getter(solution -> solution.getId() != null ? solution.getId().toString() : null)
                         .setter((solution, val) -> solution.setId(val != null ? UUID.fromString(val) : null))
                         .tags(StaticAttributeTags.primarySortKey()))
