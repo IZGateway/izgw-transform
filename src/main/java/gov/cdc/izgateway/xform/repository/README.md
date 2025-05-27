@@ -1,4 +1,6 @@
-# Repository Layer
+# Transformation Service - Storage/Repository
+
+This section/package contains the repository layer for the application, which provides data access to the underlying storage.
 
 TODO - Austin to update this doc
 
@@ -17,9 +19,6 @@ Tests
 - remote ddb with tables, but not configured
 - Run Get's for all API endpoints on files
   - Migrate (local) - run Get's for all API endpoints on ddb and diff (will require jq sort by uuid for both)
-  - 
-
-This package contains the repository layer for the application, which provides data access to the underlying storage.
 
 ## Storage Options
 
