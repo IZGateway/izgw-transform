@@ -11,6 +11,7 @@ TODO - Austin to update this doc
 - Look at adding logging for Operations/Preconditions (it's missed because they override getEntitySet)
 - Sorting of objects returned via getEntitySet? currently file-based is the order its in the file.  DynamoDB is the sortKey which is the UUID of the object.
 - Document creation of table
+- Can you run this in dynamodb mode and NOT specify the files
 
 Tests
 
