@@ -4,13 +4,9 @@ This section/package contains the repository layer for the application, which pr
 
 TODO - Austin to update this doc
 
-- Pickup w/ Postman to make sure JWT section works
 - IAM requirements for this to run in AWS (maybe this is already documented for Hub)
-- Look at Hub documentation re: running locally + configuring in AWS re: setting region & credentials
-  - Remember for documetation that if running in dynamodb mode that you'll have to set AWS env
 - Look at adding logging for Operations/Preconditions (it's missed because they override getEntitySet)
 - Sorting of objects returned via getEntitySet? currently file-based is the order its in the file.  DynamoDB is the sortKey which is the UUID of the object.
-- Document creation of table
 - Can you run this in dynamodb mode and NOT specify the files
 
 Tests
