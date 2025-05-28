@@ -42,4 +42,7 @@ public class MessageHeaderService implements IMessageHeaderService {
     public IMessageHeader saveAndFlush(IMessageHeader h) {
         return null;
     }
+
+    @Override
+    public void delete(String id) {}
 }
