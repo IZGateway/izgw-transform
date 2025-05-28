@@ -69,7 +69,7 @@ public class AccessControlService extends GenericService<AccessControl> {
     public Map<String, TreeSet<String>> getUserRoles() {
         Map<String, TreeSet<String>> userRoleMap = new HashMap<>();
         for (AccessControl ac : repo.getEntitySet()) {
-            userRoleMap.put(ac.getUserId().toString(), new TreeSet<>(List.of(ac.getRoles())));
+            userRoleMap.put(ac.getUserId().toString(), new TreeSet<>(ac.getRoles()));
         }
 
         return userRoleMap;

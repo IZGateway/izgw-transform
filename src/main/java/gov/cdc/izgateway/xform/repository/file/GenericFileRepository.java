@@ -1,8 +1,10 @@
-package gov.cdc.izgateway.xform.repository;
+package gov.cdc.izgateway.xform.repository.file;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.cdc.izgateway.xform.model.BaseModel;
+import gov.cdc.izgateway.xform.repository.RepositoryRuntimeException;
+import gov.cdc.izgateway.xform.repository.XformRepository;
 
 import java.io.IOException;
 import java.io.InputStream;

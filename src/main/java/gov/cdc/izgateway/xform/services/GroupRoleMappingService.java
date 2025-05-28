@@ -25,7 +25,6 @@ public class GroupRoleMappingService extends GenericService<GroupRoleMapping> im
                 .filter(m -> m.getGroupName().equals(group))
                 .findFirst()
                 .map(GroupRoleMapping::getRoles)
-                .map(List::of)
                 .orElse(Collections.emptyList());
     }
 

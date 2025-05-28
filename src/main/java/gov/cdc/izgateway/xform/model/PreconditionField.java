@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class PreconditionField implements BaseModel {
+public class PreconditionField extends BaseModel {
 
     @NotNull(message = "Precondition Field ID is required")
     private UUID id;
