@@ -148,6 +148,7 @@ client:
     trust-store-password: ${COMMON_PASS:}
     trust-store-provider: BCFIPS
     trust-store-type: bcfks
+    certificate-header: ${CLIENT_CERTIFICATE_HEADER:x-amzn-mtls-clientcert-leaf}
 
 logging:
   file:

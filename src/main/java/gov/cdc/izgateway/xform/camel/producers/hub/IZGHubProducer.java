@@ -3,6 +3,7 @@ package gov.cdc.izgateway.xform.camel.producers.hub;
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.model.IDestination;
+import gov.cdc.izgateway.model.RetryStrategy;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.xform.camel.producers.ProducerBase;
 import gov.cdc.izgateway.xform.context.IZGXformContext;
@@ -35,7 +36,7 @@ public class IZGHubProducer extends ProducerBase {
         try {
             context.getSubmitSingleMessageRequest().setHl7Message(context.getServiceContext().getRequestMessage().encode());
         } catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
+            throw new HubControllerFault(e);
         }
 
         SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(destination,

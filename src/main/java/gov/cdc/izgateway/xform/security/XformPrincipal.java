@@ -1,9 +1,6 @@
 package gov.cdc.izgateway.xform.security;
 
-import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.security.IzgPrincipal;
-import gov.cdc.izgateway.xform.model.User;
-
 import java.util.Set;
 import java.util.UUID;
 

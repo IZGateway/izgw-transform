@@ -120,12 +120,18 @@ public class XformTransactionData extends TransactionData {
     }
 
     private void logPipelineDetail() {
+    	if (pipelineAdvice == null) {
+    		return;
+    	}
         XformLogDetail logDetail = createLogDetail("pipeline", pipelineAdvice.getName());
 
         log.info(Markers2.append(XFORM_TRANSACTION_DATA, logDetail), "{}", "");
     }
 
     private void logSolutionDetail() {
+    	if (pipelineAdvice == null) {
+    		return;
+    	}
         pipelineAdvice.getSolutionAdviceList().forEach(s -> {
             XformSolutionLogDetail logDetail = createSolutionLogDetail("solution", s.getName());
 
