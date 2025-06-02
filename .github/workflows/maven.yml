@@ -193,7 +193,7 @@ jobs:
             "--ssl-client-cert" ../newman.pem \
             "--ssl-client-key" ../newman.key \
             "--ssl-client-passphrase" $TESTING_PASS \
-            "--insecure" 
+            "--insecure"  > ../logs/warmup.log
             
           newman run ../scripts/TS_Integration_Test.postman_collection.json -n 1 \
             "--environment" ../scripts/dev.xform.izgateway.org.postman_environment.json \
