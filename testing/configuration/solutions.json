@@ -1,50 +1,4 @@
 [ {
-  "id" : "79def078-5953-4d31-b44a-79d4da9beef9",
-  "solutionName" : "RegexMatchPrecondition",
-  "description" : "Sets a field if RegexMatch precondition is met",
-  "version" : "1.0",
-  "active" : true,
-  "requestOperations" : [ {
-    "preconditions" : [ {
-      "method" : "regex_match",
-      "id" : "b1181da0-5b7d-4853-b39f-33596d94243a",
-      "dataPath" : "/MSH-1-1",
-      "regex" : "^\\|$"
-    } ],
-    "operationList" : [ {
-      "method" : "set",
-      "id" : "edb9e6b9-d807-491c-a97f-19a54e0d0e90",
-      "order" : 0,
-      "destinationField" : "/MSH-22-3",
-      "setValue" : "RegexMatchPrecondition_Solution"
-    } ]
-  }, {
-    "preconditions" : [ {
-      "method" : "regex_match",
-      "id" : "2e6048c8-630a-449f-a3b4-f63425a60442",
-      "dataPath" : "/MSH-9-1",
-      "regex" : "^VXU$"
-    } ],
-    "operationList" : [ {
-      "method" : "mapper",
-      "id" : "3cf98427-a5d5-4cd5-82ca-4fe7b30141ef",
-      "order" : 0,
-      "codeField" : "/PID-10-1",
-      "codeSystemField" : "/PID-10-3",
-      "codeSystemDefault" : "CDCREC"
-    } ]
-  } ],
-  "responseOperations" : [ {
-    "preconditions" : [ ],
-    "operationList" : [ {
-      "method" : "set",
-      "id" : "c995f9f1-7cca-4b01-a1fa-1087a35d5502",
-      "order" : 0,
-      "destinationField" : "/MSH-22-1",
-      "setValue" : "MSH 22 NEW VALUE 4"
-    } ]
-  } ]
-}, {
   "id" : "8abc8887-1cab-4a96-98ea-29f8f6c977d5",
   "solutionName" : "AllOperations",
   "description" : "Calls all implemented Operations.  Sets MSH-23-1 to a value.  Then copies that value to MSH-23-2.  Then does a goofy regex on it to reverse the first two characters",
@@ -92,37 +46,6 @@
   } ],
   "responseOperations" : [ ]
 }, {
-  "id" : "40ac2845-d026-47ea-ad0b-d3ade3915a82",
-  "solutionName" : "CauseErrorOnSet",
-  "description" : "Causes an error when setting a field",
-  "version" : "1.0",
-  "active" : true,
-  "requestOperations" : [ {
-    "preconditions" : [ {
-      "method" : "regex_match",
-      "id" : "b1181da0-5b7d-4853-b39f-33596d94243a",
-      "dataPath" : "/MSH-1-1",
-      "regex" : "^\\|$"
-    } ],
-    "operationList" : [ {
-      "method" : "set",
-      "id" : "c0e3c374-f489-43ac-a4f9-8c0514e1c6ee",
-      "order" : 0,
-      "destinationField" : "/MSH-22-3",
-      "setValue" : "RegexMatchPrecondition_Solution"
-    } ]
-  } ],
-  "responseOperations" : [ {
-    "preconditions" : [ ],
-    "operationList" : [ {
-      "method" : "set",
-      "id" : "ef3eb737-0cf2-44cc-8608-84e7017e5c27",
-      "order" : 0,
-      "destinationField" : "/MSX-22-1",
-      "setValue" : "MSH 22 NEW VALUE"
-    } ]
-  } ]
-}, {
   "id" : "7e9ab0bf-e174-4073-a63f-75e2fabdb3a3",
   "solutionName" : "MapperExampleForVXU",
   "description" : "Translates a code for an HL7 field based on the mapping settings for a VXU message",
@@ -148,7 +71,7 @@
 }, {
   "id" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
   "solutionName" : "ZipFixer",
-  "description" : "Standardizes the zip for PID-11-5",
+  "description" : "Standardizes the zip for PID-11-5 and QPD-8-5",
   "version" : "1.0",
   "active" : true,
   "requestOperations" : [ {
@@ -185,26 +108,6 @@
       "field" : "/QPD-8-5",
       "regex" : "^(\\d{5})(\\d{4})$",
       "replacement" : "$1-$2"
-    } ]
-  } ]
-}, {
-  "id" : "bf3326fe-ab52-4d6c-b37f-7db5f1769c4c",
-  "solutionName" : "POSTMAN MSH-19-1 Response Transformer - DO NOT DELETE",
-  "description" : "Used in Postman Tests",
-  "version" : "1.0",
-  "active" : true,
-  "requestOperations" : [ {
-    "preconditions" : [ ],
-    "operationList" : [ ]
-  } ],
-  "responseOperations" : [ {
-    "preconditions" : [ ],
-    "operationList" : [ {
-      "method" : "set",
-      "id" : "6f750e31-3b60-49bc-a01e-1c2d8b84e3db",
-      "order" : 0,
-      "destinationField" : "/MSH-19-1",
-      "setValue" : "MSH 19 NEW VALUE"
     } ]
   } ]
 }, {
@@ -281,5 +184,110 @@
       "setValue" : "NotEqualsPrecondition_Solution"
     } ]
   } ],
+  "responseOperations" : [ ]
+}, {
+  "id" : "40ac2845-d026-47ea-ad0b-d3ade3915a82",
+  "solutionName" : "CauseErrorOnSet",
+  "description" : "Causes an error when setting a field",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "b1181da0-5b7d-4853-b39f-33596d94243a",
+      "dataPath" : "/MSH-1-1",
+      "regex" : "^\\|$"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "id" : "c0e3c374-f489-43ac-a4f9-8c0514e1c6ee",
+      "order" : 0,
+      "destinationField" : "/MSH-22-3",
+      "setValue" : "RegexMatchPrecondition_Solution"
+    } ]
+  } ],
+  "responseOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "id" : "ef3eb737-0cf2-44cc-8608-84e7017e5c27",
+      "order" : 0,
+      "destinationField" : "/MSX-7-1",
+      "setValue" : "MSH 7 NEW VALUE"
+    } ]
+  } ]
+}, {
+  "id" : "79def078-5953-4d31-b44a-79d4da9beef9",
+  "solutionName" : "RegexMatchPrecondition",
+  "description" : "Sets a field if RegexMatch precondition is met",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "b1181da0-5b7d-4853-b39f-33596d94243a",
+      "dataPath" : "/MSH-1-1",
+      "regex" : "^\\|$"
+    } ],
+    "operationList" : [ {
+      "method" : "set",
+      "id" : "edb9e6b9-d807-491c-a97f-19a54e0d0e90",
+      "order" : 0,
+      "destinationField" : "/MSH-22-3",
+      "setValue" : "RegexMatchPrecondition_Solution"
+    } ]
+  }, {
+    "preconditions" : [ {
+      "method" : "regex_match",
+      "id" : "2e6048c8-630a-449f-a3b4-f63425a60442",
+      "dataPath" : "/MSH-9-1",
+      "regex" : "^VXU$"
+    } ],
+    "operationList" : [ {
+      "method" : "mapper",
+      "id" : "3cf98427-a5d5-4cd5-82ca-4fe7b30141ef",
+      "order" : 0,
+      "codeField" : "/PID-10-1",
+      "codeSystemField" : "/PID-10-3",
+      "codeSystemDefault" : "CDCREC"
+    } ]
+  } ],
+  "responseOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "id" : "c995f9f1-7cca-4b01-a1fa-1087a35d5502",
+      "order" : 0,
+      "destinationField" : "/MSH-22-1",
+      "setValue" : "MSH 22 NEW VALUE 4"
+    } ]
+  } ]
+}, {
+  "id" : "bf3326fe-ab52-4d6c-b37f-7db5f1769c4c",
+  "solutionName" : "POSTMAN MSH-19-1 Response Transformer - DO NOT DELETE",
+  "description" : "Used in Postman Tests",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ ]
+  } ],
+  "responseOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "id" : "6f750e31-3b60-49bc-a01e-1c2d8b84e3db",
+      "order" : 0,
+      "destinationField" : "/MSH-19-1",
+      "setValue" : "MSH 19 NEW VALUE"
+    } ]
+  } ]
+}, {
+  "id" : "9228213f-f638-4891-a425-2d3abef31e55",
+  "solutionName" : "Synergistic web-enabled superstructure",
+  "description" : "Team-oriented holistic website",
+  "version" : "376.32",
+  "active" : true,
+  "requestOperations" : [ ],
   "responseOperations" : [ ]
 } ]

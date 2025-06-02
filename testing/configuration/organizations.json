@@ -4,16 +4,6 @@
   "active" : true,
   "commonName" : "OK"
 }, {
-  "organizationName" : "Starfleet Medical Systems",
-  "id" : "0d15449b-fb08-4013-8985-20c148b353fe",
-  "active" : true,
-  "commonName" : "pcahill.testing.izgateway.org"
-}, {
-  "organizationName" : "Starfleet Medical Systems",
-  "id" : "0d15449b-fb08-4013-8985-20c148b353fe",
-  "active" : true,
-  "commonName" : "sampleSubject"
-}, {
   "organizationName" : "Cosmic Ray Immunization Center (localhost)",
   "id" : "a10bb561-5d7b-4ec7-84c5-b6fa73efe562",
   "active" : true,
@@ -32,12 +22,12 @@
   "organizationName" : "Orion's Belt Family Practice",
   "id" : "b9bdedc5-cb33-4772-be37-b78dc7bf3786",
   "active" : true,
-  "commonName" : "xpcahill.testing.izgateway.org"
+  "commonName" : "pcahill.testing.izgateway.org"
 }, {
   "organizationName" : "Supernova Vaccination Services",
   "id" : "8fbcad81-dc40-4da5-a696-962bf919e5fe",
   "active" : true,
-  "commonName" : "xpcahill.testing.izgateway.org"
+  "commonName" : "pcahill.testing.izgateway.org"
 }, {
   "organizationName" : "Lunar Colony Health Alliance",
   "id" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
@@ -84,8 +74,13 @@
   "active" : true,
   "commonName" : "ppatel.testing.izgateway.org"
 }, {
-  "organizationName" : "Banzai Institute for Biomedical Engineering",
-  "id" : "03adf8af-c182-4ad6-8707-f62efdebf96e",
+  "organizationName" : "Starfleet Prime Medical Research",
+  "id" : "8c905096-c79c-4351-86a7-1d6b7da5ecee",
   "active" : true,
-  "commonName" : "kboone.testing.izgateway.org"
+  "commonName" : "ToneSoutherland"
+}, {
+  "organizationName" : "Starfleet Medical Systems",
+  "id" : "0d15449b-fb08-4013-8985-20c148b353fe",
+  "active" : true,
+  "commonName" : "sampleSubject"
 } ]

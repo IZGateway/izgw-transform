@@ -1,9 +1,4 @@
 [ {
-  "userName" : "kboone.testing.izgateway.org",
-  "id" : "4f5b1f8e-6c7d-4a9b-8e3f-2d7c6b5a9e4d",
-  "organizationIds" : [ "f56a10cc-bf37-4257-bba7-44dcf376dc3e", "d339cd15-2e57-4456-94b6-1e14f079a0de", "03adf8af-c182-4ad6-8707-f62efdebf96e", "1be42412-2208-4f2a-b568-083b931368ba" ],
-  "active" : true
-}, {
   "userName" : "pcahill.testing.izgateway.org",
   "id" : "8c942339-e10d-418f-8898-d8e73388198c",
   "organizationIds" : [ "d339cd15-2e57-4456-94b6-1e14f079a0de", "0d15449b-fb08-4013-8985-20c148b353fe", "1be42412-2208-4f2a-b568-083b931368ba" ],
@@ -24,11 +19,6 @@
   "organizationIds" : [ "8c905096-c79c-4351-86a7-1d6b7da5ec44", "d339cd15-2e57-4456-94b6-1e14f079a0de", "1be42412-2208-4f2a-b568-083b931368ba" ],
   "active" : true
 }, {
-  "userName" : "preprod-cc.phiz-project.org",
-  "id" : "8556e4a3-743a-4e71-9971-6d8e2d679ed6",
-  "organizationIds" : [ "11d32c29-b91a-455f-931e-591cb8ee4f51" ],
-  "active" : true
-}, {
   "userName" : "sampleSubject",
   "id" : "d3f29c8e-5b6a-4c8b-9e2f-1a3b5c7d8e9f",
   "organizationIds" : [ "d339cd15-2e57-4456-94b6-1e14f079a0de", "0d15449b-fb08-4013-8985-20c148b353fe", "1be42412-2208-4f2a-b568-083b931368ba" ],
@@ -36,6 +26,16 @@
 }, {
   "userName" : "amoody@ainq.com",
   "id" : "0d7fa94b-3804-4de2-b729-bd153e7f68c3",
+  "organizationIds" : [ "d339cd15-2e57-4456-94b6-1e14f079a0de", "6d531709-6911-463f-9ee8-5fd704f22b24" ],
+  "active" : true
+}, {
+  "userName" : "preprod-cc.phiz-project.org",
+  "id" : "8556e4a3-743a-4e71-9971-6d8e2d679ed6",
+  "organizationIds" : [ "d339cd15-2e57-4456-94b6-1e14f079a0de", "6d531709-6911-463f-9ee8-5fd704f22b24" ],
+  "active" : true
+}, {
+  "userName" : "kboone.testing.izgateway.org",
+  "id" : "18d0c708-23b6-4a45-a3f5-96570535678c",
   "organizationIds" : [ "d339cd15-2e57-4456-94b6-1e14f079a0de", "6d531709-6911-463f-9ee8-5fd704f22b24" ],
   "active" : true
 } ]
