@@ -38,7 +38,12 @@ public class AccessControlValve extends ValveBase {
 
     public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
         String path = req.getRequestURI();
-        if ( Boolean.FALSE.equals(accessControlService.checkAccess(req.getMethod(), path)) ) {
+        Boolean accessAllowed = accessControlService.checkAccess(req.getMethod(), path);
+        if (accessAllowed == null) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            log.debug("Path does not exist: {}", path);
+            return false;
+        } else if ( Boolean.FALSE.equals(accessAllowed) ) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             log.debug("Access denied to protected URL {} address by {} at {}", 
         		path, 

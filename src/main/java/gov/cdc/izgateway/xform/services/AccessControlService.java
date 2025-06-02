@@ -56,7 +56,10 @@ public class AccessControlService extends GenericService<AccessControl> {
      */
     public Boolean checkXformAccess(String method, String path) {
         List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);
-
+        if (allowedRoles == null || allowedRoles.isEmpty()) {
+        	// This path is unknown
+        	return null;
+        }
         // Check for public access
         if (allowedRoles.contains(Roles.PUBLIC_ACCESS)) {
             return true;
