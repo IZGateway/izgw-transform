@@ -9,12 +9,6 @@ xform:
       uri: ${XFORM_IIS_DESTINATION:https://localhost/dev/IISService}
       id: ${XFORM_IIS_DESTINATION_ID:iis}
       type: 5
-  repository:
-    type: ${XFORM_REPOSITORY_TYPE:file}
-    dynamodb:
-      # Endpoint can be set to connect to a local DynamoDB instance (e.g., http://localhost:8000)
-      endpoint: ${XFORM_DYNAMODB_ENDPOINT:}
-      table: ${XFORM_DYNAMODB_TABLE:izgw-hub}
   configurations:
     organizations: testing/configuration/organizations.json
     pipelines: testing/configuration/pipelines.json

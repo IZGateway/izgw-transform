@@ -25,7 +25,7 @@ public class MigratorFactory {
     private final MigrationConfiguration migrationConfig;
     
     public MigratorFactory(DynamoDbEnhancedClient dynamoDbClient,
-                          @Value("${xform.repository.dynamodb.table}") String tableName,
+                          @Value("${amazon.dynamodb.table}") String tableName,
                           MigrationConfiguration migrationConfig) {
         this.dynamoDbClient = dynamoDbClient;
         this.tableName = tableName;
