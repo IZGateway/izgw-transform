@@ -3,7 +3,6 @@ package gov.cdc.izgateway.xform.configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
@@ -19,14 +18,14 @@ import java.net.URI;
 import java.util.ServiceConfigurationError;
 
 @Configuration
-@ConditionalOnExpression("'${xform.repository.type}'.equals('dynamodb') || '${xform.repository.type}'.equals('migration')")
+//@ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('dynamodb') || '${spring.database:}'.equalsIgnoreCase('migrate')")
 @Slf4j
 public class DynamoDBConfig {
 
-    @Value("${xform.repository.dynamodb.endpoint}")
+    @Value("${amazon.dynamodb.endpoint:}")
     private String dynamodbEndpoint;
 
-    @Value("${xform.repository.dynamodb.table}")
+    @Value("${amazon.dynamodb.table:}")
     private String dynamodbTable;
 
     @Bean

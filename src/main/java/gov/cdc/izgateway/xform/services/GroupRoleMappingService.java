@@ -2,22 +2,20 @@ package gov.cdc.izgateway.xform.services;
 
 import gov.cdc.izgateway.security.principal.GroupToRoleMapper;
 import gov.cdc.izgateway.xform.model.GroupRoleMapping;
-import gov.cdc.izgateway.xform.repository.XformRepository;
+import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-import static org.bouncycastle.asn1.x509.X509ObjectIdentifiers.organization;
-
 @Slf4j
 @Service
 public class GroupRoleMappingService extends GenericService<GroupRoleMapping> implements GroupToRoleMapper {
 
     @Autowired
-    public GroupRoleMappingService(XformRepository<GroupRoleMapping> repo) {
-        super(repo);
+    public GroupRoleMappingService(RepositoryFactory repositoryFactory) {
+        super(repositoryFactory.groupRoleMappingRepository());
     }
 
     public List<String> getRolesByGroup(String group) {

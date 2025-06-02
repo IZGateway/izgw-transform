@@ -11,16 +11,16 @@ There is also the opportunity to have the system migrate data from files to Dyna
 
 ## Configuration
 
-The type of storage is configured via the XFORM_REPOSITORY_TYPE environment variable. There are currently three options for this setting:
+The type of storage is configured via the SPRING_DATABASE environment variable. There are currently three options for this setting:
 
 - file
-  - This is the default is the environment variable is not set
+  - This is the default is the environment variable is not set TODO
 - dynamodb
-- migration
+- migrate
 
 ### File-based Storage Configuration
 
-To use file-based storage, XFORM_REPOSITORY_TYPE will need to be set to ```file```.
+To use file-based storage, SPRING_DATABASE will need to be set to ```file```.
 
 In addition, each entity type's file location will need to be configured. These environment variables are:
 
@@ -35,14 +35,14 @@ In addition, each entity type's file location will need to be configured. These 
 
 ### AWS DynamoDB Storage Configuration
 
-To use DynamoDB storage, XFORM_REPOSITORY_TYPE will need to be set to ```dynamodb```.
+To use DynamoDB storage, SPRING_DATABASE will need to be set to ```dynamodb```.
 
-In addition, you may also configure the following items:
+In addition, you may also configure the following amazon related items:
 
-- XFORM_DYNAMODB_ENDPOINT
+- AMAZON_DYNAMODB_ENDPOINT
   - This is the URL for the DynamoDB endpoint. If not set, the endpoint is determined by the application from the AWS account and region information.
   - When running locally for development and testing, this would be set to http://localhost:8080/
-- XFORM_DYNAMODB_TABLE
+- AMAZON_DYNAMODB_TABLE
   - The name of the table to use. If not set, the default is izgw-hub
   - Please see the _AWS DynamoDB Table Setup_ section in this document for details on this setup
 
@@ -126,7 +126,7 @@ The following permissions should cover what is needed:
 
 If you have existing configuration in files, you may have the application do a migration to DynamoDB.
 
-You would set XFORM_REPOSITORY_TYPE to ```migration```.
+You would set SPRING_DATABASE to ```migrate```.
 
 In addition, you will need to configure the options spelled out in the File-based and DynamoDB sections above. This is so that the application will know where to find the files containing data to migrate to DynamoDB.
 
@@ -138,12 +138,12 @@ This assumes running multiple ECS containers
 2. Leave an existing, file-based task running so that the system is processing requests during migration
 3. Configure ECS task definition for migration as detailed above
 4. Start a new ECS task in the service using the migration definition
-5. Verify the updated ECS task started propery and that the migration completed successfully
+5. Verify the updated ECS task started property and that the migration completed successfully
 6. Configure the ECS task definition for dynamodb as detailed above
 7. Have _all_ instances start with the new dynamodb ECS task definition
 8. Verify the system is operational via smoketest
 
-The above assumes you are running multiple ECS containers. If you are running a single node you would simply update the task definition for migration and restart the node. At some point coming back to change the task definition to just dynamodb.
+The above assumes you are running multiple ECS containers. If you are running a single node, you would update the task definition for migration and restart the node. At some point coming back to change the task definition to just dynamodb.
 
 #### Example Migration Log
 
@@ -232,7 +232,7 @@ When running NoSQL Workbench, you should see an option on the main screen on the
 
 There are 4 properies you'll need to set via your environment in order to connect to DynamoDB locally:
 
-- XFORM_DYNAMODB_ENDPOINT 
+- AMAZON_DYNAMODB_ENDPOINT 
   - Tells the application where to connect to the local DynamoDB. By default, the local DynamoDB will run on port 8000 so you would set this variable to ```http://localhost:8000```
 - AWS_ACCESS_KEY_ID
   - Required to exist even if we are connecting locally. This doesn't need to be a valid access key, you can set this to literally a string like ```dummy```

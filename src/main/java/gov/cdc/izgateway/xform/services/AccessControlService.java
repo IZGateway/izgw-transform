@@ -3,6 +3,7 @@ package gov.cdc.izgateway.xform.services;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.xform.model.AccessControl;
+import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import gov.cdc.izgateway.xform.repository.XformRepository;
 import gov.cdc.izgateway.xform.security.Roles;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +18,8 @@ public class AccessControlService extends GenericService<AccessControl> {
     private final AccessControlRegistry registry;
 
     @Autowired
-    public AccessControlService(XformRepository<AccessControl> repo, AccessControlRegistry registry) {
-        super(repo);
+    public AccessControlService(RepositoryFactory repositoryFactory, AccessControlRegistry registry) {
+        super(repositoryFactory.accessControlRepository());
         this.registry = registry;
     }
 
