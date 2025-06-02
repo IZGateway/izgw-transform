@@ -16,9 +16,4 @@ public class OrganizationRepository extends GenericDynamoDBRepository<Organizati
             @Value("${xform.repository.dynamodb.table}") String tableName) {
         super(dynamoDbClient, tableName, Organization.class, TableSchema.fromBean(Organization.class));
     }
-
-    @Override
-    protected String getEntityName() {
-        return Organization.class.getSimpleName();
-    }
 }

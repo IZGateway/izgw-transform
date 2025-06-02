@@ -22,8 +22,4 @@ public class PipelineRepository extends GenericDynamoDBRepository<Pipeline> {
         super(dynamoDbClient, tableName, Pipeline.class, TableSchema.fromBean(Pipeline.class));
     }
 
-    @Override
-    protected String getEntityName() {
-        return Pipeline.class.getSimpleName();
-    }
 }

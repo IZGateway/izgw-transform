@@ -15,10 +15,4 @@ public class UserRepository extends GenericDynamoDBRepository<User> {
             @Value("${xform.repository.dynamodb.table}") String tableName) {
         super(dynamoDbClient, tableName, User.class, TableSchema.fromBean(User.class));
     }
-
-    @Override
-    protected String getEntityName() {
-        return User.class.getSimpleName();
-    }
-
 }

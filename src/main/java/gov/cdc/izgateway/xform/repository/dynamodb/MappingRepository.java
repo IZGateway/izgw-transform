@@ -1,6 +1,5 @@
 package gov.cdc.izgateway.xform.repository.dynamodb;
 
-import gov.cdc.izgateway.xform.model.GroupRoleMapping;
 import gov.cdc.izgateway.xform.model.Mapping;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -16,10 +15,4 @@ public class MappingRepository extends GenericDynamoDBRepository<Mapping> {
             @Value("${xform.repository.dynamodb.table}") String tableName) {
         super(dynamoDbClient, tableName, Mapping.class, TableSchema.fromBean(Mapping.class));
     }
-
-    @Override
-    protected String getEntityName() {
-        return Mapping.class.getSimpleName();
-    }
-
 }
