@@ -14,7 +14,7 @@ There is also the opportunity to have the system migrate data from files to Dyna
 The type of storage is configured via the SPRING_DATABASE environment variable. There are currently three options for this setting:
 
 - file
-  - This is the default is the environment variable is not set TODO
+  - This is the default if the environment variable is not set
 - dynamodb
 - migrate
 
