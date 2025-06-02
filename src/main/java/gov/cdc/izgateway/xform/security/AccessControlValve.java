@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.security;
 
+import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.xform.services.AccessControlService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,8 +40,18 @@ public class AccessControlValve extends ValveBase {
         String path = req.getRequestURI();
         if ( Boolean.FALSE.equals(accessControlService.checkAccess(req.getMethod(), path)) ) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            log.debug("Access denied to protected URL {} address by {} at {}", 
+        		path, 
+        		RequestContext.getPrincipal().getName(), 
+        		RequestContext.getTransactionData().getSource().getIpAddress()
+            );
             return false;
         } else {
+            log.debug("Access granted to protected URL {} address by {} at {}", 
+        		path, 
+        		RequestContext.getPrincipal().getName(), 
+        		RequestContext.getTransactionData().getSource().getIpAddress()
+        	);
             return true;
         }
     }
