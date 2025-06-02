@@ -38,4 +38,10 @@
   "id" : "18d0c708-23b6-4a45-a3f5-96570535678c",
   "organizationIds" : [ "d339cd15-2e57-4456-94b6-1e14f079a0de", "6d531709-6911-463f-9ee8-5fd704f22b24" ],
   "active" : true
-} ]
+}, {
+  "userName" : "cicd.testing.izgateway.org",
+  "id" : "a67d65b5-07dd-40cc-b2ed-4ad9b5be0cd6",
+  "organizationIds" : [ "d339cd15-2e57-4456-94b6-1e14f079a0de", "6d531709-6911-463f-9ee8-5fd704f22b24" ],
+  "active" : true
+}
+ ]
