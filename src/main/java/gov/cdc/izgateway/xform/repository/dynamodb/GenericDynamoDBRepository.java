@@ -26,10 +26,12 @@ public abstract class GenericDynamoDBRepository<T extends BaseModel> implements 
 
     /**
      * Returns the entity name to be used as the partition key.
-     * This should be implemented by each specific repository.
+     * Derived from the entity class simple name.
      * @return the entity name
      */
-    protected abstract String getEntityName();
+    protected String getEntityName() {
+        return entityClass.getSimpleName();
+    }
 
     protected GenericDynamoDBRepository(DynamoDbEnhancedClient dynamoDbClient, String tableName, Class<T> entityClass, TableSchema<T> tableSchema) {
         this.dynamoDbClient = dynamoDbClient;

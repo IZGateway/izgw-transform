@@ -16,9 +16,4 @@ public class OperationPreconditionFieldRepository extends GenericDynamoDBReposit
         super(dynamoDbClient, tableName, OperationPreconditionField.class, TableSchema.fromBean(OperationPreconditionField.class));
     }
 
-    @Override
-    protected String getEntityName() {
-        return OperationPreconditionField.class.getSimpleName();
-    }
-
 }

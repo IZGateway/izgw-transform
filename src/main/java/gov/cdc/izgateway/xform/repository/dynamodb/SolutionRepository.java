@@ -21,10 +21,4 @@ public class SolutionRepository extends GenericDynamoDBRepository<Solution> {
             @Value("${xform.repository.dynamodb.table}") String tableName) {
         super(dynamoDbClient, tableName, Solution.class, TableSchema.fromClass(Solution.class));
     }
-
-    @Override
-    protected String getEntityName() {
-        return Solution.class.getSimpleName();
-    }
-
 }
