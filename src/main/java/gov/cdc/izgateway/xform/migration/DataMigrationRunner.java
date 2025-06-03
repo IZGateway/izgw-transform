@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "xform.repository.type", havingValue = "migration")
+@ConditionalOnProperty(name = "spring.database", havingValue = "migrate")
 public class DataMigrationRunner implements ApplicationRunner {
     
     private final DataMigrationService migrationService;
