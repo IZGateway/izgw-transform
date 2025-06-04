@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.repository.dynamodb;
 
+import gov.cdc.izgateway.configuration.DynamoDbConfig;
 import gov.cdc.izgateway.xform.model.AccessControl;
 import gov.cdc.izgateway.xform.model.GroupRoleMapping;
 import gov.cdc.izgateway.xform.model.Mapping;
@@ -10,7 +11,6 @@ import gov.cdc.izgateway.xform.model.Solution;
 import gov.cdc.izgateway.xform.model.User;
 import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import gov.cdc.izgateway.xform.repository.XformRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
@@ -34,9 +34,9 @@ public class DynamoDbRepositoryFactory implements RepositoryFactory {
 
     public DynamoDbRepositoryFactory(
             DynamoDbEnhancedClient dynamoDbClient,
-            @Value("${amazon.dynamodb.table}") String tableName) {
+            DynamoDbConfig dynamoDbConfig) {
         this.dynamoDbClient = dynamoDbClient;
-        this.tableName = tableName;
+        this.tableName = dynamoDbConfig.getDynamodbTable();
     }
 
     @Override

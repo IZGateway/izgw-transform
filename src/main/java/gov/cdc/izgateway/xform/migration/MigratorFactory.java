@@ -1,8 +1,8 @@
 package gov.cdc.izgateway.xform.migration;
 
+import gov.cdc.izgateway.configuration.DynamoDbConfig;
 import gov.cdc.izgateway.xform.model.BaseModel;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "xform.repository.type", havingValue = "migration")
+@ConditionalOnProperty(name = "spring.database", havingValue = "migrate")
 public class MigratorFactory {
     
     private final DynamoDbEnhancedClient dynamoDbClient;
@@ -25,10 +25,10 @@ public class MigratorFactory {
     private final MigrationConfiguration migrationConfig;
     
     public MigratorFactory(DynamoDbEnhancedClient dynamoDbClient,
-                          @Value("${amazon.dynamodb.table}") String tableName,
+                           DynamoDbConfig dynamoDbConfig,
                           MigrationConfiguration migrationConfig) {
         this.dynamoDbClient = dynamoDbClient;
-        this.tableName = tableName;
+        this.tableName = dynamoDbConfig.getDynamodbTable();
         this.migrationConfig = migrationConfig;
     }
     
