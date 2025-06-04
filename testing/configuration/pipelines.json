@@ -58,12 +58,7 @@
     "id" : "f90d99d4-0406-4500-a15d-5a60752482ce",
     "solutionId" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
     "solutionVersion" : "1.0",
-    "preconditions" : [ {
-      "method" : "equals",
-      "id" : "e55248e0-156c-45b7-b03b-56bd207a3c93",
-      "dataPath" : "/MSH-9-1",
-      "comparisonValue" : "VXU"
-    } ]
+    "preconditions" : []
   } ]
 }, {
   "pipelineName" : "Pipeline for Postman Tests for IIS endpoint",
@@ -103,59 +98,11 @@
     "solutionId" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
     "solutionVersion" : "1.0",
     "preconditions" : [ {
-      "method" : "equals",
+      "method" : "regex_match",
       "id" : "e55248e0-156c-45b7-b03b-56bd207a3ccc",
       "dataPath" : "/MSH-9-1",
-      "comparisonValue" : "VXU"
+      "regex" : "^(VXU|RSP|QBP)$"
     } ]
-  } ]
-}, {
-  "pipelineName" : "Starfleet Medical Systems to Nebula Health Network Pipeline",
-  "id" : "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
-  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
-  "description" : "Pipeline to call all implemented Preconditions and Operations",
-  "inboundEndpoint" : "izgts:IISHubService",
-  "outboundEndpoint" : "izghub:IISHubService",
-  "active" : true,
-  "pipes" : [ {
-    "id" : "ba5c2b8c-2196-419e-8e1d-7e9029982501",
-    "solutionId" : "018f7881-7607-7220-a94b-fe0c7e81cbec",
-    "solutionVersion" : "1.0",
-    "preconditions" : [ {
-      "method" : "equals",
-      "id" : "6786e55c-1da6-4cc4-9405-b586081630ac",
-      "dataPath" : "/MSH-1-1",
-      "comparisonValue" : "|"
-    }, {
-      "method" : "exists",
-      "id" : "d9e3806c-b252-414d-a357-8fe87c1f0bad",
-      "dataPath" : "/MSH-1-1"
-    } ]
-  }, {
-    "id" : "1f0e3782-fe11-4843-9b6b-7ecf224a88cb",
-    "solutionId" : "64bc92f4-053c-4e55-85b5-5ff52f5ff47f",
-    "solutionVersion" : "1.0",
-    "preconditions" : [ {
-      "method" : "not_equals",
-      "id" : "43f884dd-60c9-4fc1-aaf7-479e4e0e02d6",
-      "dataPath" : "/MSH-1-1",
-      "comparisonValue" : "x"
-    } ]
-  }, {
-    "id" : "422170fd-deed-4ab6-9299-aa5268aa4ea9",
-    "solutionId" : "79def078-5953-4d31-b44a-79d4da9beef9",
-    "solutionVersion" : "1.0",
-    "preconditions" : [ {
-      "method" : "regex_match",
-      "id" : "b1b2d555-31bf-4d63-8afc-0cd0cf0b007c",
-      "dataPath" : "/MSH-1-1",
-      "regex" : "^\\|$"
-    } ]
-  }, {
-    "id" : "1c30d865-b4b5-43ee-93d0-22b3b2eaa3fb",
-    "solutionId" : "8abc8887-1cab-4a96-98ea-29f8f6c977d5",
-    "solutionVersion" : "1.0",
-    "preconditions" : [ ]
   } ]
 }, {
   "pipelineName" : "Orion's Belt Family Practice to Orion's Belt Family Practice Pipeline",
@@ -276,6 +223,33 @@
   "description" : null,
   "inboundEndpoint" : "User-friendly eco-centric pricing structure)",
   "outboundEndpoint" : "Progressive impactful paradigm)",
+  "active" : true,
+  "pipes" : [ ]
+}, {
+  "pipelineName" : "Open-architected dynamic core",
+  "id" : "e3d2d8ec-1043-475d-a892-6507cda50568",
+  "organizationId" : "748fc027-0844-4e26-9842-b84e12ccd331",
+  "description" : null,
+  "inboundEndpoint" : "Devolved discrete moderator)",
+  "outboundEndpoint" : "Managed high-level info-mediaries)",
+  "active" : false,
+  "pipes" : [ ]
+}, {
+  "pipelineName" : "Virtual interactive synergy",
+  "id" : "8bc274f9-4760-4c25-bc8d-493c581f4e87",
+  "organizationId" : "8ae03804-1401-40a3-91f8-b818aec979d2",
+  "description" : null,
+  "inboundEndpoint" : "Versatile 4th generation encryption)",
+  "outboundEndpoint" : "Extended attitude-oriented knowledge user)",
+  "active" : false,
+  "pipes" : [ ]
+}, {
+  "pipelineName" : "Starfleet Medical Systems to Nebula Health Network Pipeline",
+  "id" : "018f5ebf-fe48-709a-aaa4-e74552ae3a66",
+  "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
+  "description" : "Pipeline to call all implemented Preconditions and Operations",
+  "inboundEndpoint" : "izgts:IISHubService",
+  "outboundEndpoint" : "izghub:IISHubService",
   "active" : true,
   "pipes" : [ ]
 } ]

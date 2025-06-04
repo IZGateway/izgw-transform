@@ -2,7 +2,6 @@ package gov.cdc.izgateway.xform.endpoints.hub;
 
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.security.AccessControlRegistry;
-import gov.cdc.izgateway.security.Roles;
 import gov.cdc.izgateway.service.IMessageHeaderService;
 import gov.cdc.izgateway.soap.fault.Fault;
 import gov.cdc.izgateway.soap.fault.SecurityFault;
@@ -11,8 +10,10 @@ import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
 import gov.cdc.izgateway.xform.camel.constants.EndpointUris;
 import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.enums.DataType;
+import gov.cdc.izgateway.xform.security.Roles;
 import gov.cdc.izgateway.xform.services.AccessControlService;
 import gov.cdc.izgateway.xform.services.OrganizationService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,7 +29,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 @RestController
-@RolesAllowed({Roles.SOAP, Roles.ADMIN})
+@RolesAllowed({Roles.XFORM_SENDING_SYSTEM, Roles.ADMIN})
 @RequestMapping("/IISService")
 @Lazy(false)
 @Slf4j
@@ -83,7 +84,7 @@ public class IISController extends BaseController {
                     submitSingleMessage.getFacilityID(),
                     submitSingleMessage.getHl7Message());
         } catch (HL7Exception e) {
-            throw new HubControllerFault(e.getMessage());
+            throw new HubControllerFault(e);
         }
     }
 

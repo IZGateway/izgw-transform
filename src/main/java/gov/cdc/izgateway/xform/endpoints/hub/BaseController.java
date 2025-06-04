@@ -63,7 +63,7 @@ public abstract class BaseController extends SoapControllerBase {
 
             context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
         } catch (CamelExecutionException | HL7Exception e) {
-            throw new HubControllerFault(e.getCause().getMessage());
+            throw new HubControllerFault(e.getCause());
         }
 
         return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
@@ -74,6 +74,7 @@ public abstract class BaseController extends SoapControllerBase {
         if (organization == null) {
             throw new HubControllerFault("Organization not found for " + commonName);
         }
+        log.debug("{} found for {}", organization.getOrganizationName(), commonName);
         return organization;
     }
 

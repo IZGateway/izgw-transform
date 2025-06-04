@@ -1,7 +1,5 @@
 package gov.cdc.izgateway.xform.validation;
 
-import gov.cdc.izgateway.xform.model.Organization;
-import gov.cdc.izgateway.xform.services.OrganizationService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;

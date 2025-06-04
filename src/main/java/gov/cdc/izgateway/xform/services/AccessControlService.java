@@ -24,7 +24,7 @@ public class AccessControlService extends GenericService<AccessControl> {
 
     public List<String> getAllowedRoles(RequestMethod method, String path) {
         List<String> roles = registry.getAllowedRoles(method, path);
-        log.debug("Roles allowed for {} {} are {}", method, path, roles);
+        log.trace("Roles allowed for {} {} are {}", method, path, roles);
         return roles;
     }
 
@@ -56,14 +56,24 @@ public class AccessControlService extends GenericService<AccessControl> {
      */
     public Boolean checkXformAccess(String method, String path) {
         List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);
-
+        if (allowedRoles == null || allowedRoles.isEmpty()) {
+        	// This path is unknown
+        	return null;
+        }
         // Check for public access
         if (allowedRoles.contains(Roles.PUBLIC_ACCESS)) {
             return true;
         }
 
         // If RequestContext.getRoles() has one role that matches the roles list, return true
-        return RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);
+        boolean result = RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);
+        if (!result) {
+        	log.debug("User {} missing one of the following roles: {}", 
+        		RequestContext.getPrincipal().getName(),
+        		allowedRoles
+        	);
+        }
+        return result;
     }
 
     public Map<String, TreeSet<String>> getUserRoles() {

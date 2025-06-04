@@ -17,7 +17,7 @@ on:
 concurrency: dev
 
 jobs:
-  validate:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -168,7 +168,54 @@ jobs:
           ECR_REPOSITORY: transformation-service
         run: |
           aws ecs update-service --cluster xform-service-dev --service xform-service-dev --force-new-deployment --enable-execute-command --desired-count 1 | jq ".service.deployments[].id"
+          aws ecs update-service --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count 1 | jq ".service.deployments[].id"
+          aws ecs wait services-stable --cluster xform-service-alb-dev --service xform-service-alb-dev
 
+      - name: Setup certs
+        env:
+          TESTING_CERT: ${{ secrets.TESTING_CERT }}
+          TESTING_KEY: ${{ secrets.TESTING_KEY }}
+        run: |
+          echo "$TESTING_CERT" > testing/newman.pem
+          # Don't upload this file !!!
+          echo "$TESTING_KEY" > testing/newman.key
+                                  
+      - name: Execute Functional Tests
+        id: FunctionalTests
+        working-directory: ./testing/scripts
+        env:
+          TESTING_PASS: ${{ secrets.TESTING_PASS }}
+          JWT_SHARED_SECRET: ${{ secrets.JWT_SHARED_SECRET }}
+        run: |
+          mkdir ../logs
+          # Do a few warmup runs to let SLA testing pass
+          newman run ../scripts/TS_Integration_Test.postman_collection.json -x -n 2 \
+            --folder "Integration Tests" \
+            "--environment" ../scripts/dev.xform.izgateway.org.postman_environment.json \
+            "--env-var" "jwtSharedSecret=$JWT_SHARED_SECRET" \
+            "--ssl-extra-ca-certs" ../certs/izgwroot.pem \
+            "--ssl-client-cert" ../newman.pem \
+            "--ssl-client-key" ../newman.key \
+            "--ssl-client-passphrase" $TESTING_PASS \
+            "--insecure"  > ../logs/warmup.log
+            
+          newman run ../scripts/TS_Integration_Test.postman_collection.json -n 1 \
+            --folder "Integration Tests" \
+            "--environment" ../scripts/dev.xform.izgateway.org.postman_environment.json \
+            "--env-var" "jwtSharedSecret=$JWT_SHARED_SECRET" \
+            "--ssl-extra-ca-certs" ../certs/izgwroot.pem \
+            "--ssl-client-cert" ../newman.pem \
+            "--ssl-client-key" ../newman.key \
+            "--ssl-client-passphrase" $TESTING_PASS \
+            "--insecure" --reporters cli,junitfull --reporter-junitfull-export ../logs/integration-test.xml
+
+      - name: Upload test logs
+        uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: TestLogs
+          path: ./testing/logs
+                                      
       - name: Login to GitHub Repository
         if: github.ref == 'refs/heads/main'
         uses: docker/login-action@v3
