@@ -188,8 +188,9 @@ jobs:
           JWT_SHARED_SECRET: ${{ secrets.JWT_SHARED_SECRET }}
         run: |
           mkdir ../logs
-          # Do a few warmup runs to let SLA testing to pass
+          # Do a few warmup runs to let SLA testing pass
           newman run ../scripts/TS_Integration_Test.postman_collection.json -x -n 2 \
+            --folder "Integration Tests" \
             "--environment" ../scripts/dev.xform.izgateway.org.postman_environment.json \
             "--env-var" "jwtSharedSecret=$JWT_SHARED_SECRET" \
             "--ssl-extra-ca-certs" ../certs/izgwroot.pem \
@@ -199,6 +200,7 @@ jobs:
             "--insecure"  > ../logs/warmup.log
             
           newman run ../scripts/TS_Integration_Test.postman_collection.json -n 1 \
+            --folder "Integration Tests" \
             "--environment" ../scripts/dev.xform.izgateway.org.postman_environment.json \
             "--env-var" "jwtSharedSecret=$JWT_SHARED_SECRET" \
             "--ssl-extra-ca-certs" ../certs/izgwroot.pem \
