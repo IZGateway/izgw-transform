@@ -68,7 +68,7 @@ public class AccessControlService extends GenericService<AccessControl> {
         // If RequestContext.getRoles() has one role that matches the roles list, return true
         boolean result = RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);
         if (!result) {
-        	log.info("User {} missing one of the following roles: {}", 
+        	log.debug("User {} missing one of the following roles: {}", 
         		RequestContext.getPrincipal().getName(),
         		allowedRoles
         	);

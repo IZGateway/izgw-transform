@@ -56,7 +56,7 @@ public class PipelineRunnerService implements Advisable, Transformable {
         for (Pipe pipe : pipes) {
             gov.cdc.izgateway.xform.model.Solution solutionModel = xformConfig.getSolution(pipe.getSolutionId());
             String solutionName = solutionModel.getSolutionName();
-            log.info("Executing Pipe: {}", solutionName);
+            log.debug("Executing Pipe: {}", solutionName);
             if (Boolean.TRUE.equals(preconditionsPassed(pipe))) {
                 // Create & Execute Solution
             	log.debug("Precondition passed for {}", solutionName);

@@ -126,9 +126,7 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
 
     	String transformedRequest = null;
     	boolean isResponse = submitSingleMessage.getHl7Message().contains("MSA|");
-    	SubmitSingleMessageResponse response = isResponse ? 
-    			new SubmitSingleMessageResponse(submitSingleMessage, getMessageNamespace(), true) :
-    			null;
+    	SubmitSingleMessageResponse response = new SubmitSingleMessageResponse(submitSingleMessage, getMessageNamespace(), true);
     	try {
         	if (isResponse) {
         		// Setup for the Response Path
@@ -150,10 +148,10 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
                 	response.getXformHeader().setOriginalResponse(advice.getResponse());
                 }
             }
-            if (!isResponse) {
-            	response.setHl7Message(transformedRequest);
+            if (isResponse) {
+            	response.setHl7Message(context.getServiceContext().getResponseMessage().encode());
             } else {
-            	response.setHl7Message(context.getServiceContext().getCurrentMessage().toString());
+            	response.setHl7Message(transformedRequest);
             }
         } catch (CamelExecutionException e) {
             throw new HubControllerFault(e.getCause());

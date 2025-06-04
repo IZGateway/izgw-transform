@@ -74,6 +74,7 @@ public abstract class BaseController extends SoapControllerBase {
         if (organization == null) {
             throw new HubControllerFault("Organization not found for " + commonName);
         }
+        log.debug("{} found for {}", organization.getOrganizationName(), commonName);
         return organization;
     }
 

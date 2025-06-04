@@ -186,6 +186,7 @@ jobs:
         env:
           TESTING_PASS: ${{ secrets.TESTING_PASS }}
         run: |
+          mkdir ../logs
           # Do a few warmup runs to let SLA testing to pass
           newman run ../scripts/TS_Integration_Test.postman_collection.json -x -n 3 \
             "--environment" ../scripts/dev.xform.izgateway.org.postman_environment.json \

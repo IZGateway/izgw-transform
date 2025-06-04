@@ -2,7 +2,7 @@
   "id" : "fe65c254-eeee-4d41-a81c-187847a10dd0",
   "groupName" : "Admin",
   "active" : true,
-  "roles" : [ "organization-deleter", "organization-reader", "organization-writer", "pipeline-deleter", "pipeline-reader", "pipeline-writer", "solution-deleter", "solution-reader", "solution-writer", "xform-sender" ]
+  "roles" : [ "admin", "organization-deleter", "organization-reader", "organization-writer", "pipeline-deleter", "pipeline-reader", "pipeline-writer", "solution-deleter", "solution-reader", "solution-writer", "xform-sender" ]
 }, {
   "id" : "fe65c254-bbbb-4d41-a81c-187847a10dd0",
   "groupName" : "BusinessAnalyst",
