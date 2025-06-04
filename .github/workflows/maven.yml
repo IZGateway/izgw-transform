@@ -185,11 +185,13 @@ jobs:
         working-directory: ./testing/scripts
         env:
           TESTING_PASS: ${{ secrets.TESTING_PASS }}
+          JWT_SHARED_SECRET: ${{ secrets.JWT_SHARED_SECRET }}
         run: |
           mkdir ../logs
           # Do a few warmup runs to let SLA testing to pass
-          newman run ../scripts/TS_Integration_Test.postman_collection.json -x -n 3 \
+          newman run ../scripts/TS_Integration_Test.postman_collection.json -x -n 2 \
             "--environment" ../scripts/dev.xform.izgateway.org.postman_environment.json \
+            "--env-var" "jwtSharedSecret=$JWT_SHARED_SECRET" \
             "--ssl-extra-ca-certs" ../certs/izgwroot.pem \
             "--ssl-client-cert" ../newman.pem \
             "--ssl-client-key" ../newman.key \
@@ -198,6 +200,7 @@ jobs:
             
           newman run ../scripts/TS_Integration_Test.postman_collection.json -n 1 \
             "--environment" ../scripts/dev.xform.izgateway.org.postman_environment.json \
+            "--env-var" "jwtSharedSecret=$JWT_SHARED_SECRET" \
             "--ssl-extra-ca-certs" ../certs/izgwroot.pem \
             "--ssl-client-cert" ../newman.pem \
             "--ssl-client-key" ../newman.key \

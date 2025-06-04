@@ -24,7 +24,7 @@ public class AccessControlService extends GenericService<AccessControl> {
 
     public List<String> getAllowedRoles(RequestMethod method, String path) {
         List<String> roles = registry.getAllowedRoles(method, path);
-        log.debug("Roles allowed for {} {} are {}", method, path, roles);
+        log.trace("Roles allowed for {} {} are {}", method, path, roles);
         return roles;
     }
 
