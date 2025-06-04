@@ -8,1949 +8,2110 @@
 	},
 	"item": [
 		{
-			"name": "Certificate Based Integration Testing",
+			"name": "Integration Tests",
 			"item": [
 				{
-					"name": "TS_TC_01 QBP RESPONSE MSH-7",
-					"event": [
+					"name": "Certificate Based Integration Testing",
+					"item": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageLF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_02 VXU Mapping",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"/* disabling this test b/c I cannot figure out why it isn't working yet  */\r",
-									"if (false) {\r",
-									"    pm.test(\"Response is As Expected\", function () {\r",
-									"        var response = utils.removeNS(xml2Json(responseBody));\r",
-									"        var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"        pm.expect(utils.hl7Terser(hl7Message, 'PID', 10, 1)).to.eql('NEWCODE!');\r",
-									"    });\r",
-									"}\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "0d15449b-fb08-4013-8985-20c148b353fe",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_03 VXU Zip Fixer Positive",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"TransformedRequest Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['TransformedRequest'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_04 QBP State Test",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"MSH-22-1 in the response message has been transformed\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 22, 1)).to.eql('STATE_CHECKS');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageLF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_05 VXU State Test",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"MSH-22-1 in the response message has been transformed\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 22, 1)).to.eql('STATE_CHECKS');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20230809110858-0500');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_06 QBP RESPONSE MSH-7 CDC-WSDL",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <wsa:Action>urn:cdc:iisb:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn:SubmitSingleMessageRequest>\r\n      <urn:Username>duser</urn:Username>\r\n      <urn:Password>dpassword</urn:Password>\r\n      <urn:Hl7Message>{{GoodMessageLF}}</urn:Hl7Message>\r\n    </urn:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>\r\n"
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/IISService",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"IISService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_07 FHIR Query Returns Data",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"let response = pm.response.json();",
-									"pm.test(\"verify type is Bundle\", function() {",
-									"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
-									"});",
-									"",
-									"pm.test(\"Verify Entry length is 4\", function() {",
-									"    pm.expect(response.entry.length).to.equal(4);",
-									"});",
-									"",
-									"pm.test(\"Verify Immunization Code\", function() {",
-									"    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
-									"});",
-									"",
-									"pm.test(\"Verify Vaccine Code\", function() {",
-									"    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
-									"});",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "",
-								"value": "",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
+							"name": "TS_TC_01 QBP RESPONSE MSH-7",
+							"event": [
 								{
-									"key": "patient.given",
-									"value": "{{fhirPatientGiven}}",
-									"type": "text"
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
+											"});\r",
+											"\r",
+											"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
 								},
 								{
-									"key": "patient.family",
-									"value": "{{fhirPatientFamily}}",
-									"type": "text"
-								},
-								{
-									"key": "patient.birthdate",
-									"value": "{{fhirPatientDOB}}",
-									"type": "text"
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
 								}
-							]
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
 							],
-							"port": "{{port}}",
-							"path": [
-								"fhir",
-								"dev",
-								"Immunization"
-							]
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageLF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_02 VXU Mapping",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"/* disabling this test b/c I cannot figure out why it isn't working yet  */\r",
+											"if (false) {\r",
+											"    pm.test(\"Response is As Expected\", function () {\r",
+											"        var response = utils.removeNS(xml2Json(responseBody));\r",
+											"        var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"        pm.expect(utils.hl7Terser(hl7Message, 'PID', 10, 1)).to.eql('NEWCODE!');\r",
+											"    });\r",
+											"}\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "0d15449b-fb08-4013-8985-20c148b353fe",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_03 VXU Zip Fixer Positive",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"TransformedRequest Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['TransformedRequest'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_04 QBP State Test",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"MSH-22-1 in the response message has been transformed\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 22, 1)).to.eql('STATE_CHECKS');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageLF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_05 VXU State Test",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"MSH-22-1 in the response message has been transformed\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 22, 1)).to.eql('STATE_CHECKS');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20230809110858-0500');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_06 QBP RESPONSE MSH-7 CDC-WSDL",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <wsa:Action>urn:cdc:iisb:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn:SubmitSingleMessageRequest>\r\n      <urn:Username>duser</urn:Username>\r\n      <urn:Password>dpassword</urn:Password>\r\n      <urn:Hl7Message>{{GoodMessageLF}}</urn:Hl7Message>\r\n    </urn:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>\r\n"
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/IISService",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"IISService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_07 FHIR Query Returns Data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"pm.test(\"verify type is Bundle\", function() {",
+											"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+											"});",
+											"",
+											"pm.test(\"Verify Entry length is 4\", function() {",
+											"    pm.expect(response.entry.length).to.equal(4);",
+											"});",
+											"",
+											"pm.test(\"Verify Immunization Code\", function() {",
+											"    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+											"});",
+											"",
+											"pm.test(\"Verify Vaccine Code\", function() {",
+											"    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "patient.given",
+											"value": "{{fhirPatientGiven}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.family",
+											"value": "{{fhirPatientFamily}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.birthdate",
+											"value": "{{fhirPatientDOB}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"fhir",
+										"dev",
+										"Immunization"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_08 FHIR Query Returns No Data",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"pm.test(\"verify type is Bundle\", function() {",
+											"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+											"});",
+											"",
+											"pm.test(\"Verify Entry length is 2\", function() {",
+											"    pm.expect(response.entry.length).to.equal(2);",
+											"});",
+											"",
+											"pm.test(\"Verify NF is returned indicating no data found\", function() {",
+											"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "patient.given",
+											"value": "{{fhirNoDataPatientGiven}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.family",
+											"value": "{{fhirNoDataPatientFamily}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.birthdate",
+											"value": "{{fhirNoDataPatientDOB}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"fhir",
+										"dev",
+										"Immunization"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_09 VXU Zip Fixer Positive With Loopback",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"TransformedRequest Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['TransformedRequest'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_10 VXU Zip Fixer Positive Response With Loopback",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"TransformedRequest Response is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									},
+									{
+										"key": "X-Loopback",
+										"value": "true",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n        <urn1:FacilityID>IZG</urn1:FacilityID>\r\n        <urn1:Hl7Message>MSH|^~\\&amp;|IRIS IIS|IRIS||IZG|20220205||RSP^K11^RSP_K11|20210330093013AZQ231|P|2.5.1|||||||||Z32^CDCPHINVS\r\nMSA|AA|20210330093013AZQ231||0||0^Message Accepted^HL70357\r\nQAK|20210330093013AZQ231|NF|Z34^Request Complete Immunization history^CDCPHINVS&amp;\r\nQPD|Z34^Request Immunization History^CDCPHINVS|20210330093013IA231|112258-9^^^IA^MR|BABYIZG^BABYIZG^AmeliaIZG^^L|BrunoIZG^EllaIZG^TeresaIZG^^M|20170723|F|123 Main Street^^TAMPA^FL^376041234^USA^L|^PRN^PH^^^423^364-3003|Y|1\r\nPID|1||DC1ADMIN^IZG-TEST^MR||BABYIZG^BABYIZG^AmeliaIZG^^L|BrunoIZG^EllaIZG^TeresaIZG^^M|20170723|F||NEWCODE!^White^CDCREC3~2054-5^Black or African American^CDCREC|123 Main Street^^TAMPA^FL^376041234^USA||(423) 364-3003^PRN^CP^1^215^5551213||eng^English^ISO639|||||||2135-2^Hispanic or Latino^CDCREC\r\n      </urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					],
+					"description": "These tests verify basic transformation capabilities and solutions of the Transformation service when called by a user with a certificate that is recognized by an appropriately configured transformation service."
 				},
 				{
-					"name": "TS_TC_08 FHIR Query Returns No Data",
-					"event": [
+					"name": "JWT Based Integration Testing",
+					"item": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"let response = pm.response.json();",
-									"pm.test(\"verify type is Bundle\", function() {",
-									"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
-									"});",
-									"",
-									"pm.test(\"Verify Entry length is 2\", function() {",
-									"    pm.expect(response.entry.length).to.equal(2);",
-									"});",
-									"",
-									"pm.test(\"Verify NF is returned indicating no data found\", function() {",
-									"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
-									"});",
-									"",
-									""
+							"name": "TS_TC_01 QBP RESPONSE MSH-7 with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
 								],
-								"type": "text/javascript",
-								"packages": {}
-							}
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageLF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISHubService",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_02 VXU Mapping with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"/* disabling this test b/c I cannot figure out why it isn't working yet  */\r",
+											"if (false) {\r",
+											"    pm.test(\"Response is As Expected\", function () {\r",
+											"        var response = utils.removeNS(xml2Json(responseBody));\r",
+											"        var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"        pm.expect(utils.hl7Terser(hl7Message, 'PID', 10, 1)).to.eql('NEWCODE!');\r",
+											"    });\r",
+											"}\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "0d15449b-fb08-4013-8985-20c148b353fe",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISHubService",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_03 VXU Zip Fixer Positive with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"TransformedRequest Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['TransformedRequest'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISHubService",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_04 QBP State Test with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"MSH-22-1 in the response message has been transformed\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 22, 1)).to.eql('STATE_CHECKS');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageLF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISHubService",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_05 VXU State Test with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"MSH-22-1 in the response message has been transformed\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 22, 1)).to.eql('STATE_CHECKS');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20230809110858-0500');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISHubService",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"IISHubService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_06 QBP RESPONSE MSH-7 CDC-WSDL with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const xml2js = require('xml2js');\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
+											"\r",
+											"\r",
+											"});\r",
+											"\r",
+											"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
+											"    var response = utils.removeNS(xml2Json(responseBody));\r",
+											"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
+											"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
+											"\r",
+											"});\r",
+											"\r",
+											"utils.testForPHIInLogs(pm);\r",
+											"utils.testSLA(pm, LONG_SLA);\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"utils.setup(pm);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml",
+										"type": "text"
+									},
+									{
+										"key": "x-xform-organization",
+										"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <wsa:Action>urn:cdc:iisb:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn:SubmitSingleMessageRequest>\r\n      <urn:Username>duser</urn:Username>\r\n      <urn:Password>dpassword</urn:Password>\r\n      <urn:Hl7Message>{{GoodMessageLF}}</urn:Hl7Message>\r\n    </urn:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>\r\n"
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISService",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"IISService"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_07 FHIR Query Returns Data with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"pm.test(\"verify type is Bundle\", function() {",
+											"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+											"});",
+											"",
+											"pm.test(\"Verify Entry length is 4\", function() {",
+											"    pm.expect(response.entry.length).to.equal(4);",
+											"});",
+											"",
+											"pm.test(\"Verify Immunization Code\", function() {",
+											"    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+											"});",
+											"",
+											"pm.test(\"Verify Vaccine Code\", function() {",
+											"    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "patient.given",
+											"value": "{{fhirPatientGiven}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.family",
+											"value": "{{fhirPatientFamily}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.birthdate",
+											"value": "{{fhirPatientDOB}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"fhir",
+										"dev",
+										"Immunization"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TS_TC_08 FHIR Query Returns No Data with JWT",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200\", function () {",
+											"    pm.response.to.have.status(200);",
+											"});",
+											"",
+											"let response = pm.response.json();",
+											"pm.test(\"verify type is Bundle\", function() {",
+											"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+											"});",
+											"",
+											"pm.test(\"Verify Entry length is 2\", function() {",
+											"    pm.expect(response.entry.length).to.equal(2);",
+											"});",
+											"",
+											"pm.test(\"Verify NF is returned indicating no data found\", function() {",
+											"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "jwt",
+									"jwt": [
+										{
+											"key": "payload",
+											"value": "{{validJwt}}",
+											"type": "string"
+										},
+										{
+											"key": "secret",
+											"value": "{{jwtSharedSecret}}",
+											"type": "string"
+										},
+										{
+											"key": "isSecretBase64Encoded",
+											"value": false,
+											"type": "boolean"
+										},
+										{
+											"key": "algorithm",
+											"value": "HS256",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "headerPrefix",
+											"value": "Bearer",
+											"type": "string"
+										},
+										{
+											"key": "queryParamKey",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "header",
+											"value": "{}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "",
+										"value": "",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "patient.given",
+											"value": "{{fhirNoDataPatientGiven}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.family",
+											"value": "{{fhirNoDataPatientFamily}}",
+											"type": "text"
+										},
+										{
+											"key": "patient.birthdate",
+											"value": "{{fhirNoDataPatientDOB}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
+									"protocol": "{{no_cert_protocol}}",
+									"host": [
+										"{{no_cert_host}}"
+									],
+									"port": "{{no_cert_port}}",
+									"path": [
+										"fhir",
+										"dev",
+										"Immunization"
+									]
+								}
+							},
+							"response": []
 						}
 					],
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "",
-								"value": "",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "patient.given",
-									"value": "{{fhirNoDataPatientGiven}}",
-									"type": "text"
-								},
-								{
-									"key": "patient.family",
-									"value": "{{fhirNoDataPatientFamily}}",
-									"type": "text"
-								},
-								{
-									"key": "patient.birthdate",
-									"value": "{{fhirNoDataPatientDOB}}",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"fhir",
-								"dev",
-								"Immunization"
-							]
-						}
-					},
-					"response": []
+					"description": "These tests verify basic transformation capabilities and solutions of the Transformation service when called by a user with a Jave Web Token (JWT) that is recognized by an appropriately configured transformation service."
 				},
 				{
-					"name": "TS_TC_09 VXU Zip Fixer Positive With Loopback",
-					"event": [
+					"name": "Core Tests",
+					"item": [
 						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"TransformedRequest Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['TransformedRequest'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
+							"name": "TC_00a Retrieval of Logs",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Save the request for use by subsequent tests\r",
+											"pm.variables.set(\"getLogs\",pm.request);\r",
+											"pm.test(\"Content-Type to be application/json\", function() {\r",
+											"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.be.eql(\"application/json\");\r",
+											"} )\r",
+											"if (pm.variables.get(\"host\").endsWith('phiz-project.org')) {\r",
+											"    return;\r",
+											"}\r",
+											"pm.test(\"Body to parse as json array\", function() {\r",
+											"    pm.expect(pm.response.json().length).to.be.greaterThan(0);\r",
+											"} )\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// No setup for this one"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml"
+									},
+									{
+										"key": "X-Message-ID",
+										"value": "{{testMessageId}}"
+									}
 								],
-								"type": "text/javascript",
-								"packages": {}
-							}
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}{{prefix}}/logs",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}{{prefix}}",
+									"path": [
+										"logs"
+									]
+								},
+								"description": "Verify recent logs can be retrieved via\n\nGET /rest/logs\n\nLog output content type is application/json\n\nLog parses as a json Array"
+							},
+							"response": []
 						},
 						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
+							"name": "TC_00b Reset of Logs",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"// Verify the output.  It must be valid json with content-type application/json\r",
+											"\r",
+											"// Save the request for use by subsequent tests\r",
+											"pm.variables.set(\"resetLogs\",pm.request);\r",
+											"pm.test(\"Status code is 204\", function () {\r",
+											"    pm.expect(pm.response).to.have.status(204);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"No Body\", function () {\r",
+											"    pm.expect(pm.response.responseSize).to.be.eql(0);\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"// No setup for this one"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {
+									"host": true
+								}
+							},
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Host",
+										"value": "{{hostHeader}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/xml"
+									},
+									{
+										"key": "X-Message-ID",
+										"value": "{{testMessageId}}"
+									}
 								],
-								"type": "text/javascript",
-								"packages": {}
-							}
+								"url": {
+									"raw": "{{protocol}}://{{host}}:{{port}}{{prefix}}/logs?clear=dev",
+									"protocol": "{{protocol}}",
+									"host": [
+										"{{host}}"
+									],
+									"port": "{{port}}{{prefix}}",
+									"path": [
+										"logs"
+									],
+									"query": [
+										{
+											"key": "clear",
+											"value": "dev"
+										}
+									]
+								}
+							},
+							"response": []
 						}
 					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_10 VXU Zip Fixer Positive Response With Loopback",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"TransformedRequest Response is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							},
-							{
-								"key": "X-Loopback",
-								"value": "true",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n        <urn1:FacilityID>IZG</urn1:FacilityID>\r\n        <urn1:Hl7Message>MSH|^~\\&amp;|IRIS IIS|IRIS||IZG|20220205||RSP^K11^RSP_K11|20210330093013AZQ231|P|2.5.1|||||||||Z32^CDCPHINVS\r\nMSA|AA|20210330093013AZQ231||0||0^Message Accepted^HL70357\r\nQAK|20210330093013AZQ231|NF|Z34^Request Complete Immunization history^CDCPHINVS&amp;\r\nQPD|Z34^Request Immunization History^CDCPHINVS|20210330093013IA231|112258-9^^^IA^MR|BABYIZG^BABYIZG^AmeliaIZG^^L|BrunoIZG^EllaIZG^TeresaIZG^^M|20170723|F|123 Main Street^^TAMPA^FL^376041234^USA^L|^PRN^PH^^^423^364-3003|Y|1\r\nPID|1||DC1ADMIN^IZG-TEST^MR||BABYIZG^BABYIZG^AmeliaIZG^^L|BrunoIZG^EllaIZG^TeresaIZG^^M|20170723|F||NEWCODE!^White^CDCREC3~2054-5^Black or African American^CDCREC|123 Main Street^^TAMPA^FL^376041234^USA||(423) 364-3003^PRN^CP^1^215^5551213||eng^English^ISO639|||||||2135-2^Hispanic or Latino^CDCREC\r\n      </urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}/IISHubService",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "JWT Based Integration Testing",
-			"item": [
-				{
-					"name": "TS_TC_01 QBP RESPONSE MSH-7 with JWT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "jwt",
-							"jwt": [
-								{
-									"key": "payload",
-									"value": "{{validJwt}}",
-									"type": "string"
-								},
-								{
-									"key": "secret",
-									"value": "{{jwtSharedSecret}}",
-									"type": "string"
-								},
-								{
-									"key": "isSecretBase64Encoded",
-									"value": false,
-									"type": "boolean"
-								},
-								{
-									"key": "algorithm",
-									"value": "HS256",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								},
-								{
-									"key": "headerPrefix",
-									"value": "Bearer",
-									"type": "string"
-								},
-								{
-									"key": "queryParamKey",
-									"value": "token",
-									"type": "string"
-								},
-								{
-									"key": "header",
-									"value": "{}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageLF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISHubService",
-							"protocol": "{{no_cert_protocol}}",
-							"host": [
-								"{{no_cert_host}}"
-							],
-							"port": "{{no_cert_port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_02 VXU Mapping with JWT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"/* disabling this test b/c I cannot figure out why it isn't working yet  */\r",
-									"if (false) {\r",
-									"    pm.test(\"Response is As Expected\", function () {\r",
-									"        var response = utils.removeNS(xml2Json(responseBody));\r",
-									"        var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"        pm.expect(utils.hl7Terser(hl7Message, 'PID', 10, 1)).to.eql('NEWCODE!');\r",
-									"    });\r",
-									"}\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "jwt",
-							"jwt": [
-								{
-									"key": "payload",
-									"value": "{{validJwt}}",
-									"type": "string"
-								},
-								{
-									"key": "secret",
-									"value": "{{jwtSharedSecret}}",
-									"type": "string"
-								},
-								{
-									"key": "isSecretBase64Encoded",
-									"value": false,
-									"type": "boolean"
-								},
-								{
-									"key": "algorithm",
-									"value": "HS256",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								},
-								{
-									"key": "headerPrefix",
-									"value": "Bearer",
-									"type": "string"
-								},
-								{
-									"key": "queryParamKey",
-									"value": "token",
-									"type": "string"
-								},
-								{
-									"key": "header",
-									"value": "{}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "0d15449b-fb08-4013-8985-20c148b353fe",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISHubService",
-							"protocol": "{{no_cert_protocol}}",
-							"host": [
-								"{{no_cert_host}}"
-							],
-							"port": "{{no_cert_port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_03 VXU Zip Fixer Positive with JWT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"TransformedRequest Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['TransformedRequest'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'PID', 11, 5)).to.eql('37604-1234');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "jwt",
-							"jwt": [
-								{
-									"key": "payload",
-									"value": "{{validJwt}}",
-									"type": "string"
-								},
-								{
-									"key": "secret",
-									"value": "{{jwtSharedSecret}}",
-									"type": "string"
-								},
-								{
-									"key": "isSecretBase64Encoded",
-									"value": false,
-									"type": "boolean"
-								},
-								{
-									"key": "algorithm",
-									"value": "HS256",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								},
-								{
-									"key": "headerPrefix",
-									"value": "Bearer",
-									"type": "string"
-								},
-								{
-									"key": "queryParamKey",
-									"value": "token",
-									"type": "string"
-								},
-								{
-									"key": "header",
-									"value": "{}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}\r\n</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISHubService",
-							"protocol": "{{no_cert_protocol}}",
-							"host": [
-								"{{no_cert_host}}"
-							],
-							"port": "{{no_cert_port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_04 QBP State Test with JWT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"MSH-22-1 in the response message has been transformed\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 22, 1)).to.eql('STATE_CHECKS');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "jwt",
-							"jwt": [
-								{
-									"key": "payload",
-									"value": "{{validJwt}}",
-									"type": "string"
-								},
-								{
-									"key": "secret",
-									"value": "{{jwtSharedSecret}}",
-									"type": "string"
-								},
-								{
-									"key": "isSecretBase64Encoded",
-									"value": false,
-									"type": "boolean"
-								},
-								{
-									"key": "algorithm",
-									"value": "HS256",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								},
-								{
-									"key": "headerPrefix",
-									"value": "Bearer",
-									"type": "string"
-								},
-								{
-									"key": "queryParamKey",
-									"value": "token",
-									"type": "string"
-								},
-								{
-									"key": "header",
-									"value": "{}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageLF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISHubService",
-							"protocol": "{{no_cert_protocol}}",
-							"host": [
-								"{{no_cert_host}}"
-							],
-							"port": "{{no_cert_port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_05 VXU State Test with JWT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"MSH-22-1 in the response message has been transformed\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 22, 1)).to.eql('STATE_CHECKS');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20230809110858-0500');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "jwt",
-							"jwt": [
-								{
-									"key": "payload",
-									"value": "{{validJwt}}",
-									"type": "string"
-								},
-								{
-									"key": "secret",
-									"value": "{{jwtSharedSecret}}",
-									"type": "string"
-								},
-								{
-									"key": "isSecretBase64Encoded",
-									"value": false,
-									"type": "boolean"
-								},
-								{
-									"key": "algorithm",
-									"value": "HS256",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								},
-								{
-									"key": "headerPrefix",
-									"value": "Bearer",
-									"type": "string"
-								},
-								{
-									"key": "queryParamKey",
-									"value": "token",
-									"type": "string"
-								},
-								{
-									"key": "header",
-									"value": "{}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:hub:2014\" xmlns:urn1=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <urn:HubRequestHeader>\r\n      <urn:DestinationId>dev</urn:DestinationId>\r\n    </urn:HubRequestHeader>\r\n    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn1:SubmitSingleMessageRequest>\r\n      <urn1:FacilityID>IZG</urn1:FacilityID>\r\n      <urn1:Hl7Message>{{GoodMessageVXULF}}</urn1:Hl7Message>\r\n    </urn1:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>"
-						},
-						"url": {
-							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISHubService",
-							"protocol": "{{no_cert_protocol}}",
-							"host": [
-								"{{no_cert_host}}"
-							],
-							"port": "{{no_cert_port}}",
-							"path": [
-								"IISHubService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_06 QBP RESPONSE MSH-7 CDC-WSDL with JWT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"const xml2js = require('xml2js');\r",
-									"\r",
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"MSH-19 in the response message has been transformed\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Body']['SubmitSingleMessageResponse']['Hl7Message'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 19, 1)).to.eql('MSH 19 NEW VALUE');\r",
-									"\r",
-									"\r",
-									"});\r",
-									"\r",
-									"pm.test(\"OriginalResponse Response Header is As Expected\", function () {\r",
-									"    var response = utils.removeNS(xml2Json(responseBody));\r",
-									"    var hl7Message = response['Envelope']['Header']['XformResponseHeader']['OriginalResponse'];\r",
-									"    pm.expect(utils.hl7Terser(hl7Message, 'MSH', 7, 1)).to.eql('20220205');\r",
-									"\r",
-									"});\r",
-									"\r",
-									"utils.testForPHIInLogs(pm);\r",
-									"utils.testSLA(pm, LONG_SLA);\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"utils.setup(pm);"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"auth": {
-							"type": "jwt",
-							"jwt": [
-								{
-									"key": "payload",
-									"value": "{{validJwt}}",
-									"type": "string"
-								},
-								{
-									"key": "secret",
-									"value": "{{jwtSharedSecret}}",
-									"type": "string"
-								},
-								{
-									"key": "isSecretBase64Encoded",
-									"value": false,
-									"type": "boolean"
-								},
-								{
-									"key": "algorithm",
-									"value": "HS256",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								},
-								{
-									"key": "headerPrefix",
-									"value": "Bearer",
-									"type": "string"
-								},
-								{
-									"key": "queryParamKey",
-									"value": "token",
-									"type": "string"
-								},
-								{
-									"key": "header",
-									"value": "{}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml",
-								"type": "text"
-							},
-							{
-								"key": "x-xform-organization",
-								"value": "d339cd15-2e57-4456-94b6-1e14f079a0de",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:cdc:iisb:2014\">\r\n  <soap:Header xmlns:wsa=\"http://www.w3.org/2005/08/addressing\">\r\n    <wsa:Action>urn:cdc:iisb:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>\r\n    <wsa:MessageID>{{testMessageId}}</wsa:MessageID>\r\n  </soap:Header>\r\n  <soap:Body>\r\n    <urn:SubmitSingleMessageRequest>\r\n      <urn:Username>duser</urn:Username>\r\n      <urn:Password>dpassword</urn:Password>\r\n      <urn:Hl7Message>{{GoodMessageLF}}</urn:Hl7Message>\r\n    </urn:SubmitSingleMessageRequest>\r\n  </soap:Body>\r\n</soap:Envelope>\r\n"
-						},
-						"url": {
-							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/IISService",
-							"protocol": "{{no_cert_protocol}}",
-							"host": [
-								"{{no_cert_host}}"
-							],
-							"port": "{{no_cert_port}}",
-							"path": [
-								"IISService"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_07 FHIR Query Returns Data with JWT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"let response = pm.response.json();",
-									"pm.test(\"verify type is Bundle\", function() {",
-									"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
-									"});",
-									"",
-									"pm.test(\"Verify Entry length is 4\", function() {",
-									"    pm.expect(response.entry.length).to.equal(4);",
-									"});",
-									"",
-									"pm.test(\"Verify Immunization Code\", function() {",
-									"    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
-									"});",
-									"",
-									"pm.test(\"Verify Vaccine Code\", function() {",
-									"    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
-									"});",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "jwt",
-							"jwt": [
-								{
-									"key": "payload",
-									"value": "{{validJwt}}",
-									"type": "string"
-								},
-								{
-									"key": "secret",
-									"value": "{{jwtSharedSecret}}",
-									"type": "string"
-								},
-								{
-									"key": "isSecretBase64Encoded",
-									"value": false,
-									"type": "boolean"
-								},
-								{
-									"key": "algorithm",
-									"value": "HS256",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								},
-								{
-									"key": "headerPrefix",
-									"value": "Bearer",
-									"type": "string"
-								},
-								{
-									"key": "queryParamKey",
-									"value": "token",
-									"type": "string"
-								},
-								{
-									"key": "header",
-									"value": "{}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "",
-								"value": "",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "patient.given",
-									"value": "{{fhirPatientGiven}}",
-									"type": "text"
-								},
-								{
-									"key": "patient.family",
-									"value": "{{fhirPatientFamily}}",
-									"type": "text"
-								},
-								{
-									"key": "patient.birthdate",
-									"value": "{{fhirPatientDOB}}",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
-							"protocol": "{{no_cert_protocol}}",
-							"host": [
-								"{{no_cert_host}}"
-							],
-							"port": "{{no_cert_port}}",
-							"path": [
-								"fhir",
-								"dev",
-								"Immunization"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "TS_TC_08 FHIR Query Returns No Data with JWT",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"let response = pm.response.json();",
-									"pm.test(\"verify type is Bundle\", function() {",
-									"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
-									"});",
-									"",
-									"pm.test(\"Verify Entry length is 2\", function() {",
-									"    pm.expect(response.entry.length).to.equal(2);",
-									"});",
-									"",
-									"pm.test(\"Verify NF is returned indicating no data found\", function() {",
-									"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
-									"});",
-									"",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"request": {
-						"auth": {
-							"type": "jwt",
-							"jwt": [
-								{
-									"key": "payload",
-									"value": "{{validJwt}}",
-									"type": "string"
-								},
-								{
-									"key": "secret",
-									"value": "{{jwtSharedSecret}}",
-									"type": "string"
-								},
-								{
-									"key": "isSecretBase64Encoded",
-									"value": false,
-									"type": "boolean"
-								},
-								{
-									"key": "algorithm",
-									"value": "HS256",
-									"type": "string"
-								},
-								{
-									"key": "addTokenTo",
-									"value": "header",
-									"type": "string"
-								},
-								{
-									"key": "headerPrefix",
-									"value": "Bearer",
-									"type": "string"
-								},
-								{
-									"key": "queryParamKey",
-									"value": "token",
-									"type": "string"
-								},
-								{
-									"key": "header",
-									"value": "{}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [
-							{
-								"key": "",
-								"value": "",
-								"type": "text",
-								"disabled": true
-							}
-						],
-						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "patient.given",
-									"value": "{{fhirNoDataPatientGiven}}",
-									"type": "text"
-								},
-								{
-									"key": "patient.family",
-									"value": "{{fhirNoDataPatientFamily}}",
-									"type": "text"
-								},
-								{
-									"key": "patient.birthdate",
-									"value": "{{fhirNoDataPatientDOB}}",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
-							"protocol": "{{no_cert_protocol}}",
-							"host": [
-								"{{no_cert_host}}"
-							],
-							"port": "{{no_cert_port}}",
-							"path": [
-								"fhir",
-								"dev",
-								"Immunization"
-							]
-						}
-					},
-					"response": []
+					"description": "Core tests verify core capabilities used for testing are functioning properly. These are capabilities that enable the test tools to reset and retrieve log information to verify logging works as required."
 				}
 			]
 		},
@@ -32756,159 +32917,6 @@
 							"response": []
 						}
 					]
-				}
-			]
-		},
-		{
-			"name": "Core Tests",
-			"item": [
-				{
-					"name": "TC_00a Retrieval of Logs",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Save the request for use by subsequent tests\r",
-									"pm.variables.set(\"getLogs\",pm.request);\r",
-									"pm.test(\"Content-Type to be application/json\", function() {\r",
-									"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.be.eql(\"application/json\");\r",
-									"} )\r",
-									"if (pm.variables.get(\"host\").endsWith('phiz-project.org')) {\r",
-									"    return;\r",
-									"}\r",
-									"pm.test(\"Body to parse as json array\", function() {\r",
-									"    pm.expect(pm.response.json().length).to.be.greaterThan(0);\r",
-									"} )\r",
-									"\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"// No setup for this one"
-								],
-								"type": "text/javascript",
-								"packages": {}
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml"
-							},
-							{
-								"key": "X-Message-ID",
-								"value": "{{testMessageId}}"
-							}
-						],
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}{{prefix}}/logs",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}{{prefix}}",
-							"path": [
-								"logs"
-							]
-						},
-						"description": "Verify recent logs can be retrieved via\n\nGET /rest/logs\n\nLog output content type is application/json\n\nLog parses as a json Array"
-					},
-					"response": []
-				},
-				{
-					"name": "TC_00b Reset of Logs",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"// Verify the output.  It must be valid json with content-type application/json\r",
-									"\r",
-									"// Save the request for use by subsequent tests\r",
-									"pm.variables.set(\"resetLogs\",pm.request);\r",
-									"pm.test(\"Status code is 204\", function () {\r",
-									"    pm.expect(pm.response).to.have.status(204);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"No Body\", function () {\r",
-									"    pm.expect(pm.response.responseSize).to.be.eql(0);\r",
-									"});\r",
-									"\r",
-									""
-								],
-								"type": "text/javascript"
-							}
-						},
-						{
-							"listen": "prerequest",
-							"script": {
-								"exec": [
-									"// No setup for this one"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disabledSystemHeaders": {
-							"host": true
-						}
-					},
-					"request": {
-						"method": "DELETE",
-						"header": [
-							{
-								"key": "Host",
-								"value": "{{hostHeader}}"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/xml"
-							},
-							{
-								"key": "X-Message-ID",
-								"value": "{{testMessageId}}"
-							}
-						],
-						"url": {
-							"raw": "{{protocol}}://{{host}}:{{port}}{{prefix}}/logs?clear=dev",
-							"protocol": "{{protocol}}",
-							"host": [
-								"{{host}}"
-							],
-							"port": "{{port}}{{prefix}}",
-							"path": [
-								"logs"
-							],
-							"query": [
-								{
-									"key": "clear",
-									"value": "dev"
-								}
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		}
