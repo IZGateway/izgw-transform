@@ -51,7 +51,7 @@ public class XformPrincipalService implements PrincipalService {
      */
     @Override
     public IzgPrincipal getPrincipal(HttpServletRequest request) {
-        IzgPrincipal izgPrincipal = getPrincipalFromJWT(request);
+        IzgPrincipal izgPrincipal = jwtPrincipalProvider.createPrincipalFromJwt(request);
 
         if (izgPrincipal == null) {
             izgPrincipal = getPrincipalFromCertificate(request);
@@ -71,16 +71,6 @@ public class XformPrincipalService implements PrincipalService {
             xformPrincipal.setAllowedOrganizationIds(user.getOrganizationIds());
             return xformPrincipal;
         }
-    }
-
-
-    /**
-     * Gets the principal from the JWT in the request.
-     * @param request The request to get the principal from
-     * @return The principal from the JWT in the request, null if no principal found
-     */
-    private IzgPrincipal getPrincipalFromJWT(HttpServletRequest request) {
-        return jwtPrincipalProvider.createPrincipalFromJwt(request);
     }
 
     /**

@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.xform.services;
 
 import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.security.IzgPrincipal;
 import gov.cdc.izgateway.xform.logging.ApiEventLogger;
 import gov.cdc.izgateway.xform.model.BaseModel;
 import gov.cdc.izgateway.xform.model.OrganizationAware;
@@ -101,7 +102,11 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
      * It retrieves the principal from the request context and returns the allowed organization IDs.
      */
     private Set<UUID> getAllowedOrganizationIds() {
-        return ((XformPrincipal) RequestContext.getPrincipal()).getAllowedOrganizationIds();
+    	IzgPrincipal p = RequestContext.getPrincipal();
+    	if (p instanceof XformPrincipal x) {
+    		return x.getAllowedOrganizationIds();
+    	}
+    	return Collections.emptySet();
     }
 
     /**

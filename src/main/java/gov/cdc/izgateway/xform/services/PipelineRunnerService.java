@@ -54,16 +54,18 @@ public class PipelineRunnerService implements Advisable, Transformable {
         	Collections.reverse(pipes);
         }
         for (Pipe pipe : pipes) {
-            log.trace("Executing Pipe: {}", pipe.getId());
-
+            gov.cdc.izgateway.xform.model.Solution solutionModel = xformConfig.getSolution(pipe.getSolutionId());
+            String solutionName = solutionModel.getSolutionName();
+            log.info("Executing Pipe: {}", solutionName);
             if (Boolean.TRUE.equals(preconditionsPassed(pipe))) {
                 // Create & Execute Solution
-                gov.cdc.izgateway.xform.model.Solution solutionModel = xformConfig.getSolution(pipe.getSolutionId());
-                log.trace("Solution Name: {}", solutionModel.getSolutionName());
+            	log.debug("Precondition passed for {}", solutionName);
                 Solution solution = new Solution(solutionModel);
                 solution.execute(context);
+            } else {
+            	log.debug("Precondition failed on {}", solutionName);
             }
-
+            log.debug("");
         }
 
     }

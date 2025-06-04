@@ -24,6 +24,7 @@ import gov.cdc.izgateway.xform.enums.DataType;
 import gov.cdc.izgateway.xform.security.Roles;
 import gov.cdc.izgateway.xform.services.AccessControlService;
 import gov.cdc.izgateway.xform.services.OrganizationService;
+import gov.cdc.izgateway.xform.util.Hl7Utils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -125,15 +126,18 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
 
     	String transformedRequest = null;
     	boolean isResponse = submitSingleMessage.getHl7Message().contains("MSA|");
-    	SubmitSingleMessageResponse response = 
-    		new SubmitSingleMessageResponse(submitSingleMessage, getMessageNamespace(), true);
-    	if (isResponse) {
-    		// Setup for the Response Path
-        	response.setHl7Message(submitSingleMessage.getHl7Message());
-    		context.setSubmitSingleMessageResponse(response);
-    		context.getServiceContext().setCurrentDirection(DataFlowDirection.RESPONSE);
-    	}
+    	SubmitSingleMessageResponse response = isResponse ? 
+    			new SubmitSingleMessageResponse(submitSingleMessage, getMessageNamespace(), true) :
+    			null;
     	try {
+        	if (isResponse) {
+        		// Setup for the Response Path
+            	response.setHl7Message(submitSingleMessage.getHl7Message());
+        		context.setSubmitSingleMessageResponse(response);
+        		context.getServiceContext().setCurrentDirection(DataFlowDirection.RESPONSE);
+        		context.getServiceContext().setResponseMessage(Hl7Utils.parseHl7v2Message(response.getHl7Message()));
+        	}
+        	
     		producerTemplate.sendBody(EndpointUris.LOOPBACK_HUB_PIPELINE, context);
         	PipelineAdvice advice = XformAdviceCollector.getTransactionData().getPipelineAdvice();
         	
@@ -148,10 +152,14 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
             }
             if (!isResponse) {
             	response.setHl7Message(transformedRequest);
-            } 
+            } else {
+            	response.setHl7Message(context.getServiceContext().getCurrentMessage().toString());
+            }
         } catch (CamelExecutionException e) {
             throw new HubControllerFault(e.getCause());
-        }
+        } catch (HL7Exception e) {
+			throw new HubControllerFault(e.getCause());
+		}
         
         return checkResponseEntitySize(new ResponseEntity<>(response, HttpStatus.OK));
 	}

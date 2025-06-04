@@ -8,6 +8,7 @@ import gov.cdc.izgateway.logging.markers.Markers2;
 import gov.cdc.izgateway.security.service.PrincipalService;
 import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -17,6 +18,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Slf4j
 @Component("xformValveLogging")
@@ -40,6 +42,11 @@ public class XformLoggingValve extends LoggingValveBase {
 	        XformRequestContext.disableApiLogging();
 	    }
     	this.getNext().invoke(request, response);
+    	if (Arrays.asList(HttpServletResponse.SC_UNAUTHORIZED, HttpServletResponse.SC_SERVICE_UNAVAILABLE).contains(response.getStatus())) {
+            // In these two cases, someone tried to access IZGW via a URL they shouldn't have.  
+    		// There was never a transaction to begin with. 
+            RequestContext.disableTransactionDataLogging();
+    	}
     }
 
     @Override
