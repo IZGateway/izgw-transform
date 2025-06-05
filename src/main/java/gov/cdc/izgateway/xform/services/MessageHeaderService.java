@@ -43,7 +43,6 @@ public class MessageHeaderService implements IMessageHeaderService {
         return null;
     }
 
-	@Override
-	public void delete(String id) {
-	}
+    @Override
+    public void delete(String id) {}
 }
