@@ -1,7 +1,7 @@
 package gov.cdc.izgateway.xform.services;
 
 import gov.cdc.izgateway.xform.model.Pipeline;
-import gov.cdc.izgateway.xform.repository.XformRepository;
+import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
@@ -10,8 +10,8 @@ import java.util.UUID;
 public class PipelineService extends GenericService<Pipeline>{
 
     @Autowired
-    public PipelineService(XformRepository<Pipeline> repo) {
-        super(repo);
+    public PipelineService(RepositoryFactory repositoryFactory) {
+        super(repositoryFactory.pipelineRepository());
     }
 
     public Pipeline getPipelineByOrganizationAndEndpoints(UUID organizationId, String inboundEndpoint, String outboundEndpoint) {

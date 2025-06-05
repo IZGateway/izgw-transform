@@ -3,12 +3,14 @@ package gov.cdc.izgateway.xform.model;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
 import java.util.UUID;
 
 @Getter
 @Setter
-public class Mapping implements BaseModel, OrganizationAware {
+@DynamoDbBean
+public class Mapping extends BaseModel implements OrganizationAware {
     private UUID id;
     @NotNull(message = "Mapping active status is required")
     private Boolean active;

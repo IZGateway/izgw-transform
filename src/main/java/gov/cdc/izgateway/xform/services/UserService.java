@@ -1,15 +1,15 @@
 package gov.cdc.izgateway.xform.services;
 
 import gov.cdc.izgateway.xform.model.User;
-import gov.cdc.izgateway.xform.repository.XformRepository;
+import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService extends GenericService<User> {
     @Autowired
-    public UserService(XformRepository<User> repo) {
-        super(repo);
+    public UserService(RepositoryFactory repositoryFactory) {
+        super(repositoryFactory.userRepository());
     }
 
     public User getUserByUserName(String userName) {
@@ -25,4 +25,3 @@ public class UserService extends GenericService<User> {
     }
 
 }
-
