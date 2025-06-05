@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.repository.file;
 
+import gov.cdc.izgateway.common.HealthService;
 import gov.cdc.izgateway.xform.model.AccessControl;
 import gov.cdc.izgateway.xform.model.GroupRoleMapping;
 import gov.cdc.izgateway.xform.model.Mapping;
@@ -54,6 +55,8 @@ public class FileRepositoryFactory implements RepositoryFactory {
         this.pipelineFilePath = pipelineFilePath;
         this.solutionFilePath = solutionFilePath;
         this.userFilePath = userFilePath;
+
+        HealthService.setDatabase("files");
     }
 
     @Override
