@@ -36,7 +36,7 @@ public class MappingApiController extends BaseApiController {
         registry.register(this);
     }
 
-    @RolesAllowed({Roles.SOLUTION_READER})
+    @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/mappings")
     public ResponseEntity<String> getMappingsList(
             @RequestParam(required = false) String nextCursor,
@@ -52,7 +52,7 @@ public class MappingApiController extends BaseApiController {
         }
     }
 
-    @RolesAllowed({Roles.SOLUTION_READER})
+    @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/mappings/{uuid}")
     public ResponseEntity<Mapping> getMappingByUUID(@PathVariable UUID uuid) {
         Mapping entity = mappingService.getObject(uuid);
@@ -62,7 +62,7 @@ public class MappingApiController extends BaseApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
-    @RolesAllowed({Roles.SOLUTION_WRITER})
+    @RolesAllowed({Roles.PIPELINE_WRITER})
     @PostMapping("/api/v1/mappings")
     public ResponseEntity<Mapping> createMapping(
             @Valid @RequestBody() Mapping mapping
@@ -71,7 +71,7 @@ public class MappingApiController extends BaseApiController {
         return new ResponseEntity<>(mapping, HttpStatus.OK);
     }
 
-    @RolesAllowed({Roles.SOLUTION_WRITER})
+    @RolesAllowed({Roles.PIPELINE_WRITER})
     @PutMapping("/api/v1/mappings/{uuid}")
     public ResponseEntity<Mapping> updateMapping(
             @PathVariable UUID uuid,
@@ -82,7 +82,7 @@ public class MappingApiController extends BaseApiController {
         return new ResponseEntity<>(updatedMapping, HttpStatus.OK);
     }
 
-    @RolesAllowed({Roles.SOLUTION_DELETER})
+    @RolesAllowed({Roles.PIPELINE_DELETER})
     @DeleteMapping("/api/v1/mappings/{uuid}")
     public ResponseEntity<Mapping> deleteMapping(
             @PathVariable UUID uuid
