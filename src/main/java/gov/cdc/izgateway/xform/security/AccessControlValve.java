@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.security;
 
+import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.xform.services.AccessControlService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,10 +38,25 @@ public class AccessControlValve extends ValveBase {
 
     public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
         String path = req.getRequestURI();
-        if ( Boolean.FALSE.equals(accessControlService.checkAccess(req.getMethod(), path)) ) {
+        Boolean accessAllowed = accessControlService.checkAccess(req.getMethod(), path);
+        if (accessAllowed == null) {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            log.trace("Path does not exist: {}", path);
+            return false;
+        } else if ( Boolean.FALSE.equals(accessAllowed) ) {
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            log.trace("Access denied to protected URL {} address by {} at {}", 
+        		path, 
+        		RequestContext.getPrincipal().getName(), 
+        		RequestContext.getTransactionData().getSource().getIpAddress()
+            );
             return false;
         } else {
+            log.trace("Access granted to protected URL {} address by {} at {}", 
+        		path, 
+        		RequestContext.getPrincipal().getName(), 
+        		RequestContext.getTransactionData().getSource().getIpAddress()
+        	);
             return true;
         }
     }

@@ -1,128 +1,46 @@
-[
-  {
-    "id": "b8a2c7e9-5d6f-4e3c-9b2a-1d7e8f3c5b9d",
-    "userId": "4f5b1f8e-6c7d-4a9b-8e3f-2d7c6b5a9e4d",
-    "active": true,
-    "roles": [
-      "admin",
-      "xform-sender",
-      "pipeline-reader",
-      "pipeline-writer",
-      "pipeline-deleter",
-      "organization-reader",
-      "organization-writer",
-      "organization-deleter",
-      "solution-reader",
-      "solution-writer",
-      "solution-deleter"
-    ]
-  },
-  {
-    "id": "d50994c7-5c6d-441b-aa08-12be7509923e",
-    "userId": "8c942339-e10d-418f-8898-d8e73388198c",
-    "active": true,
-    "roles": [
-      "admin",
-      "xform-sender",
-      "pipeline-reader",
-      "pipeline-writer",
-      "pipeline-deleter",
-      "organization-reader",
-      "organization-writer",
-      "organization-deleter",
-      "solution-reader",
-      "solution-writer",
-      "solution-deleter"
-    ]
-  },
-  {
-    "id": "fe65c254-d106-4d41-a81c-187847a10dd0",
-    "userId": "f1d0616c-ec7c-4070-b43a-9e7295d45d21",
-    "active": true,
-    "roles": [
-      "admin",
-      "xform-sender",
-      "pipeline-reader",
-      "pipeline-writer",
-      "pipeline-deleter",
-      "organization-reader",
-      "organization-writer",
-      "organization-deleter",
-      "solution-reader",
-      "solution-writer",
-      "solution-deleter"
-    ]
-  },
-  {
-    "id": "e9654dd4-e0b8-4531-9bed-dfded96fcb34",
-    "userId": "61d7e381-2807-4d0f-8e6a-8a0df182d70d",
-    "active": true,
-    "roles": [
-      "admin",
-      "xform-sender",
-      "pipeline-reader",
-      "pipeline-writer",
-      "pipeline-deleter",
-      "organization-reader",
-      "organization-writer",
-      "organization-deleter",
-      "solution-reader",
-      "solution-writer",
-      "solution-deleter"
-    ]
-  },
-  {
-    "id": "48bcafc2-de8c-43b6-8dd2-5afd8e02a327",
-    "userId": "7ae8e29b-aca6-4795-8de6-1183236e56b6",
-    "active": true,
-    "roles": [
-      "admin",
-      "xform-sender",
-      "pipeline-reader",
-      "pipeline-writer",
-      "pipeline-deleter",
-      "organization-reader",
-      "organization-writer",
-      "organization-deleter",
-      "solution-reader",
-      "solution-writer",
-      "solution-deleter"
-    ]
-  },
-  {
-    "id": "fd97881d-7c37-474a-8a14-6d038a7fbc8c",
-    "userId": "8556e4a3-743a-4e71-9971-6d8e2d679ed6",
-    "active": true,
-    "roles": [
-      "admin",
-      "xform-sender",
-      "pipeline-reader",
-      "pipeline-writer",
-      "pipeline-deleter",
-      "organization-reader",
-      "organization-writer",
-      "organization-deleter",
-      "solution-reader",
-      "solution-writer",
-      "solution-deleter"
-    ]
-  },
-    {
-    "id": "a7d3ef19-5283-47de-b67c-bfa88d0bb0c2",
-    "userId": "18d0c708-23b6-4a45-a3f5-96570535678c",
-    "active": true,
-    "roles": [
-      "admin",
-      "xform-sender",
-      "pipeline-reader",
-      "pipeline-writer",
-      "pipeline-deleter",
-      "organization-reader",
-      "organization-writer",
-      "organization-deleter",
-      "solution-reader",
-      "solution-writer",
-      "solution-deleter"
-    ]
-  }
-]
+[ {
+  "id" : "d50994c7-5c6d-441b-aa08-12be7509923e",
+  "userId" : "8c942339-e10d-418f-8898-d8e73388198c",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}, {
+  "id" : "fe65c254-d106-4d41-a81c-187847a10dd0",
+  "userId" : "f1d0616c-ec7c-4070-b43a-9e7295d45d21",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}, {
+  "id" : "e9654dd4-e0b8-4531-9bed-dfded96fcb34",
+  "userId" : "61d7e381-2807-4d0f-8e6a-8a0df182d70d",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}, {
+  "id" : "48bcafc2-de8c-43b6-8dd2-5afd8e02a327",
+  "userId" : "7ae8e29b-aca6-4795-8de6-1183236e56b6",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}, {
+  "id" : "fd97881d-7c37-474a-8a14-6d038a7fbc8c",
+  "userId" : "8556e4a3-743a-4e71-9971-6d8e2d679ed6",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}, {
+  "id" : "863ee7fc-c259-44ea-920e-301e02f91905",
+  "userId" : "cc58fd43-8b70-4c71-aa2f-b9084cd961bc",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}, {
+  "id" : "9653c2dc-15a7-4634-b732-619840326154",
+  "userId" : "18d0c708-23b6-4a45-a3f5-96570535678c",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}, {
+  "id" : "0d9ca28b-b0b9-4967-a246-1773dd184cc7",
+  "userId" : "4f5b1f8e-6c7d-4a9b-8e3f-2d7c6b5a9e4d",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}, {
+  "id" : "d6c1d488-6a97-4676-b042-86b3a73f557b",
+  "userId" : "a67d65b5-07dd-40cc-b2ed-4ad9b5be0cd6",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+} ]

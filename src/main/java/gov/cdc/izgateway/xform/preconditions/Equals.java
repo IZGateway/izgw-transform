@@ -46,8 +46,8 @@ public class Equals implements Precondition, Advisable, Transformable {
     @CaptureXformAdvice
     public boolean evaluate(ServiceContext context) {
 
-        if (log.isTraceEnabled()) {
-            log.trace("Precondition: {} / dataPath: '{}' / comparisonValue: '{}'",
+        if (log.isDebugEnabled()) {
+            log.debug("Precondition: {} / dataPath: '{}' / comparisonValue: '{}'",
                     this.getClass().getSimpleName(),
                     this.getDataPath(),
                     this.getComparisonValue());

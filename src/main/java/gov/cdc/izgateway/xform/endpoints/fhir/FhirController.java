@@ -73,7 +73,6 @@ import gov.cdc.izgateway.logging.info.SourceInfo;
 import gov.cdc.izgateway.logging.markers.Markers2;
 import gov.cdc.izgateway.model.RetryStrategy;
 import gov.cdc.izgateway.security.AccessControlValve;
-import gov.cdc.izgateway.security.Roles;
 import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.soap.fault.UnexpectedExceptionFault;
 import gov.cdc.izgateway.soap.message.FaultMessage;
@@ -82,6 +81,8 @@ import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
 import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.soap.message.WsaHeaders;
 import gov.cdc.izgateway.xform.endpoints.hub.HubController;
+import gov.cdc.izgateway.xform.security.Roles;
+import io.azam.ulidj.ULID;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -127,7 +128,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author Audacious Inquiry 
  */
 @RestController
-@RolesAllowed({Roles.SOAP, Roles.ADMIN})
+@RolesAllowed({Roles.XFORM_SENDING_SYSTEM, Roles.ADMIN})
 @RequestMapping("/fhir")
 @Slf4j
 @Lazy(false)
@@ -240,7 +241,26 @@ public class FhirController {
         @PathVariable String destinationId,
         HttpServletRequest req
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
+    	String summary = req.getParameter("_summary");
+    	String count = req.getParameter("_count");
+    	if (Arrays.asList("summary", "count").contains(summary)) {
+    		return connectionTest(count);
+    	}
         return processQuery(req, destinationId);
+    }
+    
+    /**
+     * This exists to allow query connector to validate authentication
+     * parameters when connecting via /Patients?_summary=count&_count=1
+     * @param count	Not used
+     * @return	A SearchSet Bundle reporting 100 patients available.
+     */
+    private ResponseEntity<Bundle> connectionTest(String count) {
+		Bundle b = new Bundle();
+		b.setId(new IdType(b.fhirType() + "/" + ULID.random()));
+		b.setType(BundleType.SEARCHSET);
+		b.setTotal(100);
+		return new ResponseEntity<>(b, HttpStatus.OK);
     }
 
     /**
