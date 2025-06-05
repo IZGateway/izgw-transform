@@ -208,13 +208,13 @@ Steps to create the keystore bcfks file:
 * Create a .p12 file from your cert and key pem files:
     * ```openssl pkcs12 -export -in sample-cert.pem -inkey sample-private-key.pem -out sample-keystore.p12 -name "samplealias"```
 * Create a .bcfks file using the following command:
-    * ```keytool -importkeystore -srckeystore sample-keystore.p12 -srcstorepass 'password' -storepass 'password' -destkeystore server_keystore.bcfks -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-1.0.2.4.jar```
+    * ```keytool -importkeystore -srckeystore sample-keystore.p12 -srcstorepass 'password' -storepass 'password' -destkeystore server_keystore.bcfks -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar```
 * Add the root ca cert to the bcfks file:
-    * ```keytool -importcert -file DigiCertCA.crt -keystore server_keystore.bcfks -storetype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-1.0.2.4.jar -storepass 'password' -alias DigiCertCA```
+    * ```keytool -importcert -file DigiCertCA.crt -keystore server_keystore.bcfks -storetype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar -storepass 'password' -alias DigiCertCA```
 * Add the intermediate cert to the bcfks file
-    * ```keytool -importcert -file TrustedRoot.crt -keystore server_keystore.bcfks -storetype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-1.0.2.4.jar -storepass 'password' -alias TrustedRoot```
+    * ```keytool -importcert -file TrustedRoot.crt -keystore server_keystore.bcfks -storetype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar -storepass 'password' -alias TrustedRoot```
 * To list the contents of the bcfks file:
-    * ```keytool -list -keystore ./server_keystore.bcfks -storepass 'password' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-1.0.2.4.jar```
+    * ```keytool -list -keystore ./server_keystore.bcfks -storepass 'password' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar```
 
 ### Generate Client Trust Store
 
@@ -236,4 +236,4 @@ Steps to create the file
     * Notes about the keytool command below
         * Use the password that you intend to use as the COMMON_PASS environment variable where you see <PASSWORD>
         * Replace <PATH TO> to the location for the bc-fips jar file
-    * ```keytool -import -alias dev.izgateway.org -keystore client_keystore.bcfks -file dev.izgateway.org.crt -noprompt -storepass '<PASSWORD>' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath /<PATH TO>/bc-fips-1.0.2.4.jar```
+    * ```keytool -import -alias dev.izgateway.org -keystore client_keystore.bcfks -file dev.izgateway.org.crt -noprompt -storepass '<PASSWORD>' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath /<PATH TO>/bc-fips-2.0.0.jar```

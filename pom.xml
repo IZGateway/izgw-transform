@@ -514,7 +514,7 @@
 									<arg value="-provider" />
 									<arg value="org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider" />
 									<arg value="-providerpath" />
-									<arg value="${project.basedir}/docker/data/lib/bc-fips-1.0.2.5.jar" />
+									<arg value="${project.basedir}/docker/data/lib/bc-fips-2.0.0.jar" />
 								</exec>
 								<exec executable="keytool" failonerror="true">
 									<arg value="-keystore" />
@@ -548,7 +548,7 @@
 									<arg value="-provider" />
 									<arg value="org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider" />
 									<arg value="-providerpath" />
-									<arg value="${project.basedir}/docker/data/lib/bc-fips-1.0.2.5.jar" />
+									<arg value="${project.basedir}/docker/data/lib/bc-fips-2.0.0.jar" />
 								</exec>
 							</target>
 						</configuration>
