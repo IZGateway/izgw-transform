@@ -18,9 +18,9 @@
   "groupName" : "IZG Operations",
   "active" : true,
   "roles" : [ "organization-reader", "pipeline-deleter", "pipeline-reader", "pipeline-writer" ]
-} , {
-    "id" : "7b23ee9e-ba1a-43f7-9290-2b6a3dccaf32",
-    "groupName" : "Xform Sender",
-    "active" : true,
-    "roles" : [ "xform-sender" ]
-  } ]
+}, {
+  "id" : "7b23ee9e-ba1a-43f7-9290-2b6a3dccaf32",
+  "groupName" : "Xform Sender",
+  "active" : true,
+  "roles" : [ "xform-sender" ]
+} ]

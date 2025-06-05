@@ -1,7 +1,15 @@
 [ {
-  "id" : "e69ea576-045f-43a1-8472-ad090ca8655b",
+  "id" : "ace4066b-44be-4765-83f4-a05fcfe5774d",
   "active" : true,
   "organizationId" : "0d15449b-fb08-4013-8985-20c148b353fe",
+  "codeSystem" : "CDCREC",
+  "code" : "2106-3",
+  "targetCodeSystem" : "CDCREC3",
+  "targetCode" : "NEWCODE!"
+}, {
+  "id" : "e69ea576-045f-43a1-8472-ad090ca8655b",
+  "active" : true,
+  "organizationId" : "d339cd15-2e57-4456-94b6-1e14f079a0de",
   "codeSystem" : "CDCREC",
   "code" : "2106-3",
   "targetCodeSystem" : "CDCREC3",
