@@ -226,8 +226,14 @@
 		     ca.uhn.hapi.fhir:org.hl7.fhir.convertors:jar:6.1.2.2
 		     ca.uhn.hapi.fhir:org.hl7.fhir.validation:jar:6.1.2.2
 			 Both with CVE-2024-51132, 6.4.0 is fix version
-			 org.fhir:ucum:jar:1.0.8 with CVE-2024-55887, 1.0.9 is fix version
+			 org.fhir:ucum:jar:1.0.8 with CVE-2024-55887, 1.0.9 is the fix version
 		-->
+		<!-- v2tofhir dependency opencsv 5.11 (latest version) pulls 1.10.0 with vulnerability, override -->
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.11.0</version>
+		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>org.hl7.fhir.dstu2</artifactId>
