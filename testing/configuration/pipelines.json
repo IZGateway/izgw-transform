@@ -58,7 +58,7 @@
     "id" : "f90d99d4-0406-4500-a15d-5a60752482ce",
     "solutionId" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
     "solutionVersion" : "1.0",
-    "preconditions" : []
+    "preconditions" : [ ]
   } ]
 }, {
   "pipelineName" : "Pipeline for Postman Tests for IIS endpoint",

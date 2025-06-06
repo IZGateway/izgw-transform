@@ -3,7 +3,7 @@ package gov.cdc.izgateway.xform.services;
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.xform.model.AccessControl;
-import gov.cdc.izgateway.xform.repository.XformRepository;
+import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import gov.cdc.izgateway.xform.security.Roles;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +17,14 @@ public class AccessControlService extends GenericService<AccessControl> {
     private final AccessControlRegistry registry;
 
     @Autowired
-    public AccessControlService(XformRepository<AccessControl> repo, AccessControlRegistry registry) {
-        super(repo);
+    public AccessControlService(RepositoryFactory repositoryFactory, AccessControlRegistry registry) {
+        super(repositoryFactory.accessControlRepository());
         this.registry = registry;
     }
 
     public List<String> getAllowedRoles(RequestMethod method, String path) {
         List<String> roles = registry.getAllowedRoles(method, path);
-        log.trace("Roles allowed for {} {} are {}", method, path, roles);
+        log.debug("Roles allowed for {} {} are {}", method, path, roles);
         return roles;
     }
 
@@ -56,30 +56,20 @@ public class AccessControlService extends GenericService<AccessControl> {
      */
     public Boolean checkXformAccess(String method, String path) {
         List<String> allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);
-        if (allowedRoles == null || allowedRoles.isEmpty()) {
-        	// This path is unknown
-        	return null;
-        }
+
         // Check for public access
         if (allowedRoles.contains(Roles.PUBLIC_ACCESS)) {
             return true;
         }
 
         // If RequestContext.getRoles() has one role that matches the roles list, return true
-        boolean result = RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);
-        if (!result) {
-        	log.debug("User {} missing one of the following roles: {}", 
-        		RequestContext.getPrincipal().getName(),
-        		allowedRoles
-        	);
-        }
-        return result;
+        return RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);
     }
 
     public Map<String, TreeSet<String>> getUserRoles() {
         Map<String, TreeSet<String>> userRoleMap = new HashMap<>();
         for (AccessControl ac : repo.getEntitySet()) {
-            userRoleMap.put(ac.getUserId().toString(), new TreeSet<>(List.of(ac.getRoles())));
+            userRoleMap.put(ac.getUserId().toString(), new TreeSet<>(ac.getRoles()));
         }
 
         return userRoleMap;
