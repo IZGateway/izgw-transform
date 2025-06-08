@@ -51,7 +51,7 @@ then
 fi
 
 java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaagent:lib/spring-instrument-5.3.8.jar \
-   -XX:+CreateCoredumpOnCrash -cp ./lib/bc-fips-1.0.2.5.jar:./lib/bcpkix-fips-1.0.7.jar:./lib/bctls-fips-1.0.19.jar \
+   -XX:+CreateCoredumpOnCrash -cp ./lib/bc-fips-2.0.0.jar:./lib/bcpkix-fips-2.0.7.jar:./lib/bctls-fips-2.0.19.jar \
    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
    --add-opens=java.base/java.net=ALL-UNNAMED \
    --add-opens=jdk.management/com.sun.management.internal=ALL-UNNAMED \
