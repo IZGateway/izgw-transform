@@ -9,8 +9,8 @@
     </suppress>
     <suppress>
         <notes>IZ Gateway manages the dependencies of
-            bcpkix-fips-1.0.7.jar to
-            use bc-fips-1.0.2.4 which does not
+            bcpkix-fips-2.0.7.jar to
+            use bc-fips-2.0.0.jar which does not
             have this vulnerability
         </notes>
         <packageUrl regex="true">^pkg:maven/org\.bouncycastle/bcpkix\-fips@.*$
