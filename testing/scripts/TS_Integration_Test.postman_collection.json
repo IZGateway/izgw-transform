@@ -4155,10 +4155,7 @@
 															"    pm.expect(response.length).to.equal(expectedMethods.length);",
 															"});",
 															"",
-															"// Commenting out for now, calls to get list of Operations",
-															"// is not currently logging in Xform Service. A ticket has been entered",
-															"// into backlog with reminder to uncomment this.",
-															"//utils.testForApiLog(pm, 'READ');",
+															"utils.testForApiLog(pm, 'READ');",
 															""
 														],
 														"type": "text/javascript",
@@ -8089,10 +8086,7 @@
 															"    pm.expect(response.length).to.equal(expectedMethods.length);",
 															"});",
 															"",
-															"// Commenting out for now, calls to get list of Preconditions",
-															"// is not currently logging in Xform Service. A ticket has been entered",
-															"// into backlog with reminder to uncomment this.",
-															"//utils.testForApiLog(pm, 'READ');"
+															"utils.testForApiLog(pm, 'READ');"
 														],
 														"type": "text/javascript",
 														"packages": {}
@@ -17909,10 +17903,7 @@
 															"    pm.expect(response.length).to.equal(expectedMethods.length);",
 															"});",
 															"",
-															"// Commenting out for now, calls to get list of Operations",
-															"// is not currently logging in Xform Service. A ticket has been entered",
-															"// into backlog with reminder to uncomment this.",
-															"//utils.testForApiLog(pm, 'READ');",
+															"utils.testForApiLog(pm, 'READ');",
 															"",
 															""
 														],
@@ -21953,7 +21944,9 @@
 															"// Test to ensure no extra methods are present",
 															"pm.test(\"No extra methods present\", function() {",
 															"    pm.expect(response.length).to.equal(expectedMethods.length);",
-															"});"
+															"});",
+															"",
+															"utils.testForApiLog(pm, 'READ');"
 														],
 														"type": "text/javascript",
 														"packages": {}
