@@ -27459,9 +27459,9 @@
 					"var last;",
 					"var maxLength = 65536;",
 					"",
-					"LONG_SLA = 1000;",
-					"BASE_SLA = 500; // Change back to 250 after performance fix",
-					"TX_SLA = 250; // Change back to 150 after performance fix",
+					"LONG_SLA = 10000; // Change back to 1000 after performance fix IGDD-2068",
+					"BASE_SLA = 500;",
+					"TX_SLA = 250;",
 					"",
 					"for (i = 0; tooLarge.length < maxLength; i++) {",
 					"    last = tooLarge;",
@@ -28716,19 +28716,35 @@
 			"value": ""
 		},
 		{
-			"key": "existingUserId",
+			"key": "currentName",
 			"value": ""
 		},
 		{
-			"key": "existingUserName",
+			"key": "currentOrganizationId",
 			"value": ""
 		},
 		{
-			"key": "existingUserOrganizationIds",
+			"key": "currentInboundEndpoint",
 			"value": ""
 		},
 		{
-			"key": "existingActive",
+			"key": "currentOutboundEndpoint",
+			"value": ""
+		},
+		{
+			"key": "currentActive",
+			"value": ""
+		},
+		{
+			"key": "createdPipeline",
+			"value": ""
+		},
+		{
+			"key": "currentId",
+			"value": ""
+		},
+		{
+			"key": "nonExistingId",
 			"value": ""
 		}
 	]
