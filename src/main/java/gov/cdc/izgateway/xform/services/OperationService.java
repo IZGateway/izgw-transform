@@ -2,6 +2,7 @@ package gov.cdc.izgateway.xform.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
+import gov.cdc.izgateway.xform.logging.ApiEventLogger;
 import gov.cdc.izgateway.xform.model.OperationInfo;
 import gov.cdc.izgateway.xform.model.OperationInfoProperty;
 import gov.cdc.izgateway.xform.operations.Operation;
@@ -44,6 +45,7 @@ public class OperationService implements XformService<OperationInfo> {
                 operationInfoList.add(info);
             }
         }
+        ApiEventLogger.logReadEvent(operationInfoList);
         return operationInfoList;
     }
 

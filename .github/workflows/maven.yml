@@ -168,7 +168,7 @@ jobs:
           ECR_REPOSITORY: transformation-service
         run: |
           aws ecs update-service --cluster xform-service-dev --service xform-service-dev --force-new-deployment --enable-execute-command --desired-count 1 | jq ".service.deployments[].id"
-          aws ecs update-service --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count 1 | jq ".service.deployments[].id"
+          aws ecs update-service --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count 2 | jq ".service.deployments[].id"
           aws ecs wait services-stable --cluster xform-service-alb-dev --service xform-service-alb-dev
 
       - name: Setup certs
