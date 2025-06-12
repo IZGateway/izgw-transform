@@ -189,7 +189,7 @@ jobs:
         run: |
           mkdir ../logs
           # Do a few warmup runs to let SLA testing pass
-          newman run ../scripts/TS_Integration_Test.postman_collection.json -x -n 2 \
+          newman run ../scripts/TS_Integration_Test.postman_collection.json -x -n 4 \
             --folder "Integration Tests" \
             "--environment" ../scripts/dev.xform.izgateway.org.postman_environment.json \
             "--env-var" "jwtSharedSecret=$JWT_SHARED_SECRET" \
