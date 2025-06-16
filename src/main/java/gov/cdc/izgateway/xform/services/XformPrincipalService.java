@@ -69,6 +69,12 @@ public class XformPrincipalService implements PrincipalService {
             XformPrincipal xformPrincipal = new XformPrincipal(izgPrincipal);
             User user = userService.getUserByUserName(xformPrincipal.getName());
             xformPrincipal.setAllowedOrganizationIds(user.getOrganizationIds());
+
+            // Remove admin role if X-Not-Admin header is present (used for testing)
+            if (!StringUtils.isEmpty(request.getHeader(Roles.NOT_ADMIN_HEADER))) {
+                xformPrincipal.getRoles().remove(Roles.ADMIN);
+            }
+
             return xformPrincipal;
         }
     }
