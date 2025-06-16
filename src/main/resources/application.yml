@@ -46,7 +46,7 @@ spring:
 elastic:
   api-key: ${ELASTIC_API_KEY:}
   host: ${ELASTIC_HOST:https://audacioussearchtest.es.us-east-1.aws.found.io:9243}
-  index: ${ELASTIC_INDEX:izgw-dev-logstash}
+  index: ${ELASTIC_INDEX:izgw-xform-service-dev}
 
 v2tofhir:
   sendingApplication: ${SENDING_APPLICATION:FHIR}
