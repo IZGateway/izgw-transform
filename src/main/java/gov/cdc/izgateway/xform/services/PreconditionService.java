@@ -2,6 +2,7 @@ package gov.cdc.izgateway.xform.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
+import gov.cdc.izgateway.xform.logging.ApiEventLogger;
 import gov.cdc.izgateway.xform.model.PreconditionInfo;
 import gov.cdc.izgateway.xform.model.PreconditionInfoProperty;
 import gov.cdc.izgateway.xform.preconditions.Precondition;
@@ -45,6 +46,8 @@ public class PreconditionService implements XformService<PreconditionInfo> {
                 preconditionInfoList.add(info);
             }
         }
+
+        ApiEventLogger.logReadEvent(preconditionInfoList);
         return preconditionInfoList;
     }
 
