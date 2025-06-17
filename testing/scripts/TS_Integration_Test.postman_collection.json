@@ -5988,7 +5988,7 @@
 										"method": "GET",
 										"header": [
 											{
-												"key": "X-Not-Admin",
+												"key": "X-Remove-Admin-Role",
 												"value": "true",
 												"type": "text"
 											}
@@ -28834,7 +28834,27 @@
 			"value": ""
 		},
 		{
-			"key": "organizationCountForAdminRole",
+			"key": "currentOrgId",
+			"value": ""
+		},
+		{
+			"key": "currentOrgActive",
+			"value": ""
+		},
+		{
+			"key": "existingUserId",
+			"value": ""
+		},
+		{
+			"key": "existingUserName",
+			"value": ""
+		},
+		{
+			"key": "existingUserOrganizationIds",
+			"value": ""
+		},
+		{
+			"key": "existingActive",
 			"value": ""
 		}
 	]
