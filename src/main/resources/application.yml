@@ -26,6 +26,8 @@ jwt:
   scopes-claim: ${XFORM_JWT_SCOPES_CLAIM:scope}
 
 spring:
+  config:
+    import:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration
