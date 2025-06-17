@@ -24,6 +24,7 @@
 		<buildno>${timestamp}</buildno>
 		<logback.version>1.5.16</logback.version>
 		<camel.version>4.10.2</camel.version>
+		<xform.testing.common.pass>XFORM_TESTING_COMMON_PASS</xform.testing.common.pass>
 	</properties>
 	<repositories>
 		<repository>
@@ -443,7 +444,7 @@
 									<arg value="-out" />
 									<arg value="${project.build.directory}/self_signed_unit_tests.csr" />
 									<arg value="-subj" />
-									<arg value="/C=US/ST=Maryland/L=Baltimore/O=Audacious Inquiry/OU=Strategic Advisory/CN=localhost" />
+									<arg value="/C=US/ST=Maryland/L=Baltimore/O=Audacious Inquiry/OU=Strategic Advisory/CN=xform.local.testing.only" />
 								</exec>
 								<exec executable="openssl" failonerror="true">
 									<arg value="x509" />
@@ -479,12 +480,12 @@
 									<arg value="-keystore" />
 									<arg value="${project.build.directory}/awsdev_keystore.jks" />
 									<arg value="-storepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-noprompt" />
 									<arg value="-trustcacerts" />
 									<arg value="-importcert" />
 									<arg value="-alias" />
-									<arg value="localhost" />
+									<arg value="xform.local.testing.only" />
 									<arg value="-file" />
 									<arg value="${project.build.directory}/self_signed_unit_tests.crt" />
 								</exec>
@@ -495,11 +496,11 @@
 									<arg value="-keyalg" />
 									<arg value="RSA" />
 									<arg value="-storepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-keystore" />
 									<arg value="${project.build.directory}/awsdev_keystore.jks" />
 									<arg value="-dname" />
-									<arg value="CN=localhost" />
+									<arg value="CN=xform.local.testing.only" />
 								</exec>
 								<exec executable="keytool" failonerror="true">
 									<arg value="-importkeystore" />
@@ -508,11 +509,11 @@
 									<arg value="-srcstoretype" />
 									<arg value="JKS" />
 									<arg value="-srcstorepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-destkeystore" />
 									<arg value="${project.build.directory}/awsdev_keystore.bcfks" />
 									<arg value="-deststorepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-deststoretype" />
 									<arg value="BCFKS" />
 									<arg value="-providername" />
@@ -526,12 +527,12 @@
 									<arg value="-keystore" />
 									<arg value="${project.build.directory}/izgw_client_trust.jks" />
 									<arg value="-storepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-noprompt" />
 									<arg value="-trustcacerts" />
 									<arg value="-importcert" />
 									<arg value="-alias" />
-									<arg value="localhost" />
+									<arg value="xform.local.testing.only" />
 									<arg value="-file" />
 									<arg value="${project.build.directory}/self_signed_unit_tests.crt" />
 								</exec>
@@ -542,11 +543,11 @@
 									<arg value="-srcstoretype" />
 									<arg value="JKS" />
 									<arg value="-srcstorepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-destkeystore" />
 									<arg value="${project.build.directory}/izgw_client_trust.bcfks" />
 									<arg value="-deststorepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-deststoretype" />
 									<arg value="BCFKS" />
 									<arg value="-providername" />
@@ -556,22 +557,6 @@
 									<arg value="-providerpath" />
 									<arg value="${project.basedir}/docker/data/lib/bc-fips-2.0.0.jar" />
 								</exec>
-							</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>display-common-pass</id>
-						<phase>package</phase>
-						<configuration>
-							<target>
-								<echo message="" level="info" />
-								<echo message="***********************************" level="info" />
-								<echo message="* TEMP COMMON_PASS = ${maven.build.timestamp} *" level="info" />
-								<echo message="***********************************" level="info" />
-								<echo message="" level="info" />
 							</target>
 						</configuration>
 						<goals>
@@ -585,7 +570,7 @@
 				<configuration>
 					<environmentVariables>
 						<SSL_SHARE>${project.build.directory}</SSL_SHARE>
-						<COMMON_PASS>${maven.build.timestamp}</COMMON_PASS>
+						<COMMON_PASS>${xform.testing.common.pass}</COMMON_PASS>
 					</environmentVariables>
 				</configuration>
 			</plugin>
