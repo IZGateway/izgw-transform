@@ -46,7 +46,7 @@ public class OrganizationApiController extends BaseApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
-    @RolesAllowed({Roles.ORGANIZATION_WRITER})
+    @RolesAllowed({Roles.ADMIN})
     @PutMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> updateOrganization(@PathVariable UUID uuid, @RequestBody Organization updatedOrganization) {
         updatedOrganization.setId(uuid);
@@ -70,7 +70,7 @@ public class OrganizationApiController extends BaseApiController {
         }
     }
 
-    @RolesAllowed({Roles.ORGANIZATION_WRITER})
+    @RolesAllowed({Roles.ADMIN})
     @PostMapping("/api/v1/organizations")
     public ResponseEntity<Organization> createOrganization(
             @Valid @RequestBody() Organization organization
@@ -79,7 +79,7 @@ public class OrganizationApiController extends BaseApiController {
         return new ResponseEntity<>(organization, HttpStatus.OK);
     }
 
-    @RolesAllowed({Roles.ORGANIZATION_DELETER})
+    @RolesAllowed({Roles.ADMIN})
     @DeleteMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> deleteOrganization(
             @PathVariable UUID uuid

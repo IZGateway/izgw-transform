@@ -4,6 +4,7 @@ import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.security.IzgPrincipal;
 import gov.cdc.izgateway.xform.logging.ApiEventLogger;
 import gov.cdc.izgateway.xform.model.BaseModel;
+import gov.cdc.izgateway.xform.model.Organization;
 import gov.cdc.izgateway.xform.model.OrganizationAware;
 import gov.cdc.izgateway.xform.repository.XformRepository;
 import gov.cdc.izgateway.xform.security.Roles;
@@ -61,8 +62,9 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     @Override
     public void create(T obj) {
 
-        // Check if the object's organization ID is in the allowed organization IDs
-        if (!isAccessible(obj)) {
+        // If object is organization, skip the organizationId check
+        // otherwise, check if the user has access to the organization ID
+        if (!(obj instanceof Organization) && !isAccessible(obj)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to create this object");
         }
 
