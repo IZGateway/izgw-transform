@@ -1,10 +1,9 @@
 {
 	"info": {
-		"_postman_id": "4da6ec63-7df5-4784-91c7-fa43f2447bbc",
+		"_postman_id": "339a1b15-9a84-4988-b75b-a5c3921bd553",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "2729094",
-		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-4da6ec63-7df5-4784-91c7-fa43f2447bbc?action=share&source=collection_link&creator=2729094"
+		"_exporter_id": "28864196"
 	},
 	"item": [
 		{
@@ -5884,6 +5883,133 @@
 												"v1",
 												"organizations",
 												"{{id2}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Organizations - Admin role",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"",
+													"// Setting the count for admin role to compare in the next test for non-admin role",
+													"pm.collectionVariables.set(\"organizationCountForAdminRole\", response[\"data\"].length);",
+													"",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations?limit=100000",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"organizations"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "100000"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Organizations - Not admin role",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"pm.test(\"returns 200 OK code\", function() {",
+													"    pm.expect(pm.response.code).to.equal(200);",
+													"});",
+													"",
+													"let response = pm.response.json();",
+													"let organizationCountForNonAdminRole = 0;",
+													"",
+													"organizationCountForNonAdminRole = response[\"data\"].length;",
+													"",
+													"pm.test(\"Organization count for non-admin is less than count for admin\", function() {",
+													"    let organizationCountForAdminRole = pm.collectionVariables.get(\"organizationCountForAdminRole\");",
+													"",
+													"    pm.expect(organizationCountForNonAdminRole).to.be.lessThan(organizationCountForAdminRole);",
+													"});",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"method": "GET",
+										"header": [
+											{
+												"key": "X-Remove-Admin-Role",
+												"value": "true",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{protocol}}://{{host}}:{{port}}/api/v1/organizations?limit=100000",
+											"protocol": "{{protocol}}",
+											"host": [
+												"{{host}}"
+											],
+											"port": "{{port}}",
+											"path": [
+												"api",
+												"v1",
+												"organizations"
+											],
+											"query": [
+												{
+													"key": "limit",
+													"value": "100000"
+												}
 											]
 										}
 									},
@@ -28716,35 +28842,19 @@
 			"value": ""
 		},
 		{
-			"key": "currentName",
+			"key": "existingUserId",
 			"value": ""
 		},
 		{
-			"key": "currentOrganizationId",
+			"key": "existingUserName",
 			"value": ""
 		},
 		{
-			"key": "currentInboundEndpoint",
+			"key": "existingUserOrganizationIds",
 			"value": ""
 		},
 		{
-			"key": "currentOutboundEndpoint",
-			"value": ""
-		},
-		{
-			"key": "currentActive",
-			"value": ""
-		},
-		{
-			"key": "createdPipeline",
-			"value": ""
-		},
-		{
-			"key": "currentId",
-			"value": ""
-		},
-		{
-			"key": "nonExistingId",
+			"key": "existingActive",
 			"value": ""
 		}
 	]
