@@ -1,26 +1,31 @@
 [ {
-  "id" : "fe65c254-eeee-4d41-a81c-187847a10dd0",
-  "groupName" : "Admin",
+  "id" : "9faae548-eeae-4f0b-bd52-6a91b7c2173b",
+  "groupName" : "Xform Onboarding Staff",
   "active" : true,
-  "roles" : [ "admin", "organization-deleter", "organization-reader", "organization-writer", "pipeline-deleter", "pipeline-reader", "pipeline-writer", "solution-deleter", "solution-reader", "solution-writer", "xform-sender" ]
+  "roles" : [ "organization-reader", "pipeline-reader", "solution-reader" ]
 }, {
-  "id" : "fe65c254-bbbb-4d41-a81c-187847a10dd0",
-  "groupName" : "BusinessAnalyst",
-  "active" : true,
-  "roles" : [ "organization-reader", "pipeline-deleter", "pipeline-reader", "pipeline-writer" ]
-}, {
-  "id" : "351e3df6-bfd0-4440-ab24-b5a6fdd1f417",
-  "groupName" : "IZG Transformation Admin",
-  "active" : true,
-  "roles" : [ "organization-deleter", "organization-reader", "organization-writer", "pipeline-deleter", "pipeline-reader", "pipeline-writer", "solution-deleter", "solution-reader", "solution-writer" ]
-}, {
-  "id" : "99facbab-0841-482e-b4a7-496ba8397a43",
-  "groupName" : "IZG Operations",
-  "active" : true,
-  "roles" : [ "organization-reader", "pipeline-deleter", "pipeline-reader", "pipeline-writer" ]
-}, {
-  "id" : "7b23ee9e-ba1a-43f7-9290-2b6a3dccaf32",
+  "id" : "29375503-4acf-442a-9bd2-c1eb5abd4637",
   "groupName" : "Xform Sender",
   "active" : true,
   "roles" : [ "xform-sender" ]
+}, {
+  "id" : "89047b39-2904-42fb-8236-489ba6e71b38",
+  "groupName" : "Xform Operations Staff",
+  "active" : true,
+  "roles" : [ "organization-reader", "pipeline-deleter", "pipeline-reader", "pipeline-writer", "solution-reader" ]
+}, {
+  "id" : "8e342748-3c41-4f3d-91c5-c9b0342e2509",
+  "groupName" : "Xform Solutions Engineer",
+  "active" : true,
+  "roles" : [ "organization-reader", "pipeline-deleter", "pipeline-reader", "pipeline-writer", "solution-deleter", "solution-reader", "solution-writer" ]
+}, {
+  "id" : "13ea896e-af1d-4b3b-a5af-8f15bff7bb4e",
+  "groupName" : "Xform Business Analyst",
+  "active" : true,
+  "roles" : [ "organization-reader", "pipeline-deleter", "pipeline-reader", "pipeline-writer", "solution-reader" ]
+}, {
+  "id" : "c7d5e79b-26ae-4518-85d3-9fd84c71af6c",
+  "groupName" : "Xform Administrators",
+  "active" : true,
+  "roles" : [ "admin", "organization-deleter", "organization-reader", "organization-writer", "pipeline-deleter", "pipeline-reader", "pipeline-writer", "solution-deleter", "solution-reader", "solution-writer" ]
 } ]
