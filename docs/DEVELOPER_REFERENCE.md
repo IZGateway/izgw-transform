@@ -8,7 +8,7 @@ This document aims to help you get started quickly with building and running the
 
 ## Prerequisites
 
-Prerequisites are detailed in the [Get Running Quick](./GET_RUNNING_QUICK.md) guide.
+Prerequisites are detailed in the [Quick Start](./QUICK_START.md) guide.
 
 ## Building Transformation Service
 

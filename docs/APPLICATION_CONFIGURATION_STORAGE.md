@@ -1,5 +1,7 @@
 # Transformation Service Data Storage
 
+TODO - introduce XFORM_CONFIGURATIONS_DIRECTORY
+
 The purpose of this document is to explain how the Transformation Service stores the configuration necessary for its proper operation.
 
 There are currently two storage options:
@@ -28,10 +30,10 @@ In addition, each entity type's file location will need to be configured. These 
 - XFORM_CONFIGURATIONS_PIPELINES
 - XFORM_CONFIGURATIONS_SOLUTIONS
 - XFORM_CONFIGURATIONS_MAPPINGS
-- XFORM_CONFIGURATIONS_ACCESS-CONTROL
-- XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS
+- XFORM_CONFIGURATIONS_ACCESS_CONTROL
+- XFORM_CONFIGURATIONS_OPERATION_PRECONDITION_FIELDS
 - XFORM_CONFIGURATIONS_USERS
-- XFORM_CONFIGURATIONS_GROUP-ROLE-MAPPING
+- XFORM_CONFIGURATIONS_GROUP_ROLE_MAPPING
 
 ### AWS DynamoDB Storage Configuration
 
