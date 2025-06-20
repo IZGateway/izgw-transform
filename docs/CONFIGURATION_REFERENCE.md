@@ -4,7 +4,7 @@
 
 # Transformation Service Configuration Reference
 
-This document ains to provide complete details about the configuration of the Transformation Service.
+This document aims to provide complete details about the configuration of the Transformation Service.
 
 Configuration of the Transformation Service can be broken down into two areas:
 
@@ -40,6 +40,13 @@ Each section header will link to later in this document where descriptions for e
 | XFORM_JWT_URI                                                               | jwt.jwk-set-uri                                    |                                                          |
 | XFORM_JWT_ROLES_CLAIM                                                       | jwt.roles-claim                                    | roles                                                    |
 | XFORM_JWT_SCOPES_CLAIM                                                      | jwt.scopes-claim                                   | scope                                                    |
+| **[Security Filter Configuration](#security-filter-configuration)**         |                                                    |                                                          |
+| HUB_SECURITY_SECRET_HEADER_FILTER_ENABLED                                   | hub.security.secret-header-filter.enabled          | false                                                    |
+| HUB_SECURITY_SECRET_HEADER_FILTER_KEY                                       | hub.security.secret-header-filter.key              |                                                          |
+| HUB_SECURITY_SECRET_HEADER_FILTER_VALUE                                     | hub.security.secret-header-filter.value            |                                                          |
+| HUB_SECURITY_SECRET_HEADER_FILTER_BYPASS_PATHS                              | hub.security.secret-header-filter.bypass-paths     | /rest/health                                             |
+| HUB_SECURITY_IP_FILTER_ENABLED                                              | hub.security.ip-filter.enabled                     | false                                                    |
+| HUB_SECURITY_IP_FILTER_ALLOWED_CIDR                                         | hub.security.ip-filter.allowed-cidr                |                                                          |
 | **[Destination Configuration](#destination-configuration)**                 |                                                    |                                                          |
 | XFORM_HUB_DESTINATION_ID                                                    | xform.destination.hub.id                           | hub                                                      |
 | XFORM_HUB_DESTINATION                                                       | xform.destination.hub.uri                          | https://localhost/IISHubService                          |
@@ -183,6 +190,34 @@ can do in the system. This is controlled via the GroupRoleMapping configuration.
 This lets the Transformation Service know which claim in the JWT would have the user's scopes. By default, this is
 ```scope```.
 
+### Security Filter Configuration
+
+#### HUB_SECURITY_SECRET_HEADER_FILTER_ENABLED
+
+Enable secret HTTP header validation.
+
+#### HUB_SECURITY_SECRET_HEADER_FILTER_KEY
+
+Secret header key name.
+
+#### HUB_SECURITY_SECRET_HEADER_FILTER_VALUE
+
+Expected secret header value.
+
+#### HUB_SECURITY_SECRET_HEADER_FILTER_BYPASS_PATHS
+
+Transformation Service web-service paths that are allowed to bypass the secret header filter.
+
+#### HUB_SECURITY_IP_FILTER_ENABLED
+
+Enables IP address filtering. Any connections from an IP address not configured is rejected.
+
+#### HUB_SECURITY_IP_FILTER_ALLOWED_CIDR
+
+Comma-separated CIDR blocks for allowed IPs. IPv4 and IPv6 are allowed.
+
+Example: 10.9.90.0/24, 10.9.95.0/24, 127.0.0.1/32, ::1/128
+
 ### Destination Configuration
 
 These options tell the Transformation Service about the IZG Hub instance that it is connecting to.
@@ -267,11 +302,13 @@ here: [Application Configuration Storage](./APPLICATION_CONFIGURATION_STORAGE.md
 
 #### LOGGING_LEVEL
 
-Allows you to adjust the verbosity of the logs output by the Transformation Service.  The application uses SLF4J, possible values for logging level can be viewed here: https://www.slf4j.org/api/org/apache/log4j/Level.html
+Allows you to adjust the verbosity of the logs output by the Transformation Service. The application uses SLF4J,
+possible values for logging level can be viewed here: https://www.slf4j.org/api/org/apache/log4j/Level.html
 
 #### Elastic Settings
 
-The Transformation Service, while running in a Docker container, has Elastic Stack integration that collects both logs and metrics and ships them to Elasticsearch Cloud.
+The Transformation Service, while running in a Docker container, has Elastic Stack integration that collects both logs
+and metrics and ships them to Elasticsearch Cloud.
 
 #### ELASTIC_API_KEY
 
@@ -279,7 +316,7 @@ Elastic Cloud API key necessary to be able to push data.
 
 #### ELASTIC_ENV_TAG
 
-Tag identifying the environment in Elastic Cloud. Possible values for Audacious Inquiry use: 
+Tag identifying the environment in Elastic Cloud. Possible values for Audacious Inquiry use:
 
 - unknown
 - prod
@@ -299,3 +336,41 @@ The name of the index used in Elastic Cloud for this instance.
 ---
 
 &larr;[Back to README](../README.md)
+
+
+## Application Configuration
+
+There are different entities in the Transformation Service system necessary for it to operate:
+
+- Access Controls
+- Group Role Mappings
+- Mappings
+- Operation / Precondition Fields
+- Organizations
+- Pipelines
+- Solutions
+- Users
+
+### Access Controls
+
+Access Controls are used to determine what rights a caller to the system has, when only a certificate is presented (So no JWT).
+
+In the scenario when a JWT is not presented, the common name of the certificate is used to find a User. That User must have an Access Control setup.
+
+There is a 1:1 relationship between Access Controls and Users.
+
+Each Access Control can have one or more _roles_, which will need to represent roles specified in [Roles.java](../src/main/java/gov/cdc/izgateway/xform/security/Roles.java). 
+
+### Group Role Mappings
+### Mappings
+### Operation / Precondition Fields
+### Organizations
+### Pipelines
+### Solutions
+### Users
+
+Identifies users who can interact with the Transformation Service. Their level of interaction is determined by either Access Controls or Group Role Mappings.
+
+When a JWT is supplied, the _subject_ claim is used as the user's name. This value is matched to the _userName_ of a User object in the system to locate a configured user.
+
+When no JWT is supplied, the common name of the presented certificate is matched to the _userName_ of a User object.
