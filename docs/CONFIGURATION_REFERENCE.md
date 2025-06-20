@@ -581,16 +581,11 @@ Important pieces of a Solution:
 - solutionName &rarr; A descriptive name of what the Solution is to be used for. There is also a description field available.
 - version &rarr; A version for this Solution. For example, you could have a Zip Fixer Solution that you need to update. The update would be saved with version 2.0.
 - requestOperations &rarr; These are Operations that the Solution will execute on the _request_ message or the message as received inbound to the Transformation Service by the caller.
-- responseOperations &rarr; These are Operations that the Solution will execute on the _response_ message before returning to the original caller. This would be the response from the downstream system, so for example:
-  - IIS (caller) &rarr; 
+- responseOperations &rarr; These are Operations that the Solution will execute on the _response_ message before returning to the original caller. This would be the response from the downstream system.
 
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
+Simple example flow:
+- A QBP message from the caller goes to IZ Gateway Hub. This QBP is the _request_ message which will have changes made by the Solution's requestOperations.
+- IZ Gateway Hub response with a RSP message. This RSP is the _response_ message which will have changes made by the Solution's responseOperations.
 
 Example file: [solutions.json](../testing/configuration/solutions.json)
 
