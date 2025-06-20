@@ -7,81 +7,33 @@
 * Store Files
     * Server Key Store
     * Client Trust Store
-* A configuration file
+* Configuration Files
 
 ### Store Files
 
-The Transformation Service makes use of two separate sets of certificate and key stores: the Server Key Store and the
-Client Trust Store
+Transformation Service requires two keystore files in order to properly operate. You can read more about these here [Transformation Service SSL/Keystore File Reference](./docs/KEYSTORE_FILES.md). For running locally, you can also use files created during the build process.  See the [Quick Start](./docs/QUICK_START.md) guide for an example.
 
-Both the Server Key Store and Client Trust Store are formatted in Bouncy Castle File KeyStore (BCFKS) format to conform
-to FIPS encryption requirements for media. JKS format is non-compliant for secret material.
+In our example on this page we will assume that you have: 
 
-Please _NOTE_ the following that pertain to both files:
+- A Server Keystore file named server_keystore.bcfks
+- A Client Keystore file named client_keystore.bcfks
 
-* Both files need to have the same password set for opening them, which will be used to set the COMMON_PASS environment
-  variable when running the image.
-* You'll need to place Server Key Store and Client Trust Store files in a location that can be accessed by the running
-  Docker container. For our example let's say we put these in a /izgw-xform/ssl directory. This local directory will be
-  mapped into the running container to /ssl, which will be used to in setting environment variables for the running container.
+For this example, let's say we put these in a directory /izgw-xform/ssl. This local directory would be mapped into the running container to /ssl.
 
-#### Server Key Store
+### Application Configuration Files
 
-The Server Key Store is used to identify the Transformation Service to systems calling the Transformation Service and
-validate the certificates those calling systems present.
+The Transformation Service can store its Application Configuration as described here: [Application Configuration Storage](./docs/APPLICATION_CONFIGURATION_STORAGE.md)
 
-Systems calling the hosted Transformation Service must have a certificate that has been issued by DigiCert that has been
-provided by the IZ Gateway Security team. This enables the Transformation Service to identify trusted calling systems
-because those certificates will all be "signed" by a single Certificate Authority. This also means that the hosted
-Transformation Service does not need to change its Server Key Store frequently (only when the Certificate Authority's
-certificate has been renewed). Systems calling the Transformation Service should verify that the server certificate is
-valid, and further will be asked to present their client certificate in order for the Transformation Service to ensure
-the connection is coming from a trusted system.
+For this example, we will use files. The different Application Configurations are detailed here: [Transformation Service Configuration Reference](./docs/CONFIGURATION_REFERENCE.md#application-configuration)
 
-For the purposes of our example later in this document we will name this file server_keystore.bcfks.
+You can download example files from this repository which you'll need located in a place that can be accessed by the running Docker container. For this example, let's say we put these in a /izgw-xform/configuration directory. This local directory will be mapped into the running
+container to /configuration.
 
-#### Client Trust Store
-
-When the Transformation Service makes a connection to the IZ Gateway, it will need to verify that it has made a
-connection to a trusted system using the expected certificate. This is established by verifying that the server
-certificate of the destination IZ Gateway is a trusted certificate by appearing in the Transformation Service Client
-Trust Store.
-
-For the purposes of our example later in this document we will name this file client_keystore.bcfks.
-
-### Configuration Files
-
-The Transformation Service relies on eight configuration files at this time: Organization, Pipelines, Solutions, Mapping, Access Control, Operation/Precondition Fields, Users, and Group to Role Mappings. These
-ultimately determine the changes that will happen to data as it travels through the Transformation Service but also _who_ can access API's.
-
-You may download example configurations from the repository as described here:
-
-* Organizations &rarr; [organizations.json](/testing/configuration/organizations.json)
-* Pipelines &rarr; [pipelines.json](/testing/configuration/pipelines.json)
-* Solutions &rarr; [solutions.json](/testing/configuration/solutions.json)
-* Mappings &rarr; [mappings.json](/testing/configuration/mappings.json)
-* Access Control &rarr; [access-control.json](/testing/configuration/access-control.json)
-* Operation/Precondition Fields &rarr; [operation-precondition-fields.json](/testing/configuration/operation-precondition-fields.json)
-* Users &rarr; [users.json](/testing/configuration/users.json)
-* Group Role Mappings &rarr; [group-role-mapping.json](/testing/configuration/group-role-mapping.json)
-
-You'll need to have these files located in a place that can be accessed by the running Docker container. For our example
-let's say we put these in a /izgw-xform/configuration directory. This local directory will be mapped into the running
-container to /configuration. That directory name (/configuration) and the name of the three files will be used to set
-environment variables when running the image.
-
-The necessary environment variables for the configuration files:
-
-* XFORM_CONFIGURATIONS_ORGANIZATIONS
-* XFORM_CONFIGURATIONS_PIPELINES
-* XFORM_CONFIGURATIONS_SOLUTIONS
-* XFORM_CONFIGURATIONS_MAPPINGS
-* XFORM_CONFIGURATIONS_ACCESS-CONTROL
-* XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS
-* XFORM_CONFIGURATIONS_USERS
-* XFORM_CONFIGURATIONS_GROUP-ROLE-MAPPING
+Assuming that you have the files named as the defaults as described in the Application Configuration section of the [Configuration Reference](./CONFIGURATION_REFERENCE.md) you can just set XFORM_CONFIGURATIONS_DIRECTORY to /configuration
 
 ## Running Transformation Service Locally via Docker
+
+TODO
 
 To run the image, we need to set a few environment variables used by the running container. Those are:
 
@@ -182,45 +134,3 @@ docker ps -f name=local-xform
 CONTAINER ID   IMAGE                                     COMMAND                  CREATED         STATUS         PORTS                                      NAMES
 ded59e415a2b   ghcr.io/izgateway/izgw-transform:latest   "sh -c 'bash run.sh …"   2 minutes ago   Up 2 minutes   8000/tcp, 0.0.0.0:444->444/tcp, 9082/tcp   local-xform
 ```
-
-## Generate Server Key Store
-
-One of the files mentioned previously is the keystore that is needed to have the Transformation Service run.  For our example we will name this server_keystore.bcfks.
-
-Steps to create the keystore bcfks file:
-
-* You should already have in your possession:
-    * A key file in pem format and a cert file in pem format. For this example, we will use sample-private-key.pem and
-      sample-cert.pem to represent these files.
-* Create a .p12 file from your cert and key pem files:
-    * ```openssl pkcs12 -export -in sample-cert.pem -inkey sample-private-key.pem -out sample-keystore.p12 -name "samplealias"```
-* Create a .bcfks file using the following command:
-    * ```keytool -importkeystore -srckeystore sample-keystore.p12 -srcstorepass 'password' -storepass 'password' -destkeystore server_keystore.bcfks -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar```
-* Add the root ca cert to the bcfks file:
-    * ```keytool -importcert -file DigiCertCA.crt -keystore server_keystore.bcfks -storetype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar -storepass 'password' -alias DigiCertCA```
-* Add the intermediate cert to the bcfks file
-    * ```keytool -importcert -file TrustedRoot.crt -keystore server_keystore.bcfks -storetype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar -storepass 'password' -alias TrustedRoot```
-* To list the contents of the bcfks file:
-    * ```keytool -list -keystore ./server_keystore.bcfks -storepass 'password' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar```
-
-## Generate Client Trust Store
-
-You may already have a file that works for this if you are connecting to a dev or test IZ Gateway. However, as an
-example, below are steps to generate this file to connect to the Development IZ Gateway hosted at dev.izgateway.org.  For out example, our output file will be named client_keystore.bcfks.
-
-You will need:
-
-* To be on a system with the ability to run openssl
-* To be on a system with the ability to run keytool (this is available if you have Java installed)
-* A bc-fips jar in order to produce the Bouncy Castle FIPS compliant file
-    * The latest appropriate jar to use is in the docker/data folder
-
-Steps to create the file
-
-* Pull the public cert for the server using openssl:
-    * ```openssl s_client -showcerts -connect dev.izgateway.org:443 </dev/null 2>/dev/null | openssl x509 -outform PEM > dev.izgateway.org.crt```
-* Create the Client Trust Store using keytool
-    * Notes about the keytool command below
-        * Use the password that you intend to use as the COMMON_PASS environment variable where you see <PASSWORD>
-        * Replace <PATH TO> to the location for the bc-fips jar file
-    * ```keytool -import -alias dev.izgateway.org -keystore client_keystore.bcfks -file dev.izgateway.org.crt -noprompt -storepass '<PASSWORD>' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath /<PATH TO>/bc-fips-2.0.0.jar```

@@ -363,6 +363,8 @@ Each Access Control can have one or more _roles_, which will need to represent r
 
 Example file: [access-control.json](../testing/configuration/access-control.json)
 
+Default filename if using the XFORM_CONFIGURATIONS_DIRECTORY option is access-control.json 
+
 ### Group Role Mappings
 
 The Group to Role Mappings exist to determine what tasks a User, authenticated via JWT token, has the ability to perform in the Transformation Service.
@@ -422,6 +424,8 @@ The User would be given the Roles listed in the above example. Similar to Access
 
 Example file: [group-role-mapping.json](../testing/configuration/group-role-mapping.json)
 
+Default filename if using the XFORM_CONFIGURATIONS_DIRECTORY option is group-role-mapping.json
+
 ### Mappings
 
 Mappings are used specifically by the Mapper Operation in the Transformation Service.
@@ -447,6 +451,8 @@ An example Mapping configuration entry:
 This would be used to map an internal Race code for White to a different code set.
 
 Example file: [mappings.json](../testing/configuration/mappings.json)
+
+Default filename if using the XFORM_CONFIGURATIONS_DIRECTORY option is mappings.json
 
 ### Operation / Precondition Fields
 
@@ -484,6 +490,8 @@ This
 
 Example file: [operation-precondition-fields.json](../testing/configuration/operation-precondition-fields.json)
 
+Default filename if using the XFORM_CONFIGURATIONS_DIRECTORY option is operation-precondition-fields.json
+
 ### Organizations
 
 Organizations are one of the most important objects in the Tranformation Service. An Organization might be an IIS Jurisdiction or a Vendor of IIS software. 
@@ -514,8 +522,9 @@ Examples:
 }
 ```
 
-
 Example file: [organizations.json](../testing/configuration/organizations.json)
+
+Default filename if using the XFORM_CONFIGURATIONS_DIRECTORY option is organizations.json
 
 ### Pipelines
 
@@ -572,6 +581,8 @@ Also, you will see that the first pipe has a precondition. That pipe will only e
 
 Example file: [pipelines.json](../testing/configuration/pipelines.json)
 
+Default filename if using the XFORM_CONFIGURATIONS_DIRECTORY option is pipelines.json
+
 ### Solutions
 
 A Solution represents a specific set of Operations intended to _transform_ a message coming through the system. A Solution is intended to represent a specific change to a message.  For example, Zip Fixer could contain a set of Operations which make sure that all zip codes in a HL7v2 VXU message are in a standardized format.
@@ -589,6 +600,8 @@ Simple example flow:
 
 Example file: [solutions.json](../testing/configuration/solutions.json)
 
+Default filename if using the XFORM_CONFIGURATIONS_DIRECTORY option is solutions.json
+
 ### Users
 
 Identifies users who can interact with the Transformation Service. Their level of interaction is determined by either Access Controls or Group Role Mappings.
@@ -598,3 +611,5 @@ When a JWT is supplied, the _subject_ claim is used as the user's name. This val
 When no JWT is supplied, the common name of the presented certificate is matched to the _userName_ of a User object.
 
 Example file: [users.json](../testing/configuration/users.json)
+
+Default filename if using the XFORM_CONFIGURATIONS_DIRECTORY option is users.json

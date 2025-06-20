@@ -9,15 +9,5 @@ The Transformation Service, as a new optional use case within the IZ Gateway, of
 - Short on time? See the [Quick Start](./docs/QUICK_START.md) guide!
 - [Developer Reference](./docs/DEVELOPER_REFERENCE.md)
 - [Transformation Service Configuration Reference](./docs/CONFIGURATION_REFERENCE.md)
-- [Application Configuration Storage](./APPLICATION_CONFIGURATION_STORAGE.md)
+- [Application Configuration Storage](./docs/APPLICATION_CONFIGURATION_STORAGE.md)
 - [Transformation Service SSL/Keystore File Reference](./docs/KEYSTORE_FILES.md)
-
-## TODO
-
-- Developer Quickstart
-- Configuration Reference
-- Docker
-- Certificate Documentation
-- Example Usage (messages + API)
-- Postman
-- API References, I don't want to have to manually update this
