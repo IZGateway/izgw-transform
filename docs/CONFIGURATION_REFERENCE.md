@@ -359,14 +359,241 @@ In the scenario when a JWT is not presented, the common name of the certificate 
 
 There is a 1:1 relationship between Access Controls and Users.
 
-Each Access Control can have one or more _roles_, which will need to represent roles specified in [Roles.java](../src/main/java/gov/cdc/izgateway/xform/security/Roles.java). 
+Each Access Control can have one or more _roles_, which will need to represent roles specified in [Roles.java](../src/main/java/gov/cdc/izgateway/xform/security/Roles.java).
+
+Example file: [access-control.json](../testing/configuration/access-control.json)
 
 ### Group Role Mappings
+
+The Group to Role Mappings exist to determine what tasks a User, authenticated via JWT token, has the ability to perform in the Transformation Service.
+
+For example, your configured IDP generates JWT tokens like:
+
+```json
+{
+  "header": {
+    "kid": "M3pRwVnKx8qY2DbF7LmN9CtPsHgJzWEeRKLQV6TxBnA",
+    "alg": "RS256"
+  },
+  "payload": {
+    "ver": 1,
+    "jti": "AT.mX9vQpL7N2kFRt8s_H-wYcz4xerBj-ghPdM1GfzEykj",
+    "iss": "https://dev-example.oktapreview.com/oauth2/default",
+    "aud": "sample application",
+    "iat": 1750440000,
+    "exp": 1750443600,
+    "cid": "0oabc123def456ghi789",
+    "uid": "00udef456ghi789jkl012",
+    "scp": [
+      "openid"
+    ],
+    "auth_time": 1750439998,
+    "sub": "jdoe@example.com",
+    "Groups": [
+      "Xform Solutions Engineer"
+    ]
+  },
+  "signature": "AbC1DeFgHiJkLmNoPqRsTuVwXyZ2aBcDeFgHiJkLmNoPqRsTuVwXyZ3bCdEfGhIjKlMnOpQrStUvWxYz4AbCdEfGhIjKlMnOpQrStUvWxYz5cDeFgHiJkLmNoPqRsTuVwXyZ6dEfGhIjKlMnOpQrStUvWxYz7eFgHiJkLmNoPqRsTuVwXyZ8fGhIjKlMnOpQrStUvWxYz9gHiJkLmNoPqRsTuVwXyZaBcDeFgHiJkLmNoPqRsTuVw"
+}
+```
+
+You'd have XFORM_JWT_ROLES_CLAIM configured to _Groups_ so that the Transformation Service would know where to find the list of groups that this user belongs to.
+
+Transformation Service would then look for a Group to Role Mapping where groupName is _Xform Solutions Engineer_.  An example from our testing configuration:
+
+```json
+{
+  "id": "a3c729dd-4f0e-48c7-a6a6-18c66f8cba93",
+  "groupName": "Xform Solutions Engineer",
+  "active": true,
+  "roles": [
+    "organization-reader",
+    "pipeline-deleter",
+    "pipeline-reader",
+    "pipeline-writer",
+    "solution-deleter",
+    "solution-reader",
+    "solution-writer"
+  ]
+}
+```
+
+The User would be given the Roles listed in the above example. Similar to Access Control, the roles need to represent roles specified in [Roles.java](../src/main/java/gov/cdc/izgateway/xform/security/Roles.java).
+
+Example file: [group-role-mapping.json](../testing/configuration/group-role-mapping.json)
+
 ### Mappings
+
+Mappings are used specifically by the Mapper Operation in the Transformation Service.
+
+These can be thought of as entries in a _lookup table_ to provide a From &rarr; To mapping for data being manipulated by the Transformation Service.
+
+Each Mapping entry is tied to an Organization so that each Organization can maintain their set of mappings distinct from other Organizations.
+
+An example Mapping configuration entry:
+
+```json
+{
+  "id": "8f2e841e-1cc1-4ce6-a1dd-7a3feafe9e16",
+  "active": true,
+  "organizationId": "11490ced-151d-48f4-b33b-b9f19bb24ac7",
+  "codeSystem": "HOSPA",
+  "code": "W",
+  "targetCodeSystem": "CDCREC",
+  "targetCode": "2106-3"
+}
+```
+
+This would be used to map an internal Race code for White to a different code set.
+
+Example file: [mappings.json](../testing/configuration/mappings.json)
+
 ### Operation / Precondition Fields
+
+This configuration exists to provide a suggested list of _fields_ available to configure in Preconditions and Operations. 
+
+Each entry will tell if the field is intended to be used for Preconditions, Operations, or both. The dataPath field contains the data intended to be inserted into a Precondition or Operation configuration.
+
+Please **note** that at this time there is no restriction that would prevent you from configuring an Operation or Precondition with a field not stored in the system. This configuration was initially added for a UI to use. This may change in the future, documentation will be updated to reflect.
+
+Examples:
+
+This 
+
+```json
+{
+  "id": "b8f6adcb-ffa4-4793-a157-ffc2db85da7b",
+  "fieldName": "Sending Application",
+  "dataPath": "/MSH-3-1",
+  "forPrecondition": true,
+  "forOperation": false,
+  "active": true
+}
+```
+
+```json
+{
+  "id": "07d52845-6c34-4318-a8c9-2117072ca6e3",
+  "fieldName": "Facility ID",
+  "dataPath": "context.FacilityID",
+  "forPrecondition": true,
+  "forOperation": false,
+  "active": true
+}
+```
+
+Example file: [operation-precondition-fields.json](../testing/configuration/operation-precondition-fields.json)
+
 ### Organizations
+
+Organizations are one of the most important objects in the Tranformation Service. An Organization might be an IIS Jurisdiction or a Vendor of IIS software. 
+
+Each User can be associated with one or more Organizations.
+
+Each Pipeline and Mapping is associated with a specific Organization. Meaning that each Pipeline is distinct for an Organization.
+
+An Organization can be associated with a certificate common name. This is used when a message is received into the Transformation Service, to look up the Organization that is sending the data. That Organization is then used as a piece of information to determine the Pipeline to use. 
+
+Examples: 
+
+```json
+{
+  "organizationName": "Lunar Colony Health Alliance",
+  "id": "d339cd15-2e57-4456-94b6-1e14f079a0de",
+  "active": true,
+  "commonName": ""
+}
+```
+
+```json
+{
+  "organizationName": "Nova Prime Medical Research",
+  "id": "5415ead7-17b2-48b0-baa9-679ec85e05cd",
+  "active": true,
+  "commonName": "example.org.izgateway.org"
+}
+```
+
+
+Example file: [organizations.json](../testing/configuration/organizations.json)
+
 ### Pipelines
+
+A Pipeline details how a message will be _transformed_ by the system.
+
+Each Pipeline is associated with exactly one Organization. And it is further associated with an inbound endpoint and outbound endpoint. Meaning there is one Pipeline for each combination of Organization, Inbound Endpoint, and Outbound Endpoint.
+
+So an Organization can have one Pipeline inbound for the IISHubService endpoint sending outbound to the IISHubService endpoint at IZ Gateway Hub and then another Pipeline for inbound IIService outbound to IISService at IZ Gateway Hub.
+
+Each Pipeline is made up of one or more _"pipes"_ which are Solutions which have been configured in the system. Furthermore, each pipe can have a set of preconditions configured to determine if the pipe should execute.
+
+Example: 
+
+```json
+{
+  "pipelineName": "Example Pipeline",
+  "id": "a4c93f34-cc44-45a8-b500-6d5f2a55c8d8",
+  "organizationId": "76cadebf-d407-4114-80d9-d9bc94f6f116",
+  "description": "Pipeline for documentation example...",
+  "inboundEndpoint": "izgts:IISHubService",
+  "outboundEndpoint": "izghub:IISHubService",
+  "active": true,
+  "pipes": [
+    {
+      "id": "8b837e9a-69b7-4b65-a63b-2f2acca0bc9f",
+      "solutionId": "2a4b46c2-f8e6-4ba5-b2b3-f9950f2f4216",
+      "solutionVersion": "1.0",
+      "preconditions": [
+        {
+          "method": "equals",
+          "id": "242d93bd-96c4-47cc-8bea-9c3a9ead8d90",
+          "dataPath": "/MSH-9-1",
+          "comparisonValue": "VXU"
+        }
+      ]
+    },
+    {
+      "id": "4b0c3f52-c168-4e4d-b068-1ddbd7060d10",
+      "solutionId": "e326caeb-4272-4d0f-81a6-1e8340b038b3",
+      "solutionVersion": "1.0",
+      "preconditions": []
+    }
+  ]
+}
+```
+
+This example shows a Pipeline for Organization with id 76cadebf-d407-4114-80d9-d9bc94f6f116 for inbound endpoint izgts:IISHubService and outbound endpoint izghub:IISHubService.
+
+The pipeline will execute two pipes, one for Solution with id 2a4b46c2-f8e6-4ba5-b2b3-f9950f2f4216 and another for Solution with id e326caeb-4272-4d0f-81a6-1e8340b038b3. 
+
+Of note, the pipe specifies not only the Solution by id but also version. This is because Solutions as they evolve will receive a new version. Each pipe is therefore locked in by id and version so that updates to Solutions do not automatically affect Pipelines without testing.
+
+Also, you will see that the first pipe has a precondition. That pipe will only execute if the HL7v2 Message Type (MSH.9.1) is VXU. A pipe can have multiple Preconditions specified, in which case _all_ the Preconditions must evaluate to true.
+
+Example file: [pipelines.json](../testing/configuration/pipelines.json)
+
 ### Solutions
+
+A Solution represents a specific set of Operations intended to _transform_ a message coming through the system. A Solution is intended to represent a specific change to a message.  For example, Zip Fixer could contain a set of Operations which make sure that all zip codes in a HL7v2 VXU message are in a standardized format.
+
+Important pieces of a Solution:
+
+- solutionName &rarr; A descriptive name of what the Solution is to be used for. There is also a description field available.
+- version &rarr; A version for this Solution. For example, you could have a Zip Fixer Solution that you need to update. The update would be saved with version 2.0.
+- requestOperations &rarr; These are Operations that the Solution will execute on the _request_ message or the message as received inbound to the Transformation Service by the caller.
+- responseOperations &rarr; These are Operations that the Solution will execute on the _response_ message before returning to the original caller. This would be the response from the downstream system, so for example:
+  - IIS (caller) &rarr; 
+
+```mermaid
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+```
+
+Example file: [solutions.json](../testing/configuration/solutions.json)
+
 ### Users
 
 Identifies users who can interact with the Transformation Service. Their level of interaction is determined by either Access Controls or Group Role Mappings.
@@ -374,3 +601,5 @@ Identifies users who can interact with the Transformation Service. Their level o
 When a JWT is supplied, the _subject_ claim is used as the user's name. This value is matched to the _userName_ of a User object in the system to locate a configured user.
 
 When no JWT is supplied, the common name of the presented certificate is matched to the _userName_ of a User object.
+
+Example file: [users.json](../testing/configuration/users.json)
