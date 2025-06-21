@@ -9,7 +9,7 @@ to FIPS encryption requirements for media. JKS format is non-compliant for secre
 Please _NOTE_ the following that pertain to both files:
 
 * Both files need to have the same password set for opening them, which will be used to set the COMMON_PASS environment variable when running the image.
-* You'll need to place Server Key Store and Client Trust Store files in a location that can be accessed by the running code. For example, let's say we put these in a /izgw-xform/ssl directory. This local directory would need to be mapped into the running container, that directory would be set via properties so that Transformation Service would know where to read them.
+* You'll need to place Server Key Store and Client Trust Store files in a location that can be accessed by the running code. For example, let's say we put these in a /tmp/izgw-xform/ssl directory. This local directory would need to be mapped into the running container, that directory would be set via properties so that Transformation Service would know where to read them.
 
 For the examples in this document to create files you will need:
 
@@ -27,7 +27,7 @@ Systems calling the APHL hosted Transformation Service must have a certificate t
 
 ### Generating A Server Key Store
 
-Below are example commands to run to generate a Server Key store. For our example, we will name this server_keystore.bcfks.
+Below are example commands to run to generate a Server Key store. For our example, we will name this the default of awsdev_keystore.bcfks.
 
 To follow these instructions, you should already have in your possession:
 - A key file in pem format (sample-private-key.pem)
@@ -40,13 +40,13 @@ Steps:
 -Create a .p12 file from your cert and key pem files 
     ```openssl pkcs12 -export -in sample-cert.pem -inkey sample-private-key.pem -out sample-keystore.p12 -name "samplealias"```
 - Create a .bcfks file using the following command 
-  - ```keytool -importkeystore -srckeystore sample-keystore.p12 -srcstorepass '<PASSWORD>' -storepass <PASSWORD> -destkeystore server_keystore.bcfks -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar```
+  - ```keytool -importkeystore -srckeystore sample-keystore.p12 -srcstorepass '<PASSWORD>' -storepass <PASSWORD> -destkeystore awsdev_keystore.bcfks -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar```
 - Add the root ca cert to the bcfks file 
-  - ```keytool -importcert -file DigiCertCA.crt -keystore server_keystore.bcfks -storetype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar -storepass '<PASSWORD>' -alias DigiCertCA```
+  - ```keytool -importcert -file DigiCertCA.crt -keystore awsdev_keystore.bcfks -storetype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar -storepass '<PASSWORD>' -alias DigiCertCA```
 - Add the intermediate cert to the bcfks file 
-  - ```keytool -importcert -file IntermediateRoot.crt -keystore server_keystore.bcfks -storetype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar -storepass '<PASSWORD>' -alias IntermediateRoot```
+  - ```keytool -importcert -file IntermediateRoot.crt -keystore awsdev_keystore.bcfks -storetype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar -storepass '<PASSWORD>' -alias IntermediateRoot```
 - To list the contents of the bcfks file
-  - ```keytool -list -keystore ./server_keystore.bcfks -storepass '<PASSWORD>' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar```
+  - ```keytool -list -keystore ./awsdev_keystore.bcfks -storepass '<PASSWORD>' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar```
 
 ## Client Trust Store
 
@@ -54,11 +54,11 @@ When the Transformation Service makes a connection to any outbound system (IZ Ga
 
 ## Generate Client Trust Store
 
-You may already have a file that works for this if you are connecting to a dev or test IZ Gateway. However, as an example, below are steps to generate this file to connect to the Development IZ Gateway hosted at dev.izgateway.org.  For this example, the output file will be named client_keystore.bcfks.
+You may already have a file that works for this if you are connecting to a dev or test IZ Gateway. However, as an example, below are steps to generate this file to connect to the Development IZ Gateway hosted at dev.izgateway.org.  For this example, the output file will be named izgw_client_trust.bcfks.
 
 Steps:
 
 - Pull the public cert for the server using openssl 
   - ```openssl s_client -showcerts -connect dev.izgateway.org:443 </dev/null 2>/dev/null | openssl x509 -outform PEM > dev.izgateway.org.crt```
 - Create the Client Trust Store using keytool 
-  - ```keytool -import -alias dev.izgateway.org -keystore client_keystore.bcfks -file dev.izgateway.org.crt -noprompt -storepass '<PASSWORD>' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar```
+  - ```keytool -import -alias dev.izgateway.org -keystore izgw_client_trust.bcfks -file dev.izgateway.org.crt -noprompt -storepass '<PASSWORD>' -deststoretype BCFKS -providername BCFIPS -provider org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider -providerpath ./bc-fips-2.0.0.jar```
