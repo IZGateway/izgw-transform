@@ -1,4 +1,8 @@
-# Running In Docker
+&larr;[Back to README](../README.md)
+
+---
+
+# Running Transformation Service In Docker
 
 ## Prerequisites
 
@@ -70,17 +74,29 @@ docker run \
 izgw-transform:latest
 ```
 
-This can be simplified by creating a dotenv formatted file. So we can create a file named _.env_ and put the configuration contents in as:
+This can be simplified by creating a dotenv formatted file. There is an example file at the root of the repository called ```.env.simple-docker``` which has a _Simple Docker Example_ section:
+
+```shell
+cp .env.simple-docker .env
+```
+
+Open the .env file in an editor and you'll see this section like: 
 
 ```
+# BEGIN : Simple Docker Example
 XFORM_SERVER_PORT=443
 XFORM_CONFIGURATIONS_DIRECTORY=/configuration
+XFORM_CONFIGURATIONS_DIRECTORY_LOCAL=/tmp/izgw-xform/configuration
 COMMON_PASS=<PASSWORD>
 XFORM_DESTINATION_HUB_URI=https://dev.izgateway.org/IISHubService
 XFORM_IIS_DESTINATION=https://dev.izgateway.org/dev/IISService
+SSL_SHARE_LOCAL=/tmp/izgw-xform/ssl
 SSL_SHARE=/ssl
 LOGGING_LEVEL=TRACE
+# BEGIN : Simple Docker Example
 ```
+
+You should only need to replace ```<PASSWORD>``` with the proper value for your keystores. 
 
 The docker command then becomes:
 
@@ -96,14 +112,14 @@ izgw-transform:latest
 
 ### Run Docker Image via Compose
 
+There is a [docker-compose.yml](../docker-compose.yml) file that uses a .env file (like the previous example) to run the image.
 
+Assuming you have a .env in place, you can run this from the root of the repository:
 
-### TODO
-
-At this point you can run docker's ps command to see that the container is running:
-
-```bash
-docker ps -f name=local-xform
-CONTAINER ID   IMAGE                                     COMMAND                  CREATED         STATUS         PORTS                                      NAMES
-ded59e415a2b   ghcr.io/izgateway/izgw-transform:latest   "sh -c 'bash run.sh …"   2 minutes ago   Up 2 minutes   8000/tcp, 0.0.0.0:444->444/tcp, 9082/tcp   local-xform
+```shell
+docker compose up
 ```
+
+---
+
+&larr;[Back to README](../README.md)

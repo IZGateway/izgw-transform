@@ -11,3 +11,4 @@ The Transformation Service, as a new optional use case within the IZ Gateway, of
 - [Transformation Service Configuration Reference](./docs/CONFIGURATION_REFERENCE.md)
 - [Application Configuration Storage](./docs/APPLICATION_CONFIGURATION_STORAGE.md)
 - [Transformation Service SSL/Keystore File Reference](./docs/KEYSTORE_FILES.md)
+- [Running Transformation Service In Docker](./docs/RUNNING_IN_DOCKER.md)

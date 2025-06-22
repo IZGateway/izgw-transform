@@ -1,9 +1,6 @@
 services:
   izgw-transform:
     image: izgw-transform:latest
-#    build:
-#      context: ./
-#      dockerfile: ./Dockerfile
     ports:
       - "443:443"
     env_file: ./.env
