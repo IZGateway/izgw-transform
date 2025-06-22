@@ -96,7 +96,7 @@ izgw-transform:latest
 
 ### Run Docker Image via Compose
 
-TODO
+
 
 ### TODO
 

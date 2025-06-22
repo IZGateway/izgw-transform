@@ -1,0 +1,16 @@
+services:
+  izgw-transform:
+    image: izgw-transform:latest
+#    build:
+#      context: ./
+#      dockerfile: ./Dockerfile
+    ports:
+      - "443:443"
+    env_file: ./.env
+    volumes:
+      - type: bind
+        source: ${XFORM_CONFIGURATIONS_DIRECTORY_LOCAL}
+        target: ${XFORM_CONFIGURATIONS_DIRECTORY}
+      - type: bind
+        source: ${SSL_SHARE_LOCAL}
+        target: ${SSL_SHARE}
