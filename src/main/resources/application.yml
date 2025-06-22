@@ -69,7 +69,7 @@ security:
   enable-blacklist: true
   enable-ocsp: false
   # Set to the deployment path of the SSL
-  # For test and dev deployments, set SHARE environment variable to the location of the EFS File system in
+  # For test and dev deployments, set SSL_SHARE environment variable to the location of the EFS File system in
   # the AWS environment.
   ssl-path: ${SSL_SHARE:}
 
