@@ -10,6 +10,8 @@ This document aims to get Transformation Service up and running in minutes. Leav
 
 - Java 17
 - Maven 3.6+
+- openssl
+  - Needed as part of keystore creation for unit tests
 - Git
 - GitHub Account
 - Docker
