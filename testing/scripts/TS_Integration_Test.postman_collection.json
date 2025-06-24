@@ -27466,7 +27466,7 @@
 					"var last;",
 					"var maxLength = 65536;",
 					"",
-					"LONG_SLA = 1000;",
+					"LONG_SLA = 10000;",
 					"BASE_SLA = 500; // Change back to 250 after performance fix",
 					"TX_SLA = 250; // Change back to 150 after performance fix",
 					"",
