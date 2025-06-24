@@ -15,4 +15,5 @@ import gov.cdc.izgateway.xform.exceptions.OperationException;
 })
 public interface Operation {
     void execute(ServiceContext context) throws OperationException;
+    Integer getOrder();
 }
