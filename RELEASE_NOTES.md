@@ -1,5 +1,8 @@
 # IZ Gateway Transformation Service 0.9.0
 * IGDD-2024 Added PUT and DELETE operations on MessageHeader
+* IGDD-2092 Bump Spring Framework version to 3.4.7
+* IGDD-2016 Make Organizations in the Transformation Service “Organization Aware” like other objects, meaning that a user will only have access to read or update Organizations assigned to their user
+* IGDD-2043 Update so that calls to /api/v1/operations and /api/v1/preconditions endpoints properly log details on the user making the call
 
 # IZ Gateway Transformation Service 0.8.0
 * IGDD-1991 - API calls to CREATE objects generates and saves UUIDv4 for ID instead of accepted ID submitted by @austinmoody in #144
