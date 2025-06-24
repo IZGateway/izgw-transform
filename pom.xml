@@ -185,6 +185,10 @@
 					<groupId>com.mysql</groupId>
 					<artifactId>mysql-connector-j</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>commons-fileupload</groupId>
+					<artifactId>commons-fileupload</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
