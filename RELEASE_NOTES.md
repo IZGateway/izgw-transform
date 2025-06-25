@@ -1,4 +1,5 @@
 # IZ Gateway Transformation Service 0.9.0
+* IGDD-2085 Update bcfips to 2.1.0
 * IGDD-2024 Added PUT and DELETE operations on MessageHeader
 * IGDD-2092 Bump Spring Framework version to 3.4.7
 * IGDD-2016 Make Organizations in the Transformation Service “Organization Aware” like other objects, meaning that a user will only have access to read or update Organizations assigned to their user
