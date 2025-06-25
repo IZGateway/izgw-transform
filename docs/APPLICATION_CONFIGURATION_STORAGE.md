@@ -1,3 +1,7 @@
+&larr;[Back to README](../README.md)
+
+---
+
 # Transformation Service Data Storage
 
 The purpose of this document is to explain how the Transformation Service stores the configuration necessary for its proper operation.
@@ -22,16 +26,21 @@ The type of storage is configured via the SPRING_DATABASE environment variable. 
 
 To use file-based storage, SPRING_DATABASE will need to be set to ```file```.
 
-In addition, each entity type's file location will need to be configured. These environment variables are:
+In addition, the Transformation Service will need to know the location of the configuration files.
 
-- XFORM_CONFIGURATIONS_ORGANIZATIONS
-- XFORM_CONFIGURATIONS_PIPELINES
-- XFORM_CONFIGURATIONS_SOLUTIONS
-- XFORM_CONFIGURATIONS_MAPPINGS
-- XFORM_CONFIGURATIONS_ACCESS-CONTROL
-- XFORM_CONFIGURATIONS_OPERATION-PRECONDITION-FIELDS
-- XFORM_CONFIGURATIONS_USERS
-- XFORM_CONFIGURATIONS_GROUP-ROLE-MAPPING
+There are a couple ways to do this:
+
+- Set XFORM_CONFIGURATIONS_DIRECTORY to the directory location that contains the files
+  - This assumes that you are using the default file names as described in the Application Configuration section of the [Configuration Reference](./CONFIGURATION_REFERENCE.md)
+- Set the full path and name of each individual configuration file. These environment variables are:
+  - XFORM_CONFIGURATIONS_ORGANIZATIONS
+  - XFORM_CONFIGURATIONS_PIPELINES
+  - XFORM_CONFIGURATIONS_SOLUTIONS
+  - XFORM_CONFIGURATIONS_MAPPINGS
+  - XFORM_CONFIGURATIONS_ACCESS_CONTROL
+  - XFORM_CONFIGURATIONS_OPERATION_PRECONDITION_FIELDS
+  - XFORM_CONFIGURATIONS_USERS
+  - XFORM_CONFIGURATIONS_GROUP_ROLE_MAPPING
 
 ### AWS DynamoDB Storage Configuration
 
@@ -292,3 +301,7 @@ services:
 ## Package
 
 The [gov.cdc.izgateway.xform.repository](https://github.com/IZGateway/izgw-transform/blob/f97d2918bd031a55de081c907341811ed82b6749/src/main/java/gov/cdc/izgateway/xform/repository) package contains the code for Tranformation Service storage.
+
+---
+
+&larr;[Back to README](../README.md)
