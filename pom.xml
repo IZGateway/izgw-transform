@@ -185,27 +185,23 @@
 					<groupId>com.mysql</groupId>
 					<artifactId>mysql-connector-j</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>commons-fileupload</groupId>
-					<artifactId>commons-fileupload</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<!-- add -debug to get debug jars -->
 			<artifactId>bc-fips</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-fips</artifactId>
-			<version>2.0.7</version>
+			<version>2.1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bctls-fips</artifactId>
-			<version>2.0.19</version>
+			<version>2.1.20</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -425,6 +421,22 @@
 						<phase>process-test-resources</phase>
 						<configuration>
 							<target>
+
+								<!-- Find the bc-fips JAR file -->
+								<pathconvert property="bcfips.jar.path">
+									<fileset dir="${project.basedir}/docker/data/lib/bcfips">
+										<include name="bc-fips-*.jar"/>
+									</fileset>
+								</pathconvert>
+
+								<fail message="No bc-fips-*.jar file found in ${project.basedir}/docker/data/lib/bcfips">
+									<condition>
+										<length string="${bcfips.jar.path}" length="0"/>
+									</condition>
+								</fail>
+
+								<echo message="Using BC-FIPS: ${bcfips.jar.path}" level="info" />
+
 								<delete file="${project.build.directory}/self_signed_unit_tests.crt" />
 								<delete file="${project.build.directory}/self_signed_unit_tests.csr" />
 								<delete file="${project.build.directory}/self_signed_unit_tests.key" />
@@ -524,7 +536,7 @@
 									<arg value="-provider" />
 									<arg value="org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider" />
 									<arg value="-providerpath" />
-									<arg value="${project.basedir}/docker/data/lib/bc-fips-2.0.0.jar" />
+									<arg value="${bcfips.jar.path}" />
 								</exec>
 								<exec executable="keytool" failonerror="true">
 									<arg value="-keystore" />
@@ -558,7 +570,7 @@
 									<arg value="-provider" />
 									<arg value="org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider" />
 									<arg value="-providerpath" />
-									<arg value="${project.basedir}/docker/data/lib/bc-fips-2.0.0.jar" />
+									<arg value="${bcfips.jar.path}" />
 								</exec>
 							</target>
 						</configuration>
