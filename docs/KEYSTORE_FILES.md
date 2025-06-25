@@ -17,6 +17,7 @@ For the examples in this document to create files you will need:
 - To be on a system with the ability to run keytool (this is available if you have Java installed)
 - A bc-fips jar to produce the Bouncy Castle FIPS compliant file
   - The latest appropriate jar to use is in the docker/data folder of this repository
+  - Please **note** that the instructions below may mention a bc-files file that is no longer in this repository as those get updated.
 - Where you see <PASSWORD> would be replaced with the value you'd configured as COMMON_PASS in a running system
 
 ## Server Key Store
