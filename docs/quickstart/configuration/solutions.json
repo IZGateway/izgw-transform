@@ -1,0 +1,18 @@
+[{
+  "id" : "2f81dcd6-329e-4e6b-a9f0-69aa6d5dacfd",
+  "solutionName" : "Xform Local Testing Quickstart",
+  "description" : "Just sets MSH-23-1 to hardcoded value. Quickstart loopback test.",
+  "version" : "1.0",
+  "active" : true,
+  "requestOperations" : [ {
+    "preconditions" : [ ],
+    "operationList" : [ {
+      "method" : "set",
+      "id" : "17662992-c317-4037-b9a1-149cddf8965c",
+      "order" : 0,
+      "destinationField" : "/MSH-23-1",
+      "setValue" : "XFORM_LOCAL_TESTING"
+    } ]
+  } ],
+  "responseOperations" : [ ]
+}]

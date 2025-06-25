@@ -29,7 +29,7 @@ output.elasticsearch:
   # Change to audacioussearch.es.us-east-1.aws.found.io:9243 for prod/onboarding/prr, leave as test for dev (APHL) / test (AINQ)
   hosts: [ "${ELASTIC_HOST:https://audacioussearchtest.es.us-east-1.aws.found.io:9243}" ] # Set ELASTIC_HOST in environment
   # Set index to izgw-{tag}-logstash datastream for selected environment
-  index: "${ELASTIC_INDEX:izgw-dev-logstash}" # Use izgw-prod12-logstash for production
+  index: "${ELASTIC_INDEX:izgw-xform-service-dev}" # Use izgw-prod12-logstash for production
   api_key: "${ELASTIC_API_KEY}" # Set ELASTIC_API_KEY in environment
   worker: 2
   allow_older_versions: true
