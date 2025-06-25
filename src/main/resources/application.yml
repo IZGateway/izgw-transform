@@ -17,7 +17,7 @@ xform:
     access-control: ${XFORM_CONFIGURATIONS_ACCESS_CONTROL:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/access-control.json}
     operation-precondition-fields: ${XFORM_CONFIGURATIONS_OPERATION_PRECONDITION_FIELDS:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/operation-precondition-fields.json}
     users: ${XFORM_CONFIGURATIONS_USERS:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/users.json}
-    group-role-mapping: ${XFORM_CONFIGURATIONS_GROUP_ROLE_MAPPING:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}\group-role-mapping.json}
+    group-role-mapping: ${XFORM_CONFIGURATIONS_GROUP_ROLE_MAPPING:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/group-role-mapping.json}
 jwt:
   provider: ${XFORM_JWT_PROVIDER:shared-secret}
   shared-secret: ${XFORM_JWT_SECRET:}
