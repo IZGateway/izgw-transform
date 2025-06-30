@@ -151,7 +151,7 @@ jobs:
         uses: dependency-check/Dependency-Check_Action@main
         with:
           project: V2 to FHIR
-          path: target/izgw-transform-${{env.IMAGE_BRANCH_TAG}}.jar
+          path: target/xform-${{env.BASE_TAG}}.jar
           format: 'HTML'
           args: >
             --failOnCVSS 7
