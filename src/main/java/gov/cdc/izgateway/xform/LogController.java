@@ -37,10 +37,10 @@ import java.util.List;
 @Lazy(false)
 public class LogController extends LogControllerBase {
 
-	@Autowired
-	public LogController(AccessControlRegistry registry) {
+    @Autowired
+    public LogController(AccessControlRegistry registry) {
         registry.register(this);
-	}
+    }
 
     @Operation(summary = "Get the most recent log records",
             description = "Search for the log records matching the search parameter or all records if there is no search value")
