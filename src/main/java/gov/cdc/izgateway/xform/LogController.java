@@ -8,6 +8,7 @@ import gov.cdc.izgateway.logging.MemoryAppender;
 import gov.cdc.izgateway.logging.event.LogEvent;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.security.Roles;
+import gov.cdc.izgateway.LogControllerBase;
 import gov.cdc.izgateway.utils.ListConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -45,68 +46,14 @@ import java.util.List;
 @RolesAllowed({ Roles.ADMIN, Roles.OPERATIONS, Roles.BLACKLIST })
 @RequestMapping({"/rest"})
 @Lazy(false)
-public class LogController implements InitializingBean {
-	@Configuration(proxyBeanMethods = false) 
-	public static class LogControllerConfig {
-	    @Bean
-	    public ObjectMapper getObjectMapper() {
-	        ObjectMapper mapper = new ObjectMapper();
-	        SimpleModule simpleModule = new SimpleModule();
-	        simpleModule.addSerializer(ILoggingEvent.class, new LogstashMessageSerializer());
-	        mapper.registerModule(simpleModule);
-	        return mapper;
-		}
-	}
-	
+public class LogController extends LogControllerBase {
+
 	private MemoryAppender logData = null;
 
 	@Autowired
 	public LogController(AccessControlRegistry registry) {
-		registry.register(this);
-	}
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		logData = MemoryAppender.getInstance("memory");
+        super(registry);
 	}
 
-	// TODO: Presently, blacklisted users are allowed to access the logs request, b/c blacklisting only
-	// applies to the SOAP Stack.  Once we apply it to the full HTTP stack, we will have to provide
-	// SECURE mechanism to clearing the state.
-	@Operation(summary = "Get the most recent log records",
-			description = "Search for the log records matching the search parameter or all records if there is no search value")
-	@ApiResponse(responseCode = "200", description = "Success", 
-    	content = { 
-    		@Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = LogEvent.class))) 
-    	}
-	)
-	@GetMapping("/logs")
-	public List<LogEvent> getLogs(
-			@Parameter(description = "The search string", required = false)
-			@RequestParam(required = false) String search, 
-			HttpServletResponse resp) {
 
-		List<ILoggingEvent> events = null;
-		if (logData == null) {
-			events = Collections.emptyList();
-		} else if (StringUtils.isBlank(search)) {
-			events = logData.getLoggedEvents();
-		} else {
-			events = logData.search(search);
-		}
-		
-		return new ListConverter<>(events, LogEvent::new);
-	}
-
-	@Operation(summary = "Clear log records")
-	@ApiResponse(responseCode = "204", description = "Reset the logs", content = @Content)
-	@DeleteMapping("/logs")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteLogs(HttpServletRequest servletReq,
-			@Parameter(required = false, description="If true, reset the specified endpoint, clearing maintenance")
-			@RequestParam(required = false) String clear) {
-		if (logData != null) {
-			logData.reset();
-		}
-	}
-	
 }
