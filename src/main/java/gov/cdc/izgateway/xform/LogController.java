@@ -53,9 +53,8 @@ public class LogController extends LogControllerBase {
     @Override
     public List<LogEvent> getLogs(
             @Parameter(description = "The search string")
-            @RequestParam(required = false) String search,
-            HttpServletResponse resp) {
-        return super.getLogs(search, resp);
+            @RequestParam(required = false) String search) {
+        return super.getLogs(search);
     }
 
     @Operation(summary = "Clear log records")
