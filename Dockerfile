@@ -38,9 +38,11 @@ RUN rm -f /filebeat/filebeat.yml && \
 WORKDIR /usr/share/izg-transform
 RUN mkdir module
 
-# Copy jars from docker/data/lib
-# This ensures we only use NIST certified publicly available BC-FIPS packages
-# And gives us the aspectjweaver and spring-instrument jars
+# Copy BC-FIPS Jars
+# This ensures we only use NIST certified publicly available packages
+COPY docker/data/lib/bcfips/*.jar /usr/share/izg-transform/lib/bcfips/
+
+# Copy aspectjweaver and spring-instrument jars
 COPY docker/data/lib/*.jar /usr/share/izg-transform/lib/
 
 # Add izgw-transform jar file

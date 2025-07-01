@@ -8,11 +8,7 @@
         <cve>CVE-2023-33202</cve>
     </suppress>
     <suppress>
-        <notes>IZ Gateway manages the dependencies of
-            bcpkix-fips-2.0.7.jar to
-            use bc-fips-2.0.0.jar which does not
-            have this vulnerability
-        </notes>
+        <notes>IZ Gateway manages the dependencies of bouncy castle</notes>
         <packageUrl regex="true">^pkg:maven/org\.bouncycastle/bcpkix\-fips@.*$
         </packageUrl>
         <cpe>cpe:/a:bouncycastle:bouncy_castle_for_java</cpe>
