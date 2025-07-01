@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import gov.cdc.izgateway.logging.LogstashMessageSerializer;
 import gov.cdc.izgateway.logging.MemoryAppender;
+import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.event.LogEvent;
+import gov.cdc.izgateway.model.IEndpointStatus;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.security.Roles;
 import gov.cdc.izgateway.LogControllerBase;
+import gov.cdc.izgateway.soap.fault.SecurityFault;
 import gov.cdc.izgateway.utils.ListConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -55,5 +58,31 @@ public class LogController extends LogControllerBase {
         super(registry);
 	}
 
+    @Operation(summary = "Get the most recent log records",
+            description = "Search for the log records matching the search parameter or all records if there is no search value")
+    @ApiResponse(responseCode = "200", description = "Success",
+            content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = LogEvent.class)))
+            }
+    )
+    @GetMapping("/logs")
+    @Override
+    public List<LogEvent> getLogs(
+            @Parameter(description = "The search string")
+            @RequestParam(required = false) String search,
+            HttpServletResponse resp) {
+        return super.getLogs(search, resp);
+    }
 
+    @Operation(summary = "Clear log records")
+    @ApiResponse(responseCode = "204", description = "Reset the logs", content = @Content)
+    @DeleteMapping("/logs")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RolesAllowed({ Roles.ADMIN, Roles.OPERATIONS, Roles.BLACKLIST })
+    @Override
+    public void deleteLogs(HttpServletRequest servletReq,
+                           @Parameter(description="If true, reset the specified endpoint, clearing maintenance")
+                           @RequestParam(required = false) String clear) throws SecurityFault {
+        super.deleteLogs(servletReq, clear);
+    }
 }
