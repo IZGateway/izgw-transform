@@ -1,18 +1,10 @@
 package gov.cdc.izgateway.xform;
 
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import gov.cdc.izgateway.logging.LogstashMessageSerializer;
-import gov.cdc.izgateway.logging.MemoryAppender;
-import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.logging.event.LogEvent;
-import gov.cdc.izgateway.model.IEndpointStatus;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.security.Roles;
 import gov.cdc.izgateway.LogControllerBase;
 import gov.cdc.izgateway.soap.fault.SecurityFault;
-import gov.cdc.izgateway.utils.ListConverter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -22,16 +14,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,8 +36,6 @@ import java.util.List;
 @RequestMapping({"/rest"})
 @Lazy(false)
 public class LogController extends LogControllerBase {
-
-	private MemoryAppender logData = null;
 
 	@Autowired
 	public LogController(AccessControlRegistry registry) {
