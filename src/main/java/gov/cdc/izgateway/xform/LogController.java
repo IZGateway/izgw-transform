@@ -39,7 +39,7 @@ public class LogController extends LogControllerBase {
 
 	@Autowired
 	public LogController(AccessControlRegistry registry) {
-        super(registry);
+        registry.register(this);
 	}
 
     @Operation(summary = "Get the most recent log records",
