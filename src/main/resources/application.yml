@@ -10,14 +10,14 @@ xform:
       id: ${XFORM_IIS_DESTINATION_ID:iis}
       type: 5
   configurations:
-    organizations: testing/configuration/organizations.json
-    pipelines: testing/configuration/pipelines.json
-    solutions: testing/configuration/solutions.json
-    mappings: testing/configuration/mappings.json
-    access-control: testing/configuration/access-control.json
-    operation-precondition-fields: testing/configuration/operation-precondition-fields.json
-    users: testing/configuration/users.json
-    group-role-mapping: testing/configuration/group-role-mapping.json
+    organizations: ${XFORM_CONFIGURATIONS_ORGANIZATIONS:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/organizations.json}
+    pipelines: ${XFORM_CONFIGURATIONS_PIPELINES:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/pipelines.json}
+    solutions: ${XFORM_CONFIGURATIONS_SOLUTIONS:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/solutions.json}
+    mappings: ${XFORM_CONFIGURATIONS_MAPPINGS:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/mappings.json}
+    access-control: ${XFORM_CONFIGURATIONS_ACCESS_CONTROL:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/access-control.json}
+    operation-precondition-fields: ${XFORM_CONFIGURATIONS_OPERATION_PRECONDITION_FIELDS:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/operation-precondition-fields.json}
+    users: ${XFORM_CONFIGURATIONS_USERS:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/users.json}
+    group-role-mapping: ${XFORM_CONFIGURATIONS_GROUP_ROLE_MAPPING:${XFORM_CONFIGURATIONS_DIRECTORY:testing/configuration}/group-role-mapping.json}
 jwt:
   provider: ${XFORM_JWT_PROVIDER:shared-secret}
   shared-secret: ${XFORM_JWT_SECRET:}
@@ -46,7 +46,7 @@ spring:
 elastic:
   api-key: ${ELASTIC_API_KEY:}
   host: ${ELASTIC_HOST:https://audacioussearchtest.es.us-east-1.aws.found.io:9243}
-  index: ${ELASTIC_INDEX:izgw-dev-logstash}
+  index: ${ELASTIC_INDEX:izgw-xform-service-dev}
 
 v2tofhir:
   sendingApplication: ${SENDING_APPLICATION:FHIR}

@@ -1,0 +1,6 @@
+[{
+  "id" : "cd0ed895-18ca-450d-b684-1c045c976139",
+  "userId" : "56a004af-c888-41d0-9e13-d99299fd9ace",
+  "active" : true,
+  "roles" : [  "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}]

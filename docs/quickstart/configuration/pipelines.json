@@ -1,0 +1,15 @@
+[{
+  "pipelineName" : "Xform Local Testing Only - Hub Service",
+  "id" : "6e6df3c3-78e7-478f-8c38-f6e937127b1c",
+  "organizationId" : "7c74f309-810c-4a05-8a8d-4938d099383d",
+  "description" : "",
+  "inboundEndpoint" : "izgts:IISHubService",
+  "outboundEndpoint" : "izghub:IISHubService",
+  "active" : true,
+  "pipes" : [ {
+    "id" : "cc6fcd21-f395-4155-a82e-8436351659f4",
+    "solutionId" : "2f81dcd6-329e-4e6b-a9f0-69aa6d5dacfd",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ ]
+  } ]
+}]

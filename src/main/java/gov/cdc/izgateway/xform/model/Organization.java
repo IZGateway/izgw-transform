@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @DynamoDbBean
-public class Organization extends BaseModel {
+public class Organization extends BaseModel implements OrganizationAware {
     @NotBlank(message = "Organization name is required")
     private String organizationName;
 
@@ -21,4 +22,9 @@ public class Organization extends BaseModel {
 
     @NotNull(message = "Organization common name is required")
     private String commonName;
+
+    @JsonIgnore
+    public UUID getOrganizationId() {
+        return id;
+    }
 }

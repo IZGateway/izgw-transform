@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
 	<artifactId>xform</artifactId>
-        <version>0.8.1</version>
+        <version>0.9.0</version>
 	<name>xform</name>
 	<description>IZ Gateway Xform Service</description>
 	<properties>
@@ -24,6 +24,7 @@
 		<buildno>${timestamp}</buildno>
 		<logback.version>1.5.16</logback.version>
 		<camel.version>4.10.2</camel.version>
+		<xform.testing.common.pass>XFORM_TESTING_COMMON_PASS</xform.testing.common.pass>
 	</properties>
 	<repositories>
 		<repository>
@@ -191,17 +192,17 @@
 			<groupId>org.bouncycastle</groupId>
 			<!-- add -debug to get debug jars -->
 			<artifactId>bc-fips</artifactId>
-			<version>2.0.0</version>
+			<version>2.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-fips</artifactId>
-			<version>2.0.7</version>
+			<version>2.1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bctls-fips</artifactId>
-			<version>2.0.19</version>
+			<version>2.1.20</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -421,6 +422,22 @@
 						<phase>process-test-resources</phase>
 						<configuration>
 							<target>
+
+								<!-- Find the bc-fips JAR file -->
+								<pathconvert property="bcfips.jar.path">
+									<fileset dir="${project.basedir}/docker/data/lib/bcfips">
+										<include name="bc-fips-*.jar"/>
+									</fileset>
+								</pathconvert>
+
+								<fail message="No bc-fips-*.jar file found in ${project.basedir}/docker/data/lib/bcfips">
+									<condition>
+										<length string="${bcfips.jar.path}" length="0"/>
+									</condition>
+								</fail>
+
+								<echo message="Using BC-FIPS: ${bcfips.jar.path}" level="info" />
+
 								<delete file="${project.build.directory}/self_signed_unit_tests.crt" />
 								<delete file="${project.build.directory}/self_signed_unit_tests.csr" />
 								<delete file="${project.build.directory}/self_signed_unit_tests.key" />
@@ -443,7 +460,7 @@
 									<arg value="-out" />
 									<arg value="${project.build.directory}/self_signed_unit_tests.csr" />
 									<arg value="-subj" />
-									<arg value="/C=US/ST=Maryland/L=Baltimore/O=Audacious Inquiry/OU=Strategic Advisory/CN=localhost" />
+									<arg value="/C=US/ST=Maryland/L=Baltimore/O=Audacious Inquiry/OU=Strategic Advisory/CN=xform.local.testing.only" />
 								</exec>
 								<exec executable="openssl" failonerror="true">
 									<arg value="x509" />
@@ -479,12 +496,12 @@
 									<arg value="-keystore" />
 									<arg value="${project.build.directory}/awsdev_keystore.jks" />
 									<arg value="-storepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-noprompt" />
 									<arg value="-trustcacerts" />
 									<arg value="-importcert" />
 									<arg value="-alias" />
-									<arg value="localhost" />
+									<arg value="xform.local.testing.only" />
 									<arg value="-file" />
 									<arg value="${project.build.directory}/self_signed_unit_tests.crt" />
 								</exec>
@@ -495,11 +512,11 @@
 									<arg value="-keyalg" />
 									<arg value="RSA" />
 									<arg value="-storepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-keystore" />
 									<arg value="${project.build.directory}/awsdev_keystore.jks" />
 									<arg value="-dname" />
-									<arg value="CN=localhost" />
+									<arg value="CN=xform.local.testing.only" />
 								</exec>
 								<exec executable="keytool" failonerror="true">
 									<arg value="-importkeystore" />
@@ -508,11 +525,11 @@
 									<arg value="-srcstoretype" />
 									<arg value="JKS" />
 									<arg value="-srcstorepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-destkeystore" />
 									<arg value="${project.build.directory}/awsdev_keystore.bcfks" />
 									<arg value="-deststorepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-deststoretype" />
 									<arg value="BCFKS" />
 									<arg value="-providername" />
@@ -520,18 +537,18 @@
 									<arg value="-provider" />
 									<arg value="org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider" />
 									<arg value="-providerpath" />
-									<arg value="${project.basedir}/docker/data/lib/bc-fips-2.0.0.jar" />
+									<arg value="${bcfips.jar.path}" />
 								</exec>
 								<exec executable="keytool" failonerror="true">
 									<arg value="-keystore" />
 									<arg value="${project.build.directory}/izgw_client_trust.jks" />
 									<arg value="-storepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-noprompt" />
 									<arg value="-trustcacerts" />
 									<arg value="-importcert" />
 									<arg value="-alias" />
-									<arg value="localhost" />
+									<arg value="xform.local.testing.only" />
 									<arg value="-file" />
 									<arg value="${project.build.directory}/self_signed_unit_tests.crt" />
 								</exec>
@@ -542,11 +559,11 @@
 									<arg value="-srcstoretype" />
 									<arg value="JKS" />
 									<arg value="-srcstorepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-destkeystore" />
 									<arg value="${project.build.directory}/izgw_client_trust.bcfks" />
 									<arg value="-deststorepass" />
-									<arg value="${maven.build.timestamp}" />
+									<arg value="${xform.testing.common.pass}" />
 									<arg value="-deststoretype" />
 									<arg value="BCFKS" />
 									<arg value="-providername" />
@@ -554,7 +571,7 @@
 									<arg value="-provider" />
 									<arg value="org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider" />
 									<arg value="-providerpath" />
-									<arg value="${project.basedir}/docker/data/lib/bc-fips-2.0.0.jar" />
+									<arg value="${bcfips.jar.path}" />
 								</exec>
 							</target>
 						</configuration>
@@ -569,7 +586,7 @@
 				<configuration>
 					<environmentVariables>
 						<SSL_SHARE>${project.build.directory}</SSL_SHARE>
-						<COMMON_PASS>${maven.build.timestamp}</COMMON_PASS>
+						<COMMON_PASS>${xform.testing.common.pass}</COMMON_PASS>
 					</environmentVariables>
 				</configuration>
 			</plugin>

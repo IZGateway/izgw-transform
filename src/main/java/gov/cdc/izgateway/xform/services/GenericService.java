@@ -4,8 +4,10 @@ import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.security.IzgPrincipal;
 import gov.cdc.izgateway.xform.logging.ApiEventLogger;
 import gov.cdc.izgateway.xform.model.BaseModel;
+import gov.cdc.izgateway.xform.model.Organization;
 import gov.cdc.izgateway.xform.model.OrganizationAware;
 import gov.cdc.izgateway.xform.repository.XformRepository;
+import gov.cdc.izgateway.xform.security.Roles;
 import gov.cdc.izgateway.xform.security.XformPrincipal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,8 +28,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     public T getObject(UUID id) {
         T existing = repo.getEntity(id);
 
-        // Check if the object's organization ID is in the allowed organization IDs
-        if (existing instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId())) {
+        if (!isAccessible(existing)) {
             return null;
         }
 
@@ -39,8 +40,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     @Override
     public List<T> getList() {
         ArrayList<T> list = new ArrayList<>(repo.getEntitySet());
-
-        list.removeIf(item -> item instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId()));
+        list.removeIf(item -> !isAccessible(item));
 
         ApiEventLogger.logReadEvent(list);
         return list;
@@ -62,8 +62,9 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     @Override
     public void create(T obj) {
 
-        // Check if the object's organization ID is in the allowed organization IDs
-        if (obj instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId())) {
+        // If object is organization, skip the organizationId check
+        // otherwise, check if the user has access to the organization ID
+        if (!(obj instanceof Organization) && !isAccessible(obj)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to create this object");
         }
 
@@ -88,7 +89,7 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
         }
 
         // Check if the organization ID is in the allowed organization IDs
-        if (item instanceof OrganizationAware organizationAware && !getAllowedOrganizationIds().contains(organizationAware.getOrganizationId())) {
+        if (!isAccessible(item)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this object");
         }
 
@@ -107,6 +108,23 @@ public abstract class GenericService<T extends BaseModel> implements XformServic
     		return x.getAllowedOrganizationIds();
     	}
     	return Collections.emptySet();
+    }
+
+    /**
+     * Check if the object is accessible based on its organization ID or if the user is an admin.
+     */
+    private boolean isAccessible(T obj) {
+        // If the RequestContext principal is an admin, return true
+        if (RequestContext.getPrincipal().getRoles().contains(Roles.ADMIN))  {
+            return true;
+        }
+
+        if (obj instanceof OrganizationAware organizationAware) {
+            Set<UUID> allowedOrgIds = getAllowedOrganizationIds();
+            return allowedOrgIds.contains(organizationAware.getOrganizationId());
+        }
+
+        return true; // If the object is not organization-aware, it's accessible
     }
 
     /**

@@ -24,6 +24,12 @@ public class Roles {
     /** Header to indicate that request from localhost should not be treated as an admin */
     public static final String NOT_ADMIN_HEADER = "X-Not-Admin";
 
+    /** Header to indicate that the request should remove admin role from the principal to test non-admin access.
+     *  This is different from NOT_ADMIN_HEADER in that it is used to remove the admin role regardless of whether
+     *  the request is from localhost or not.
+     */
+    public static final String REMOVE_ADMIN_ROLE_HEADER = "X-Remove-Admin-Role";
+
     // Special role for public access to an API endpoint.  Health check endpoints use this role.
     public static final String PUBLIC_ACCESS = "public-access";
 
