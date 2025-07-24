@@ -1,0 +1,584 @@
+{
+	"info": {
+		"_postman_id": "ab060ea1-c242-4381-ada7-649577c24b1e",
+		"name": "Transformation Service FHIR Requests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "940288",
+		"_collection_link": "https://cloudy-sunset-429868.postman.co/workspace/IZ-Gateway~a583eb4f-68db-4044-b8cf-d251024eca35/collection/940288-ab060ea1-c242-4381-ada7-649577c24b1e?action=share&source=collection_link&creator=940288"
+	},
+	"item": [
+		{
+			"name": "TS_TC_07a FHIR Query Returns Immunizations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let response = pm.response.json();",
+							"pm.test(\"verify type is Bundle\", function() {",
+							"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+							"});",
+							"",
+							"pm.test(\"Verify Entry length is 4\", function() {",
+							"    pm.expect(response.entry.length).to.equal(4);",
+							"});",
+							"",
+							"pm.test(\"Verify Immunization Code\", function() {",
+							"    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+							"});",
+							"",
+							"pm.test(\"Verify Vaccine Code\", function() {",
+							"    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "patient.given",
+							"value": "{{fhirPatientGiven}}",
+							"type": "text"
+						},
+						{
+							"key": "patient.family",
+							"value": "{{fhirPatientFamily}}",
+							"type": "text"
+						},
+						{
+							"key": "patient.birthdate",
+							"value": "{{fhirPatientDOB}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"dev",
+						"Immunization"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TS_TC_07b FHIR Query Returns All Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let response = pm.response.json();",
+							"pm.test(\"verify type is Bundle\", function() {",
+							"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+							"});",
+							"",
+							"pm.test(\"Verify Entry length is 6\", function() {",
+							"    pm.expect(response.entry.length).to.equal(6);",
+							"});",
+							"",
+							"pm.test(\"Verify Immunization Code\", function() {",
+							"    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+							"});",
+							"",
+							"pm.test(\"Verify Vaccine Code\", function() {",
+							"    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "patient.given",
+							"value": "{{fhirPatientGiven}}",
+							"type": "text"
+						},
+						{
+							"key": "patient.family",
+							"value": "{{fhirPatientFamily}}",
+							"type": "text"
+						},
+						{
+							"key": "patient.birthdate",
+							"value": "{{fhirPatientDOB}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization?_include=*",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"dev",
+						"Immunization"
+					],
+					"query": [
+						{
+							"key": "_include",
+							"value": "*"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TS_TC_08a FHIR Query Patient Single",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let response = pm.response.json();",
+							"pm.test(\"verify type is Bundle\", function() {",
+							"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+							"});",
+							"",
+							"pm.test(\"Verify Entry length is 3\", function() {",
+							"    pm.expect(response.entry.length).to.equal(3);",
+							"});",
+							"",
+							"pm.test(\"Verify OK is returned\", function() {",
+							"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"OK\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "given",
+							"value": "{{fhirPatientGiven}}",
+							"type": "text"
+						},
+						{
+							"key": "family",
+							"value": "{{fhirPatientFamily}}",
+							"type": "text"
+						},
+						{
+							"key": "birthdate",
+							"value": "{{fhirPatientDOB}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Patient",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"dev",
+						"Patient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TS_TC_08c FHIR Query Patient No Data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let response = pm.response.json();",
+							"pm.test(\"verify type is Bundle\", function() {",
+							"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+							"});",
+							"",
+							"pm.test(\"Verify Entry length is 2\", function() {",
+							"    pm.expect(response.entry.length).to.equal(2);",
+							"});",
+							"",
+							"pm.test(\"Verify NF is returned indicating no data found\", function() {",
+							"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "given",
+							"value": "{{fhirNoDataPatientGiven}}",
+							"type": "text"
+						},
+						{
+							"key": "family",
+							"value": "{{fhirNoDataPatientFamily}}",
+							"type": "text"
+						},
+						{
+							"key": "birthdate",
+							"value": "{{fhirNoDataPatientDOB}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Patient",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"dev",
+						"Patient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TS_TC_08c FHIR Query Patient Multiple",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let response = pm.response.json();",
+							"pm.test(\"verify type is Bundle\", function() {",
+							"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+							"});",
+							"",
+							"pm.test(\"Verify Entry length is 4\", function() {",
+							"    pm.expect(response.entry.length).to.equal(4);",
+							"});",
+							"",
+							"pm.test(\"Verify OK is returned indicating data found\", function() {",
+							"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"OK\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "given",
+							"value": "{{fhirDupGiven}}",
+							"type": "text"
+						},
+						{
+							"key": "family",
+							"value": "{{fhirDupFamily}}",
+							"type": "text"
+						},
+						{
+							"key": "birthdate",
+							"value": "{{fhirDupDOB}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Patient",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"dev",
+						"Patient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TS_TC_08a FHIR Query Patient Too Many",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"let response = pm.response.json();",
+							"pm.test(\"verify type is Bundle\", function() {",
+							"    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+							"});",
+							"",
+							"pm.test(\"Verify Entry length is 2\", function() {",
+							"    pm.expect(response.entry.length).to.equal(2);",
+							"});",
+							"",
+							"pm.test(\"Verify TM is returned indicating too many found\", function() {",
+							"    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"TM\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "patient.given",
+							"value": "{{fhirTooManyGiven}}",
+							"type": "text"
+						},
+						{
+							"key": "patient.family",
+							"value": "{{fhirTooManyFamily}}",
+							"type": "text"
+						},
+						{
+							"key": "patient.birthdate",
+							"value": "{{fhirTooManyDOB}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+					"protocol": "{{protocol}}",
+					"host": [
+						"{{host}}"
+					],
+					"port": "{{port}}",
+					"path": [
+						"fhir",
+						"dev",
+						"Immunization"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "fhirPatientGiven",
+			"value": "MarneyAIRA",
+			"type": "string"
+		},
+		{
+			"key": "fhirPatientFamily",
+			"value": "CuyahogaAIRA",
+			"type": "string"
+		},
+		{
+			"key": "fhirPatientDOB",
+			"value": "1960-05-07",
+			"type": "string"
+		},
+		{
+			"key": "fhirNoDataPatientGiven",
+			"value": "NogivenAIRA",
+			"type": "string"
+		},
+		{
+			"key": "fhirNoDataPatientFamily",
+			"value": "NofamilyAIRA",
+			"type": "string"
+		},
+		{
+			"key": "fhirNoDataPatientDOB",
+			"value": "1900-01-01",
+			"type": "string"
+		},
+		{
+			"key": "host",
+			"value": "demo.xform.izgateway.org",
+			"type": "string"
+		},
+		{
+			"key": "fhirDupFamily",
+			"value": "NavarroAIRA1",
+			"type": "string"
+		},
+		{
+			"key": "fhirDupGiven",
+			"value": "ZadorAIRA",
+			"type": "string"
+		},
+		{
+			"key": "fhirDupDOB",
+			"value": "2001-08-10",
+			"type": "string"
+		},
+		{
+			"key": "fhirTooManyFamily",
+			"value": "FagenAIRA",
+			"type": "string"
+		},
+		{
+			"key": "fhirTooManyGiven",
+			"value": "RudraniAIRA",
+			"type": "string"
+		},
+		{
+			"key": "fhirTooManyDOB",
+			"value": "2021-01-02",
+			"type": "string"
+		},
+		{
+			"key": "port",
+			"value": "443",
+			"type": "string"
+		},
+		{
+			"key": "protocol",
+			"value": "https",
+			"type": "string"
+		}
+	]
+}

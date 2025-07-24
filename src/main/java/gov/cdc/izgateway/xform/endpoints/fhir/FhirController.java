@@ -2,6 +2,7 @@ package gov.cdc.izgateway.xform.endpoints.fhir;
 
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
+import gov.cdc.izgw.v2tofhir.converter.Parser;
 import gov.cdc.izgw.v2tofhir.datatype.HumanNameParser;
 import gov.cdc.izgw.v2tofhir.segment.PIDParser;
 import gov.cdc.izgw.v2tofhir.utils.QBPUtils;
@@ -736,7 +737,7 @@ public class FhirController {
     
     private void removeInfrastructureCreatedResources(List<Resource> resources, List<Include> includes, List<Include> revIncludes,
             Iterator<BundleEntryComponent> it, Resource r) {
-        if (r != null && r.getUserData(MessageParser.SOURCE) != null) {
+        if (r != null && r.getUserData(Parser.SOURCE) != null) {
             // Some DatatypeConverter and MessageParser created resources have limited utility.  
             // What we should we do with those depends on what resources the
             // user asks to include.  These infrastructure crafted resources can be white-listed
@@ -749,7 +750,7 @@ public class FhirController {
             // _include=Resource:source:Organization
             // MessageParser created DocumentReference/Provenance
             // _include=Resource:source:DocumentReference
-            String source = r.getUserData(MessageParser.SOURCE).toString();
+            String source = r.getUserData(Parser.SOURCE).toString();
             if (
                 // ANY Source requested
                 // DatatypeConverter created resources including Organization, Practitioner, RelatedPerson, and Location
@@ -777,7 +778,7 @@ public class FhirController {
     private boolean matchesSource(List<Include> includes, String target) {
         for (Include include: includes) {
             if ("Resource".equals(include.getParamType()) 
-            	&& MessageParser.SOURCE.equals(include.getParamName())
+            	&& Parser.SOURCE.equals(include.getParamName())
             	&& Arrays.asList("*", target, null).contains(include.getParamTargetType())
             ) {
                 return true;
