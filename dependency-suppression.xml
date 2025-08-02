@@ -39,4 +39,19 @@
         </packageUrl>
         <cve>CVE-2020-26939</cve>
     </suppress>
+    <suppress>
+        <notes>CVE-2018-1258 requires Spring Framework 5.0.5, project is on 6.2.9 as of now - false positive</notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
+    <suppress>
+        <notes>CVE-2018-1258 requires Spring Framework 5.0.5, project is on 6.2.9 as of now - false positive</notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-oauth2\-resource\-server@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
+    <suppress>
+        <notes>CVE-2018-1258 requires Spring Framework 5.0.5, project is on 6.2.9 as of now - false positive</notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-web@.*$</packageUrl>
+        <cve>CVE-2018-1258</cve>
+    </suppress>
 </suppressions>
