@@ -25,7 +25,6 @@
 		<logback.version>1.5.16</logback.version>
 		<camel.version>4.10.2</camel.version>
 		<xform.testing.common.pass>XFORM_TESTING_COMMON_PASS</xform.testing.common.pass>
-		<spring-security.version>6.5.2</spring-security.version>
 	</properties>
 	<repositories>
 		<repository>
