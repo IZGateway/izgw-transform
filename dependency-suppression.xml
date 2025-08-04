@@ -40,17 +40,17 @@
         <cve>CVE-2020-26939</cve>
     </suppress>
     <suppress>
-        <notes>CVE-2018-1258 requires Spring Framework 5.0.5, project is on 6.2.9 as of now - false positive</notes>
+        <notes>CVE-2018-1258 requires Spring Framework 5.0.5, project is on 6.2.9 as of now - false positive (IGDD-2171)</notes>
         <cpe>cpe:2.3:a:pivotal_software:spring_security:*:*:*:*:*:*:*:*</cpe>
         <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
-        <notes>CVE-2018-1258 requires Spring Framework 5.0.5, project is on 6.2.9 as of now - false positive</notes>
+        <notes>CVE-2018-1258 requires Spring Framework 5.0.5, project is on 6.2.9 as of now - false positive (IGDD-2171)</notes>
         <cpe>cpe:2.3:a:pivotal:spring_security_oauth:*:*:*:*:*:*:*:*</cpe>
         <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
-        <notes>CVE-2018-1258 requires Spring Framework 5.0.5, project is on 6.2.9 as of now - false positive</notes>
+        <notes>CVE-2018-1258 requires Spring Framework 5.0.5, project is on 6.2.9 as of now - false positive (IGDD-2171)</notes>
         <cpe>cpe:2.3:a:web_project:web:*:*:*:*:*:*:*:*</cpe>
         <cve>CVE-2018-1258</cve>
     </suppress>
