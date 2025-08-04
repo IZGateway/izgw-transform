@@ -1,0 +1,15 @@
+[ {
+  "pipelineName" : "Pipeline for Interstellar Immunization Database",
+  "id" : "7952c20c-0832-49a8-bd84-2286d7aa0f4d",
+  "organizationId" : "eb369b0e-38db-4eb2-bf8d-b327b1a5cdc5",
+  "description" : "Interstellar Immunization Database pipeline description",
+  "inboundEndpoint" : "izgts:IISHubService",
+  "outboundEndpoint" : "izghub:IISHubService",
+  "active" : true,
+  "pipes" : [ {
+    "id" : "064a1de6-3754-42e9-be82-815b37d125c6",
+    "solutionId" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
+    "solutionVersion" : "1.0",
+    "preconditions" : [ ]
+  } ]
+} ]
