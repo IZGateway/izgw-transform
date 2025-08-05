@@ -23,7 +23,8 @@
 		<image.tag>${project.build.finalName}</image.tag>
 		<buildno>${timestamp}</buildno>
 		<logback.version>1.5.16</logback.version>
-		<camel.version>4.10.2</camel.version>
+		<camel.version>4.10.3</camel.version>
+        <gson.version>2.13.1</gson.version>
 		<xform.testing.common.pass>XFORM_TESTING_COMMON_PASS</xform.testing.common.pass>
 	</properties>
 	<repositories>
