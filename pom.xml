@@ -25,6 +25,8 @@
 		<logback.version>1.5.16</logback.version>
 		<camel.version>4.10.3</camel.version>
         <gson.version>2.13.1</gson.version>
+        <spring-security.version>6.4.6</spring-security.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
 		<xform.testing.common.pass>XFORM_TESTING_COMMON_PASS</xform.testing.common.pass>
 	</properties>
 	<repositories>
@@ -176,7 +178,6 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents.client5</groupId>
 			<artifactId>httpclient5</artifactId>
-			<version>5.4.4</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
@@ -208,7 +209,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.8.2</version>
+			<version>2.8.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -330,7 +331,7 @@
 							<configLocation>ai-checkstyle.xml</configLocation>
 							<consoleOutput>true</consoleOutput>
 							<failsOnError>true</failsOnError>
-							<!-- Optionally, specify the location of the violations file -->
+                            <!-- Optionally, specify the location of the violations file -->
 							<outputFile>${project.build.directory}/checkstyle-result.xml</outputFile>
 						</configuration>
 					</execution>
@@ -424,7 +425,7 @@
 						<configuration>
 							<target>
 
-								<!-- Find the bc-fips JAR file -->
+                                <!-- Find the bc-fips JAR file -->
 								<pathconvert property="bcfips.jar.path">
 									<fileset dir="${project.basedir}/docker/data/lib/bcfips">
 										<include name="bc-fips-*.jar"/>
@@ -592,25 +593,25 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<!-- Since all libraries are deliverable, this should in fact be
+                <!-- Since all libraries are deliverable, this should in fact be
                             the only dependency check required.
                          -->
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
 				<version>12.1.1</version>
 				<configuration>
-					<!--nvdApiKey>${env.NVDAPIKEY}</nvdApiKey-->
+                    <!--nvdApiKey>${env.NVDAPIKEY}</nvdApiKey-->
 					<formats>
 						<format>html</format>
 						<format>json</format>
 					</formats>
-					<!-- Disable .NET Analyzer -->
+                    <!-- Disable .NET Analyzer -->
 					<assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
 					<nugetconfAnalyzerEnabled>false</nugetconfAnalyzerEnabled>
 					<nuspecAnalyzerEnabled>false</nuspecAnalyzerEnabled>
-					<!-- Fail builds where this is used to 7 High to Critical -->
+                    <!-- Fail builds where this is used to 7 High to Critical -->
 					<failBuildOnCVSS>7</failBuildOnCVSS>
-					<!-- Don't fail on error (for cases where CVE REPO is bad) -->
+                    <!-- Don't fail on error (for cases where CVE REPO is bad) -->
 					<failOnError>false</failOnError>
 					<skip>${skipDependencyCheck}</skip>
 					<suppressionFile>${project.basedir}/dependency-suppression.xml</suppressionFile>
@@ -625,4 +626,13 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencyManagement>
+		<dependencies>
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>10.4.1</version>
+            </dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

@@ -122,7 +122,6 @@ public class Application implements WebMvcConfigurer {
     private static void initialize() {
         Thread.currentThread().setName("Xform Service");
 
-
         // This is necessary initialization to use BCFKS module
         CryptoServicesRegistrar.setSecureRandom(getSecureRandom());
         Security.insertProviderAt(new BouncyCastleFipsProvider(), 1);
