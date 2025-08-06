@@ -1,5 +1,8 @@
 name: Java CI with Maven
 
+env:
+  AWS_REGIONS: "us-east-1 us-west-2"
+
 on:
   pull_request:
     branches:
@@ -193,8 +196,20 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: transformation-service
         run: |
-          aws ecs update-service --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count 2 | jq ".service.deployments[].id"
-          aws ecs wait services-stable --cluster xform-service-alb-dev --service xform-service-alb-dev
+          # Start deployments in all configured regions
+          for region in $AWS_REGIONS; do
+            echo "Update ECS services in $region"
+            aws ecs update-service --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count 2 | jq ".service.deployments[].id" &
+          done
+          
+          wait
+          
+          for region in $AWS_REGIONS; do
+            echo "Wait for ECS servicestability in $region"
+            aws ecs wait services-stable --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev &
+          done
+          
+          wait
 
       - name: Setup certs
         env:
