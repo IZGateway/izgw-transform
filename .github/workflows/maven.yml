@@ -191,6 +191,8 @@ jobs:
         # AWS_REGIONS can be set in GitHub Settings → Secrets and variables → Actions
         # Format: space-separated regions (e.g., "us-east-1 us-west-2")
         # Default of us-east-1 will be used if this is not set
+        # ECS_DESIRED_COUNT can be set in GitHub Settings -> Secrets and variables -> Actions
+        # This is used to know how many container instances to start. Default is 1 if not set
       - name: Update ECS service to force new deployment of latest image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -201,9 +203,14 @@ jobs:
             AWS_REGIONS="us-east-1"
           fi
           
+          if [ -z "$ECS_DESIRED_COUNT" ]; then
+            echo "ECS_DESIRED_COUNT not set, defaulting to 1"
+            ECS_DESIRED_COUNT="1"
+          fi
+          
           for region in $AWS_REGIONS; do
             echo "Update ECS services in $region"
-            aws ecs update-service --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count 2 | jq ".service.deployments[].id" &
+            aws ecs update-service --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count $ECS_DESIRED_COUNT | jq ".service.deployments[].id" &
           done
           
           wait
