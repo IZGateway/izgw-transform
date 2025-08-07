@@ -211,7 +211,7 @@ jobs:
           fi
           
           for region in $AWS_REGIONS; do
-            echo "Update ECS services in $region"
+            echo "Update ECS services in $region (starting $ECS_DESIRED_COUNT containers)"
             aws ecs update-service --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count $ECS_DESIRED_COUNT | jq ".service.deployments[].id" &
           done
           
