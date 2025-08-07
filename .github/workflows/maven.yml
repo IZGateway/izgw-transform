@@ -188,10 +188,10 @@ jobs:
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
 
-        # AWS_REGIONS can be set in GitHub Settings → Secrets and variables → Actions
+        # AWS_REGIONS can be set in GitHub Settings -> Secrets and variables -> Actions -> Variables -> Repository Variables
         # Format: space-separated regions (e.g., "us-east-1 us-west-2")
         # Default of us-east-1 will be used if this is not set
-        # ECS_DESIRED_COUNT can be set in GitHub Settings -> Secrets and variables -> Actions
+        # ECS_DESIRED_COUNT can be set in GitHub Settings -> Secrets and variables -> Actions -> Variables -> Repository Variables
         # This is used to know how many container instances to start. Default is 1 if not set
       - name: Update ECS service to force new deployment of latest image
         env:
