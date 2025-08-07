@@ -421,8 +421,8 @@
 						<SSL_SHARE>${project.build.directory}</SSL_SHARE>
 						<COMMON_PASS>${xform.testing.common.pass}</COMMON_PASS>
                         <XFORM_INIT>true</XFORM_INIT>
-                        <XFORM_INIT_CERTIFICATE_PATH>${project.build.directory}/self_signed_unit_tests.crt</XFORM_INIT_CERTIFICATE_PATH>
-                        <XFORM_INIT_KEY_PATH>${project.build.directory}/self_signed_unit_tests.key</XFORM_INIT_KEY_PATH>
+                        <XFORM_CRYPTO_CLIENT_CERT_FILE>${project.build.directory}/self_signed_unit_tests.crt</XFORM_CRYPTO_CLIENT_CERT_FILE>
+                        <XFORM_CRYPTO_CLIENT_KEY_FILE>${project.build.directory}/self_signed_unit_tests.key</XFORM_CRYPTO_CLIENT_KEY_FILE>
                         <XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE>${project.build.directory}/awsdev_keystore.bcfks</XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE>
                         <XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE>${project.build.directory}/izgw_client_trust.bcfks</XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE>
                         <XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE>${project.build.directory}/awsdev_keystore.bcfks</XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE>
