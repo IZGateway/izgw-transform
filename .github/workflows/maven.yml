@@ -188,21 +188,19 @@ jobs:
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
 
+        # AWS_REGIONS can be set in GitHub Settings → Secrets and variables → Actions
+        # Format: space-separated regions (e.g., "us-east-1 us-west-2")
+        # Default of us-east-1 will be used if this is not set
       - name: Update ECS service to force new deployment of latest image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: transformation-service
         run: |
-          # AWS_REGIONS can be set in GitHub Settings → Secrets and variables → Actions
-          # Format: space-separated regions (e.g., "us-east-1 us-west-2")
-
-          # Set default region if AWS_REGIONS isn't configured
           if [ -z "$AWS_REGIONS" ]; then
             echo "AWS_REGIONS not set, defaulting to us-east-1"
             AWS_REGIONS="us-east-1"
           fi
           
-          # Start deployments in all regions configured via AWS_REGIONS environment variable
           for region in $AWS_REGIONS; do
             echo "Update ECS services in $region"
             aws ecs update-service --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count 2 | jq ".service.deployments[].id" &
