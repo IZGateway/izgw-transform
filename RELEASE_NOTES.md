@@ -1,3 +1,6 @@
+# IZ Gateway Transformation Service 0.9.1
+* IGDD-2155 Rebuild using latest base image to resolve CVE-2025-50106 and CVE-2025-30749
+
 # IZ Gateway Transformation Service 0.9.0
 * IGDD-2045 LogController now extends LogControllerBase from izgw-core, reduce duplicate code
 * IGDD-2063 Add Dependency Checker to GitHub Action
