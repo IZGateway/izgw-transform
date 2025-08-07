@@ -1,8 +1,5 @@
 name: Java CI with Maven
 
-env:
-  AWS_REGIONS: "us-east-1 us-west-2"
-
 on:
   pull_request:
     branches:
@@ -196,7 +193,16 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: transformation-service
         run: |
-          # Start deployments in all configured regions
+          # AWS_REGIONS can be set in GitHub Settings → Secrets and variables → Actions
+          # Format: space-separated regions (e.g., "us-east-1 us-west-2")
+
+          # Set default region if AWS_REGIONS isn't configured
+          if [ -z "$AWS_REGIONS" ]; then
+            echo "AWS_REGIONS not set, defaulting to us-east-1"
+            AWS_REGIONS="us-east-1"
+          fi
+          
+          # Start deployments in all regions configured via AWS_REGIONS environment variable
           for region in $AWS_REGIONS; do
             echo "Update ECS services in $region"
             aws ecs update-service --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count 2 | jq ".service.deployments[].id" &
@@ -205,7 +211,7 @@ jobs:
           wait
           
           for region in $AWS_REGIONS; do
-            echo "Wait for ECS servicestability in $region"
+            echo "Wait for ECS service stability in $region"
             aws ecs wait services-stable --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev &
           done
           
