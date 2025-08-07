@@ -197,6 +197,8 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: transformation-service
+          AWS_REGIONS: ${{ vars.AWS_REGIONS }}
+          ECS_DESIRED_COUNT: ${{ vars.ECS_DESIRED_COUNT }}
         run: |
           if [ -z "$AWS_REGIONS" ]; then
             echo "AWS_REGIONS not set, defaulting to us-east-1"
