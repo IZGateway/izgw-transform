@@ -1,6 +1,7 @@
 &larr;[Back to README](../README.md)
 
 ---
+# NOTE: 7-Aug-2025 This .md may go away - this is a temporary document until test is complete and we figure out how we want to integrate with the current quick start doc.
 
 # Get Running Quick
 
@@ -12,53 +13,42 @@ This document aims to get Transformation Service up and running in minutes. Leav
 
 ## Up and Running Quickly—Docker
 
-### 1. Clone repository
+### 1. Setup your local environment
 
 ```shell
-git clone git@github.com:IZGateway/izgw-transform.git
-cd izgw-transform
+possibly a cd or mkdir, tbd...  
 ```
 
-### 2. Build Project & Docker Image
+### 2. Run the image in a Docker container
 
 ```shell
-mvn clean install
-```
-
-This will build the code and then build and tag a Docker image locally as izgw-transform:latest.
-
-### 3. Run Transformation Service Docker Container
-
-```shell
-docker run --name=local-xform \
--e SSL_SHARE=/target \
--e XFORM_CONFIGURATIONS_DIRECTORY=/docs/quickstart/configuration \
--e COMMON_PASS=XFORM_TESTING_COMMON_PASS \
---volume=./target:/target \
---volume=./docs:/docs \
+docker run \
+--network dynamodb-network \
+--env='COMMON_PASS=FIXTHIS' \
+--env=XFORM_DESTINATION_HUB_URI=https://dev.izgateway.org/IISHubService \
+--env=XFORM_SERVER_PORT=444 \
+--env=XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE=/ssl/dev_key_and_cert_plus_phiz_certs_keystore.bcfks \
+--env=XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE=/ssl/dev_key_and_cert_plus_phiz_certs_keystore.bcfks \
+--env=XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE=/ssl/truststore.bcfks \
+--env=XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE=/ssl/dev_key_and_cert_plus_phiz_certs_keystore.bcfks \
+--env=XFORM_INIT=true \
+--env=XFORM_CONFIGURATIONS_DIRECTORY=/usr/share/izg-transform/quickstart/configuration \
+--env=XFORM_CRYPTO_CLIENT_CERT_FILE=/ssl/client-cert.pem \
+--env=XFORM_CRYPTO_CLIENT_KEY_FILE=/ssl/client-key.pem \
+--volume=/Users/cahilp/projects/izg-transform-code/izgw-transform/initial:/configuration \
+--volume=/Users/cahilp/ssl-new:/ssl \
 -p 444:444 \
-izgw-transform:latest
+-d \
+ghcr.io/izgateway/izgw-transform:latest
 ```
 
-Similar to running locally, you should see these log entries on the console:
+
+You should see these log entries on the console:
 
 ```json
 {"@timestamp":"2025-06-17T21:36:51.262972-04:00","@version":"1","message":"Xform application loaded","logger_name":"gov.cdc.izgateway.xform.Application","thread_name":"Xform Service","level":"INFO","level_value":20000}
 {"@timestamp":"2025-06-17T21:36:51.263036-04:00","@version":"1","message":"Build: xform-0.8.0-202506172057","logger_name":"gov.cdc.izgateway.xform.Application","thread_name":"Xform Service","level":"INFO","level_value":20000}
 ```
-
-## Environment Variable Explanation
-
-The above commands to execute Transformation Service use these bare minimum configuration options:
-
-- SSL_SHARE &rarr; The directory containing keystore files necessary for server SSL and for mTLS
-    - The build process generates self-signed files for use in unit testing, which we are using here for local testing
-    - See [Transformation Service SSL/Keystore File Reference](./KEYSTORE_FILES.md) for more details on the necessary ssl/keystore files
-- COMMON_PASS &rarr; Password used to access the keystore files in the specified SSL_SHARE directory
-- XFORM_CONFIGURATIONS_DIRECTORY &rarr; The directory containing application configuration for the system once running
-    - This contains a bare minimum set of configuration files to run locally
-
-There are _many_ other configuration properties needed for proper Transformation Service execution. The above three work for local configuration because the default settings are appropriate in this case. For a full explanation of all configuration options please see the [Transformation Service Configuration Reference](./CONFIGURATION_REFERENCE.md)
 
 ## Example Calls
 
@@ -125,6 +115,18 @@ This should result in the following output:
 </soap:Envelope>
 ```
 
+## Environment Variable Explanation
+
+The above commands to execute Transformation Service use these bare minimum configuration options:
+
+- SSL_SHARE &rarr; The directory containing keystore files necessary for server SSL and for mTLS
+    - The build process generates self-signed files for use in unit testing, which we are using here for local testing
+    - See [Transformation Service SSL/Keystore File Reference](./KEYSTORE_FILES.md) for more details on the necessary ssl/keystore files
+- COMMON_PASS &rarr; Password used to access the keystore files in the specified SSL_SHARE directory
+- XFORM_CONFIGURATIONS_DIRECTORY &rarr; The directory containing application configuration for the system once running
+    - This contains a bare minimum set of configuration files to run locally
+
+There are _many_ other configuration properties needed for proper Transformation Service execution. The above three work for local configuration because the default settings are appropriate in this case. For a full explanation of all configuration options please see the [Transformation Service Configuration Reference](./CONFIGURATION_REFERENCE.md)
 ---
 
 &larr;[Back to README](../README.md)

@@ -45,6 +45,9 @@ COPY docker/data/lib/bcfips/*.jar /usr/share/izg-transform/lib/bcfips/
 # Copy aspectjweaver and spring-instrument jars
 COPY docker/data/lib/*.jar /usr/share/izg-transform/lib/
 
+# Copy docs/quickstart to the image
+COPY docs/quickstart /usr/share/izg-transform/quickstart
+
 # Add izgw-transform jar file
 ADD target/$JAR_FILENAME app.jar
 
