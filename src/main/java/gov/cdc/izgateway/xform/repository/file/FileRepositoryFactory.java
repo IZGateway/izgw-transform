@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 //Allow operation of hub and xform service in same configuration
-@ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('jpa') || '${spring.database:}'.equalsIgnoreCase('file')")
+@ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('jpa') || '${spring.database:file}'.equalsIgnoreCase('file')")
 public class FileRepositoryFactory implements RepositoryFactory {
 
     private final String accessControlFilePath;
