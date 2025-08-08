@@ -24,7 +24,7 @@ possibly a cd or mkdir, tbd...
 ```shell
 docker run \
 --network dynamodb-network \
---env='COMMON_PASS=FIXTHIS' \
+--env='COMMON_PASS=apassword' \
 --env=XFORM_DESTINATION_HUB_URI=https://dev.izgateway.org/IISHubService \
 --env=XFORM_SERVER_PORT=444 \
 --env=XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE=/ssl/dev_key_and_cert_plus_phiz_certs_keystore.bcfks \
@@ -35,11 +35,10 @@ docker run \
 --env=XFORM_CONFIGURATIONS_DIRECTORY=/usr/share/izg-transform/quickstart/configuration \
 --env=XFORM_CRYPTO_CLIENT_CERT_FILE=/ssl/client-cert.pem \
 --env=XFORM_CRYPTO_CLIENT_KEY_FILE=/ssl/client-key.pem \
---volume=/Users/cahilp/projects/izg-transform-code/izgw-transform/initial:/configuration \
---volume=/Users/cahilp/ssl-new:/ssl \
+--volume=/Users/cahilp/temp/20250808/ssl:/ssl \
 -p 444:444 \
 -d \
-ghcr.io/izgateway/izgw-transform:latest
+izgw-transform:latest
 ```
 
 
