@@ -282,7 +282,7 @@ jobs:
      
       - name: List .m2 directory on build failure
         if: ${{ failure() }}
-        run: ls -la ~/.m2 > m2-directory.txt
+        run: ls -laR ~/.m2 > m2-directory.txt
                                
       - name: Upload build environment as artifact for failed build
         uses: actions/upload-artifact@v4
