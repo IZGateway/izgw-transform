@@ -82,13 +82,38 @@ There is an [example_message.xml](./quickstart/example_message.xml) file which w
 Execute the following command:
 
 ```shell
-curl -X POST -k \
---cert ./target/self_signed_unit_tests.crt \
---key ./target/self_signed_unit_tests.key \
---location 'https://localhost:444/IISHubService' \
---header 'x-loopback: true' \
+curl -v -k --cert ./ssl/client-cert.pem --key ./ssl/client-key.pem --location 'https://localhost:444/IISHubService' \
+--header 'Host: localhost' --header 'x-loopback: true' \
 --header 'Content-Type: application/xml' \
---data @./docs/quickstart/example_message.xml
+--data-raw '<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:cdc:iisb:hub:2014" xmlns:urn1="urn:cdc:iisb:2014">
+  <soap:Header xmlns:wsa="http://www.w3.org/2005/08/addressing">
+    <urn:HubRequestHeader>
+      <urn:DestinationId>dev</urn:DestinationId>
+    </urn:HubRequestHeader>
+    <wsa:Action>urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest</wsa:Action>
+    <wsa:MessageID>TS_TC_03</wsa:MessageID>
+  </soap:Header>
+  <soap:Body>
+    <urn1:SubmitSingleMessageRequest>
+      <urn1:FacilityID>IZG</urn1:FacilityID>
+      <urn1:Hl7Message>MSH|^~\&amp;|IZGATEWAY|FLHOSP1|FLSHOTS|FLSHOTS|20230809110858-0500||VXU^V04^VXU_V04|IZGIIS-IIS-PreTestVXU-IISA|X|2.5.1|||ER|AL|
+PID|1||DC1ADMIN^IZG-TEST^MR||BABYIZG^BABYIZG^AmeliaIZG^^L|BrunoIZG^EllaIZG^TeresaIZG^^M|20170723|F||2106-3^White^CDCREC~2054-5^Black or African American^CDCREC|123 Main Street^^TAMPA^FL^376041234^USA||(423) 364-3003^PRN^CP^1^215^5551213||eng^English^ISO639|||||||2135-2^Hispanic or Latino^CDCREC|||
+PD1|||||||||||02^Reminder/Recall - any method^HL70215|||||A|20150901|20150901|
+NK1|1|WinchesterIZG^EllaIZG^TeresaIZG^^^L|MTH^Mother^HL70063|5255 Loughboro Rd NW^^Tampa^FL^33601^USA^P|^PRN^PH^1^555^5551212NETizgatewaytesting@gmail.com|||||||||||||||||||||||||||^^^^43040-1234
+ORC|RE||197028^SP|||||||1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN||2223334445^Jones^Casey^^^^L^^NPI^^^^^^MD|||||DMC53427^IZ Gateway Clinic^HL70362|||||^^^^08540
+RXA|0|1|20200815|20200815|03^measles, mumps, rubella virus vaccine^CVX^00006-4681-01^MMR II^NDC|0.5|mLUCUM||02^Historical information - from other provider^NIP001|1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN|^DMC53427^^^4 First Street^PO Box^Tampa^FL^33601||||0934GG|20211231|MSD^Merck Sharp T Dohme Corp^MVX|||CP|A|
+RXR|C38299^Subcutaneous^NCIT^SC^Subcutaneous^HL70162|RA^Right Arm^HL70163|
+OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|2|V02^VFC eligible-Medicaid/Medicaid Managed Care^HL70064||||||F|||20201031||||||||
+OBX|2|CE|30963-3^Vaccine funding source^LN|2|VXC50^Public^CDCPHINVS||||||F|||20201031|
+ORC|RE||197028^SP|||||||1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN||2223334445^Jonesizg^Caseyizg^^^^L^^NPI^^^^^^MD|||||DMC53427^IZ Gateway Clinic^HL70362|||||^^^^129011234
+RXA|0|1|20211020||21^Varicella^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001|1112223334^GrecoIZG^AlanaIZG^^^^L^^NPI^^^^^^RN|^DMC53427^^^4 First Street^PO Box^Tampa^FL^33601||||U6329BP|20211231|MSD^Merck and Co^MVX|||CP|A|
+RXR|C38299NCIT|RA^HL70163|
+OBX|1|CE|64994-7^vaccine fund pgm elig cat^LN|1|V01^Not VFC elig^HL70064||||||F|||20210723|
+OBX|2|CE|30963-3^Vaccine funding source^LN|1|VXC50^Public^HL70064||||||F|||20220406|
+</urn1:Hl7Message>
+    </urn1:SubmitSingleMessageRequest>
+  </soap:Body>
+</soap:Envelope>'
 ```
 
 This should result in the following output:
