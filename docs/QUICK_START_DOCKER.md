@@ -62,8 +62,8 @@ In a _real_ scenario, you would be using valid keystores and client certificate.
 In this example, we call the Pipelines API endpoint using the HTTP method GET. This will pull back a list of Pipelines configured in the running system.
 
 ```shell
-curl -X GET -k --cert ./target/self_signed_unit_tests.crt \
---key ./target/self_signed_unit_tests.key \
+curl -X GET -k --cert ./client-cert.pem \
+--key ./client-key.pem \
 --location 'https://localhost:444/api/v1/pipelines'
 ```
 
