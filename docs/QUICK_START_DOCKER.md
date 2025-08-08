@@ -23,18 +23,15 @@ mkdir -p $HOME/xform/ssl && cd $HOME/xform/ssl
 
 ```shell
 docker run \
---network dynamodb-network \
---env='COMMON_PASS=apassword' \
---env=XFORM_DESTINATION_HUB_URI=https://dev.izgateway.org/IISHubService \
---env=XFORM_SERVER_PORT=444 \
---env=XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE=/ssl/dev_key_and_cert_plus_phiz_certs_keystore.bcfks \
---env=XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE=/ssl/dev_key_and_cert_plus_phiz_certs_keystore.bcfks \
---env=XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE=/ssl/truststore.bcfks \
---env=XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE=/ssl/dev_key_and_cert_plus_phiz_certs_keystore.bcfks \
 --env=XFORM_INIT=true \
---env=XFORM_CONFIGURATIONS_DIRECTORY=/usr/share/izg-transform/quickstart/configuration \
+--env='COMMON_PASS=apassword' \
 --env=XFORM_CRYPTO_CLIENT_CERT_FILE=/ssl/client-cert.pem \
 --env=XFORM_CRYPTO_CLIENT_KEY_FILE=/ssl/client-key.pem \
+--env=XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE=/ssl/server_and_client_keystore.bcfks \
+--env=XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE=/ssl/server_and_client_keystore.bcfks \
+--env=XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE=/ssl/server-truststore.bcfks \
+--env=XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE=/ssl/server_and_client_keystore.bcfks \
+--env=XFORM_CONFIGURATIONS_DIRECTORY=/usr/share/izg-transform/quickstart/configuration \
 --volume=$HOME/xform/ssl:/ssl \
 -p 444:444 \
 -d \
