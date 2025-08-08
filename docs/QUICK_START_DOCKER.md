@@ -14,9 +14,10 @@ This document aims to get Transformation Service up and running in minutes. Leav
 ## Up and Running Quickly—Docker
 
 ### 1. Setup your local environment
-
+Create a local directory to hold the necessary SSL/keystore files. For this example, we will use `~/xform/ssl` as the directory.
 ```shell
-possibly a cd or mkdir, tbd...  
+mkdir -p ~/xform/ssl && cd ~/xform/ssl
+  
 ```
 
 ### 2. Run the image in a Docker container
@@ -35,10 +36,10 @@ docker run \
 --env=XFORM_CONFIGURATIONS_DIRECTORY=/usr/share/izg-transform/quickstart/configuration \
 --env=XFORM_CRYPTO_CLIENT_CERT_FILE=/ssl/client-cert.pem \
 --env=XFORM_CRYPTO_CLIENT_KEY_FILE=/ssl/client-key.pem \
---volume=/Users/cahilp/temp/20250808/ssl:/ssl \
+--volume=~/xform/ssl:/ssl \
 -p 444:444 \
 -d \
-izgw-transform:latest
+ghcr.io/izgateway/izgw-transform:latest
 ```
 
 
