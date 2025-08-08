@@ -82,7 +82,7 @@ There is an [example_message.xml](./quickstart/example_message.xml) file which w
 Execute the following command:
 
 ```shell
-curl -v -k --cert ./ssl/client-cert.pem --key ./ssl/client-key.pem --location 'https://localhost:444/IISHubService' \
+curl -v -k --cert ./client-cert.pem --key ./client-key.pem --location 'https://localhost:444/IISHubService' \
 --header 'Host: localhost' --header 'x-loopback: true' \
 --header 'Content-Type: application/xml' \
 --data-raw '<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:urn="urn:cdc:iisb:hub:2014" xmlns:urn1="urn:cdc:iisb:2014">
