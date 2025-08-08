@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.8</version>
+		<version>3.5.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
@@ -22,8 +22,8 @@
 		<project.build.finalName>${project.artifactId}-${project.version}-${timestamp}</project.build.finalName>
 		<image.tag>${project.build.finalName}</image.tag>
 		<buildno>${timestamp}</buildno>
-		<logback.version>1.5.16</logback.version>
-		<camel.version>4.10.2</camel.version>
+		<camel.version>4.13.0</camel.version>
+		<commons-lang3.version>3.18.0</commons-lang3.version>
 		<xform.testing.common.pass>XFORM_TESTING_COMMON_PASS</xform.testing.common.pass>
 	</properties>
 	<repositories>
@@ -175,18 +175,11 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents.client5</groupId>
 			<artifactId>httpclient5</artifactId>
-			<version>5.4.4</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>izgw-core</artifactId>
-			<version>2.2.1-izgw-core-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.mysql</groupId>
-					<artifactId>mysql-connector-j</artifactId>
-				</exclusion>
-			</exclusions>
+			<version>2.2.2-izgw-core-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -207,7 +200,7 @@
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.8.2</version>
+			<version>2.8.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -222,20 +215,20 @@
 			<artifactId>v2tofhir</artifactId>
 			<version>1.0.0-v2tofhir-SNAPSHOT</version>
 		</dependency>
-		<!-- v2tofhir pulls in
-		     ca.uhn.hapi.fhir:org.hl7.fhir.dstu2:jar:6.1.2.2
-		     ca.uhn.hapi.fhir:org.hl7.fhir.convertors:jar:6.1.2.2
-		     ca.uhn.hapi.fhir:org.hl7.fhir.validation:jar:6.1.2.2
-			 Both with CVE-2024-51132, 6.4.0 is fix version
-			 org.fhir:ucum:jar:1.0.8 with CVE-2024-55887, 1.0.9 is the fix version
-		-->
 		<!-- v2tofhir dependency opencsv 5.11 (latest version) pulls 1.10.0 with vulnerability, override -->
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
 			<version>1.11.0</version>
 		</dependency>
-		<dependency>
+        <!-- v2tofhir pulls in
+             ca.uhn.hapi.fhir:org.hl7.fhir.dstu2:jar:6.1.2.2
+             ca.uhn.hapi.fhir:org.hl7.fhir.convertors:jar:6.1.2.2
+             ca.uhn.hapi.fhir:org.hl7.fhir.validation:jar:6.1.2.2
+             Both with CVE-2024-51132, 6.4.0 is fix version
+             org.fhir:ucum:jar:1.0.8 with CVE-2024-55887, 1.0.9 is the fix version
+        -->
+        <dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>org.hl7.fhir.dstu2</artifactId>
 			<version>6.4.0</version>
@@ -329,7 +322,7 @@
 							<configLocation>ai-checkstyle.xml</configLocation>
 							<consoleOutput>true</consoleOutput>
 							<failsOnError>true</failsOnError>
-							<!-- Optionally, specify the location of the violations file -->
+                            <!-- Optionally, specify the location of the violations file -->
 							<outputFile>${project.build.directory}/checkstyle-result.xml</outputFile>
 						</configuration>
 					</execution>
@@ -423,7 +416,7 @@
 						<configuration>
 							<target>
 
-								<!-- Find the bc-fips JAR file -->
+                                <!-- Find the bc-fips JAR file -->
 								<pathconvert property="bcfips.jar.path">
 									<fileset dir="${project.basedir}/docker/data/lib/bcfips">
 										<include name="bc-fips-*.jar"/>
@@ -591,25 +584,25 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<!-- Since all libraries are deliverable, this should in fact be
+                <!-- Since all libraries are deliverable, this should in fact be
                             the only dependency check required.
                          -->
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
 				<version>12.1.1</version>
 				<configuration>
-					<!--nvdApiKey>${env.NVDAPIKEY}</nvdApiKey-->
+                    <!--nvdApiKey>${env.NVDAPIKEY}</nvdApiKey-->
 					<formats>
 						<format>html</format>
 						<format>json</format>
 					</formats>
-					<!-- Disable .NET Analyzer -->
+                    <!-- Disable .NET Analyzer -->
 					<assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
 					<nugetconfAnalyzerEnabled>false</nugetconfAnalyzerEnabled>
 					<nuspecAnalyzerEnabled>false</nuspecAnalyzerEnabled>
-					<!-- Fail builds where this is used to 7 High to Critical -->
+                    <!-- Fail builds where this is used to 7 High to Critical -->
 					<failBuildOnCVSS>7</failBuildOnCVSS>
-					<!-- Don't fail on error (for cases where CVE REPO is bad) -->
+                    <!-- Don't fail on error (for cases where CVE REPO is bad) -->
 					<failOnError>false</failOnError>
 					<skip>${skipDependencyCheck}</skip>
 					<suppressionFile>${project.basedir}/dependency-suppression.xml</suppressionFile>
@@ -624,4 +617,13 @@
 			</plugin>
 		</plugins>
 	</build>
+	<dependencyManagement>
+		<dependencies>
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>10.4.1</version>
+            </dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
