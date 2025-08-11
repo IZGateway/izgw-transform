@@ -37,7 +37,6 @@ public class DataMigrationRunner implements ApplicationRunner {
 
         if ( !lockService.acquireLock() ) {
             // Wait until the migration is complete
-            // This is a blocking call, it will wait until the lock is released
             log.info("Waiting for migration lock to be released by another node...");
             while (lockService.isMigrationInProgress()) {
                 try {
@@ -67,7 +66,6 @@ public class DataMigrationRunner implements ApplicationRunner {
             throw new RuntimeException("Migration failed: " + e.getMessage(), e);
         } finally {
             lockService.releaseLock();
-            log.info("Migration lock released");
         }
     }
 

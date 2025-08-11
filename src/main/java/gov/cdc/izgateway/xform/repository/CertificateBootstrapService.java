@@ -63,6 +63,10 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
 
     private volatile boolean initialized = false;
 
+    /**
+     * Handles the ApplicationEnvironmentPreparedEvent to trigger certificate and keystore/truststore initialization.
+     * @param event the Spring application environment prepared event
+     */
     @Override
     public void onApplicationEvent(@Nullable ApplicationEnvironmentPreparedEvent event) {
         if (!performInitialization()) return;
@@ -78,6 +82,10 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
         log.info("CertificateBootstrapService has completed.");
     }
 
+    /**
+     * Checks if initialization should be performed and loads required environment variables.
+     * @return true if initialization should proceed, false otherwise
+     */
     private boolean performInitialization() {
         if (initialized) {
             log.debug("CertificateBootstrapService already initialized, skipping...");
@@ -102,6 +110,10 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
         return true;
     }
 
+    /**
+     * Creates the initial client certificate, saves it and the private key, and updates trust/key stores.
+     * @throws CertificateBootstrapException if any error occurs during the process
+     */
     private void createInitialClientCertificateAndTrust() throws CertificateBootstrapException {
         try {
             Path certFile = Paths.get(certPath);
@@ -126,6 +138,13 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
         }
     }
 
+    /**
+     * Loads an existing keystore or creates a new one if it does not exist.
+     * @param keyStorePath the path to the keystore file
+     * @param password the keystore password
+     * @return the loaded or newly created KeyStore
+     * @throws CertificateBootstrapException if loading or creation fails
+     */
     private KeyStore loadOrCreateKeyStore(String keyStorePath, String password) throws CertificateBootstrapException {
         try {
             File keyStoreFile = new File(keyStorePath);
@@ -148,6 +167,13 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
         }
     }
 
+    /**
+     * Saves the given KeyStore to the specified file path.
+     * @param keyStore the KeyStore to save
+     * @param keyStorePath the file path to save the KeyStore
+     * @param password the password for the KeyStore
+     * @throws CertificateBootstrapException if saving fails
+     */
     private void saveKeyStore(KeyStore keyStore, String keyStorePath, String password) throws CertificateBootstrapException {
         try {
             FileOutputStream fos = new FileOutputStream(keyStorePath);
@@ -159,6 +185,13 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
         }
     }
 
+    /**
+     * Adds the given certificate to the specified trust store.
+     * @param certificate the X509 certificate to add
+     * @param trustStorePath the trust store file path
+     * @param password the trust store password
+     * @throws CertificateBootstrapException if the operation fails
+     */
     private void addCertificateToTrustStore(X509Certificate certificate, String trustStorePath, String password) throws CertificateBootstrapException {
         try {
             KeyStore trustStore = loadOrCreateKeyStore(trustStorePath, password);
@@ -180,6 +213,14 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
         }
     }
 
+    /**
+     * Adds the given certificate and private key to the specified key store.
+     * @param certificate the X509 certificate to add
+     * @param keyPair the key pair containing the private key
+     * @param keyStorePath the key store file path
+     * @param password the key store password
+     * @throws CertificateBootstrapException if the operation fails
+     */
     private void addCertificateAndKeyToKeyStore(X509Certificate certificate, KeyPair keyPair, String keyStorePath, String password) throws CertificateBootstrapException {
         try {
             KeyStore keyStore = loadOrCreateKeyStore(keyStorePath, password);
@@ -190,6 +231,11 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
         }
     }
 
+    /**
+     * Generates a new RSA key pair using the Bouncy Castle FIPS provider.
+     * @return the generated KeyPair
+     * @throws CertificateBootstrapException if key generation fails
+     */
     private KeyPair generateKeyPair() throws CertificateBootstrapException {
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_ALGORITHM, PROVIDER);
@@ -199,6 +245,13 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
             throw new CertificateBootstrapException("Failed to add Bouncy Castle FIPS provider", e);
         }
     }
+
+    /**
+     * Generates a self-signed X509 certificate for the given key pair.
+     * @param keyPair the key pair to use for the certificate
+     * @return the generated X509Certificate
+     * @throws CertificateBootstrapException if certificate generation fails
+     */
     private X509Certificate generateSelfSignedCertificate(KeyPair keyPair) throws CertificateBootstrapException {
         try {
             X500Name subject = new X500Name("CN=xform.local.testing.only, O=izgateway");
@@ -229,6 +282,12 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
         }
     }
 
+    /**
+     * Saves the given X509 certificate to a file in PEM format.
+     * @param certificate the certificate to save
+     * @param path the file path to save the certificate
+     * @throws CertificateBootstrapException if saving fails
+     */
     private void saveCertificate(X509Certificate certificate, Path path) throws CertificateBootstrapException {
         try {
             Files.createDirectories(path.getParent());
@@ -244,6 +303,12 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
 
     }
 
+    /**
+     * Saves the given private key to a file in PEM format.
+     * @param privateKey the private key to save
+     * @param path the file path to save the private key
+     * @throws CertificateBootstrapException if saving fails
+     */
     private void savePrivateKey(PrivateKey privateKey, Path path) throws CertificateBootstrapException {
         try {
             Files.createDirectories(path.getParent());

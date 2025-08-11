@@ -35,7 +35,7 @@ public class MigrationLockService {
             }
 
             Event event = new Event();
-            event.setName("Migration");
+            event.setName(Event.MIGRATION);
             event.setStarted(Instant.now());
             eventRepository.createEntity(event);
             log.info("Migration lock acquired by node: {}", event.getReportedBy());
