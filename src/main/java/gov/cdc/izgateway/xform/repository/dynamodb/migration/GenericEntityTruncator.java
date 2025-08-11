@@ -9,9 +9,8 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import java.util.Set;
 
 /**
- * Generic migrator for entities that extend from BaseModel
- *
- * @param <T> Entity type to migrate
+ * Truncates (deletes) all entities of a given type from DynamoDB storage.
+ * Uses a generic repository to perform deletion for any entity extending BaseModel.
  */
 @Slf4j
 public class GenericEntityTruncator<T extends BaseModel> implements EntityTruncator<T> {
@@ -19,6 +18,12 @@ public class GenericEntityTruncator<T extends BaseModel> implements EntityTrunca
     private final GenericDynamoDBRepository<T> dynamoDbRepository;
     private final Class<T> entityClass;
 
+    /**
+     * Constructs a GenericEntityTruncator for the specified entity type and DynamoDB table.
+     * @param entityClass the class of the entity
+     * @param dynamoDbClient the DynamoDB enhanced client
+     * @param tableName the name of the DynamoDB table
+     */
     public GenericEntityTruncator(Class<T> entityClass,
                                   DynamoDbEnhancedClient dynamoDbClient,
                                   String tableName) {
@@ -26,6 +31,10 @@ public class GenericEntityTruncator<T extends BaseModel> implements EntityTrunca
         this.dynamoDbRepository = new GenericDynamoDBRepositoryImpl<>(dynamoDbClient, tableName, entityClass);
     }
 
+    /**
+     * Deletes all entities of the specified type from the DynamoDB table.
+     * Logs progress and continues on errors.
+     */
     @Override
     public void truncate() {
         Set<T> entities = dynamoDbRepository.getEntitySet();
@@ -52,23 +61,36 @@ public class GenericEntityTruncator<T extends BaseModel> implements EntityTrunca
 
     }
 
+    /**
+     * Returns the class type of the entity.
+     * @return the entity class
+     */
     @Override
     public Class<T> getEntityType() {
         return entityClass;
     }
 
+    /**
+     * Returns the simple name of the entity type.
+     * @return the entity name
+     */
     @Override
     public String getEntityName() {
         return entityClass.getSimpleName();
     }
 
-
     /**
-     * Generic DynamoDB repository implementation for migration
+     * Internal implementation of the generic DynamoDB repository for a specific entity type.
      */
     private static class GenericDynamoDBRepositoryImpl<T extends BaseModel> extends GenericDynamoDBRepository<T> {
         private final Class<T> entityClass;
 
+        /**
+         * Constructs the repository implementation for the given entity type and table.
+         * @param dynamoDbClient the DynamoDB enhanced client
+         * @param tableName the name of the DynamoDB table
+         * @param entityClass the class of the entity
+         */
         public GenericDynamoDBRepositoryImpl(DynamoDbEnhancedClient dynamoDbClient,
                                              String tableName,
                                              Class<T> entityClass) {
@@ -76,6 +98,10 @@ public class GenericEntityTruncator<T extends BaseModel> implements EntityTrunca
             this.entityClass = entityClass;
         }
 
+        /**
+         * Returns the simple name of the entity type.
+         * @return the entity name
+         */
         @Override
         protected String getEntityName() {
             return entityClass.getSimpleName();
