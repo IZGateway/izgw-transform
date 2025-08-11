@@ -2,8 +2,10 @@ package gov.cdc.izgateway.xform.repository.dynamodb.migration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -13,14 +15,18 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "spring.database", havingValue = "migrate")
+@ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('migrate') || '${spring.database:}'.equalsIgnoreCase('reinit')")
 public class DataMigrationRunner implements ApplicationRunner {
+    @Value("${xform.reinit:false}")
+    private boolean shouldReinitialize;
 
     private final DataMigrationService migrationService;
+    private final MigrationLockService lockService;
 
     @Autowired
-    public DataMigrationRunner(DataMigrationService migrationService) {
+    public DataMigrationRunner(DataMigrationService migrationService, MigrationLockService lockService) {
         this.migrationService = migrationService;
+        this.lockService = lockService;
     }
 
     @Override
@@ -28,8 +34,24 @@ public class DataMigrationRunner implements ApplicationRunner {
 
         log.info("Starting Data Migration from File Storage to DynamoDB");
 
+        if ( !lockService.acquireLock() ) {
+            // Wait until the migration is complete
+            // This is a blocking call, it will wait until the lock is released
+            log.info("Waiting for migration lock to be released by another node...");
+            while (lockService.isMigrationInProgress()) {
+                try {
+                    Thread.sleep(5000); // Check every 5 seconds
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.error("Migration wait interrupted", e);
+                }
+            }
+            log.warn("Migration has been completed by another node. Exiting.");
+            return;
+        }
+
         try {
-            boolean success = migrationService.migrateAll();
+            boolean success = migrationService.migrateAll(shouldReinitialize);
 
             if (success) {
                 log.info("Data Migration Completed Successfully");
@@ -42,6 +64,9 @@ public class DataMigrationRunner implements ApplicationRunner {
         } catch (Exception e) {
             log.error("Data Migration Failed", e);
             throw new RuntimeException("Migration failed: " + e.getMessage(), e);
+        } finally {
+            lockService.releaseLock();
+            log.info("Migration lock released");
         }
     }
 }

@@ -1,14 +1,7 @@
 package gov.cdc.izgateway.xform.repository.file;
 
 import gov.cdc.izgateway.common.HealthService;
-import gov.cdc.izgateway.xform.model.AccessControl;
-import gov.cdc.izgateway.xform.model.GroupRoleMapping;
-import gov.cdc.izgateway.xform.model.Mapping;
-import gov.cdc.izgateway.xform.model.OperationPreconditionField;
-import gov.cdc.izgateway.xform.model.Organization;
-import gov.cdc.izgateway.xform.model.Pipeline;
-import gov.cdc.izgateway.xform.model.Solution;
-import gov.cdc.izgateway.xform.model.User;
+import gov.cdc.izgateway.xform.model.*;
 import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import gov.cdc.izgateway.xform.repository.XformRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -129,5 +122,10 @@ public class FileRepositoryFactory implements RepositoryFactory {
             ur.setFilePath(userFilePath);
         }
         return ur;
+    }
+
+    @Override
+    public XformRepository<Event> eventRepository() {
+        return null;
     }
 }
