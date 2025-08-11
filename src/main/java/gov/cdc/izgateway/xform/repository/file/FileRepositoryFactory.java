@@ -5,11 +5,12 @@ import gov.cdc.izgateway.xform.model.*;
 import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import gov.cdc.izgateway.xform.repository.XformRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(name = "spring.database", havingValue = "file", matchIfMissing = true)
+//Allow operation of hub and xform service in same configuration
+@ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('jpa') || '${spring.database:file}'.equalsIgnoreCase('file')")
 public class FileRepositoryFactory implements RepositoryFactory {
 
     private final String accessControlFilePath;
