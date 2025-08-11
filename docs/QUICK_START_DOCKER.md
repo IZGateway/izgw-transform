@@ -140,14 +140,21 @@ This should result in the following output:
 
 The above commands to execute Transformation Service use these bare minimum configuration options:
 
-- SSL_SHARE &rarr; The directory containing keystore files necessary for server SSL and for mTLS
-    - The build process generates self-signed files for use in unit testing, which we are using here for local testing
-    - See [Transformation Service SSL/Keystore File Reference](./KEYSTORE_FILES.md) for more details on the necessary ssl/keystore files
-- COMMON_PASS &rarr; Password used to access the keystore files in the specified SSL_SHARE directory
-- XFORM_CONFIGURATIONS_DIRECTORY &rarr; The directory containing application configuration for the system once running
-    - This contains a bare minimum set of configuration files to run locally
 
-There are _many_ other configuration properties needed for proper Transformation Service execution. The above three work for local configuration because the default settings are appropriate in this case. For a full explanation of all configuration options please see the [Transformation Service Configuration Reference](./CONFIGURATION_REFERENCE.md)
----
+```shell
+- XFORM_INIT &rarr; When set to true, this will initialize the system on first run. This includes setting up an initial client cert and key that will be used to call Xform Service.
+- COMMON_PASS &rarr; Password used to access the keystore files
+- XFORM_CRYPTO_CLIENT_CERT_FILE &rarr; The client certificate file used to authenticate the client to the Xform Service
+- XFORM_CRYPTO_CLIENT_KEY_FILE &rarr; The client key file used to authenticate the client to the Xform Service
+- XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE &rarr; The file used to hold the server certificate and key
+- XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE &rarr; The file used to hold the client certificate and key used to call outbound to the Hub Service
+- XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE &rarr; The file used to hold the certificates that the server will trust for mTLS.
+- XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE &rarr; The file used to hold the certificates that the client will trust when calling outbound to the Hub Service.
+- XFORM_CONFIGURATIONS_DIRECTORY &rarr; The directory where the configuration files will exist.
+
+```
+
+
+There are _many_ other configuration properties needed for proper Transformation Service execution. The ones above work for local configuration because the default settings are appropriate in this case. For a full explanation of all configuration options please see the [Transformation Service Configuration Reference](./CONFIGURATION_REFERENCE.md)
 
 &larr;[Back to README](../README.md)

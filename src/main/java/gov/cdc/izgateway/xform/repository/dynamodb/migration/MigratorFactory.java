@@ -3,6 +3,7 @@ package gov.cdc.izgateway.xform.repository.dynamodb.migration;
 import gov.cdc.izgateway.configuration.DynamoDbConfig;
 import gov.cdc.izgateway.xform.model.BaseModel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(name = "spring.database", havingValue = "migrate")
+@ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('migrate') || '${spring.database:}'.equalsIgnoreCase('reinit')")
 public class MigratorFactory {
 
     private final DynamoDbEnhancedClient dynamoDbClient;

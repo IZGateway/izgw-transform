@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.xform.repository.dynamodb.migration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
@@ -17,8 +18,8 @@ import org.springframework.stereotype.Component;
 @Component
 @ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('migrate') || '${spring.database:}'.equalsIgnoreCase('reinit')")
 public class DataMigrationRunner implements ApplicationRunner {
-    @Value("${xform.reinit:false}")
-    private boolean shouldReinitialize;
+    @Value("${spring.database:}")
+    private String springDatabase;
 
     private final DataMigrationService migrationService;
     private final MigrationLockService lockService;
@@ -51,7 +52,7 @@ public class DataMigrationRunner implements ApplicationRunner {
         }
 
         try {
-            boolean success = migrationService.migrateAll(shouldReinitialize);
+            boolean success = migrationService.migrateAll(shouldReinitialize());
 
             if (success) {
                 log.info("Data Migration Completed Successfully");
@@ -68,5 +69,9 @@ public class DataMigrationRunner implements ApplicationRunner {
             lockService.releaseLock();
             log.info("Migration lock released");
         }
+    }
+
+    private boolean shouldReinitialize() {
+        return StringUtils.equalsIgnoreCase(springDatabase, "reinit");
     }
 }

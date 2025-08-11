@@ -126,6 +126,7 @@ public class FileRepositoryFactory implements RepositoryFactory {
 
     @Override
     public XformRepository<Event> eventRepository() {
+        // File-based event repository is not needed, it is only applicable for DynamoDB
         return null;
     }
 }
