@@ -55,8 +55,8 @@
         <cve>CVE-2018-1258</cve>
     </suppress>
     <suppress>
-        <notes>CVE-2025-5222 researching this as a false positive</notes>
-        <cpe>cpe:2.3:a:unicode:international_components_for_unicode:*:*:*:*:*:*:*:*</cpe>
+        <notes>CVE-2025-5222 false positive - affects ICU C++ not ICU4J Java</notes>
+        <packageUrl regex="true">^pkg:maven/com\.ibm\.icu/icu4j@.*$</packageUrl>
         <cve>CVE-2025-5222</cve>
     </suppress>
 </suppressions>
