@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-@ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('migrate') || '${spring.database:}'.equalsIgnoreCase('reinit')")
+@ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('migrate')")
 public class DataMigrationRunner implements ApplicationRunner {
     @Value("${spring.database:}")
     private String springDatabase;
@@ -51,7 +51,7 @@ public class DataMigrationRunner implements ApplicationRunner {
         }
 
         try {
-            boolean success = migrationService.migrateAll(shouldReinitialize());
+            boolean success = migrationService.migrateAll();
 
             if (success) {
                 log.info("Data Migration Completed Successfully");
@@ -67,9 +67,5 @@ public class DataMigrationRunner implements ApplicationRunner {
         } finally {
             lockService.releaseLock();
         }
-    }
-
-    private boolean shouldReinitialize() {
-        return StringUtils.equalsIgnoreCase(springDatabase, "reinit");
     }
 }

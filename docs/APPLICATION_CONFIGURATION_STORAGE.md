@@ -21,7 +21,6 @@ The type of storage is configured via the SPRING_DATABASE environment variable. 
     - This is the default if the environment variable is not set
 - dynamodb
 - migrate
-- reinit
 
 ### File-based Storage Configuration
 
@@ -136,7 +135,7 @@ The following permissions should cover what is needed:
 
 If you have existing configuration in files, you may have the application do a migration to DynamoDB.
 
-You would set SPRING_DATABASE to ```migrate```, or ```reinit```.  The difference between the two is that ```migrate``` will only migrate data from files to DynamoDB, while ```reinit``` will reinitialize the DynamoDB table, removing any existing data, and then will migrate data from files to the DynamoDB table.
+You would set SPRING_DATABASE to ```migrate``` to migrate the configuration files from a file store to a DynamoDB table.
 
 When running in migration mode, the application will look for the configuration files in the same way as it does for file-based storage.
 
@@ -159,7 +158,7 @@ The above assumes you are running multiple ECS containers. If you are running a 
 
 #### Example Migration Log
 
-When the application is started in Migration mode, you will be able to see log entries detailing what it is working on.  If the application is started in "reinit" mode it will also log that it is deleting existing data in the DynamoDB table before the migration happens.
+When the application is started in Migration mode, you will be able to see log entries detailing what it is working on.
 
 A shortened example follows:
 
@@ -172,21 +171,6 @@ Creating migrator for Solution with file path: testing/configuration/solutions.j
 Creating migrator for Pipeline with file path: testing/configuration/pipelines.json
 Creating migrator for AccessControl with file path: testing/configuration/access-control.json
 Creating migrator for Mapping with file path: testing/configuration/mappings.json
-<START OF TRUNCATION LOGS IF REINIT IS CONFIGURED>
-Creating truncator for Pipeline
-Creating truncator for AccessControl
-Truncating all existing data before migration...
-Truncating existing data for Pipeline...
-Found 1 Pipeline entities in file storage
-Truncated Pipeline: 6e6df3c3-78e7-478f-8c38-f6e937127b1c
-Successfully truncated 1/1 Pipeline
-Truncating existing data for AccessControl...
-Found 1 AccessControl entities in file storage
-Truncated AccessControl: cd0ed895-18ca-450d-b684-1c045c976139
-Successfully truncated 1/1 AccessControl
-All existing data truncated successfully.
-<REMOVED VERBOSENESS>
-<END OF TRUNCATION LOGS IF REINIT IS CONFIGURED>
 Starting Data Migration from File Storage to DynamoDB
 Starting data migration for 8 entity types
 Migrating GroupRoleMapping...

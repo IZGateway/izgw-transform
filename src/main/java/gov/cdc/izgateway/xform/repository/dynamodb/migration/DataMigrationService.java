@@ -14,12 +14,10 @@ import java.util.List;
 public class DataMigrationService {
 
     private final List<EntityMigrator<?>> migrators;
-    private final List<EntityTruncator<?>> truncators;
 
     @Autowired
-    public DataMigrationService(List<EntityMigrator<?>> migrators, List<EntityTruncator<?>> truncators) {
+    public DataMigrationService(List<EntityMigrator<?>> migrators) {
         this.migrators = migrators;
-        this.truncators = truncators;
     }
 
     /**
@@ -27,12 +25,7 @@ public class DataMigrationService {
      *
      * @return Migration success status
      */
-    public boolean migrateAll(boolean shouldReinitialize) {
-        if (shouldReinitialize) {
-            truncateAll();
-        } else {
-            log.info("Skipping data truncation as reinitialization is not requested.");
-        }
+    public boolean migrateAll() {
 
         log.info("Starting data migration for {} entity types", migrators.size());
 
@@ -63,20 +56,5 @@ public class DataMigrationService {
         }
 
         return overallSuccess;
-    }
-
-    private void truncateAll() {
-        log.info("Truncating all existing data before migration...");
-
-        for (EntityTruncator<?> tuncator : truncators) {
-            log.info("Truncating existing data for {}...", tuncator.getEntityName());
-            try {
-                tuncator.truncate();
-            } catch (Exception e) {
-                log.error("Failed to truncate {}: {}", tuncator.getEntityName(), e.getMessage(), e);
-            }
-        }
-
-        log.info("All existing data truncated successfully.");
     }
 }

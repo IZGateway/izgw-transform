@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Configuration
-@ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('migrate') || '${spring.database:}'.equalsIgnoreCase('reinit')")
+@ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('migrate')")
 public class MigratorFactory {
 
     private final DynamoDbEnhancedClient dynamoDbClient;
