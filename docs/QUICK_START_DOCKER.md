@@ -158,3 +158,4 @@ The above commands to execute Transformation Service use these bare minimum conf
 There are _many_ other configuration properties needed for proper Transformation Service execution. The ones above work for local configuration because the default settings are appropriate in this case. For a full explanation of all configuration options please see the [Transformation Service Configuration Reference](./CONFIGURATION_REFERENCE.md)
 
 &larr;[Back to README](../README.md)
+
