@@ -1,0 +1,2 @@
+# Register ApplicationListener for early initialization
+org.springframework.context.ApplicationListener=gov.cdc.izgateway.xform.repository.CertificateBootstrapService
