@@ -135,7 +135,9 @@ The following permissions should cover what is needed:
 
 If you have existing configuration in files, you may have the application do a migration to DynamoDB.
 
-You would set SPRING_DATABASE to ```migrate```.
+You would set SPRING_DATABASE to ```migrate``` to migrate the configuration files from a file store to a DynamoDB table.
+
+When running in migration mode, the application will look for the configuration files in the same way as it does for file-based storage.
 
 In addition, you will need to configure the options spelled out in the File-based and DynamoDB sections above. This is so that the application will know where to find the files containing data to migrate to DynamoDB.
 
@@ -143,7 +145,7 @@ In addition, you will need to configure the options spelled out in the File-base
 
 This assumes running multiple ECS containers
 
-1. Ensure the necessary DynamoDB table (See _AWS DynamoDB Table Setup_ section)
+1. Ensure the necessary DynamoDB table exists (See _AWS DynamoDB Table Setup_ section)
 2. Leave an existing, file-based task running so that the system is processing requests during migration
 3. Configure ECS task definition for migration as detailed above
 4. Start a new ECS task in the service using the migration definition

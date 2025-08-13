@@ -26,6 +26,7 @@ public class DataMigrationService {
      * @return Migration success status
      */
     public boolean migrateAll() {
+
         log.info("Starting data migration for {} entity types", migrators.size());
 
         boolean overallSuccess = true;

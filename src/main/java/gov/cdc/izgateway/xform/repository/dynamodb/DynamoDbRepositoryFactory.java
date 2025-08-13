@@ -1,14 +1,7 @@
 package gov.cdc.izgateway.xform.repository.dynamodb;
 
 import gov.cdc.izgateway.configuration.DynamoDbConfig;
-import gov.cdc.izgateway.xform.model.AccessControl;
-import gov.cdc.izgateway.xform.model.GroupRoleMapping;
-import gov.cdc.izgateway.xform.model.Mapping;
-import gov.cdc.izgateway.xform.model.OperationPreconditionField;
-import gov.cdc.izgateway.xform.model.Organization;
-import gov.cdc.izgateway.xform.model.Pipeline;
-import gov.cdc.izgateway.xform.model.Solution;
-import gov.cdc.izgateway.xform.model.User;
+import gov.cdc.izgateway.xform.model.*;
 import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import gov.cdc.izgateway.xform.repository.XformRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -31,6 +24,7 @@ public class DynamoDbRepositoryFactory implements RepositoryFactory {
     private PipelineRepository pr;
     private SolutionRepository sr;
     private UserRepository ur;
+    private EventRepository er;
 
     public DynamoDbRepositoryFactory(
             DynamoDbEnhancedClient dynamoDbClient,
@@ -101,5 +95,13 @@ public class DynamoDbRepositoryFactory implements RepositoryFactory {
             ur = new UserRepository(dynamoDbClient, tableName);
         }
         return ur;
+    }
+
+    @Override
+    public XformRepository<Event> eventRepository() {
+        if (er == null) {
+            er = new EventRepository(dynamoDbClient, tableName);
+        }
+        return er;
     }
 }
