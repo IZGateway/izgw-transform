@@ -304,7 +304,7 @@ jobs:
           ECR_REGISTRY: ${{ secrets.APHL_ECR_REGISTRY }}
           ECR_REPOSITORY: ${{ secrets.APHL_ECR_REPOSITORY }}
         run: |
-          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:izgw-transf-${{env.VERSION}}_${{github.run_number}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:izgw-transf-${{env.VERSION}}-${{github.run_number}}
           docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
      
       - name: List .m2 directory on build failure
