@@ -10,19 +10,24 @@ fi
 export SERVICE_NAME
 
 # Start filebeat and metricbeat if API key is provided
+FILEBEAT_STARTED=false
+METRICBEAT_STARTED=false
+
 if [[ $ELASTIC_API_KEY ]]; then
     if command -v filebeat >/dev/null 2>&1; then
         filebeat -e &
+        FILEBEAT_STARTED=true
         echo "Started Filebeat"
     else
-        echo "ERROR: filebeat not found"
+        echo "WARNING: filebeat not found - skipping filebeat monitoring"
     fi
     
     if command -v metricbeat >/dev/null 2>&1; then
         metricbeat -e &
+        METRICBEAT_STARTED=true
         echo "Started MetricBeat"
     else
-        echo "ERROR: metricbeat not found"
+        echo "WARNING: metricbeat not found - skipping metricbeat monitoring"
     fi
 else
     echo "Elastic logging not enabled"
@@ -30,17 +35,28 @@ fi
 
 # Monitor beats and exit container if they stop unexpectedly
 monitor_beats() {
+    local java_pid=$1  # Pass Java PID as parameter
     while true; do
         sleep 30
         if [[ $ELASTIC_API_KEY ]]; then
-            if ! pgrep -f "filebeat" > /dev/null; then
-                echo "Filebeat process has died unexpectedly. Stopping Transform serviceand container."
-                pkill -f "java.*app.jar" 2>/dev/null
+            # Only monitor filebeat if it was successfully started
+            if [[ $FILEBEAT_STARTED == "true" ]] && ! pgrep -f "filebeat" > /dev/null; then
+                echo "ALERT: Filebeat process has stopped unexpectedly. Stopping Transform service."
+                if [[ -n "$java_pid" ]]; then
+                    kill "$java_pid" 2>/dev/null
+                else
+                    echo "ERROR: Java PID not available, cannot terminate gracefully"
+                fi
                 exit 1
             fi
-            if ! pgrep -f "metricbeat" > /dev/null; then
-                echo "Metricbeat process has died unexpectedly. Stopping Transform service and container."
-                pkill -f "java.*app.jar" 2>/dev/null
+            # Only monitor metricbeat if it was successfully started
+            if [[ $METRICBEAT_STARTED == "true" ]] && ! pgrep -f "metricbeat" > /dev/null; then
+                echo "ALERT: Metricbeat process has stopped unexpectedly. Stopping Transform service."
+                if [[ -n "$java_pid" ]]; then
+                    kill "$java_pid" 2>/dev/null
+                else
+                    echo "ERROR: Java PID not available, cannot terminate gracefully"
+                fi
                 exit 1
             fi
         fi
@@ -70,12 +86,6 @@ then
     JAVA_TOOL_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000
 fi
 
-# Start monitoring in background if logging is enabled
-if [[ $ELASTIC_API_KEY ]]; then
-    monitor_beats &
-    echo "Started beat monitoring"
-fi
-
 # Start Java application
 java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaagent:lib/spring-instrument-5.3.8.jar \
    -XX:+CreateCoredumpOnCrash -cp "./lib/bcfips/*" \
@@ -91,7 +101,14 @@ java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaage
    -jar $jarfilename &
 
 JAVA_PID=$!
+export JAVA_PID
 echo "Started Java application with PID: $JAVA_PID"
+
+# Start monitoring in background if logging is enabled (after Java starts)
+if [[ $ELASTIC_API_KEY ]]; then
+    monitor_beats "$JAVA_PID" &
+    echo "Started beat monitoring with Java PID: $JAVA_PID"
+fi
 
 # Wait for the Java process to finish
 wait $JAVA_PID
