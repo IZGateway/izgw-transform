@@ -25,22 +25,8 @@ RUN (crontab -l 2>/dev/null; echo "*/15 * * * * /etc/periodic/daily/logrotate") 
 WORKDIR /
 # Install tini
 RUN apk add --no-cache tini
-
-# Install filebeat and metricbeat from Alpine packages or download directly
-RUN apk add --no-cache curl && \
-    mkdir -p /opt/beats && \
-    curl -L -o /tmp/filebeat.tar.gz https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.11.0-linux-x86_64.tar.gz && \
-    curl -L -o /tmp/metricbeat.tar.gz https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-8.11.0-linux-x86_64.tar.gz && \
-    tar xzf /tmp/filebeat.tar.gz -C /opt/beats && \
-    tar xzf /tmp/metricbeat.tar.gz -C /opt/beats && \
-    mv /opt/beats/filebeat-8.11.0-linux-x86_64 /filebeat && \
-    mv /opt/beats/metricbeat-8.11.0-linux-x86_64 /metricbeat && \
-    rm -rf /tmp/*.tar.gz /opt/beats && \
-    chmod +x /filebeat/filebeat /metricbeat/metricbeat
-
-# Add filebeat and metricbeat to PATH
-ENV PATH="/filebeat:/metricbeat:${PATH}"
-
+# Install filebeat
+# Install metricbeat
 # Rename default dnsmasq file to make sure dnsmasq does not read its entries
 RUN rm -f /filebeat/filebeat.yml && \
     cp /usr/share/izg-transform/filebeat.yml /filebeat/ && \
