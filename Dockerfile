@@ -23,9 +23,24 @@ COPY docker/data/logrotate.conf /etc/logrotate.conf
 RUN (crontab -l 2>/dev/null; echo "*/15 * * * * /etc/periodic/daily/logrotate") | crontab -
 
 WORKDIR /
+# Install tini
+RUN apk add --no-cache tini
 
-# Install filebeat
-# Install metricbeat
+# Install filebeat and metricbeat from Alpine packages or download directly
+RUN apk add --no-cache curl && \
+    mkdir -p /opt/beats && \
+    curl -L -o /tmp/filebeat.tar.gz https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.11.0-linux-x86_64.tar.gz && \
+    curl -L -o /tmp/metricbeat.tar.gz https://artifacts.elastic.co/downloads/beats/metricbeat/metricbeat-8.11.0-linux-x86_64.tar.gz && \
+    tar xzf /tmp/filebeat.tar.gz -C /opt/beats && \
+    tar xzf /tmp/metricbeat.tar.gz -C /opt/beats && \
+    mv /opt/beats/filebeat-8.11.0-linux-x86_64 /filebeat && \
+    mv /opt/beats/metricbeat-8.11.0-linux-x86_64 /metricbeat && \
+    rm -rf /tmp/*.tar.gz /opt/beats && \
+    chmod +x /filebeat/filebeat /metricbeat/metricbeat
+
+# Add filebeat and metricbeat to PATH
+ENV PATH="/filebeat:/metricbeat:${PATH}"
+
 # Rename default dnsmasq file to make sure dnsmasq does not read its entries
 RUN rm -f /filebeat/filebeat.yml && \
     cp /usr/share/izg-transform/filebeat.yml /filebeat/ && \
@@ -58,12 +73,9 @@ COPY docker/fatjar-run.sh run1.sh
 RUN tr -d '\r' <run1.sh >run.sh && \
     rm run1.sh
 
-# Add izgw-transform jar file
-ADD target/$JAR_FILENAME app.jar
-
 # Make scripts executable
 RUN ["chmod", "u+r+x", "run.sh"]
 
 ENV XFORM_VERSION=$XFORM_VERSION
 
-ENTRYPOINT ["sh","-c","crond && bash run.sh app.jar"]
+ENTRYPOINT ["/sbin/tini", "--", "sh", "-c", "crond && exec bash run.sh app.jar"]

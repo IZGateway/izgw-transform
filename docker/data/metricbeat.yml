@@ -17,6 +17,7 @@ metricbeat.modules:
     period: 60s
     metricsets:
       - task_stats
+    enabled: ${AWSFARGATE_ENABLED:true}  # Enabled by default, set to false to disable
 
 #================================= ES Output =================================
 # The Kibana section can be enabled to import dashboards and visualizations for specific Elastic Beats.

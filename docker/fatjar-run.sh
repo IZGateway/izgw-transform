@@ -2,30 +2,50 @@
 
 cd /usr/share/izg-transform || exit
 
-# Get Service Name from AWS for log reporting.
+# Get Service Name from AWS for log reporting
 SERVICE_NAME=unknown
-if [[ $ECS_CONTAINER_METADATA_URI_V4 ]]
-then
-    SERVICE_NAME=`curl -s $ECS_CONTAINER_METADATA_URI_V4 | jq -r '.Labels["com.amazonaws.ecs.container-name"]'`
+if [[ $ECS_CONTAINER_METADATA_URI_V4 ]]; then
+    SERVICE_NAME=$(curl -s $ECS_CONTAINER_METADATA_URI_V4 | jq -r '.Labels["com.amazonaws.ecs.container-name"]')
 fi
 export SERVICE_NAME
 
-# If an API Key has been given, then send data to elastic search.
-if [[ $ELASTIC_API_KEY ]]
-then
-    filebeat -e &
-    echo Started Filebeat
+# Start filebeat and metricbeat if API key is provided
+if [[ $ELASTIC_API_KEY ]]; then
+    if command -v filebeat >/dev/null 2>&1; then
+        filebeat -e &
+        echo "Started Filebeat"
+    else
+        echo "ERROR: filebeat not found"
+    fi
+    
+    if command -v metricbeat >/dev/null 2>&1; then
+        metricbeat -e &
+        echo "Started MetricBeat"
+    else
+        echo "ERROR: metricbeat not found"
+    fi
 else
-    echo Filebeat logging not enabled
+    echo "Elastic logging not enabled"
 fi
 
-if [[ $ELASTIC_API_KEY ]]
-then
-    metricbeat -e &
-    echo Started MetricBeat
-else
-    echo MetricBeat logging not enabled
-fi
+# Monitor beats and exit container if they stop unexpectedly
+monitor_beats() {
+    while true; do
+        sleep 30
+        if [[ $ELASTIC_API_KEY ]]; then
+            if ! pgrep -f "filebeat" > /dev/null; then
+                echo "Filebeat process has died unexpectedly. Stopping Transform serviceand container."
+                pkill -f "java.*app.jar" 2>/dev/null
+                exit 1
+            fi
+            if ! pgrep -f "metricbeat" > /dev/null; then
+                echo "Metricbeat process has died unexpectedly. Stopping Transform service and container."
+                pkill -f "java.*app.jar" 2>/dev/null
+                exit 1
+            fi
+        fi
+    done
+}
 
 jarfilename=$1
 
@@ -50,6 +70,13 @@ then
     JAVA_TOOL_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000
 fi
 
+# Start monitoring in background if logging is enabled
+if [[ $ELASTIC_API_KEY ]]; then
+    monitor_beats &
+    echo "Started beat monitoring"
+fi
+
+# Start Java application
 java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaagent:lib/spring-instrument-5.3.8.jar \
    -XX:+CreateCoredumpOnCrash -cp "./lib/bcfips/*" \
    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
@@ -61,5 +88,11 @@ java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaage
    -Xms4g \
    -Xmx8g \
    -Djava.library.path=lib \
-   -jar $jarfilename
+   -jar $jarfilename &
+
+JAVA_PID=$!
+echo "Started Java application with PID: $JAVA_PID"
+
+# Wait for the Java process to finish
+wait $JAVA_PID
 
