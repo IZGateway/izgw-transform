@@ -23,7 +23,8 @@ COPY docker/data/logrotate.conf /etc/logrotate.conf
 RUN (crontab -l 2>/dev/null; echo "*/15 * * * * /etc/periodic/daily/logrotate") | crontab -
 
 WORKDIR /
-
+# Install tini
+RUN apk add --no-cache tini
 # Install filebeat
 # Install metricbeat
 # Rename default dnsmasq file to make sure dnsmasq does not read its entries
@@ -58,12 +59,9 @@ COPY docker/fatjar-run.sh run1.sh
 RUN tr -d '\r' <run1.sh >run.sh && \
     rm run1.sh
 
-# Add izgw-transform jar file
-ADD target/$JAR_FILENAME app.jar
-
 # Make scripts executable
 RUN ["chmod", "u+r+x", "run.sh"]
 
 ENV XFORM_VERSION=$XFORM_VERSION
 
-ENTRYPOINT ["sh","-c","crond && bash run.sh app.jar"]
+ENTRYPOINT ["/sbin/tini", "--", "sh", "-c", "crond && exec bash run.sh app.jar"]
