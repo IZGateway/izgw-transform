@@ -33,4 +33,14 @@
   "userId" : "a67d65b5-07dd-40cc-b2ed-4ad9b5be0cd6",
   "active" : true,
   "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}, {
+  "id" : "5aa7e970-636e-4dd5-b3a2-bd7be2d1f2cd",
+  "userId" : "a573d101-527f-440d-a514-7f3b67fddb4e",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
+}, {
+  "id" : "9e3fb42c-1113-4664-888f-c70a2d73b945",
+  "userId" : "c9a9e2cc-3c0f-47d2-be2f-dabf00c38b71",
+  "active" : true,
+  "roles" : [ "admin", "xform-sender", "pipeline-reader", "pipeline-writer", "pipeline-deleter", "organization-reader", "organization-writer", "organization-deleter", "solution-reader", "solution-writer", "solution-deleter" ]
 } ]

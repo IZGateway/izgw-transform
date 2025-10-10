@@ -98,4 +98,14 @@
   "id" : "acb8d5c1-dd08-4a3f-8aaa-f6bf09b9210a",
   "active" : true,
   "commonName" : "Compatible next generation artificial intelligence"
+}, {
+  "organizationName" : "Red Giant Primary Care Network",
+  "id" : "4588481c-bcb7-4fdd-8c99-62eb440cbcaa",
+  "active" : true,
+  "commonName" : "akanuri.testing.izgateway.org"
+}, {
+  "organizationName" : "Saturn Ring Immunization Hub",
+  "id" : "4fe23506-14fb-4bc4-9ece-d34810ca935b",
+  "active" : true,
+  "commonName" : "ebrock.testing.izgateway.org"
 } ]
