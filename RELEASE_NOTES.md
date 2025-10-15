@@ -1,3 +1,18 @@
+# IZ Gateway Transformation Service 0.12.0
+IGDD-2226 Update GitHub Action to properly tag image pushed to APHL during release
+IGDD-2216 Update IZG Hub and Xform Service Docker containers to shutdown if there is a failure of any services
+IGDD-2052 Updated secret setting code to base64 decode the secret
+
+# IZ Gateway Transformation Service 0.11.0
+IGDD-2181 Update Github Actions to push Docker Images to new APHL environment
+IGDD-2184 Update versions of netty, spring-core, and bc-fips
+
+# IZ Gateway Transformation Service 0.10.0
+- IGDD-2171 Bump spring version for tomcat cve. Update for next release version
+- IGDD-2171 Update GSON and Camel to later versions
+- IGDD-2157 Update GitHub Action to deploy in multiple regions
+- IGDD-2046 Adding initialization capability for creating self-signed certs and re-initializing DynamoDB
+
 # IZ Gateway Transformation Service 0.9.1
 * IGDD-2155 Rebuild using latest base image to resolve CVE-2025-50106 and CVE-2025-30749
 
