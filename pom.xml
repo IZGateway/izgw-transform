@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.4</version>
+		<version>3.5.5</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
 	<artifactId>xform</artifactId>
-        <version>0.11.0</version>
+        <version>0.12.0</version>
 	<name>xform</name>
 	<description>IZ Gateway Xform Service</description>
 	<properties>
@@ -26,7 +26,8 @@
 		<commons-lang3.version>3.18.0</commons-lang3.version>
 		<xform.testing.common.pass>XFORM_TESTING_COMMON_PASS</xform.testing.common.pass>
         <tomcat.version>10.1.44</tomcat.version>
-        <spring-framework.version>6.2.10</spring-framework.version>
+        <spring-framework.version>6.2.11</spring-framework.version>
+        <spring-security.version>6.5.4</spring-security.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -468,7 +469,7 @@
             <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-bom</artifactId>
-                <version>4.2.5.Final</version>
+                <version>4.2.6.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

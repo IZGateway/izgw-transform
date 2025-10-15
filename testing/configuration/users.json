@@ -43,5 +43,14 @@
   "id" : "a67d65b5-07dd-40cc-b2ed-4ad9b5be0cd6",
   "organizationIds" : [ "d339cd15-2e57-4456-94b6-1e14f079a0de", "6d531709-6911-463f-9ee8-5fd704f22b24" ],
   "active" : true
-}
- ]
+}, {
+  "userName" : "akanuri.testing.izgateway.org",
+  "id" : "a573d101-527f-440d-a514-7f3b67fddb4e",
+  "organizationIds" : [ "d339cd15-2e57-4456-94b6-1e14f079a0de", "4588481c-bcb7-4fdd-8c99-62eb440cbcaa" ],
+  "active" : true
+}, {
+  "userName" : "ebrock.testing.izgateway.org",
+  "id" : "c9a9e2cc-3c0f-47d2-be2f-dabf00c38b71",
+  "organizationIds" : [ "d339cd15-2e57-4456-94b6-1e14f079a0de", "4fe23506-14fb-4bc4-9ece-d34810ca935b" ],
+  "active" : true
+} ]
