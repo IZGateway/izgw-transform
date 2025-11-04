@@ -1,3 +1,6 @@
+# IZ Gateway Transformation Service 0.13.0
+IGDD-2298 Update tomcat, bc-fips, and logback-core versions
+
 # IZ Gateway Transformation Service 0.12.0
 IGDD-2226 Update GitHub Action to properly tag image pushed to APHL during release
 IGDD-2216 Update IZG Hub and Xform Service Docker containers to shutdown if there is a failure of any services
