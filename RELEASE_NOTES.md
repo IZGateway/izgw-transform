@@ -1,3 +1,9 @@
+# IZ Gateway Transformation Service 0.14.0
+IGDD-2294 Update to utilize izgw-bom 
+
+# IZ Gateway Transformation Service 0.13.0
+Update tomcat to 10.1.48
+
 # IZ Gateway Transformation Service 0.12.0
 IGDD-2226 Update GitHub Action to properly tag image pushed to APHL during release
 IGDD-2216 Update IZG Hub and Xform Service Docker containers to shutdown if there is a failure of any services

@@ -189,6 +189,11 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
         return hubDestination;
     }
 
+    @Override
+    protected boolean isHubWsdl() {
+        return getDestinationService() != null;
+    }
+
     @Operation(
             summary = "Post a message to the SOAP Interface",
             description = "Send a request to the SOAP Interface for IZ Gateway"

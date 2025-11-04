@@ -49,5 +49,46 @@ public class Destination implements IDestination {
 
     @Override
     public void setPassExpiry(Date expiry) {
+        // Not used for Xform Service
+    }
+
+    @Override
+    public String getCreatedBy() {
+        return null;
+    }
+
+    @Override
+    public void setCreatedBy(String createdBy) {
+        // Not used for Xform Service
+    }
+
+    @Override
+    public String getUpdatedBy() {
+        return null;
+    }
+
+    @Override
+    public void setUpdatedBy(String updatedBy) {
+        // Not used for Xform Service
+    }
+
+    @Override
+    public Date getCreatedOn() {
+        return null;
+    }
+
+    @Override
+    public void setCreatedOn(Date createdAt) {
+        // Not used for Xform Service
+    }
+
+    @Override
+    public Date getUpdatedOn() {
+        return null;
+    }
+
+    @Override
+    public void setUpdatedOn(Date updatedAt) {
+        // Not used for Xform Service
     }
 }

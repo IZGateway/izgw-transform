@@ -51,6 +51,12 @@ public class IISController extends BaseController {
         return super.submitSingleMessage(submitSingleMessage, EndpointUris.DIRECT_IIS_PIPELINE);
     }
 
+    @Override
+    protected boolean isHubWsdl() {
+        // IIS Controller is never to be considered Hub
+        return false;
+    }
+
     @Operation(
             summary = "Post a message to the SOAP Interface",
             description = "Send a request to the SOAP Interface for IZ Gateway"
