@@ -41,7 +41,6 @@ jobs:
       - name: Set up Toolchain
         shell: bash
         run: |
-          echo BASE_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout` >> $GITHUB_ENV
           echo COMPUTERNAME=`hostname` >> $GITHUB_ENV
           npm install -g newman-reporter-junitfull
           npm install -g xunit-viewer
@@ -93,6 +92,10 @@ jobs:
             </toolchain>
           </toolchains>
           EOF
+
+      - name: Set BASE_TAG
+        run: |
+          echo BASE_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout` >> $GITHUB_ENV
 
       - name: Check version format
         run: |
