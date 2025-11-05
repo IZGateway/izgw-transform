@@ -105,6 +105,7 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
             }
             
         	response.setHl7Message(context.getServiceContext().getResponseMessage().encode());
+            response.updateAction(isHubWsdl());
         } catch (CamelExecutionException | HL7Exception e) {
             throw new HubControllerFault(e.getCause());
         }
@@ -153,6 +154,8 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
             } else {
             	response.setHl7Message(transformedRequest);
             }
+
+            response.updateAction(isHubWsdl());
         } catch (CamelExecutionException e) {
             throw new HubControllerFault(e.getCause());
         } catch (HL7Exception e) {
@@ -191,7 +194,8 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
 
     @Override
     protected boolean isHubWsdl() {
-        return getDestinationService() != null;
+        // Handles IISHubService
+        return true;
     }
 
     @Operation(
