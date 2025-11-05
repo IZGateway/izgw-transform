@@ -213,6 +213,14 @@
 						</dependency>
 					</requiresUnpack>
 				</configuration>
+				<executions>
+					<execution>
+                        <id>default-jar</id>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>com.spotify</groupId>
