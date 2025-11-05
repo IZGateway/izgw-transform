@@ -33,14 +33,6 @@ jobs:
           distribution: "adopt"
           cache: maven
 
-      - name: Check version format
-        run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Version $VERSION is not in the correct format. It should be #.#.#"
-            exit 1
-          fi
-
       - name: Set up Maven
         uses: stCarolas/setup-maven@v5
         with:
@@ -69,7 +61,7 @@ jobs:
                 <configuration>
                   <jdkHome>$JAVA_HOME_11_X64</jdkHome>
                 </configuration>
-            </toolchain>            
+            </toolchain>
             <toolchain>
               <type>jdk</type>
                 <provides>
@@ -79,9 +71,17 @@ jobs:
                 <configuration>
                   <jdkHome>$JAVA_HOME_17_X64</jdkHome>
                 </configuration>
-            </toolchain>            
+            </toolchain>
           </toolchains>
           EOF
+
+      - name: Check version format
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version $VERSION is not in the correct format. It should be #.#.#"
+            exit 1
+          fi
 
       - name: Output target branch
         run: |
