@@ -1,0 +1,55 @@
+name: ECS Unpark (Start Containers)
+
+on:
+  schedule:
+    # Run at 6:00 AM UTC, Monday through Friday (cron: 0 6 ? * 2-6 *)
+    # Note: GitHub Actions uses standard cron format (minute hour day month day-of-week)
+    # This translates to: At 06:00 UTC on Monday through Friday
+    - cron: '0 6 * * 1-5'
+
+  workflow_dispatch:
+    # Allow manual triggering of the workflow
+
+jobs:
+  unpark-ecs-service:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Unpark ECS service (restore desired count)
+        env:
+          AWS_REGIONS: ${{ vars.AWS_REGIONS }}
+          ECS_DESIRED_COUNT: ${{ vars.ECS_DESIRED_COUNT }}
+        run: |
+          if [ -z "$AWS_REGIONS" ]; then
+            echo "AWS_REGIONS not set, defaulting to us-east-1"
+            AWS_REGIONS="us-east-1"
+          fi
+          
+          if [ -z "$ECS_DESIRED_COUNT" ]; then
+            echo "ECS_DESIRED_COUNT not set, defaulting to 1"
+            ECS_DESIRED_COUNT="1"
+          fi
+          
+          echo "Unparking ECS services (starting $ECS_DESIRED_COUNT containers)..."
+          
+          for region in $AWS_REGIONS; do
+            echo "Unparking ECS service in $region (setting desired count to $ECS_DESIRED_COUNT)"
+            aws ecs update-service --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev --desired-count $ECS_DESIRED_COUNT | jq ".service.deployments[].id" &
+          done
+          
+          wait
+          
+          echo "All ECS services have been unparked successfully"
+          
+          for region in $AWS_REGIONS; do
+            SERVICE_STATUS=$(aws ecs describe-services --region $region --cluster xform-service-alb-dev --services xform-service-alb-dev | jq -r '.services[0].desiredCount')
+            echo "Region $region: Desired count is now $SERVICE_STATUS"
+          done
+
