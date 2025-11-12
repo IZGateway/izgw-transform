@@ -1,3 +1,6 @@
+# IZ Gateway Transformation Service 0.14.0
+IGDD-2294 Update to utilize izgw-bom 
+
 # IZ Gateway Transformation Service 0.13.0
 IGDD-2298 Update tomcat, bc-fips, and logback-core versions
 

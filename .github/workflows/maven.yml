@@ -33,14 +33,6 @@ jobs:
           distribution: "adopt"
           cache: maven
 
-      - name: Check version format
-        run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Version $VERSION is not in the correct format. It should be #.#.#"
-            exit 1
-          fi
-
       - name: Set up Maven
         uses: stCarolas/setup-maven@v5
         with:
@@ -49,13 +41,31 @@ jobs:
       - name: Set up Toolchain
         shell: bash
         run: |
-          echo BASE_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout` >> $GITHUB_ENV
           echo COMPUTERNAME=`hostname` >> $GITHUB_ENV
           npm install -g newman-reporter-junitfull
           npm install -g xunit-viewer
           mkdir -p ~/.m2
           cat << EOF > ~/.m2/settings.xml
-          <?xml version="1.0" encoding="UTF-8"?><settings><servers><server><id>github</id><username>${{ env.GITHUB_ACTOR }}</username><password>${{ secrets.IZGW_ALL_REPO_ACCESS_TOKEN }}</password></server></servers></settings>
+          <?xml version="1.0" encoding="UTF-8"?>
+          <settings>
+            <servers>
+              <server>
+                <id>github-bom</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+              <server>
+                  <id>github-core</id>
+                  <username>${{ github.actor }}</username>
+                  <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+              <server>
+                <id>v2tofhir</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+            </servers>
+          </settings>
           EOF
           cat << EOF > ~/.m2/toolchains.xml
           <?xml version="1.0" encoding="UTF8"?>
@@ -69,7 +79,7 @@ jobs:
                 <configuration>
                   <jdkHome>$JAVA_HOME_11_X64</jdkHome>
                 </configuration>
-            </toolchain>            
+            </toolchain>
             <toolchain>
               <type>jdk</type>
                 <provides>
@@ -79,9 +89,21 @@ jobs:
                 <configuration>
                   <jdkHome>$JAVA_HOME_17_X64</jdkHome>
                 </configuration>
-            </toolchain>            
+            </toolchain>
           </toolchains>
           EOF
+
+      - name: Set BASE_TAG
+        run: |
+          echo BASE_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout` >> $GITHUB_ENV
+
+      - name: Check version format
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version $VERSION is not in the correct format. It should be #.#.#"
+            exit 1
+          fi
 
       - name: Output target branch
         run: |

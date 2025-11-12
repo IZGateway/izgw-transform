@@ -48,6 +48,7 @@ public abstract class BaseController extends SoapControllerBase {
     }
 
     protected ResponseEntity<?> submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String pipeline) throws Fault {
+
         UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();
         IZGXformContext context = createXformContext(organization, submitSingleMessage);
 
@@ -62,6 +63,8 @@ public abstract class BaseController extends SoapControllerBase {
             }
 
             context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());
+            context.getSubmitSingleMessageResponse().updateAction(isHubWsdl());
+
         } catch (CamelExecutionException | HL7Exception e) {
             throw new HubControllerFault(e.getCause());
         }
