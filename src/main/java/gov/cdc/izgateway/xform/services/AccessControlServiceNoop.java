@@ -17,15 +17,9 @@ import java.util.TreeSet;
  */
 @Component
 public class AccessControlServiceNoop implements IAccessControlService {
-
-    @Override
-    public String getServerName() {
-        return "";
-    }
-
     @Override
     public void refresh() {
-
+        // Not used for Xform Service
     }
 
     @Override
@@ -34,13 +28,13 @@ public class AccessControlServiceNoop implements IAccessControlService {
     }
 
     @Override
-    public Map<String, Map<String, Boolean>> getAllowedUsersByGroup() {
+    public Map<String, ?> getGroups() {
         return Map.of();
     }
 
     @Override
-    public Map<String, Map<String, Boolean>> getAllowedRoutesByEvent() {
-        return Map.of();
+    public boolean isUserInGroup(String user, String group) {
+        return false;
     }
 
     @Override
@@ -49,28 +43,13 @@ public class AccessControlServiceNoop implements IAccessControlService {
     }
 
     @Override
-    public boolean isUserBlacklisted(String user) {
+    public boolean isUserDenied(String user) {
         return false;
-    }
-
-    @Override
-    public Map<String, Boolean> getEventMap(String event) {
-        return Map.of();
     }
 
     @Override
     public Set<String> getEventTypes() {
         return Set.of();
-    }
-
-    @Override
-    public boolean isRouteAllowed(String route, String event) {
-        return false;
-    }
-
-    @Override
-    public void setServerName(String serverName) {
-
     }
 
     @Override
@@ -84,17 +63,22 @@ public class AccessControlServiceNoop implements IAccessControlService {
     }
 
     @Override
-    public boolean isMemberOf(String user, String group) {
+    public boolean canAccessDestination(String user, String group) {
         return false;
     }
 
     @Override
-    public IAccessControl removeUserFromBlacklist(String user) {
+    public Object removeUserFromDenyList(String user) {
         return null;
     }
 
     @Override
-    public IAccessControl addUserToBlacklist(String user) {
+    public Object addUserToDenyList(String user) {
         return null;
+    }
+
+    @Override
+    public Set<String> getDenyList() {
+        return Set.of();
     }
 }

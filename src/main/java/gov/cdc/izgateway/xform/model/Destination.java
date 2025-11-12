@@ -2,6 +2,7 @@ package gov.cdc.izgateway.xform.model;
 
 import gov.cdc.izgateway.model.IDestination;
 import gov.cdc.izgateway.model.IDestinationId;
+import gov.cdc.izgateway.security.IzgPrincipal;
 
 import java.util.Date;
 
@@ -89,6 +90,26 @@ public class Destination implements IDestination {
 
     @Override
     public void setUpdatedOn(Date updatedAt) {
+        // Not used for Xform Service
+    }
+
+    @Override
+    public void setCreated() {
+        // Not used for Xform Service
+    }
+
+    @Override
+    public void setCreated(IzgPrincipal principal, String hostname) {
+        // Not used for Xform Service
+    }
+
+    @Override
+    public void setUpdated() {
+        // Not used for Xform Service
+    }
+
+    @Override
+    public void setUpdated(IzgPrincipal principal, String hostname) {
         // Not used for Xform Service
     }
 }
