@@ -1,9 +1,10 @@
 {
 	"info": {
-		"_postman_id": "339a1b15-9a84-4988-b75b-a5c3921bd553",
+		"_postman_id": "b6788f6f-073e-4ace-baaf-b09cd4ba841e",
 		"name": "TS Integration Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "28864196"
+		"_exporter_id": "2729094",
+		"_collection_link": "https://lively-space-957471.postman.co/workspace/IZG~107100cc-f7df-4edf-97fa-f5e0022afeca/collection/2729094-b6788f6f-073e-4ace-baaf-b09cd4ba841e?action=share&source=collection_link&creator=2729094"
 	},
 	"item": [
 		{
@@ -27551,6 +27552,7 @@
 			"listen": "prerequest",
 			"script": {
 				"type": "text/javascript",
+				"requests": {},
 				"exec": [
 					"// This needs to match the Organziation that we are using for Postman tests",
 					"// !!!!! Any user who needs to run Postman tests will have to have this organization assigned",
@@ -27585,9 +27587,9 @@
 					"var last;",
 					"var maxLength = 65536;",
 					"",
-					"LONG_SLA = 10000;",
-					"BASE_SLA = 500; // Change back to 250 after performance fix",
-					"TX_SLA = 250; // Change back to 150 after performance fix",
+					"LONG_SLA = 1000;",
+					"BASE_SLA = 250;",
+					"TX_SLA = 150;",
 					"",
 					"for (i = 0; tooLarge.length < maxLength; i++) {",
 					"    last = tooLarge;",
@@ -28754,6 +28756,7 @@
 			"listen": "test",
 			"script": {
 				"type": "text/javascript",
+				"requests": {},
 				"exec": [
 					""
 				]
