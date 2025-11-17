@@ -55,7 +55,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import gov.cdc.izgateway.security.AccessControlServiceNoop;
 import gov.cdc.izgateway.security.SSLImplementation;
+import gov.cdc.izgateway.service.IAccessControlService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.License;
@@ -92,7 +94,6 @@ public class Application implements WebMvcConfigurer {
             protocol.reloadSslHostConfigs();
         }
     }
-
     public static void main(String[] args) {
         initialize();
 
@@ -284,4 +285,10 @@ public class Application implements WebMvcConfigurer {
         factory.addAdditionalTomcatConnectors(connector);
         return factory;
     }
+    
+    @Bean
+    IAccessControlService accessControlServiceBean() {
+		return new AccessControlServiceNoop();
+	}
+    
 }
