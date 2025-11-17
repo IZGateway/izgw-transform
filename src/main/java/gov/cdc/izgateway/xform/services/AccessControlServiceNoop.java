@@ -28,7 +28,7 @@ public class AccessControlServiceNoop implements IAccessControlService {
     }
 
     @Override
-    public Map<String, ?> getGroups() {
+    public Map<String, Object> getGroups() {
         return Map.of();
     }
 
