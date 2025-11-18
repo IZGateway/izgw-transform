@@ -99,17 +99,7 @@ public class Destination implements IDestination {
     }
 
     @Override
-    public void setCreated(IzgPrincipal principal, String hostname) {
-        // Not used for Xform Service
-    }
-
-    @Override
     public void setUpdated() {
-        // Not used for Xform Service
-    }
-
-    @Override
-    public void setUpdated(IzgPrincipal principal, String hostname) {
         // Not used for Xform Service
     }
 }
