@@ -288,7 +288,7 @@ public class Application implements WebMvcConfigurer {
     
     @Bean
     IAccessControlService accessControlServiceBean() {
-		return new AccessControlServiceNoop();
-	}
+        return new AccessControlServiceNoop();
+    }
     
 }
