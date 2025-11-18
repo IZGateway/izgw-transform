@@ -73,7 +73,7 @@ public class AccessControlServiceNoop implements IAccessControlService {
     }
 
     @Override
-    public Object addUserToDenyList(String user) {
+    public Object addUserToDenyList(String user, String reason) {
         return null;
     }
 
