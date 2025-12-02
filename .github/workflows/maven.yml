@@ -13,6 +13,8 @@ on:
       - Release*
       - main
 
+  workflow_dispatch:
+
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
 
