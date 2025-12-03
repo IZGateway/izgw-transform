@@ -1,3 +1,6 @@
+# IZ Gateway Transformation Service 0.14.0
+IGDD-2294 Update to utilize izgw-bom 
+
 # IZ Gateway Transformation Service 0.13.1
 Maintenance release to deploy updated Docker image with IZG Base Image updates
 IGDD-2311 - CVE-2025-64118 - tar packaged with npm in base image
