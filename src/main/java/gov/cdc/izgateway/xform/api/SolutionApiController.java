@@ -24,7 +24,7 @@ import java.util.logging.Level;
 @RestController
 public class SolutionApiController extends BaseApiController {
     private final SolutionService solutionService;
-	private final PipelineService pipelineService;
+    private final PipelineService pipelineService;
     @Autowired
     public SolutionApiController(
             SolutionService solutionService,
