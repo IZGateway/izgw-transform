@@ -24,9 +24,6 @@ import java.util.logging.Level;
 public class OrganizationApiController extends BaseApiController {
     private final OrganizationService organizationService;
 
-    @Value("${xform.allow-delete-via-api}")
-    private Boolean allowDelete;
-
     @Autowired
     public OrganizationApiController(
             OrganizationService organizationService,
@@ -84,10 +81,6 @@ public class OrganizationApiController extends BaseApiController {
     public ResponseEntity<Organization> deleteOrganization(
             @PathVariable UUID uuid
     ) {
-        if (Boolean.FALSE.equals(allowDelete)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
         organizationService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

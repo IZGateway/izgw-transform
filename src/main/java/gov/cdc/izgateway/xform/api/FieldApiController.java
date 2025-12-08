@@ -24,9 +24,6 @@ import java.util.logging.Level;
 public class FieldApiController extends BaseApiController {
     private final OperationPreconditionFieldService operationPreconditionFieldService;
 
-    @Value("${xform.allow-delete-via-api}")
-    private Boolean allowDelete;
-
     @Autowired
     public FieldApiController(
             OperationPreconditionFieldService operationPreconditionFieldService,
@@ -105,10 +102,6 @@ public class FieldApiController extends BaseApiController {
     public ResponseEntity<OperationPreconditionField> deleteFieldByUUID(
             @PathVariable UUID uuid
     ) {
-        if (Boolean.FALSE.equals(allowDelete)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
         operationPreconditionFieldService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
