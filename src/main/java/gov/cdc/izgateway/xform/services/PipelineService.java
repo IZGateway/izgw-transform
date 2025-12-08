@@ -5,7 +5,6 @@ import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Service
 public class PipelineService extends GenericService<Pipeline>{
