@@ -40,7 +40,7 @@ public class PipelineService extends GenericService<Pipeline>{
      */
     public boolean isSolutionInUse(UUID solutionId) {
     	return repo.getEntitySet().stream()
-				.flatMap(p -> p.getPipes().stream())
+				.flatMap(p -> p.getPipes() == null ? Stream.empty() : p.getPipes().stream())
 				.filter(pipe -> pipe.getSolutionId().equals(solutionId))
 				.findFirst()
 				.orElse(null) != null;
