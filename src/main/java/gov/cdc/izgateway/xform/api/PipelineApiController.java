@@ -24,9 +24,6 @@ import java.util.logging.Level;
 public class PipelineApiController extends BaseApiController {
     private final PipelineService pipelineService;
 
-    @Value("${xform.allow-delete-via-api}")
-    private Boolean allowDelete;
-
     @Autowired
     public PipelineApiController(
             PipelineService pipelineService,
@@ -85,10 +82,6 @@ public class PipelineApiController extends BaseApiController {
     public ResponseEntity<Pipeline> deletePipeline(
             @PathVariable UUID uuid
     ) {
-
-        if (Boolean.FALSE.equals(allowDelete)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
 
         pipelineService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

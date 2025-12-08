@@ -24,9 +24,6 @@ import java.util.logging.Level;
 public class MappingApiController extends BaseApiController {
     private final MappingService mappingService;
 
-    @Value("${xform.allow-delete-via-api}")
-    private Boolean allowDelete;
-
     @Autowired
     public MappingApiController(
             MappingService mappingService,
@@ -87,10 +84,6 @@ public class MappingApiController extends BaseApiController {
     public ResponseEntity<Mapping> deleteMapping(
             @PathVariable UUID uuid
     ) {
-        if (Boolean.FALSE.equals(allowDelete)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
         mappingService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

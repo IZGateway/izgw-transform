@@ -24,9 +24,6 @@ import java.util.logging.Level;
 public class GroupRoleMappingApiController extends BaseApiController {
     private final GroupRoleMappingService groupRoleMappingService;
 
-    @Value("${xform.allow-delete-via-api}")
-    private Boolean allowDelete;
-
     @Autowired
     public GroupRoleMappingApiController(
             GroupRoleMappingService groupRoleMappingService,
@@ -87,10 +84,6 @@ public class GroupRoleMappingApiController extends BaseApiController {
     public ResponseEntity<GroupRoleMapping> deleteGroupRoleMapping(
             @PathVariable UUID uuid
     ) {
-        if (Boolean.FALSE.equals(allowDelete)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
         groupRoleMappingService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

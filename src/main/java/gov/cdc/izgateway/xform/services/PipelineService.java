@@ -5,6 +5,7 @@ import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 public class PipelineService extends GenericService<Pipeline>{
@@ -32,5 +33,18 @@ public class PipelineService extends GenericService<Pipeline>{
                         p.getOutboundEndpoint().equalsIgnoreCase(pipeline.getOutboundEndpoint())
         );
     }
+    
+    /**
+     * Determines if a solution is in use by any pipeline
+     * @param solutionId	The solution UUID to check
+     * @return			True if the solution is in use, false otherwise
+     */
+    public boolean isSolutionInUse(UUID solutionId) {
+    	return repo.getEntitySet().stream()
+				.flatMap(p -> p.getPipes().stream())
+				.filter(pipe -> pipe.getSolutionId().equals(solutionId))
+				.findFirst()
+				.orElse(null) != null;
+	}
 
 }

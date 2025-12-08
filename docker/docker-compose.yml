@@ -24,7 +24,6 @@ services:
       XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE: /ssl/server_keystore.bcfks
       XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE: /ssl/server_keystore.bcfks
       XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE: /ssl/client_keystore.bcfks
-      xform.allow-delete-via-api: true
       LOGGING_LEVEL: ${LOGGING_LEVEL}
     volumes:
       - type: bind

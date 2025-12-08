@@ -24,9 +24,6 @@ import java.util.logging.Level;
 public class AccessControlApiController extends BaseApiController {
     private final AccessControlService accessControlService;
 
-    @Value("${xform.allow-delete-via-api}")
-    private Boolean allowDelete;
-
     @Autowired
     public AccessControlApiController(
             AccessControlService accessControlService,
@@ -87,10 +84,6 @@ public class AccessControlApiController extends BaseApiController {
     public ResponseEntity<AccessControl> deleteAccessControl(
             @PathVariable UUID uuid
     ) {
-        if (Boolean.FALSE.equals(allowDelete)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
         accessControlService.delete(uuid);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

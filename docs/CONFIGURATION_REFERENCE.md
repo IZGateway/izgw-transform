@@ -26,7 +26,6 @@ Each section header will link to later in this document where descriptions for e
 | **[Application Configuration](#application-configuration)**                 |                                                    |                                                          |
 | XFORM_SERVER_HOSTNAME                                                       | server.hostname                                    | dev.izgateway.org                                        | 
 | XFORM_SERVER_PORT                                                           | server.port                                        | 444                                                      |
-| XFORM_ALLOW_DELETE_VIA_API                                                  | xform.allow-delete-via-api                         | false                                                    | |
 | **[SSL and Keystore Configuration](#ssl-and-keystore-configuration)**       |                                                    |                                                          |
 | SSL_SHARE                                                                   | security.ssl-path                                  |                                                          |
 | COMMON_PASS                                                                 | N/A                                                |                                                          |
