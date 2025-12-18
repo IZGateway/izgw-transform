@@ -55,9 +55,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import gov.cdc.izgateway.security.AccessControlServiceNoop;
 import gov.cdc.izgateway.security.SSLImplementation;
-import gov.cdc.izgateway.service.IAccessControlService;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.License;
@@ -77,8 +75,7 @@ import lombok.extern.slf4j.Slf4j;
         )
 )
 @SpringBootApplication
-@ComponentScan(basePackages={"gov.cdc.izgateway.xform", "gov.cdc.izgateway.soap.net", "gov.cdc.izgateway.configuration","gov.cdc.izgateway.security","gov.cdc.izgateway.service.impl", 
-		"gov.cdc.izgateway.service", "gov.cdc.izgateway.repository"})
+@ComponentScan(basePackages={"gov.cdc.izgateway.xform", "gov.cdc.izgateway.soap.net", "gov.cdc.izgateway.configuration","gov.cdc.izgateway.security","gov.cdc.izgateway.service.impl"})
 public class Application implements WebMvcConfigurer {
     private static final Map<String, byte[]> staticPages = new TreeMap<>();
     static final String BUILD = "build";
@@ -286,10 +283,4 @@ public class Application implements WebMvcConfigurer {
         factory.addAdditionalTomcatConnectors(connector);
         return factory;
     }
-    
-    @Bean
-    IAccessControlService accessControlServiceBean() {
-        return new AccessControlServiceNoop();
-    }
-    
 }
