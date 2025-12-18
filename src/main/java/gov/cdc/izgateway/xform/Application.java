@@ -77,7 +77,8 @@ import lombok.extern.slf4j.Slf4j;
         )
 )
 @SpringBootApplication
-@ComponentScan(basePackages={"gov.cdc.izgateway.xform", "gov.cdc.izgateway.soap.net", "gov.cdc.izgateway.configuration","gov.cdc.izgateway.security","gov.cdc.izgateway.service.impl"})
+@ComponentScan(basePackages={"gov.cdc.izgateway.xform", "gov.cdc.izgateway.soap.net", "gov.cdc.izgateway.configuration","gov.cdc.izgateway.security","gov.cdc.izgateway.service.impl", 
+		"gov.cdc.izgateway.service", "gov.cdc.izgateway.repository"})
 public class Application implements WebMvcConfigurer {
     private static final Map<String, byte[]> staticPages = new TreeMap<>();
     static final String BUILD = "build";
