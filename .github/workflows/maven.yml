@@ -13,7 +13,22 @@ on:
       - Release*
       - main
 
+  # Schedule runs on the default branch.
+  schedule:
+    - cron: '0 6 * * 1-5'
+
   workflow_dispatch:
+    inputs:
+      run-sonar:
+        description: 'Run SonarQube Analysis?'
+        required: false
+        default: true
+        type: boolean
+      run-site-build:
+        description: 'Run Site Build?'
+        required: false
+        default: false
+        type: boolean
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
