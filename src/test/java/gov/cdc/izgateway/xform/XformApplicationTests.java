@@ -19,7 +19,6 @@ import java.security.Security;
 @SpringBootTest
 class XformApplicationTests {
     private static SecureRandom secureRandom;
-
     @BeforeAll
     static void setup() {
         //Security.addProvider(new BouncyCastleFipsProvider());
@@ -75,4 +74,3 @@ class XformApplicationTests {
         return secureRandom;
     }
 }
-
