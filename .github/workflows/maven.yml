@@ -18,17 +18,6 @@ on:
     - cron: '0 6 * * 1-5'
 
   workflow_dispatch:
-    inputs:
-      run-sonar:
-        description: 'Run SonarQube Analysis?'
-        required: false
-        default: true
-        type: boolean
-      run-site-build:
-        description: 'Run Site Build?'
-        required: false
-        default: false
-        type: boolean
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
@@ -208,7 +197,14 @@ jobs:
         if: ${{ always() }}
         with:
           name: DependencyCheck
-          path: ./reports                  
+          path: ./reports
+
+      - name: Publish Site
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/site
+          destination_dir: current
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
