@@ -166,7 +166,7 @@ jobs:
           SSL_SHARE: ${{ github.workspace }}/target
 
         run: |
-          env && mvn -B clean package install -Dbuildno=${{github.run_number}} \
+          env && mvn -B clean package install site -Dbuildno=${{github.run_number}} \
               -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
               -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
               -Dimage.tag=$IMAGE_BRANCH_TAG
@@ -180,9 +180,10 @@ jobs:
           JAVA_HOME: /opt/jdk
         uses: dependency-check/Dependency-Check_Action@main
         with:
-          project: V2 to FHIR
+          project: IZG Transformation Service
           path: target/xform-${{env.BASE_TAG}}.jar
           format: 'HTML'
+          out: 'target/site'
           args: >
             --ossIndexUsername ${{ secrets.OSS_INDEX_USERNAME }}
             --ossIndexPassword ${{ secrets.OSS_INDEX_PASSWORD }} 
@@ -197,7 +198,7 @@ jobs:
         if: ${{ always() }}
         with:
           name: DependencyCheck
-          path: ./reports
+          path: ./target/site/dependency-check-report.html
 
       - name: Publish Site
         uses: peaceiris/actions-gh-pages@v4
