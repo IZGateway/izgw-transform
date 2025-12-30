@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PipelineApiController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.api</a> &gt; <span class="el_source">PipelineApiController.java</span></div><h1>PipelineApiController.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.api;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.xform.model.Pipeline;
+import gov.cdc.izgateway.xform.security.Roles;
+import gov.cdc.izgateway.xform.services.PipelineService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+import java.util.logging.Level;
+
+<span class="fc" id="L21">@Log</span>
+@Lazy(false)
+@RestController
+public class PipelineApiController extends BaseApiController {
+    private final PipelineService pipelineService;
+
+    @Autowired
+    public PipelineApiController(
+            PipelineService pipelineService,
+            AccessControlRegistry registry
+<span class="fc" id="L31">    ) {</span>
+<span class="fc" id="L32">        this.pipelineService = pipelineService;</span>
+<span class="fc" id="L33">        registry.register(this);</span>
+<span class="fc" id="L34">    }</span>
+
+    @RolesAllowed({Roles.PIPELINE_READER})
+    @GetMapping(&quot;/api/v1/pipelines/{uuid}&quot;)
+    public ResponseEntity&lt;Pipeline&gt; getPipelineByUUID(@PathVariable UUID uuid) {
+<span class="nc" id="L39">        Pipeline entity = pipelineService.getObject(uuid);</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (entity == null) {</span>
+<span class="nc" id="L41">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="nc" id="L43">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
+    }
+
+    @RolesAllowed({Roles.PIPELINE_WRITER})
+    @PutMapping(&quot;/api/v1/pipelines/{uuid}&quot;)
+    public ResponseEntity&lt;Pipeline&gt; updatePipeline(@PathVariable UUID uuid, @Valid @RequestBody Pipeline updatedPipeline) {
+<span class="nc" id="L49">        updatedPipeline.setId(uuid);</span>
+<span class="nc" id="L50">        pipelineService.update(updatedPipeline);</span>
+<span class="nc" id="L51">        return new ResponseEntity&lt;&gt;(updatedPipeline, HttpStatus.OK);</span>
+    }
+
+    // TODO - Paul to look at AccessControl as it works with groups too.
+    @RolesAllowed({Roles.PIPELINE_READER})
+    @GetMapping(&quot;/api/v1/pipelines&quot;)
+    public ResponseEntity&lt;String&gt; getPipelinesList(
+            @RequestParam(required = false) String nextCursor,
+            @RequestParam(required = false) String prevCursor,
+            @RequestParam(defaultValue = &quot;false&quot;) Boolean includeInactive,
+            @RequestParam(defaultValue = &quot;10&quot;) int limit
+    ) {
+        try {
+<span class="nc" id="L64">            return processList(pipelineService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
+<span class="nc" id="L65">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L66">            log.log(Level.SEVERE, e.getMessage(), e);</span>
+<span class="nc" id="L67">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    @RolesAllowed({Roles.PIPELINE_WRITER})
+    @PostMapping(&quot;/api/v1/pipelines&quot;)
+    public ResponseEntity&lt;Pipeline&gt; createPipeline(
+            @Valid @RequestBody() Pipeline pipeline
+    ) {
+<span class="nc" id="L76">        pipelineService.create(pipeline);</span>
+<span class="nc" id="L77">        return new ResponseEntity&lt;&gt;(pipeline, HttpStatus.OK);</span>
+    }
+
+    @RolesAllowed({Roles.PIPELINE_DELETER})
+    @DeleteMapping(&quot;/api/v1/pipelines/{uuid}&quot;)
+    public ResponseEntity&lt;Pipeline&gt; deletePipeline(
+            @PathVariable UUID uuid
+    ) {
+
+<span class="nc" id="L86">        pipelineService.delete(uuid);</span>
+<span class="nc" id="L87">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
