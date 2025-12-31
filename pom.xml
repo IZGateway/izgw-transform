@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
 	<artifactId>xform</artifactId>
-    <version>0.13.1-AUSTINTEST</version>
+    <version>0.13.99</version>
 	<name>xform</name>
 	<description>IZ Gateway Xform Service</description>
 	<properties>
