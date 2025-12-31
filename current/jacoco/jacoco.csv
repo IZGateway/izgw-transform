@@ -11,22 +11,22 @@ xform,gov.cdc.izgateway.xform.repository.dynamodb,EventRepository,8,0,0,0,2,0,1,
 xform,gov.cdc.izgateway.xform.repository.dynamodb,GroupRoleMappingRepository,8,0,0,0,2,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.dynamodb,UserRepository,8,0,0,0,2,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.file,AccessControlRepository,5,7,0,0,1,3,1,2,1,2
-xform,gov.cdc.izgateway.xform.repository.file,OrganizationRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.repository.file,OrganizationRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.file,OperationPreconditionFieldRepository,5,7,0,0,1,3,1,2,1,2
-xform,gov.cdc.izgateway.xform.repository.file,MappingRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.repository.file,MappingRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.file,UserRepository,5,7,0,0,1,3,1,2,1,2
 xform,gov.cdc.izgateway.xform.repository.file,PipelineRepository,5,7,0,0,1,3,1,2,1,2
 xform,gov.cdc.izgateway.xform.repository.file,FileRepositoryFactory,2,157,8,8,1,43,9,9,1,9
 xform,gov.cdc.izgateway.xform.repository.file,SolutionRepository,5,7,0,0,1,3,1,2,1,2
-xform,gov.cdc.izgateway.xform.repository.file,PipelineRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
-xform,gov.cdc.izgateway.xform.repository.file,SolutionRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.repository.file,PipelineRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.repository.file,SolutionRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.file,GenericFileRepository,127,3,2,0,25,1,10,1,9,1
-xform,gov.cdc.izgateway.xform.repository.file,AccessControlRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.repository.file,AccessControlRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.file,OrganizationRepository,5,7,0,0,1,3,1,2,1,2
 xform,gov.cdc.izgateway.xform.repository.file,MappingRepository,5,7,0,0,1,3,1,2,1,2
-xform,gov.cdc.izgateway.xform.repository.file,OperationPreconditionFieldRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
-xform,gov.cdc.izgateway.xform.repository.file,UserRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
-xform,gov.cdc.izgateway.xform.repository.file,GroupRoleMappingRepository.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.repository.file,OperationPreconditionFieldRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.repository.file,UserRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.repository.file,GroupRoleMappingRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.file,GroupRoleMappingRepository,5,7,0,0,1,3,1,2,1,2
 xform,gov.cdc.izgateway.xform.common,ContainerCustomizer,31,0,0,0,8,0,3,0,3,0
 xform,gov.cdc.izgateway.xform.constants,XformConstants,7,0,0,0,2,0,1,0,1,0
@@ -140,9 +140,9 @@ xform,gov.cdc.izgateway.xform.aspects.xformadvice,XformAdviceAspect,250,0,44,0,5
 xform,gov.cdc.izgateway.xform.aspects.xformadvice,MethodDisposition,15,0,0,0,3,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.camel.routers,XformRouter,12,49,0,0,3,15,1,2,1,2
 xform,gov.cdc.izgateway.xform,LogController,9,6,0,0,3,3,2,1,2,1
-xform,gov.cdc.izgateway.xform,Application.new TomcatServletWebServerFactory() {...},18,0,0,0,4,0,2,0,2,0
+xform,gov.cdc.izgateway.xform,Application.new TomcatServletWebServerFactory() {...},15,0,0,0,4,0,2,0,2,0
 xform,gov.cdc.izgateway.xform,Application.new Thread() {...},5,0,0,0,3,0,2,0,2,0
-xform,gov.cdc.izgateway.xform,Application.new UserDetailsService() {...},14,0,0,0,2,0,2,0,2,0
+xform,gov.cdc.izgateway.xform,Application.new UserDetailsService() {...},11,0,0,0,2,0,2,0,2,0
 xform,gov.cdc.izgateway.xform,Application,281,50,14,0,77,10,22,4,15,4
 xform,gov.cdc.izgateway.xform,XformApplicationController,20,11,2,0,6,4,4,2,3,2
 xform,gov.cdc.izgateway.xform.model,GroupRoleMapping,42,0,2,0,9,0,3,0,2,0
@@ -155,15 +155,15 @@ xform,gov.cdc.izgateway.xform.model,Organization,6,0,0,0,2,0,2,0,2,0
 xform,gov.cdc.izgateway.xform.model,PreconditionField,3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,OperationInfoProperty,3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,Pipeline,53,0,4,0,16,0,7,0,5,0
-xform,gov.cdc.izgateway.xform.model,Pipe.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.model,Pipe.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,PreconditionInfoProperty,3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,Destination,19,0,0,0,13,0,13,0,13,0
 xform,gov.cdc.izgateway.xform.model,Event,16,0,0,0,6,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,BaseModel,26,0,4,0,6,0,7,0,5,0
-xform,gov.cdc.izgateway.xform.model,Solution.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
-xform,gov.cdc.izgateway.xform.model,Solution.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.model,Solution.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.model,Solution.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,OperationPreconditionField,3,0,0,0,1,0,1,0,1,0
-xform,gov.cdc.izgateway.xform.model,Pipeline.new TypeReference() {...},6,0,0,0,1,0,1,0,1,0
+xform,gov.cdc.izgateway.xform.model,Pipeline.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,PreconditionInfo,3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,Mapping,3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,Pipe,53,0,4,0,16,0,7,0,5,0
