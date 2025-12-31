@@ -12,6 +12,7 @@ on:
       - develop
       - Release*
       - main
+      - IGDD-2106_pipeline-updates  # TEMPORARY - remove after testing
 
   # Schedule runs on the default branch.
   schedule:
@@ -200,7 +201,7 @@ jobs:
           name: DependencyCheck
           path: ./target/site/dependency-check-report.html
 
-      - name: Publish Site to Develop
+      - name: Publish Site (Develop)
         # Publish to /develop/ for: push to develop, PRs targeting develop, scheduled runs, manual dispatch
         if: |
           github.ref == 'refs/heads/develop' ||
@@ -211,24 +212,25 @@ jobs:
           publish_dir: ./target/site
           destination_dir: develop
 
-      - name: Publish Site to Current
+      - name: Publish Site (Current)
         # Publish to /current/ only on Release branch push
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')
+        # TEMPORARY: Added IGDD-2106_pipeline-updates for testing - remove after testing
+        if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/Release') || github.ref == 'refs/heads/IGDD-2106_pipeline-updates')
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/site
           destination_dir: current
 
-      - name: Publish Versioned Site
+      - name: Publish Site (Versioned)
         # Publish to /v{version}/ only on Release branch push (same time as APHL push)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')
+        # TEMPORARY: Added IGDD-2106_pipeline-updates for testing - remove after testing
+        if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/Release') || github.ref == 'refs/heads/IGDD-2106_pipeline-updates')
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/site
           destination_dir: v${{ env.BASE_TAG }}
-          keep_files: true
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
