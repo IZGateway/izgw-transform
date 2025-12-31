@@ -12,7 +12,6 @@ on:
       - develop
       - Release*
       - main
-      - IGDD-2106_pipeline-updates  # TEMPORARY - remove after testing
 
   # Schedule runs on the default branch.
   schedule:
@@ -214,8 +213,7 @@ jobs:
 
       - name: Publish Site (Current)
         # Publish to /current/ only on Release branch push
-        # TEMPORARY: Added IGDD-2106_pipeline-updates for testing - remove after testing
-        if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/Release') || github.ref == 'refs/heads/IGDD-2106_pipeline-updates')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -224,8 +222,7 @@ jobs:
 
       - name: Publish Site (Versioned)
         # Publish to /v{version}/ only on Release branch push (same time as APHL push)
-        # TEMPORARY: Added IGDD-2106_pipeline-updates for testing - remove after testing
-        if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/Release') || github.ref == 'refs/heads/IGDD-2106_pipeline-updates')
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
