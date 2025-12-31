@@ -14,7 +14,7 @@
 	<name>xform</name>
 	<description>IZ Gateway Xform Service</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
 		<project.java.package>${project.groupId}</project.java.package>
@@ -219,8 +219,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<compilerId>javac</compilerId>
-					<source>17</source>
-					<target>17</target>
+					<source>21</source>
+					<target>21</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>
