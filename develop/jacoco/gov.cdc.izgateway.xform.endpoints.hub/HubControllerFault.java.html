@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HubControllerFault.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.endpoints.hub</a> &gt; <span class="el_source">HubControllerFault.java</span></div><h1>HubControllerFault.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.endpoints.hub;
+
+import org.apache.commons.lang3.StringUtils;
+
+import gov.cdc.izgateway.model.RetryStrategy;
+import gov.cdc.izgateway.soap.fault.Fault;
+import gov.cdc.izgateway.soap.fault.MessageSupport;
+
+/**
+ * @author Audacious Inquiry
+ * Represents faults related to the Transformation controller.
+ */
+public class HubControllerFault extends Fault {
+    private static final long serialVersionUID = 1L;
+
+    private HubControllerFault(String detail, Throwable ex) {
+    	// For now, at least while in Pilot, a this Fault should indicate a CONTACT_SUPPORT RetryStrategy.
+<span class="nc" id="L18">    	super(new MessageSupport(&quot;HubControllerFault&quot;, &quot;500&quot;, getMessage(detail), getDetail(detail), null, RetryStrategy.CONTACT_SUPPORT), ex);</span>
+<span class="nc" id="L19">    }</span>
+    /** Construct a new HubControllerFault with a message */
+    public HubControllerFault(String detail) {
+<span class="nc" id="L22">        this(detail, null);</span>
+<span class="nc" id="L23">    }</span>
+    /** Construct a new HubControllerFault from an exception */
+    public HubControllerFault(Throwable ex) {
+<span class="nc" id="L26">        this(ex.getMessage(), ex);</span>
+<span class="nc" id="L27">    }</span>
+    
+    private static String getMessage(String message) {
+<span class="nc" id="L30">    	return StringUtils.defaultIfEmpty(StringUtils.substringBefore(message, &quot;:&quot;), &quot;An error occurred while processing the request&quot;);</span>
+    }
+    
+    private static String getDetail(String message) {
+<span class="nc" id="L34">    	return StringUtils.defaultIfEmpty(StringUtils.substringAfter(message, &quot;:&quot;), message);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>XformLoggingValve.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.logging</a> &gt; <span class="el_source">XformLoggingValve.java</span></div><h1>XformLoggingValve.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.logging;
+
+import gov.cdc.izgateway.logging.LoggingValveBase;
+import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.logging.event.TransactionData;
+import gov.cdc.izgateway.logging.info.SourceInfo;
+import gov.cdc.izgateway.logging.markers.Markers2;
+import gov.cdc.izgateway.security.service.PrincipalService;
+import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.Arrays;
+
+<span class="nc" id="L23">@Slf4j</span>
+@Component(&quot;xformValveLogging&quot;)
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class XformLoggingValve extends LoggingValveBase {
+
+    @Autowired
+<span class="nc" id="L29">    public XformLoggingValve(PrincipalService principalService) {</span>
+<span class="nc" id="L30">        this.principalService = principalService;</span>
+<span class="nc" id="L31">    }</span>
+
+    @Override
+	protected void clearContext() {
+<span class="nc" id="L35">		XformAdviceCollector.clear();</span>
+<span class="nc" id="L36">		XformRequestContext.clear();</span>
+<span class="nc" id="L37">	}</span>
+
+    @Override
+    protected void handleSpecificInvoke(Request request, Response response, SourceInfo source) throws IOException, ServletException {
+<span class="nc bnc" id="L41" title="All 2 branches missed.">	    if (!isLogEnabledForApi(request.getRequestURI())) {</span>
+<span class="nc" id="L42">	        XformRequestContext.disableApiLogging();</span>
+	    }
+<span class="nc" id="L44">    	this.getNext().invoke(request, response);</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">    	if (Arrays.asList(HttpServletResponse.SC_UNAUTHORIZED, HttpServletResponse.SC_SERVICE_UNAVAILABLE).contains(response.getStatus())) {</span>
+            // In these two cases, someone tried to access IZGW via a URL they shouldn't have.  
+    		// There was never a transaction to begin with. 
+<span class="nc" id="L48">            RequestContext.disableTransactionDataLogging();</span>
+    	}
+<span class="nc" id="L50">    }</span>
+
+    @Override
+    protected boolean isLogged(String requestURI) {
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        return requestURI.startsWith(&quot;/IISHubService&quot;) ||</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                requestURI.startsWith(&quot;/dev/&quot;) ||</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">                requestURI.startsWith(&quot;/IISService&quot;);</span>
+    }
+
+    protected boolean isLogEnabledForApi(String requestURI) {
+<span class="nc" id="L60">        return requestURI.startsWith(&quot;/api&quot;);</span>
+    }
+
+	@Override
+	protected TransactionData createTransactionData(Request req) {
+<span class="nc" id="L65">        XformTransactionData t = new XformTransactionData();</span>
+<span class="nc" id="L66">        XformAdviceCollector.setTransactionData(t);</span>
+<span class="nc" id="L67">		return t;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
