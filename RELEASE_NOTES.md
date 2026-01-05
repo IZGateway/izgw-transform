@@ -1,5 +1,6 @@
 # IZ Gateway Transformation Service 0.14.0
 IGDD-2294 Update to utilize izgw-bom 
+IGDD-2106 Update to use Java 21, CI/CD updates to publish Site Report
 
 # IZ Gateway Transformation Service 0.13.1
 Maintenance release to deploy updated Docker image with IZG Base Image updates
