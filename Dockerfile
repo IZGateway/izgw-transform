@@ -2,7 +2,7 @@ FROM ghcr.io/izgateway/alpine-node-openssl-fips:latest
 
 RUN apk update && \
     apk upgrade --no-cache && \
-    apk add --no-cache openjdk17-jre
+    apk add --no-cache openjdk21-jre
 
 # Define arguments (set in izgw-transform pom.xml)
 ARG JAR_FILENAME
