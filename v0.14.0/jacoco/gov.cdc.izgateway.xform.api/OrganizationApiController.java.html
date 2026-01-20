@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrganizationApiController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.api</a> &gt; <span class="el_source">OrganizationApiController.java</span></div><h1>OrganizationApiController.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.api;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.xform.model.Organization;
+import gov.cdc.izgateway.xform.security.Roles;
+import gov.cdc.izgateway.xform.services.OrganizationService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+import java.util.logging.Level;
+
+<span class="fc" id="L21">@Log</span>
+@Lazy(false)
+@RestController
+public class OrganizationApiController extends BaseApiController {
+    private final OrganizationService organizationService;
+
+    @Autowired
+    public OrganizationApiController(
+            OrganizationService organizationService,
+            AccessControlRegistry registry
+<span class="fc" id="L31">    ) {</span>
+<span class="fc" id="L32">        this.organizationService = organizationService;</span>
+<span class="fc" id="L33">        registry.register(this);</span>
+<span class="fc" id="L34">    }</span>
+
+    @RolesAllowed({Roles.ORGANIZATION_READER})
+    @GetMapping(&quot;/api/v1/organizations/{uuid}&quot;)
+    public ResponseEntity&lt;Organization&gt; getOrganizationByUUID(@PathVariable UUID uuid) {
+<span class="nc" id="L39">        Organization entity = organizationService.getObject(uuid);</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (entity == null) {</span>
+<span class="nc" id="L41">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="nc" id="L43">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @PutMapping(&quot;/api/v1/organizations/{uuid}&quot;)
+    public ResponseEntity&lt;Organization&gt; updateOrganization(@PathVariable UUID uuid, @RequestBody Organization updatedOrganization) {
+<span class="nc" id="L49">        updatedOrganization.setId(uuid);</span>
+<span class="nc" id="L50">        organizationService.update(updatedOrganization);</span>
+<span class="nc" id="L51">        return new ResponseEntity&lt;&gt;(updatedOrganization, HttpStatus.OK);</span>
+    }
+
+    @RolesAllowed({Roles.ORGANIZATION_READER})
+    @GetMapping(&quot;/api/v1/organizations&quot;)
+    public ResponseEntity&lt;String&gt; getOrganizationsList(
+            @RequestParam(required = false) String nextCursor,
+            @RequestParam(required = false) String prevCursor,
+            @RequestParam(defaultValue = &quot;false&quot;) Boolean includeInactive,
+            @RequestParam(defaultValue = &quot;10&quot;) int limit) {
+        try {
+<span class="nc" id="L62">            return processList(organizationService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
+
+<span class="nc" id="L64">        } catch (JsonProcessingException e) { //need to keep this part of the logic because log.log is dependent on @Log</span>
+<span class="nc" id="L65">            log.log(Level.SEVERE, e.getMessage(), e);</span>
+<span class="nc" id="L66">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @PostMapping(&quot;/api/v1/organizations&quot;)
+    public ResponseEntity&lt;Organization&gt; createOrganization(
+            @Valid @RequestBody() Organization organization
+    ) {
+<span class="nc" id="L75">        organizationService.create(organization);</span>
+<span class="nc" id="L76">        return new ResponseEntity&lt;&gt;(organization, HttpStatus.OK);</span>
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @DeleteMapping(&quot;/api/v1/organizations/{uuid}&quot;)
+    public ResponseEntity&lt;Organization&gt; deleteOrganization(
+            @PathVariable UUID uuid
+    ) {
+<span class="nc" id="L84">        organizationService.delete(uuid);</span>
+<span class="nc" id="L85">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

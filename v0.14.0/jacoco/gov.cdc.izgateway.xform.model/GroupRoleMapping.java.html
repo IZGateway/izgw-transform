@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GroupRoleMapping.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.model</a> &gt; <span class="el_source">GroupRoleMapping.java</span></div><h1>GroupRoleMapping.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.model;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.*;
+
+import gov.cdc.izgateway.xform.security.Roles;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+
+@Getter
+@Setter
+@DynamoDbBean
+<span class="nc" id="L16">public class GroupRoleMapping extends BaseModel {</span>
+    private UUID id;
+    @NotBlank(message = &quot;GroupRoleMapping - Name is required&quot;)
+    private String groupName;
+    @NotNull(message = &quot;GroupRoleMapping - Active status is required&quot;)
+    private Boolean active;
+    @NotNull(message = &quot;GroupRoleMapping - Roles are required&quot;)
+    private List&lt;String&gt; roles;
+
+    /**
+     * Set the list of roles. This method validates the roles against
+     * the set of legal roles and removes duplicates from the content.
+     * If any invalid roles are detected, this method will throw an
+     * IllegalArgumentException with an explanatory message.  Otherwise,
+     * it will set the roles to the duplicated list.
+     * @param roles	The list of roles to set.
+     */
+    public void setRoles(List&lt;String&gt; roles) {
+<span class="nc" id="L34">        Set&lt;String&gt; invalidRoleSet = new TreeSet&lt;&gt;(roles);</span>
+        // Normalize the list to a set
+<span class="nc" id="L36">        roles = new ArrayList&lt;&gt;(invalidRoleSet);</span>
+<span class="nc" id="L37">        invalidRoleSet.removeAll(Roles.ALL_ROLES);</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (!invalidRoleSet.isEmpty()) {</span>
+<span class="nc" id="L39">            String message = String.format(</span>
+                    &quot;Roles %s do not come from the set %s&quot;,
+                    invalidRoleSet, Roles.ALL_ROLES);
+<span class="nc" id="L42">            throw new IllegalArgumentException(message);</span>
+        }
+<span class="nc" id="L44">        this.roles = roles;</span>
+<span class="nc" id="L45">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SolutionAdvice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.logging.advice</a> &gt; <span class="el_source">SolutionAdvice.java</span></div><h1>SolutionAdvice.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.logging.advice;
+
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.UUID;
+
+@Data
+public class SolutionAdvice extends SolutionAdviceDTO {
+<span class="nc" id="L10">    private final ArrayList&lt;PreconditionAdviceDTO&gt; requestPreconditionAdviceList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L11">    private final ArrayList&lt;PreconditionAdviceDTO&gt; responsePreconditionAdviceList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L12">    private final ArrayList&lt;OperationAdviceDTO&gt; requestOperationAdviceList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L13">    private final ArrayList&lt;OperationAdviceDTO&gt; responseOperationAdviceList = new ArrayList&lt;&gt;();</span>
+
+    public SolutionAdvice(UUID id, String className, String name) {
+<span class="nc" id="L16">        super(id, className, name);</span>
+<span class="nc" id="L17">    }</span>
+
+    public void addRequestOperationAdvice(OperationAdviceDTO operationAdvice) {
+<span class="nc" id="L20">        requestOperationAdviceList.add(operationAdvice);</span>
+<span class="nc" id="L21">    }</span>
+
+    public void addResponseOperationAdvice(OperationAdviceDTO operationAdvice) {
+<span class="nc" id="L24">        responseOperationAdviceList.add(operationAdvice);</span>
+<span class="nc" id="L25">    }</span>
+
+    public void addRequestPreconditionAdvice(PreconditionAdviceDTO advice) {
+<span class="nc" id="L28">        int adviceIndex = requestPreconditionAdviceList.indexOf(advice);</span>
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        if ( adviceIndex &lt; 0 ) {</span>
+<span class="nc" id="L30">            requestPreconditionAdviceList.add(advice);</span>
+        }
+<span class="nc" id="L32">    }</span>
+
+    public void addResponsePreconditionAdvice(PreconditionAdviceDTO advice) {
+<span class="nc" id="L35">        int adviceIndex = responsePreconditionAdviceList.indexOf(advice);</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        if ( adviceIndex &lt; 0 ) {</span>
+<span class="nc" id="L37">            responsePreconditionAdviceList.add(advice);</span>
+        }
+<span class="nc" id="L39">    }</span>
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (obj instanceof SolutionAdvice other) {</span>
+<span class="nc" id="L44">            return this.getId().equals(other.getId());</span>
+        }
+
+<span class="nc" id="L47">        return false;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
