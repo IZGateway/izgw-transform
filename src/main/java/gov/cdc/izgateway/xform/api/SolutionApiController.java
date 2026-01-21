@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgateway.xform.model.Solution;
 import gov.cdc.izgateway.xform.security.Roles;
+import gov.cdc.izgateway.xform.services.PipelineService;
 import gov.cdc.izgateway.xform.services.SolutionService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
@@ -23,16 +24,15 @@ import java.util.logging.Level;
 @RestController
 public class SolutionApiController extends BaseApiController {
     private final SolutionService solutionService;
-
-    @Value("${xform.allow-delete-via-api}")
-    private Boolean allowDelete;
-
+    private final PipelineService pipelineService;
     @Autowired
     public SolutionApiController(
             SolutionService solutionService,
+            PipelineService pipelineService,
             AccessControlRegistry registry
     ) {
         this.solutionService = solutionService;
+        this.pipelineService = pipelineService;
         registry.register(this);
     }
 
@@ -85,8 +85,8 @@ public class SolutionApiController extends BaseApiController {
             @PathVariable UUID uuid
     ) {
 
-        if (Boolean.FALSE.equals(allowDelete)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if (pipelineService.isSolutionInUse(uuid)) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
 
         solutionService.delete(uuid);

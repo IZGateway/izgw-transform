@@ -1,5 +1,16 @@
 # IZ Gateway Transformation Service 0.14.0
-IGDD-2294 Update to utilize izgw-bom 
+IGDD-1664 - Xform: Refactor AccessControlService
+IGDD-1665 - Xform: Refactor EndpointStatusRepository and EndpointStatus
+IGDD-2025 - Xform Service - Solution data integrity re: pipelines
+IGDD-2068 - Xform Service - Address performance of IISHubServicer and IISService endpoints
+IGDD-2076 - Xform Service - Remove XFORM_ALLOW_DELETE_VIA_API flag
+IGDD-2094 - In V2 to FHIR, Provenance resources contain duplicate quotations
+IGDD-2105 - CI/CD pipeline updated based on results of tech-debt sprint for IZ Gateway Core
+IGDD-2106 - CI/CD pipeline updated based on tech-debt spring for IZ Gateway Transformation Service
+IGDD-2107 - CI/CD pipeline will produce code quality report(s) for IZ Gateway V2 to FHIR Library
+IGDD-2127 - Xform Service - Logs reset (HTTP DELETE to /rest/logs) no longer works
+IGDD-2294 - XFORM: Integrate izgw-bom to XFORM Service
+IGDD-2416 - Netty version bump
 
 # IZ Gateway Transformation Service 0.13.1
 Maintenance release to deploy updated Docker image with IZG Base Image updates

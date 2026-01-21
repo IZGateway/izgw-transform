@@ -8,7 +8,7 @@ This document aims to get Transformation Service up and running in minutes. Leav
 
 ## Prerequisites
 
-- Java 17
+- Java 21
 - Maven 3.6+
 - openssl
   - Needed as part of keystore creation for unit tests
