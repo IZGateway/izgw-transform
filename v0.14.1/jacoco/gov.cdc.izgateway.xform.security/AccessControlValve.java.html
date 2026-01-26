@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccessControlValve.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.security</a> &gt; <span class="el_source">AccessControlValve.java</span></div><h1>AccessControlValve.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.security;
+
+import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.xform.services.AccessControlService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
+import org.apache.catalina.valves.ValveBase;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+import java.io.IOException;
+
+/**
+ * Performs access control checks.
+ */
+<span class="nc" id="L21">@Slf4j</span>
+@Component(&quot;xformValveAccessControl&quot;)
+@Order(Ordered.HIGHEST_PRECEDENCE + 10)
+public class AccessControlValve extends ValveBase {
+    private final AccessControlService accessControlService;
+
+    @Autowired
+<span class="nc" id="L28">    public AccessControlValve(AccessControlService accessControlService) {</span>
+<span class="nc" id="L29">        this.accessControlService = accessControlService;</span>
+<span class="nc" id="L30">    }</span>
+
+    @Override
+    public void invoke(Request req, Response resp) throws IOException, ServletException {
+<span class="nc bnc" id="L34" title="All 2 branches missed.">        if (accessAllowed(req, resp)) {</span>
+<span class="nc" id="L35">            this.getNext().invoke(req, resp);</span>
+        }
+<span class="nc" id="L37">    }</span>
+
+    public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
+<span class="nc" id="L40">        String path = req.getRequestURI();</span>
+<span class="nc" id="L41">        Boolean accessAllowed = accessControlService.checkAccess(req.getMethod(), path);</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (accessAllowed == null) {</span>
+<span class="nc" id="L43">            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);</span>
+<span class="nc" id="L44">            log.trace(&quot;Path does not exist: {}&quot;, path);</span>
+<span class="nc" id="L45">            return false;</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        } else if ( Boolean.FALSE.equals(accessAllowed) ) {</span>
+<span class="nc" id="L47">            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span>
+<span class="nc" id="L48">            log.trace(&quot;Access denied to protected URL {} address by {} at {}&quot;, </span>
+        		path, 
+<span class="nc" id="L50">        		RequestContext.getPrincipal().getName(), </span>
+<span class="nc" id="L51">        		RequestContext.getTransactionData().getSource().getIpAddress()</span>
+            );
+<span class="nc" id="L53">            return false;</span>
+        } else {
+<span class="nc" id="L55">            log.trace(&quot;Access granted to protected URL {} address by {} at {}&quot;, </span>
+        		path, 
+<span class="nc" id="L57">        		RequestContext.getPrincipal().getName(), </span>
+<span class="nc" id="L58">        		RequestContext.getTransactionData().getSource().getIpAddress()</span>
+        	);
+<span class="nc" id="L60">            return true;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

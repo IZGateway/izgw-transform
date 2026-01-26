@@ -1,0 +1,637 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IDIMatch.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.endpoints.fhir</a> &gt; <span class="el_source">IDIMatch.java</span></div><h1>IDIMatch.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.endpoints.fhir;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.similarity.LevenshteinDetailedDistance;
+import org.apache.commons.text.similarity.LevenshteinResults;
+import org.hl7.fhir.r4.model.Address;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Bundle.SearchEntryMode;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.ContactPoint;
+import org.hl7.fhir.r4.model.ContactPoint.ContactPointSystem;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Resource;
+import org.hl7.fhir.r4.model.StringType;
+import com.google.common.base.Objects;
+
+import gov.cdc.izgw.v2tofhir.datatype.AddressParser;
+import gov.cdc.izgw.v2tofhir.utils.ISO3166;
+import lombok.Data;
+
+/**
+ * This class implements the IDI Match Scoring Algorithm described
+ * in the HL7 Interoperable Digital Identity and Patient Matching FHIR
+ * implementation guide.
+ * 
+ * @author Audacious Inquiry
+ * @see &lt;a href=&quot;https://hl7.org/fhir/us/identity-matching/2024SEP/patient-matching.html#scoring-matches--responders-system-match-output-quality-score&quot;&gt;Scoring Matches&lt;/a&gt;
+ */
+public class IDIMatch {
+    
+	/**
+	 * @author Audacious Inquiry
+	 * The parameters to use for patient matching
+	 */
+	@Data
+	public static class PatientMatchParameters {
+	    private Patient searchPatient;
+	    private int count = 5;
+	    private boolean onlySingleMatch = false;
+	    private boolean onlyCertainMatches = false;
+	}
+
+    /** The best name match score     */
+    public static final double BEST_SCORE = 0.99;
+    /** A superior name match score     */
+    public static final double SUPERIOR_SCORE = 0.80;
+    /** A very good name match score */
+    public static final double VERY_GOOD_SCORE = 0.70;
+    /** A good name match score      */
+    public static final double GOOD_SCORE = 0.60;
+    
+    /** Code Systems used for ID types in IDIMatch */ 
+<span class="nc" id="L66">    public static final List&lt;String&gt; ID_SYSTEMS = Collections.unmodifiableList(Arrays.asList(</span>
+        &quot;http://terminology.hl7.org/CodeSystem/v2-0203&quot;, 
+        &quot;http://hl7.org/fhir/us/identity-matching/CodeSystem/Identity-Identifier-cs&quot;
+    ));
+    // It's all static.
+    private IDIMatch() {}
+    
+    /**
+     * Determines whether the identifier type matches one of the HL7 codes for
+     * identifier type systems.
+     *  
+     * @param idType    The type of the identifier
+     * @param types        The set of identifier types to check for
+     * @return    True if one of the codes in idType matches one of the codes in types. 
+     */
+    public static boolean idTypeMatches(CodeableConcept idType, List&lt;String&gt; types) {
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        for (Coding coding: idType.getCoding()) {</span>
+<span class="nc bnc" id="L83" title="All 4 branches missed.">            if (coding.hasSystem() &amp;&amp; !ID_SYSTEMS.contains(coding.getSystem())) {</span>
+<span class="nc" id="L84">                continue;</span>
+            }
+<span class="nc bnc" id="L86" title="All 2 branches missed.">            if (types.contains(coding.getCode().toUpperCase())) { </span>
+<span class="nc" id="L87">                return true;</span>
+            }
+<span class="nc" id="L89">        }</span>
+<span class="nc" id="L90">        return false;</span>
+    }
+
+    /**
+     * Reports on where there is a match on two identifiers in search and found lists.
+     * @param search    The list of identifiers being searched for
+     * @param found        The list of identifiers found
+     * @param type        The types of identifiers to check.
+     * @return    true if there is a match.
+     */
+    public static boolean doIdentifiersMatch(List&lt;Identifier&gt; search, List&lt;Identifier&gt; found, String... type) {
+<span class="nc" id="L101">        List&lt;String&gt; types = Arrays.asList(type);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        Set&lt;Identifier&gt; searchSet = new TreeSet&lt;&gt;(&quot;SSN4&quot;.equals(type[0]) ? IDIMatch::last4Comparator : IDIMatch::idComparator);</span>
+<span class="nc" id="L103">        searchSet.addAll(search.stream().filter(i -&gt; idTypeMatches(i.getType(), types)).toList());</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        Set&lt;Identifier&gt; foundSet = new TreeSet&lt;&gt;(&quot;SSN4&quot;.equals(type[0]) ? IDIMatch::last4Comparator : IDIMatch::idComparator);</span>
+<span class="nc" id="L105">        foundSet.addAll(found.stream().filter(i -&gt; idTypeMatches(i.getType(), types)).toList());</span>
+<span class="nc" id="L106">        searchSet.retainAll(foundSet);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        return !searchSet.isEmpty();</span>
+    }
+    
+    /**
+     * Compares the system and value of two identifiers for a match.
+     * NOTE: This method performs a case insensitive match b/c for systems, it case is
+     * non-essential variation, and few if any identifier systems will care about case 
+     * either.  Those that do (e.g., in base-64 encoded hashes of random values) will be 
+     * extremely UNLIKELY to collide, whereas the chance of human error for using
+     * lowercase letters where uppercase are required is much higher and creates an 
+     * excess of false MIS-matches.  None of the idTypes used by this class ever use
+     * base-64 encoding or anything similar.
+     * 
+     * @param id1    The first identifier
+     * @param id2    The second identifier
+     * @return    true if the system and value match, false otherwise.
+     */
+    public static int idComparator(Identifier id1, Identifier id2) {
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        if (Objects.equal(id1, id2)) {</span>
+<span class="nc" id="L126">            return 0;</span>
+        }
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (id1 == null) {</span>
+<span class="nc" id="L129">            return -1;</span>
+        }
+<span class="nc bnc" id="L131" title="All 2 branches missed.">        if (id2 == null) {</span>
+<span class="nc" id="L132">            return 1;</span>
+        }
+<span class="nc" id="L134">        int comp = StringUtils.compareIgnoreCase(id1.getSystem(), id2.getSystem());</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (comp != 0) {</span>
+<span class="nc" id="L136">            return comp;</span>
+        }
+<span class="nc" id="L138">        return StringUtils.compareIgnoreCase(id1.getValue(), id2.getValue());</span>
+    }
+    
+    /**
+     * Compares the last 4 characters (digits) of identifiers. 
+     * @param id1    The first identifier
+     * @param id2    The second identifier
+     * @return true if the last four characters match.
+     */
+    public static int last4Comparator(Identifier id1, Identifier id2) {
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        if (Objects.equal(id1, id2)) {</span>
+<span class="nc" id="L149">            return 0;</span>
+        }
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        if (id1 == null) {</span>
+<span class="nc" id="L152">            return -1;</span>
+        }
+<span class="nc bnc" id="L154" title="All 2 branches missed.">        if (id2 == null) {</span>
+<span class="nc" id="L155">            return 1;</span>
+        }
+<span class="nc" id="L157">        return StringUtils.compareIgnoreCase(StringUtils.right(id1.getValue(), 4), StringUtils.right(id2.getValue(), 4));</span>
+    }
+    
+    
+    /**
+     * Checks for a given/family name match.  Two names match if their given names are equivalent
+     * and the family name matches. This is a case insensitive match.  Hyphens are treated as being
+     * equivalent to spaces.
+     * 
+     * @param search    The list of names to match
+     * @param found        The list of names found
+     * @return    true if at least one pair of names match from search and found
+     */
+    public static boolean doesNameMatch(List&lt;HumanName&gt; search, List&lt;HumanName&gt; found) {
+<span class="nc bnc" id="L171" title="All 2 branches missed.">        for (HumanName s: search) {</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">            for (HumanName f: found) {</span>
+<span class="nc bnc" id="L173" title="All 2 branches missed.">                if (!stringsMatch(s.getFamily(), f.getFamily())) {</span>
+                    // Family names don't match.
+<span class="nc" id="L175">                    continue;</span>
+                }
+<span class="nc bnc" id="L177" title="All 2 branches missed.">                if (givensAreEquivalent(s.getGiven(), f.getGiven())) {</span>
+<span class="nc" id="L178">                    return true;</span>
+                }
+<span class="nc" id="L180">            }</span>
+<span class="nc" id="L181">        }</span>
+<span class="nc" id="L182">        return false;</span>
+    }
+
+    /**
+     * Compares two given names for equivalence.  Two given names are equivalent 
+     * if they BOTH don't have a given name, OR 
+     * both first names match (common case), OR
+     * the first name of one matches the second name of the other
+     * 
+     * @param search    The sought for given name parts 
+     * @param found        The found given name parts
+     * @return    true if they match
+     */
+    private static boolean givensAreEquivalent(List&lt;StringType&gt; search, List&lt;StringType&gt; found) {
+        // Neither has a given name
+<span class="nc bnc" id="L197" title="All 4 branches missed.">        if (CollectionUtils.isEmpty(search) &amp;&amp; CollectionUtils.isEmpty(found)) {</span>
+<span class="nc" id="L198">            return true;</span>
+        }
+        // One has a given name but the other doesn't.
+<span class="nc bnc" id="L201" title="All 2 branches missed.">        if (CollectionUtils.isEmpty(search) != CollectionUtils.isEmpty(found)) {</span>
+<span class="nc" id="L202">            return false;</span>
+        }
+
+        // Check for most common case
+<span class="nc" id="L206">        String searchFirst = search.get(0).asStringValue();</span>
+<span class="nc" id="L207">        String foundFirst = found.get(0).asStringValue();</span>
+<span class="nc" id="L208">        boolean match = stringsMatch(searchFirst, foundFirst);</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">        if (match) {</span>
+<span class="nc" id="L210">            return true;</span>
+        }
+        
+<span class="nc bnc" id="L213" title="All 4 branches missed.">        if (search.size() == 1 &amp;&amp; found.size() == 1) {</span>
+<span class="nc" id="L214">            return false;</span>
+        }
+        
+        // There's more than one given name and the first names don't match.
+        // Compare the first given name against the second given name.
+<span class="nc bnc" id="L219" title="All 4 branches missed.">        if (found.size() &gt; 1 &amp;&amp; stringsMatch(searchFirst, found.get(1).asStringValue())) {</span>
+<span class="nc" id="L220">            return true;</span>
+        }
+        
+<span class="nc bnc" id="L223" title="All 4 branches missed.">        return search.size() &gt; 1 &amp;&amp; stringsMatch(search.get(1).asStringValue(), foundFirst);</span>
+    }
+    
+    /**
+     * Compares two strings for a match.  This is a case-insensitive match.
+     * Two strings are considered to be a match if they are within an edit
+     * distance of one of each other where 0 = no change, and 1 = a 
+     * single deletion, insertion, replacement, or transposition.
+     * 
+     * This uses the Apache Text Levenshtein Distance metric implementation
+     * and checks afterwards for transposition errors using brute force
+     * in that special case.
+     * 
+     * @param search    The strings being sought
+     * @param found        The strings that was found
+     * @return true if the two strings match.
+     */
+    public static boolean stringsMatch(String search, String found) {
+<span class="nc bnc" id="L241" title="All 2 branches missed.">        if (StringUtils.equalsIgnoreCase(search, found)) {</span>
+<span class="nc" id="L242">            return true;</span>
+        }
+<span class="nc" id="L244">        search = StringUtils.upperCase(search);</span>
+<span class="nc" id="L245">        found = StringUtils.upperCase(found);</span>
+        
+        // Other checks.
+<span class="nc bnc" id="L248" title="All 2 branches missed.">        if (Math.abs(search.length() - found.length()) &gt; 1) {</span>
+            // Requires more than one insert/delete and so they don't match.
+<span class="nc" id="L250">            return false;</span>
+        }
+        
+<span class="nc" id="L253">        LevenshteinDetailedDistance l = new LevenshteinDetailedDistance(2);</span>
+<span class="nc" id="L254">        LevenshteinResults results = l.apply(search, found);</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">        if (results.getDistance() &lt; 0) {</span>
+<span class="nc" id="L256">            return false;</span>
+        }
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        if (results.getDistance() &lt;= 2) {</span>
+<span class="nc" id="L259">            return true;</span>
+        } 
+        
+<span class="nc" id="L262">        return isTransposition(search, found, results);</span>
+    }
+
+    private static boolean isTransposition(String search, String found, LevenshteinResults results) {
+        // distance is two, could be a single transposition, or some other pair of errors.
+<span class="nc bnc" id="L267" title="All 4 branches missed.">        if (search.length() == found.length() &amp;&amp; results.getSubstituteCount() == 2) {</span>
+            // Possibly a transpose, figure out if it is.
+<span class="nc" id="L269">            StringBuilder f = new StringBuilder(found);</span>
+<span class="nc" id="L270">            StringBuilder s = new StringBuilder(search);</span>
+<span class="nc bnc" id="L271" title="All 2 branches missed.">            for (int i = 0; i &lt; f.length() - 1; i++) {</span>
+                // Swap i and i + 1
+<span class="nc" id="L273">                swap(s, i, i + 1);</span>
+<span class="nc bnc" id="L274" title="All 2 branches missed.">                if (StringUtils.equals(s,  f)) {</span>
+<span class="nc" id="L275">                    return true;</span>
+                }
+                // Swap them back
+<span class="nc" id="L278">                swap(s, i, i + 1);</span>
+<span class="nc bnc" id="L279" title="All 2 branches missed.">                if (i + 2 &lt; f.length()) {</span>
+<span class="nc" id="L280">                    swap(s, i, i + 2); // Swap around a single character.</span>
+<span class="nc bnc" id="L281" title="All 2 branches missed.">                    if (StringUtils.equals(s,  f)) {</span>
+<span class="nc" id="L282">                        return true;</span>
+                    }
+<span class="nc" id="L284">                    swap(s, i, i + 2); // Swap them back.</span>
+                }
+            }
+        }
+<span class="nc" id="L288">        return false;</span>
+	}
+    
+    private static void swap(StringBuilder b, int i, int j) {
+<span class="nc" id="L292">        char c = b.charAt(i);</span>
+<span class="nc" id="L293">        b.setCharAt(i, b.charAt(j));</span>
+<span class="nc" id="L294">        b.setCharAt(j, c);</span>
+<span class="nc" id="L295">    }</span>
+
+    /**
+     * Compare two human names to see if names after the first given name (i.e., the middle names)
+     * match.
+     * @param search    The name or names being sought.
+     * @param found        The name or names that were found.
+     * @return true if the middle names match in one pairing.
+     */
+    public static boolean doMiddleNamesMatch(List&lt;HumanName&gt; search, List&lt;HumanName&gt; found) {
+<span class="nc bnc" id="L305" title="All 8 branches missed.">        if (search == null || search.isEmpty() || found == null || found.isEmpty()) {</span>
+<span class="nc" id="L306">            return false;</span>
+        }
+<span class="nc bnc" id="L308" title="All 2 branches missed.">        for (HumanName s: search) {</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">            for (HumanName f: found) {</span>
+                // If both names have at least two given names, compare them after first given name.
+<span class="nc bnc" id="L311" title="All 4 branches missed.">                if (hasAtLeastTwoGivenNames(s) &amp;&amp; hasAtLeastTwoGivenNames(f)) {</span>
+<span class="nc" id="L312">                    List&lt;StringType&gt; sGivens = new ArrayList&lt;&gt;(s.getGiven());</span>
+<span class="nc" id="L313">                    List&lt;StringType&gt; fGivens = new ArrayList&lt;&gt;(f.getGiven());</span>
+<span class="nc" id="L314">                    sGivens.remove(0);</span>
+<span class="nc" id="L315">                    fGivens.remove(0);</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">                    if (givensAreEquivalent(sGivens, fGivens)) {</span>
+<span class="nc" id="L317">                        return true;</span>
+                    }
+                }
+<span class="nc" id="L320">            }</span>
+<span class="nc" id="L321">        }</span>
+<span class="nc" id="L322">        return false;</span>
+    }
+    
+    private static boolean hasAtLeastTwoGivenNames(HumanName n) {
+<span class="nc bnc" id="L326" title="All 4 branches missed.">    	return n.hasGiven() &amp;&amp; n.getGiven().size() &gt; 1;</span>
+    }
+    /**
+     * See if the found addresses match the searched for address.
+     * 
+     * @param search The address being searched for
+     * @param found    The address or addresses found
+     * @return True if the address matches
+     */
+    public static boolean doesAddressMatch(List&lt;Address&gt; search, List&lt;Address&gt; found) {
+<span class="nc bnc" id="L336" title="All 2 branches missed.">        for (Address s: search) {</span>
+<span class="nc bnc" id="L337" title="All 2 branches missed.">            for (Address f: found) {</span>
+<span class="nc bnc" id="L338" title="All 4 branches missed.">                if (!countriesMatch(s, f) || !addressLinesMatch(s, f)) {</span>
+<span class="nc" id="L339">                    continue;</span>
+                }
+<span class="nc bnc" id="L341" title="All 4 branches missed.">                if (zipsMatch(s.getPostalCode(), f.getPostalCode()) || cityAndStateMatch(s, f)) {</span>
+<span class="nc" id="L342">                    return true;</span>
+                }
+
+<span class="nc" id="L345">            }</span>
+<span class="nc" id="L346">        }</span>
+<span class="nc" id="L347">        return false;</span>
+    }
+
+    private static boolean cityAndStateMatch(Address s, Address f) {
+<span class="nc bnc" id="L351" title="All 2 branches missed.">        return stringsMatch(s.getCity(), f.getCity()) </span>
+<span class="nc bnc" id="L352" title="All 2 branches missed.">            &amp;&amp; statesMatch(s.getState(), f.getState());</span>
+	}
+
+	private static boolean addressLinesMatch(Address s, Address f) {
+<span class="nc bnc" id="L356" title="All 4 branches missed.">        if (!s.hasLine() || !f.hasLine()) {</span>
+<span class="nc" id="L357">            return false;</span>
+        }
+<span class="nc" id="L359">        StringType sLine = s.getLine().get(0);</span>
+<span class="nc" id="L360">        StringType fLine = f.getLine().get(0);</span>
+        
+        // If primary address lines don't match, skip this pair
+<span class="nc bnc" id="L363" title="All 2 branches missed.">        if (!stringsMatch(sLine.asStringValue(), fLine.asStringValue())) {</span>
+<span class="nc" id="L364">        	return false;</span>
+        }
+        // If secondary address lines both exist and don't match, skip this pair
+<span class="nc bnc" id="L367" title="All 4 branches missed.">        if (s.getLine().size() &gt; 1 &amp;&amp; f.getLine().size() &gt; 1) {</span>
+<span class="nc" id="L368">            sLine = s.getLine().get(1);</span>
+<span class="nc" id="L369">            fLine = f.getLine().get(1);</span>
+<span class="nc bnc" id="L370" title="All 2 branches missed.">            if (!stringsMatch(sLine.asStringValue(), fLine.asStringValue())) {</span>
+<span class="nc" id="L371">            	return false;</span>
+            }
+        }
+        
+<span class="nc" id="L375">        return true;</span>
+	}
+
+    /**
+     * Determines if state names or abbreviations match.  
+     * 
+     * NOTE: This only works for states, provinces or territories of the US, 
+     * Canada and Mexico.
+     * 
+     * @param search    The sought after state or state abbreviation
+     * @param found        The found state or state abbreviation
+     * @return true if they two represent the same state (or province)
+     */
+    public static boolean statesMatch(String search, String found) {
+<span class="nc bnc" id="L389" title="All 2 branches missed.">        if (Objects.equal(search, found)) {</span>
+<span class="nc" id="L390">            return true;</span>
+        }
+        
+        // One reports a country but the other does not, treat as a match
+<span class="nc bnc" id="L394" title="All 4 branches missed.">        if (search == null || found == null) {</span>
+<span class="nc" id="L395">            return true;</span>
+        }
+        
+<span class="nc" id="L398">        search = AddressParser.getStateAbbreviation(search);</span>
+<span class="nc" id="L399">        found = AddressParser.getStateAbbreviation(found);</span>
+<span class="nc" id="L400">        return Objects.equal(search, found);</span>
+    }
+
+    /**
+     * Compare two countries for a match.  Will match a country name or alias
+     * with it's two or three-letter ISO code.
+     * 
+     * @param s The sought for country
+     * @param f The found country
+     * @return    true if the two match
+     */
+    public static boolean countriesMatch(Address s, Address f) {
+    	// If one has a country, and the other doesn't, or both are missing country
+<span class="nc bnc" id="L413" title="All 4 branches missed.">    	if (s.hasCountry() != f.hasCountry() || !s.hasCountry()) {</span>
+    		// Then countries match.
+<span class="nc" id="L415">    		return true;</span>
+    	}
+    	// Both have a country
+<span class="nc" id="L418">    	String search = s.getCountry();</span>
+<span class="nc" id="L419">    	String found = f.getCountry();</span>
+<span class="nc bnc" id="L420" title="All 2 branches missed.">        if (Objects.equal(search, found)) {</span>
+<span class="nc" id="L421">            return true;</span>
+        }
+        
+<span class="nc" id="L424">        search = ISO3166.twoLetterCode(search);</span>
+<span class="nc" id="L425">        found = ISO3166.twoLetterCode(found);</span>
+<span class="nc" id="L426">        return search.equals(found);</span>
+    }
+    /**
+     * Compare two zip codes for equivalence
+     * @param search The sought after postal code
+     * @param found    The found postal code
+     * @return true if the first five digits match (e.g., US, Mexico) or if 
+     * non-numeric (e.g., Canada) and the strings (sans spaces) match.
+     */
+    public static boolean zipsMatch(String search, String found) {
+        // Normalize by removing hyphens (e.g., US) and spaces (e.g., Canada).
+<span class="nc" id="L437">        search = StringUtils.replace(search, &quot;- &quot;, &quot;&quot;);</span>
+<span class="nc" id="L438">        found = StringUtils.replace(found, &quot;- &quot;, &quot;&quot;);</span>
+<span class="nc bnc" id="L439" title="All 4 branches missed.">        if (StringUtils.isNumeric(search) &amp;&amp; StringUtils.isNumeric(found)) {</span>
+<span class="nc" id="L440">            return StringUtils.equals(StringUtils.left(search, 5), StringUtils.left(found, 5));</span>
+        }
+<span class="nc" id="L442">        return StringUtils.equalsIgnoreCase(search, found);</span>
+    }
+
+    /**
+     * Compares two dates for a match
+     * @param search    The sought for date
+     * @param found        The found date
+     * @return    true if the two dates match
+     */
+    public static boolean doesDobMatch(Date search, Date found) {
+<span class="nc bnc" id="L452" title="All 2 branches missed.">        if (Objects.equal(search, found)) {</span>
+<span class="nc" id="L453">            return true;</span>
+        }
+        // One or the other is missing DOB, there is no match.
+<span class="nc bnc" id="L456" title="All 4 branches missed.">        if (search == null || found == null) {</span>
+<span class="nc" id="L457">            return false;</span>
+        }
+<span class="nc" id="L459">        return String.format(&quot;%tF&quot;, search).equals(String.format(&quot;%tF&quot;, found));</span>
+    }
+
+    /**
+     * Generic method to compare two ContactPoint lists to see if there is a match
+     * @param search    The sought after ContactPoint
+     * @param found        The found ContactPoint
+     * @param system    The type of ContactPoint to check for
+     * @return    true if at least one pair matches
+     */
+    public static boolean doesTelecomMatch(List&lt;ContactPoint&gt; search, List&lt;ContactPoint&gt; found, ContactPointSystem system) {
+<span class="nc bnc" id="L470" title="All 2 branches missed.">        for (ContactPoint s: search) {</span>
+<span class="nc bnc" id="L471" title="All 2 branches missed.">            if (!system.equals(s.getSystem())) {</span>
+<span class="nc" id="L472">                continue;</span>
+            }
+<span class="nc bnc" id="L474" title="All 2 branches missed.">            for (ContactPoint f: found) {</span>
+<span class="nc bnc" id="L475" title="All 2 branches missed.">                if (!system.equals(f.getSystem())) {</span>
+<span class="nc" id="L476">                    continue;</span>
+                }
+                // s and f have same system.
+<span class="nc" id="L479">                String sValue = s.getValue();</span>
+<span class="nc" id="L480">                String fValue = f.getValue();</span>
+                
+                // remove any punctuation before testing phone numbers
+<span class="nc bnc" id="L483" title="All 2 branches missed.">                if (ContactPointSystem.PHONE.equals(system)) {</span>
+<span class="nc" id="L484">                    sValue = StringUtils.replace(sValue, &quot;.-()[] &quot;, &quot;&quot;);</span>
+<span class="nc" id="L485">                    fValue = StringUtils.replace(fValue, &quot;.-()[] &quot;, &quot;&quot;);</span>
+                }
+<span class="nc bnc" id="L487" title="All 2 branches missed.">                if (StringUtils.equalsIgnoreCase(sValue, fValue)) {</span>
+<span class="nc" id="L488">                    return true;</span>
+                }
+<span class="nc" id="L490">            }</span>
+<span class="nc" id="L491">        }</span>
+<span class="nc" id="L492">        return false;</span>
+    }
+
+    /**
+     * Check two lists of addresses for a zip-code match
+     * @param search The sought after addresses
+     * @param found	 The found addresses
+     * @return       true if one pair in sought and found have a matching zip code
+     */
+    public static boolean doesZipMatch(List&lt;Address&gt; search, List&lt;Address&gt; found) {
+<span class="nc bnc" id="L502" title="All 2 branches missed.">        for (Address s: search) {</span>
+<span class="nc bnc" id="L503" title="All 2 branches missed.">            for (Address f: found) {</span>
+<span class="nc" id="L504">                String sPostal = StringUtils.defaultString(s.getPostalCode());</span>
+<span class="nc" id="L505">                String fPostal = StringUtils.defaultString(f.getPostalCode());</span>
+<span class="nc bnc" id="L506" title="All 2 branches missed.">                if (zipMatches(sPostal, fPostal)) {</span>
+<span class="nc" id="L507">                	return true;</span>
+                }
+<span class="nc" id="L509">            }</span>
+<span class="nc" id="L510">        }</span>
+<span class="nc" id="L511">        return false;</span>
+    }
+
+	private static boolean zipMatches(String sPostal, String fPostal) {
+<span class="nc bnc" id="L515" title="All 4 branches missed.">		if (StringUtils.isNumeric(sPostal) &amp;&amp; StringUtils.isNumeric(fPostal) </span>
+<span class="nc bnc" id="L516" title="All 2 branches missed.">			&amp;&amp; (StringUtils.equals(fPostal, sPostal) </span>
+<span class="nc bnc" id="L517" title="All 2 branches missed.">	    	   || StringUtils.equals(StringUtils.left(fPostal, 5), StringUtils.left(sPostal, 5)))</span>
+	    ) {
+<span class="nc" id="L519">	        return true;</span>
+	    }
+<span class="nc" id="L521">		return StringUtils.equalsIgnoreCase(sPostal, fPostal);</span>
+	}
+
+    /**
+     * Score the results in the bundle.
+     * 
+     * Scores the results in the bundle by comparing each returned patient against searchPatient
+     * and scoring according to the FHIR Interoperable and Digital Identity Patient Matching guide.
+     *  
+     * @param b    The bundle to score
+     * @param match The patient being searched for
+     * @see &lt;a href=&quot;https://hl7.org/fhir/us/identity-matching/2024SEP/patient-matching.html#scoring-matches--responders-system-match-output-quality-score&quot;&gt;Scoring Matches&lt;/a&gt;
+     */
+    public static void score(Bundle b, PatientMatchParameters match) {
+<span class="nc bnc" id="L535" title="All 2 branches missed.">        for (BundleEntryComponent entry: b.getEntry()) {</span>
+<span class="nc" id="L536">            Resource r = entry.getResource();</span>
+<span class="nc bnc" id="L537" title="All 2 branches missed.">            if (!(r instanceof Patient p)) {</span>
+                continue;
+            }
+<span class="nc" id="L540">            setScore(entry, getScore(match.searchPatient, p));</span>
+<span class="nc" id="L541">        }</span>
+<span class="nc" id="L542">    }</span>
+
+    /**
+     * This method computes the score for the comparison of two identifiers
+     * @param search	The searched for identifier
+     * @param p	The found identifier to score against
+     * @return	The match score
+     */
+    @SuppressWarnings({ &quot;checkstyle:npathcomplexity&quot;, &quot;checkstyle:cyclomaticcomplexity&quot; })
+    private static double getScore(Patient search, Patient p) {
+        
+        // Responder's MRN/MPI or known digital identifier
+<span class="nc" id="L554">        boolean mpiMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), &quot;MR&quot;, &quot;SR&quot;);</span>
+<span class="nc" id="L555">        boolean idMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), &quot;DL&quot;, &quot;PPN&quot;, &quot;MB&quot;);</span>
+<span class="nc" id="L556">        boolean nameMatch = doesNameMatch(search.getName(), p.getName());</span>
+<span class="nc bnc" id="L557" title="All 2 branches missed.">        if (!nameMatch) {</span>
+            // Everything else requires a name match on at least first and last name.
+<span class="nc" id="L559">            return 0.0;</span>
+        }
+<span class="nc bnc" id="L561" title="All 4 branches missed.">        if (mpiMatch || idMatch) {</span>
+            /* First Name &amp; Last Name &amp; Driver's License Number and Issuing US State
+             * First Name &amp; Last Name &amp; Passport Number and Issuing Country
+             * First Name &amp; Last Name &amp; Insurance Member Identifier and Payer ID
+             */
+<span class="nc" id="L566">            return BEST_SCORE;</span>
+        }
+        
+<span class="nc" id="L569">        boolean subscriberMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), &quot;SN&quot;);</span>
+<span class="nc" id="L570">        boolean ssnMatch = doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), &quot;SS&quot;, &quot;SB&quot;);</span>
+<span class="nc" id="L571">        boolean dobMatch = doesDobMatch(search.getBirthDate(), p.getBirthDate());</span>
+<span class="nc bnc" id="L572" title="All 6 branches missed.">        if (dobMatch &amp;&amp; (subscriberMatch || ssnMatch)) {</span>
+            /* First Name &amp; Last Name &amp; Date of Birth &amp; Insurance Subscriber Identifier and Payer ID
+             * First Name &amp; Last Name &amp; Date of Birth &amp; Social Security Number
+             */
+<span class="nc" id="L576">            return BEST_SCORE;</span>
+        } 
+        
+<span class="nc bnc" id="L579" title="All 2 branches missed.">        if (subscriberMatch) {</span>
+            /* First Name &amp; Last Name &amp; Insurance Subscriber Identifier and Payer ID */
+<span class="nc" id="L581">            return SUPERIOR_SCORE;</span>
+        }
+<span class="nc bnc" id="L583" title="All 2 branches missed.">        if (!dobMatch) {</span>
+<span class="nc" id="L584">            return 0.0;</span>
+        }
+        
+<span class="nc" id="L587">        boolean addressMatch = doesAddressMatch(search.getAddress(), p.getAddress());</span>
+<span class="nc bnc" id="L588" title="All 2 branches missed.">        if (addressMatch) {</span>
+            /* First Name &amp; Last Name &amp; Date of Birth &amp; Address line &amp; Zip (first 5)
+             * First Name &amp; Last Name &amp; Date of Birth &amp; Address line &amp; City &amp; State
+             */
+<span class="nc" id="L592">            return SUPERIOR_SCORE;</span>
+        }
+<span class="nc" id="L594">        boolean emailMatch = doesTelecomMatch(search.getTelecom(), p.getTelecom(), ContactPoint.ContactPointSystem.EMAIL);</span>
+<span class="nc bnc" id="L595" title="All 2 branches missed.">        if (emailMatch) {</span>
+            /* First Name &amp; Last Name &amp; Date of Birth &amp; email */
+<span class="nc" id="L597">            return SUPERIOR_SCORE;</span>
+        }
+<span class="nc" id="L599">        boolean phoneMatch = doesTelecomMatch(search.getTelecom(), p.getTelecom(), ContactPoint.ContactPointSystem.PHONE);</span>
+<span class="nc bnc" id="L600" title="All 2 branches missed.">        if (phoneMatch) {</span>
+            /* First Name &amp; Last Name &amp; Date of Birth &amp; phone
+             * First Name &amp; Last Name &amp; Date of Birth &amp; Sex (Assigned at Birth) &amp; Phone
+             * NOTE: Former subsumes latter 
+             */
+<span class="nc" id="L605">            return VERY_GOOD_SCORE;</span>
+        }
+        
+        /* At this stage, if gender matches, then we have at least a good score.
+         * First Name &amp; Last Name &amp; Date of Birth &amp; Sex (Assigned at Birth)
+         * First Name &amp; Last Name &amp; Date of Birth &amp; Sex (Assigned at Birth) &amp; Middle Name (initial)
+         */
+<span class="nc bnc" id="L612" title="All 2 branches missed.">        double score = !Objects.equal(search.getGender(), p.getGender()) ? GOOD_SCORE : 0.0;</span>
+
+        // At this stage, name, dob and gender match, so score is at least GOOD.
+        // It gets to VERY_GOOD if Last 4 of SSN, Phone, Zip or Middle name matches.
+        /* First Name &amp; Last Name &amp; Date of Birth &amp; Sex (Assigned at Birth) &amp; SSN (last 4) */
+<span class="nc bnc" id="L617" title="All 2 branches missed.">        if (doIdentifiersMatch(search.getIdentifier(), p.getIdentifier(), &quot;SSN4&quot;, &quot;SS&quot;)) {</span>
+<span class="nc" id="L618">            return VERY_GOOD_SCORE;</span>
+        }
+        /* First Name &amp; Last Name &amp; Date of Birth &amp; Sex (Assigned at Birth) &amp; Zip (first 5) */
+<span class="nc bnc" id="L621" title="All 2 branches missed.">        if (doesZipMatch(search.getAddress(), p.getAddress())) {</span>
+<span class="nc" id="L622">            return VERY_GOOD_SCORE;</span>
+        }
+<span class="nc bnc" id="L624" title="All 2 branches missed.">        if (doMiddleNamesMatch(search.getName(), p.getName())) {</span>
+            /* First Name &amp; Last Name &amp; Date of Birth &amp; Sex (Assigned at Birth) &amp; Middle Name */
+<span class="nc" id="L626">            return VERY_GOOD_SCORE;</span>
+        }
+<span class="nc" id="L628">        return score;</span>
+    }
+
+    private static void setScore(BundleEntryComponent entry, double d) {
+<span class="nc" id="L632">        entry.getSearch().setScore(d);</span>
+<span class="nc" id="L633">        entry.getSearch().setMode(SearchEntryMode.MATCH);</span>
+<span class="nc" id="L634">    }</span>
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
