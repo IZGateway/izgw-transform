@@ -1,3 +1,7 @@
+# IZ Gateway Transformation Service 0.14.1
+- Maintenance release to create build from latest IZG Base Image
+- IGDD-2462 - izgw-bom bump to 1.2.0 (bump logback)
+
 # IZ Gateway Transformation Service 0.14.0
 IGDD-1664 - Xform: Refactor AccessControlService
 IGDD-1665 - Xform: Refactor EndpointStatusRepository and EndpointStatus
