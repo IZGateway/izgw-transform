@@ -1,8 +1,10 @@
 FROM ghcr.io/izgateway/alpine-node-openssl-fips:latest
 
+# Install Tini and Java
 RUN apk update && \
     apk upgrade --no-cache && \
-    apk add --no-cache openjdk21-jre
+    apk add --no-cache tini && \
+    apk add --no-cache openjdk21-jre --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
 
 # Define arguments (set in izgw-transform pom.xml)
 ARG JAR_FILENAME
@@ -23,8 +25,6 @@ COPY docker/data/logrotate.conf /etc/logrotate.conf
 RUN (crontab -l 2>/dev/null; echo "*/15 * * * * /etc/periodic/daily/logrotate") | crontab -
 
 WORKDIR /
-# Install tini
-RUN apk add --no-cache tini
 # Install filebeat
 # Install metricbeat
 # Rename default dnsmasq file to make sure dnsmasq does not read its entries
