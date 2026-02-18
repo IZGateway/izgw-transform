@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EndpointUris.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.camel.constants</a> &gt; <span class="el_source">EndpointUris.java</span></div><h1>EndpointUris.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.camel.constants;
+
+/**
+ * @author Audacious Inquiry
+ * Endpoint URIs for various camel routes
+ */
+<span class="nc" id="L7">public class EndpointUris {</span>
+
+    /** The URI for the Xform Service endpoint compatible with the IZ Gateway Hub WSDL */
+    public static final String IZGTS_IISHubService = &quot;izgts:IISHubService&quot;;
+
+    /** The URI for the Xform Service endpoint compatible with the IIS CDC WSDL */
+    public static final String IZGTS_IISService = &quot;izgts:IISService&quot;;
+
+    /** The URI to place the incoming message onto the Camel route for IZG Hub pipelines */
+    public static final String DIRECT_HUB_PIPELINE = &quot;direct:izghubTransformerPipeline&quot;;
+    
+    /** The URI to place the incoming message onto the Camel route for a loopback */
+    public static final String LOOPBACK_HUB_PIPELINE = &quot;direct:izghubLoopbackPipeline&quot;;
+
+    /** The URI to place the incoming message onto the Camel route for IIS pipelines */
+    public static final String DIRECT_IIS_PIPELINE = &quot;direct:iisTransformerPipeline&quot;;
+
+    /** The URI for the IZ Gateway Hub service endpoint */
+    public static final String IZGHUB_IISHubService = &quot;izghub:IISHubService&quot;;
+
+    /** The URI for the IIS service endpoint */
+    public static final String IIS_IISService = &quot;iis:IISService&quot;;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

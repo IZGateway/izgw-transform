@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Application.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform</a> &gt; <span class="el_source">Application.java</span></div><h1>Application.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import gov.cdc.izgateway.common.HealthService;
+import gov.cdc.izgateway.soap.net.SoapMessageConverter;
+import gov.cdc.izgw.v2tofhir.utils.FhirConverter;
+
+import gov.cdc.izgateway.utils.SystemUtils;
+import org.apache.catalina.connector.Connector;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.coyote.ProtocolHandler;
+import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
+import org.bouncycastle.crypto.CryptoServicesRegistrar;
+import org.bouncycastle.crypto.EntropySourceProvider;
+import org.bouncycastle.crypto.fips.FipsDRBG;
+import org.bouncycastle.crypto.util.BasicEntropySourceProvider;
+import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider;
+import org.bouncycastle.jsse.provider.BouncyCastleJsseProvider;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServer;
+import org.springframework.boot.web.servlet.ServletContextInitializer;
+import org.springframework.context.ApplicationContextException;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import gov.cdc.izgateway.security.SSLImplementation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.info.Info;
+import lombok.extern.slf4j.Slf4j;
+
+<span class="fc" id="L65">@Slf4j</span>
+@OpenAPIDefinition(
+        info = @Info(
+                title = &quot;Xform Service&quot;,
+                version = &quot;1.0&quot;,
+                description = &quot;Operations and maintenantence APIs for Xform Service&quot;,
+                license = @License(name = &quot;Apache 2.0&quot;, url = &quot;https://www.apache.org/licenses/LICENSE-2.0&quot;),
+                contact = @Contact(url = &quot;https://support.izgateway.org/plugins/servlet/desk/portal/3&quot;,
+                        name = &quot;IZ Gateway&quot;,
+                        email = &quot;izgateway@cdc.gov&quot;)
+        )
+)
+@SpringBootApplication
+@ComponentScan(basePackages={&quot;gov.cdc.izgateway.xform&quot;, &quot;gov.cdc.izgateway.soap.net&quot;, &quot;gov.cdc.izgateway.configuration&quot;,&quot;gov.cdc.izgateway.security&quot;,&quot;gov.cdc.izgateway.service.impl&quot;})
+<span class="fc" id="L79">public class Application implements WebMvcConfigurer {</span>
+<span class="fc" id="L80">    private static final Map&lt;String, byte[]&gt; staticPages = new TreeMap&lt;&gt;();</span>
+    static final String BUILD = &quot;build&quot;;
+    private static final String BUILD_FILE = &quot;build.txt&quot;;
+
+    @Value(&quot;${spring.application.fix-newlines}&quot;)
+    private boolean fixNewlines;
+
+    private static SecureRandom secureRandom;
+
+    private static AbstractHttp11JsseProtocol&lt;?&gt; protocol;
+    public static void reloadSsl() {
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (protocol != null) {</span>
+<span class="nc" id="L92">            protocol.reloadSslHostConfigs();</span>
+        }
+<span class="nc" id="L94">    }</span>
+    public static void main(String[] args) {
+<span class="nc" id="L96">        initialize();</span>
+
+        try {
+<span class="nc" id="L99">            SpringApplication.run(Application.class, args);</span>
+<span class="nc" id="L100">        } catch (BeanCreationException | ApplicationContextException bce) {</span>
+<span class="nc" id="L101">            Throwable rootCause = ExceptionUtils.getRootCause(bce);</span>
+<span class="nc" id="L102">            System.exit(1);</span>
+<span class="nc" id="L103">        } catch (Throwable ex) {  // NOSONAR Catch any error</span>
+<span class="nc" id="L104">            System.exit(1);</span>
+<span class="nc" id="L105">        }</span>
+
+<span class="nc" id="L107">        loadStaticResource(BUILD, BUILD_FILE);</span>
+<span class="nc" id="L108">        setInitialHealth();</span>
+
+<span class="nc" id="L110">        String build = getBuild();</span>
+<span class="nc" id="L111">        log.info(&quot;Xform application loaded&quot;);</span>
+<span class="nc" id="L112">        log.info(&quot;Build: {}&quot;, build);</span>
+<span class="nc" id="L113">    }</span>
+
+    private static void setInitialHealth() {
+<span class="nc" id="L116">        HealthService.setBuildName(getBuild());</span>
+<span class="nc" id="L117">        HealthService.setHealthy(true, &quot;Application started&quot;);</span>
+<span class="nc" id="L118">        HealthService.setServerName(SystemUtils.getHostname());</span>
+<span class="nc" id="L119">    }</span>
+
+    private static void initialize() {
+<span class="nc" id="L122">        Thread.currentThread().setName(&quot;Xform Service&quot;);</span>
+
+        // This is necessary initialization to use BCFKS module
+<span class="nc" id="L125">        CryptoServicesRegistrar.setSecureRandom(getSecureRandom());</span>
+<span class="nc" id="L126">        Security.insertProviderAt(new BouncyCastleFipsProvider(), 1);</span>
+<span class="nc" id="L127">        Security.insertProviderAt(new BouncyCastleJsseProvider(), 2);</span>
+
+        // Ensure FIPS Compliance
+<span class="nc" id="L130">        System.setProperty(&quot;org.bouncycastle.fips.approved_only&quot;, &quot;true&quot;);</span>
+        // Enable renegotiation to allow servers to request client certificate after hand off from application gateway
+<span class="nc" id="L132">        System.setProperty(&quot;org.bouncycastle.jsse.client.acceptRenegotiation&quot;, &quot;true&quot;);</span>
+        // Enable JSSE Server Name Identification (SNI) connection extension in client and server connections
+<span class="nc" id="L134">        System.setProperty(&quot;jsse.enableSNIExtension&quot;, &quot;true&quot;);</span>
+
+<span class="nc" id="L136">        Runtime.getRuntime().addShutdownHook(new Thread()</span>
+<span class="nc" id="L137">        {</span>
+            @Override
+            public void run()
+            {
+<span class="nc" id="L141">                shutdown();</span>
+<span class="nc" id="L142">            }</span>
+        });
+<span class="nc" id="L144">    }</span>
+
+    private static void loadStaticResource(String name, String location) {
+<span class="nc" id="L147">        try (InputStream inStream = Application.class.getClassLoader().getResourceAsStream(location)) {</span>
+<span class="nc" id="L148">            byte[] data = IOUtils.toByteArray(inStream);</span>
+<span class="nc" id="L149">            staticPages.put(name, data);</span>
+<span class="nc" id="L150">        } catch (IOException | NullPointerException e) {</span>
+<span class="nc" id="L151">            log.error(&quot;Cannot load resource '{}' from {}&quot;, name, location);</span>
+<span class="nc" id="L152">        }</span>
+<span class="nc" id="L153">    }</span>
+
+    public static void shutdown() {
+<span class="nc" id="L156">    }</span>
+
+    public static String getBuild() {
+<span class="nc" id="L159">        byte[] v = staticPages.get(BUILD);</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">        String version = v == null ? &quot;&quot; : new String(v);</span>
+<span class="nc" id="L161">        return StringUtils.substringBetween(version, &quot;Build:&quot;, &quot;\n&quot;).trim();</span>
+    }
+
+    public static String getPage(String page) {
+<span class="nc" id="L165">        return new String(staticPages.get(page), StandardCharsets.UTF_8);</span>
+    }
+
+    /**
+     * Generate a a NIST SP 800-90A compliant secure random number
+     * generator.
+     *
+     * @return A compliant generator.
+     */
+    @Bean
+    public static SecureRandom getSecureRandom() {
+        /*
+         * According to NIST Special Publication 800-90A, a Nonce is
+         * A time-varying value that has at most a negligible chance of
+         * repeating, e.g., a random value that is generated anew for each
+         * use, a timestamp, a sequence number, or some combination of
+         * these.
+         *
+         * The nonce is combined with the entropy input to create the initial
+         * DRBG seed.
+         */
+<span class="nc bnc" id="L186" title="All 2 branches missed.">        if (secureRandom != null) {</span>
+<span class="nc" id="L187">            return secureRandom;</span>
+        }
+<span class="nc" id="L189">        byte[] nonce = ByteBuffer.allocate(8).putLong(System.nanoTime()).array();</span>
+<span class="nc" id="L190">        EntropySourceProvider entSource = new BasicEntropySourceProvider(new SecureRandom(), true);</span>
+<span class="nc" id="L191">        FipsDRBG.Builder drgbBldr = FipsDRBG.SHA512</span>
+<span class="nc" id="L192">                .fromEntropySource(entSource).setSecurityStrength(256)</span>
+<span class="nc" id="L193">                .setEntropyBitsRequired(256);</span>
+<span class="nc" id="L194">        secureRandom = drgbBldr.build(nonce, true);</span>
+<span class="nc" id="L195">        return secureRandom;</span>
+    }
+
+    @Value(&quot;${security.enable-csrf:false}&quot;)
+    private boolean enableCsrf;
+    @Value(&quot;${server.local-port:9081}&quot;)
+    private int additionalPort;
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+<span class="nc" id="L205">        http.authorizeHttpRequests(a -&gt; a.requestMatchers(&quot;/**&quot;).permitAll())</span>
+<span class="nc" id="L206">                .x509(Customizer.withDefaults())</span>
+<span class="nc" id="L207">                .userDetailsService(userDetailsService());</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if (!enableCsrf) {</span>
+<span class="nc" id="L209">            http.csrf(AbstractHttpConfigurer::disable);</span>
+        }
+<span class="nc" id="L211">        return http.build();</span>
+    }
+
+    @Override
+    public void configureMessageConverters(List&lt;HttpMessageConverter&lt;?&gt;&gt; messageConverters) {
+<span class="fc" id="L216">        SoapMessageConverter smc = new SoapMessageConverter(SoapMessageConverter.INBOUND);</span>
+<span class="fc" id="L217">        smc.setHub(true);</span>
+<span class="fc" id="L218">        messageConverters.add(smc);</span>
+        // FhirConverter should go before jackson converters
+        // because they also handle application/json and we'd
+        // prefer to use the HAPI based FHIR parsers rather
+        // than the jackson ones for FHIR content.
+<span class="fc" id="L223">        messageConverters.add(0, new FhirConverter());</span>
+<span class="fc" id="L224">    }</span>
+    
+    @Bean
+    public UserDetailsService userDetailsService() {
+<span class="nc" id="L228">        return new UserDetailsService() {</span>
+            @Override
+            public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+<span class="nc" id="L231">                return new User(username, &quot;&quot;, AuthorityUtils.commaSeparatedStringToAuthorityList(&quot;ROLE_USER&quot;));</span>
+            }
+        };
+    }
+
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer )
+    {
+    	// TODO: Check with others about this, messes up FHIR expectations.
+<span class="fc" id="L240">        configurer.ignoreAcceptHeader(true).defaultContentType(MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON, MediaType.ALL);</span>
+<span class="fc" id="L241">    }</span>
+    @Bean
+    TomcatConnectorCustomizer reloadConnectorCustomizer() {
+<span class="nc" id="L244">        return Application::customizeConnector;</span>
+    }
+
+    public static void customizeConnector(Connector connector) {
+<span class="nc bnc" id="L248" title="All 2 branches missed.">        if (&quot;https&quot;.equals(connector.getScheme())) {</span>
+<span class="nc" id="L249">            ProtocolHandler p = connector.getProtocolHandler();</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">            if (p instanceof AbstractHttp11JsseProtocol&lt;?&gt; jsse) {</span>
+<span class="nc" id="L251">                Application.protocol = jsse;</span>
+<span class="nc" id="L252">                jsse.setSslImplementationName(SSLImplementation.class.getName());</span>
+            }
+        }
+<span class="nc" id="L255">    }</span>
+
+    @Bean
+    TomcatServletWebServerFactory tomcatServletWebServerFactory(
+            ObjectProvider&lt;TomcatConnectorCustomizer&gt; connectorCustomizers,
+            ObjectProvider&lt;TomcatContextCustomizer&gt; contextCustomizers,
+            ObjectProvider&lt;TomcatProtocolHandlerCustomizer&lt;?&gt;&gt; protocolHandlerCustomizers) {
+<span class="nc" id="L262">        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory() {</span>
+            @Override
+            public WebServer getWebServer(ServletContextInitializer... initializers) {
+<span class="nc" id="L265">                log.info(&quot;Initializing Tomcat&quot;);</span>
+                try {
+<span class="nc" id="L267">                    return super.getWebServer(initializers);</span>
+                } finally {
+<span class="nc" id="L269">                    log.info(&quot;Tomcat initialized&quot;);</span>
+                }
+            }
+        };
+<span class="nc" id="L273">        factory.getTomcatConnectorCustomizers().addAll(connectorCustomizers.orderedStream().toList());</span>
+<span class="nc" id="L274">        factory.getTomcatContextCustomizers().addAll(contextCustomizers.orderedStream().toList());</span>
+<span class="nc" id="L275">        factory.getTomcatProtocolHandlerCustomizers().addAll(protocolHandlerCustomizers.orderedStream().toList());</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">        if (additionalPort &lt; 1) {</span>
+<span class="nc" id="L277">            return factory;</span>
+        }
+<span class="nc" id="L279">        Connector connector = new Connector(&quot;org.apache.coyote.http11.Http11NioProtocol&quot;);</span>
+<span class="nc" id="L280">        connector.setScheme(&quot;http&quot;);</span>
+<span class="nc" id="L281">        connector.setPort(additionalPort);</span>
+<span class="nc" id="L282">        connector.setProperty(&quot;minSpareThreads&quot;, &quot;3&quot;);  // This is for local administration, we don't need many.</span>
+<span class="nc" id="L283">        factory.addAdditionalTomcatConnectors(connector);</span>
+<span class="nc" id="L284">        return factory;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

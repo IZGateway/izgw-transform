@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccessControlService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.services</a> &gt; <span class="el_source">AccessControlService.java</span></div><h1>AccessControlService.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.services;
+
+import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.xform.model.AccessControl;
+import gov.cdc.izgateway.xform.repository.RepositoryFactory;
+import gov.cdc.izgateway.xform.security.Roles;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMethod;
+import java.util.*;
+
+<span class="fc" id="L14">@Slf4j</span>
+@Service
+public class AccessControlService extends GenericService&lt;AccessControl&gt; {
+    private final AccessControlRegistry registry;
+
+    @Autowired
+    public AccessControlService(RepositoryFactory repositoryFactory, AccessControlRegistry registry) {
+<span class="fc" id="L21">        super(repositoryFactory.accessControlRepository());</span>
+<span class="fc" id="L22">        this.registry = registry;</span>
+<span class="fc" id="L23">    }</span>
+
+    public List&lt;String&gt; getAllowedRoles(RequestMethod method, String path) {
+<span class="nc" id="L26">        List&lt;String&gt; roles = registry.getAllowedRoles(method, path);</span>
+<span class="nc" id="L27">        log.debug(&quot;Roles allowed for {} {} are {}&quot;, method, path, roles);</span>
+<span class="nc" id="L28">        return roles;</span>
+    }
+
+    public Boolean checkAccess(String method, String path) {
+        // If path starts with /swagger, return checkSwaggerAccess, else return checkXformAccess
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        if (path.startsWith(&quot;/swagger&quot;)) {</span>
+<span class="nc" id="L34">            return checkSwaggerAccess(method, path);</span>
+        } else {
+<span class="nc" id="L36">            return checkXformAccess(method, path);</span>
+        }
+    }
+
+    /**
+     * Check if the user has access to the swagger endpoints.  This method is necessary because the swagger
+     * library and endpoints will not register with our AccessControlRegistry.
+     * @param method
+     * @param path
+     * @return true if access is allowed, false if access is denied
+     */
+    public Boolean checkSwaggerAccess(String method, String path) {
+<span class="nc bnc" id="L48" title="All 4 branches missed.">        return path.startsWith(&quot;/swagger&quot;) &amp;&amp; RequestContext.getPrincipal().getRoles().contains(Roles.ADMIN);</span>
+    }
+
+    /**
+     * Check if the user has access to the xform endpoints.
+     * @param method
+     * @param path
+     * @return true if access is allowed, false if access is denied
+     */
+    public Boolean checkXformAccess(String method, String path) {
+<span class="nc" id="L58">        List&lt;String&gt; allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);</span>
+
+        // Check for public access
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (allowedRoles.contains(Roles.PUBLIC_ACCESS)) {</span>
+<span class="nc" id="L62">            return true;</span>
+        }
+
+        // If RequestContext.getRoles() has one role that matches the roles list, return true
+<span class="nc" id="L66">        return RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);</span>
+    }
+
+    public Map&lt;String, TreeSet&lt;String&gt;&gt; getUserRoles() {
+<span class="nc" id="L70">        Map&lt;String, TreeSet&lt;String&gt;&gt; userRoleMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        for (AccessControl ac : repo.getEntitySet()) {</span>
+<span class="nc" id="L72">            userRoleMap.put(ac.getUserId().toString(), new TreeSet&lt;&gt;(ac.getRoles()));</span>
+<span class="nc" id="L73">        }</span>
+
+<span class="nc" id="L75">        return userRoleMap;</span>
+    }
+
+    /**
+     * Checks if an access control with the same user id already exists
+     *
+     * @param accessControl The Access Control to check for duplication
+     * @return true if a duplicate exists, false otherwise
+     */
+    @Override
+    protected boolean isDuplicate(AccessControl accessControl) {
+<span class="nc" id="L86">        return repo.getEntitySet().stream()</span>
+<span class="nc" id="L87">                .anyMatch(ac -&gt;</span>
+<span class="nc" id="L88">                        ac.getUserId().equals(accessControl.getUserId())</span>
+                );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

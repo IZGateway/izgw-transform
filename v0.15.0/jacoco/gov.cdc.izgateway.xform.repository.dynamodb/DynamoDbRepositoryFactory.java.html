@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DynamoDbRepositoryFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.repository.dynamodb</a> &gt; <span class="el_source">DynamoDbRepositoryFactory.java</span></div><h1>DynamoDbRepositoryFactory.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.repository.dynamodb;
+
+import gov.cdc.izgateway.configuration.DynamoDbConfig;
+import gov.cdc.izgateway.xform.model.*;
+import gov.cdc.izgateway.xform.repository.RepositoryFactory;
+import gov.cdc.izgateway.xform.repository.XformRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.stereotype.Component;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+
+@Component
+@ConditionalOnExpression(&quot;'${spring.database:}'.equalsIgnoreCase('dynamodb') || '${spring.database:}'.equalsIgnoreCase('migrate')&quot;)
+public class DynamoDbRepositoryFactory implements RepositoryFactory {
+
+    private final DynamoDbEnhancedClient dynamoDbClient;
+    private final String tableName;
+
+    // Lazy-initialized repositories
+    private AccessControlRepository acr;
+    private GroupRoleMappingRepository grmr;
+    private MappingRepository mr;
+    private OperationPreconditionFieldRepository opfr;
+    private OrganizationRepository or;
+    private PipelineRepository pr;
+    private SolutionRepository sr;
+    private UserRepository ur;
+    private EventRepository er;
+
+    public DynamoDbRepositoryFactory(
+            DynamoDbEnhancedClient dynamoDbClient,
+<span class="nc" id="L31">            DynamoDbConfig dynamoDbConfig) {</span>
+<span class="nc" id="L32">        this.dynamoDbClient = dynamoDbClient;</span>
+<span class="nc" id="L33">        this.tableName = dynamoDbConfig.getDynamodbTable();</span>
+<span class="nc" id="L34">    }</span>
+
+    @Override
+    public XformRepository&lt;AccessControl&gt; accessControlRepository() {
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (acr == null) {</span>
+<span class="nc" id="L39">            acr = new AccessControlRepository(dynamoDbClient, tableName);</span>
+        }
+<span class="nc" id="L41">        return acr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;GroupRoleMapping&gt; groupRoleMappingRepository() {
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (grmr == null) {</span>
+<span class="nc" id="L47">            grmr = new GroupRoleMappingRepository(dynamoDbClient, tableName);</span>
+        }
+<span class="nc" id="L49">        return grmr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;Mapping&gt; mappingRepository() {
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (mr == null) {</span>
+<span class="nc" id="L55">            mr = new MappingRepository(dynamoDbClient, tableName);</span>
+        }
+<span class="nc" id="L57">        return mr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;OperationPreconditionField&gt; operationPreconditionFieldRepository() {
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (opfr == null) {</span>
+<span class="nc" id="L63">            opfr = new OperationPreconditionFieldRepository(dynamoDbClient, tableName);</span>
+        }
+<span class="nc" id="L65">        return opfr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;Organization&gt; organizationRepository() {
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        if (or == null) {</span>
+<span class="nc" id="L71">            or = new OrganizationRepository(dynamoDbClient, tableName);</span>
+        }
+<span class="nc" id="L73">        return or;</span>
+    }
+
+    @Override
+    public XformRepository&lt;Pipeline&gt; pipelineRepository() {
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (pr == null) {</span>
+<span class="nc" id="L79">            pr = new PipelineRepository(dynamoDbClient, tableName);</span>
+        }
+<span class="nc" id="L81">        return pr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;Solution&gt; solutionRepository() {
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        if (sr == null) {</span>
+<span class="nc" id="L87">            sr = new SolutionRepository(dynamoDbClient, tableName);</span>
+        }
+<span class="nc" id="L89">        return sr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;User&gt; userRepository() {
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (ur == null) {</span>
+<span class="nc" id="L95">            ur = new UserRepository(dynamoDbClient, tableName);</span>
+        }
+<span class="nc" id="L97">        return ur;</span>
+    }
+
+    @Override
+    public XformRepository&lt;Event&gt; eventRepository() {
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (er == null) {</span>
+<span class="nc" id="L103">            er = new EventRepository(dynamoDbClient, tableName);</span>
+        }
+<span class="nc" id="L105">        return er;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
