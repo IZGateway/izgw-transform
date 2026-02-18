@@ -1,4 +1,11 @@
+# IZ Gateway Transformation Service 0.15.0
+
+- IGDD-2413 IZG Hub logging issue when credentials are incorrect.
+- IGDD-2487 CVE-2025-69420 - openssl/openssl, openssl/openssl and 2 more
+- IGDD-2505 CVE-2026-21932 - openjdk21
+
 # IZ Gateway Transformation Service 0.14.1
+
 - Maintenance release to create build from latest IZG Base Image
 - IGDD-2462 - izgw-bom bump to 1.2.0 (bump logback)
 
