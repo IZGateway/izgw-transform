@@ -363,8 +363,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.12.0</version>
 				<configuration>
-					<failOnError>false</failOnError>
-					<additionalJOption>-Xdoclint:none</additionalJOption>
+					<failOnError>true</failOnError>
 				</configuration>
 			</plugin>
 			<plugin>

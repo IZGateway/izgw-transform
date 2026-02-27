@@ -179,11 +179,11 @@ public class FhirController {
      * @param destinationId    The destination for the FHIR Request.  This takes the place of the
      * destinationId element shown below in Soap Messages.
      * 
-     * <pre xmlns="urn:cdc:iisb:hub:2014">
-     *      <HubRequestHeader>
-     *     <DestinationId>dev</DestinationId>
-     *   </HubRequestHeader>
-     * </pre>
+    * <pre>{@code
+    * <HubRequestHeader xmlns="urn:cdc:iisb:hub:2014">
+    *   <DestinationId>dev</DestinationId>
+    * </HubRequestHeader>
+    * }</pre>
      * 
      * @param req    The HttpServletRequest to get the request parameters from.
      * @return    A FHIR Bundle containing the search results, or an OperationOutcome resource if there
