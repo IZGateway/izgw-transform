@@ -4,12 +4,21 @@ import gov.cdc.izgateway.xform.model.AccessControl;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
+/**
+ * DynamoDB repository for access control entries.
+ */
 public class AccessControlRepository extends GenericDynamoDBRepository&lt;AccessControl&gt; {
+    /**
+     * Create the repository for a DynamoDB table.
+     *
+     * @param dynamoDbClient DynamoDB enhanced client
+     * @param tableName DynamoDB table name
+     */
     public AccessControlRepository(
             DynamoDbEnhancedClient dynamoDbClient,
             String tableName) {
-<span class="nc" id="L11">        super(dynamoDbClient, tableName, AccessControl.class, TableSchema.fromBean(AccessControl.class));</span>
-<span class="nc" id="L12">    }</span>
+<span class="nc" id="L20">        super(dynamoDbClient, tableName, AccessControl.class, TableSchema.fromBean(AccessControl.class));</span>
+<span class="nc" id="L21">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
