@@ -13,7 +13,7 @@ public class UserService extends GenericService&lt;User&gt; {
 <span class="fc" id="L13">    }</span>
 
     public User getUserByUserName(String userName) {
-<span class="nc bnc" id="L16" title="All 4 branches missed.">        return repo.getEntitySet().stream().filter(o -&gt; o.getUserName().equals(userName) &amp;&amp; Boolean.TRUE.equals(o.getActive())).findFirst().orElse(null);</span>
+<span class="fc bfc" id="L16" title="All 4 branches covered.">        return repo.getEntitySet().stream().filter(o -&gt; o.getUserName().equalsIgnoreCase(userName) &amp;&amp; Boolean.TRUE.equals(o.getActive())).findFirst().orElse(null);</span>
     }
 
     @Override
