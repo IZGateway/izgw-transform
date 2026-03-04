@@ -11,68 +11,96 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.*;
 
-<span class="fc" id="L14">@Slf4j</span>
+/**
+ * Service for access control operations and authorization checks.
+ */
+<span class="fc" id="L17">@Slf4j</span>
 @Service
 public class AccessControlService extends GenericService&lt;AccessControl&gt; {
     private final AccessControlRegistry registry;
 
+    /**
+     * Create the access control service.
+     *
+     * @param repositoryFactory Repository factory for access control data
+     * @param registry Access control registry
+     */
     @Autowired
     public AccessControlService(RepositoryFactory repositoryFactory, AccessControlRegistry registry) {
-<span class="fc" id="L21">        super(repositoryFactory.accessControlRepository());</span>
-<span class="fc" id="L22">        this.registry = registry;</span>
-<span class="fc" id="L23">    }</span>
+<span class="fc" id="L30">        super(repositoryFactory.accessControlRepository());</span>
+<span class="fc" id="L31">        this.registry = registry;</span>
+<span class="fc" id="L32">    }</span>
 
+    /**
+     * Get the roles allowed for the given method and path.
+     *
+     * @param method HTTP method
+     * @param path Request path
+     * @return List of allowed roles
+     */
     public List&lt;String&gt; getAllowedRoles(RequestMethod method, String path) {
-<span class="nc" id="L26">        List&lt;String&gt; roles = registry.getAllowedRoles(method, path);</span>
-<span class="nc" id="L27">        log.debug(&quot;Roles allowed for {} {} are {}&quot;, method, path, roles);</span>
-<span class="nc" id="L28">        return roles;</span>
+<span class="nc" id="L42">        List&lt;String&gt; roles = registry.getAllowedRoles(method, path);</span>
+<span class="nc" id="L43">        log.debug(&quot;Roles allowed for {} {} are {}&quot;, method, path, roles);</span>
+<span class="nc" id="L44">        return roles;</span>
     }
 
+    /**
+     * Check whether access is allowed for the given method and path.
+     *
+     * @param method HTTP method
+     * @param path Request path
+     * @return True if access is allowed
+     */
     public Boolean checkAccess(String method, String path) {
         // If path starts with /swagger, return checkSwaggerAccess, else return checkXformAccess
-<span class="nc bnc" id="L33" title="All 2 branches missed.">        if (path.startsWith(&quot;/swagger&quot;)) {</span>
-<span class="nc" id="L34">            return checkSwaggerAccess(method, path);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (path.startsWith(&quot;/swagger&quot;)) {</span>
+<span class="nc" id="L57">            return checkSwaggerAccess(method, path);</span>
         } else {
-<span class="nc" id="L36">            return checkXformAccess(method, path);</span>
+<span class="nc" id="L59">            return checkXformAccess(method, path);</span>
         }
     }
 
     /**
      * Check if the user has access to the swagger endpoints.  This method is necessary because the swagger
      * library and endpoints will not register with our AccessControlRegistry.
-     * @param method
-     * @param path
+     * @param method HTTP method
+     * @param path Request path
      * @return true if access is allowed, false if access is denied
      */
     public Boolean checkSwaggerAccess(String method, String path) {
-<span class="nc bnc" id="L48" title="All 4 branches missed.">        return path.startsWith(&quot;/swagger&quot;) &amp;&amp; RequestContext.getPrincipal().getRoles().contains(Roles.ADMIN);</span>
+<span class="nc bnc" id="L71" title="All 4 branches missed.">        return path.startsWith(&quot;/swagger&quot;) &amp;&amp; RequestContext.getPrincipal().getRoles().contains(Roles.ADMIN);</span>
     }
 
     /**
      * Check if the user has access to the xform endpoints.
-     * @param method
-     * @param path
+     * @param method HTTP method
+     * @param path Request path
      * @return true if access is allowed, false if access is denied
      */
     public Boolean checkXformAccess(String method, String path) {
-<span class="nc" id="L58">        List&lt;String&gt; allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);</span>
+<span class="nc" id="L81">        List&lt;String&gt; allowedRoles = getAllowedRoles(RequestMethod.valueOf(method), path);</span>
 
         // Check for public access
-<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (allowedRoles.contains(Roles.PUBLIC_ACCESS)) {</span>
-<span class="nc" id="L62">            return true;</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        if (allowedRoles.contains(Roles.PUBLIC_ACCESS)) {</span>
+<span class="nc" id="L85">            return true;</span>
         }
 
         // If RequestContext.getRoles() has one role that matches the roles list, return true
-<span class="nc" id="L66">        return RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);</span>
+<span class="nc" id="L89">        return RequestContext.getPrincipal().getRoles().stream().anyMatch(allowedRoles::contains);</span>
     }
 
+    /**
+     * Build a mapping of user ids to their assigned roles.
+     *
+     * @return Map of user id to roles
+     */
     public Map&lt;String, TreeSet&lt;String&gt;&gt; getUserRoles() {
-<span class="nc" id="L70">        Map&lt;String, TreeSet&lt;String&gt;&gt; userRoleMap = new HashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L71" title="All 2 branches missed.">        for (AccessControl ac : repo.getEntitySet()) {</span>
-<span class="nc" id="L72">            userRoleMap.put(ac.getUserId().toString(), new TreeSet&lt;&gt;(ac.getRoles()));</span>
-<span class="nc" id="L73">        }</span>
+<span class="nc" id="L98">        Map&lt;String, TreeSet&lt;String&gt;&gt; userRoleMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        for (AccessControl ac : repo.getEntitySet()) {</span>
+<span class="nc" id="L100">            userRoleMap.put(ac.getUserId().toString(), new TreeSet&lt;&gt;(ac.getRoles()));</span>
+<span class="nc" id="L101">        }</span>
 
-<span class="nc" id="L75">        return userRoleMap;</span>
+<span class="nc" id="L103">        return userRoleMap;</span>
     }
 
     /**
@@ -83,9 +111,9 @@ public class AccessControlService extends GenericService&lt;AccessControl&gt; {
      */
     @Override
     protected boolean isDuplicate(AccessControl accessControl) {
-<span class="nc" id="L86">        return repo.getEntitySet().stream()</span>
-<span class="nc" id="L87">                .anyMatch(ac -&gt;</span>
-<span class="nc" id="L88">                        ac.getUserId().equals(accessControl.getUserId())</span>
+<span class="nc" id="L114">        return repo.getEntitySet().stream()</span>
+<span class="nc" id="L115">                .anyMatch(ac -&gt;</span>
+<span class="nc" id="L116">                        ac.getUserId().equals(accessControl.getUserId())</span>
                 );
     }
 }
