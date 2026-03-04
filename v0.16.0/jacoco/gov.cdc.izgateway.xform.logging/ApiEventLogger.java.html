@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ApiEventLogger.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.logging</a> &gt; <span class="el_source">ApiEventLogger.java</span></div><h1>ApiEventLogger.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.logging;
+
+import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.logging.markers.Markers2;
+import gov.cdc.izgateway.xform.model.BaseModel;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
+<span class="nc" id="L10">@Slf4j</span>
+public class ApiEventLogger {
+
+    public static &lt;T&gt; void logReadEvent(T data) {
+<span class="nc" id="L14">        logApiEvent(&quot;READ&quot;, getClassName(data), getId(data),  null, null);</span>
+<span class="nc" id="L15">    }</span>
+
+    public static &lt;T&gt; void logReadEvent(List&lt;T&gt; data) {
+<span class="nc bnc" id="L18" title="All 4 branches missed.">        if (data != null &amp;&amp; !data.isEmpty()) {</span>
+<span class="nc" id="L19">            logApiEvent(&quot;READ&quot;, getClassName(data.get(0)), null, null, null);</span>
+        }
+<span class="nc" id="L21">    }</span>
+
+    public static &lt;T&gt; void logDeleteEvent(T dataToDelete) {
+<span class="nc" id="L24">        logApiEvent(&quot;DELETE&quot;, getClassName(dataToDelete), getId(dataToDelete), null, dataToDelete);</span>
+<span class="nc" id="L25">    }</span>
+
+    public static &lt;T&gt; void logCreateEvent(T newData) {
+<span class="nc" id="L28">        logApiEvent(&quot;CREATE&quot;, getClassName(newData), getId(newData), newData, null);</span>
+<span class="nc" id="L29">    }</span>
+
+    public static &lt;T&gt; void logUpdateEvent(T newData, T existingData) {
+<span class="nc" id="L32">        logApiEvent(&quot;UPDATE&quot;, getClassName(newData), getId(newData), newData, existingData);</span>
+<span class="nc" id="L33">    }</span>
+
+    private static &lt;T&gt; void logApiEvent(String eventDescription, String objectName, String objectId, T newData, T existingData) {
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        if ( XformRequestContext.isApiLoggingDisabled() ) {</span>
+<span class="nc" id="L37">            return;</span>
+        }
+
+<span class="nc" id="L40">        XformApiDetail data = new XformApiDetail();</span>
+<span class="nc" id="L41">        data.setEventId(RequestContext.getEventId());</span>
+<span class="nc" id="L42">        data.setOldData(existingData);</span>
+<span class="nc" id="L43">        data.setNewData(newData);</span>
+<span class="nc" id="L44">        data.setMethod(eventDescription);</span>
+<span class="nc" id="L45">        data.setUserName(RequestContext.getPrincipal().getName());</span>
+<span class="nc" id="L46">        data.setPrincipalType(RequestContext.getPrincipal().getClass().getSimpleName());</span>
+<span class="nc" id="L47">        data.setObject(objectName);</span>
+<span class="nc" id="L48">        data.setObjectId(objectId);</span>
+
+<span class="nc" id="L50">        log.info(Markers2.append(&quot;apiLog&quot;, data), &quot;Log message for {} event on object: {}&quot;, eventDescription, objectName);</span>
+<span class="nc" id="L51">    }</span>
+
+    private static &lt;T&gt; String getClassName(T data) {
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        return data == null ? null : data.getClass().getSimpleName();</span>
+    }
+
+    private static &lt;T&gt; String getId(T data) {
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        return data == null ? null: ((BaseModel)data).getId().toString();</span>
+    }
+
+    private ApiEventLogger() {
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
