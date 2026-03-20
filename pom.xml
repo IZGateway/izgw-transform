@@ -79,6 +79,15 @@
         </repository>
 	</repositories>
 	<dependencies>
+		<!-- TEMP override until hapi-fhir-structures-r4 moves past 8.8.1 which still points to 6.7.9 which
+		     has issues -->
+		<dependency>
+			<groupId>ca.uhn.hapi.fhir</groupId>
+			<artifactId>org.hl7.fhir.r4</artifactId>
+			<version>6.7.11</version>
+			<scope>compile</scope>
+		</dependency>
+
 		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
