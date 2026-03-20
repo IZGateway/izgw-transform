@@ -5,12 +5,12 @@
 	<parent>
         <groupId>gov.cdc.izgw</groupId>
         <artifactId>izgw-bom</artifactId>
-        <version>1.3.0-SNAPSHOT</version>
+        <version>1.3.0</version>
         <relativePath />
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
 	<artifactId>xform</artifactId>
-    <version>0.15.0</version>
+    <version>0.16.0</version>
 	<name>xform</name>
 	<description>IZ Gateway Xform Service</description>
 	<properties>
@@ -363,8 +363,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.12.0</version>
 				<configuration>
-					<failOnError>false</failOnError>
-					<additionalJOption>-Xdoclint:none</additionalJOption>
+					<failOnError>true</failOnError>
 				</configuration>
 			</plugin>
 			<plugin>

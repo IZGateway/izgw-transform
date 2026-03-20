@@ -13,7 +13,7 @@ public class UserService extends GenericService<User> {
     }
 
     public User getUserByUserName(String userName) {
-        return repo.getEntitySet().stream().filter(o -> o.getUserName().equals(userName) && Boolean.TRUE.equals(o.getActive())).findFirst().orElse(null);
+        return repo.getEntitySet().stream().filter(o -> o.getUserName().equalsIgnoreCase(userName) && Boolean.TRUE.equals(o.getActive())).findFirst().orElse(null);
     }
 
     @Override

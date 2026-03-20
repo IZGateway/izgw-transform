@@ -41,10 +41,11 @@ import lombok.Data;
  */
 public class IDIMatch {
     
-	/**
-	 * @author Audacious Inquiry
-	 * The parameters to use for patient matching
-	 */
+    /**
+     * Parameters used for patient matching.
+     *
+     * @author Audacious Inquiry
+     */
 	@Data
 	public static class PatientMatchParameters {
 	    private Patient searchPatient;

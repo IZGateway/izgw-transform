@@ -1,8 +1,9 @@
 package gov.cdc.izgateway.xform.camel.constants;
 
 /**
+ * Endpoint URIs for various Camel routes.
+ *
  * @author Audacious Inquiry
- * Endpoint URIs for various camel routes
  */
 public class EndpointUris {
 
