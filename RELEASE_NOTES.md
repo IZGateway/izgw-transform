@@ -1,3 +1,10 @@
+# IZ Gateway Transformation Service 0.16.0
+
+- IGDD-1952 - Add postman test to verify Environment on health check
+- IGDD-2015 - Make check of username from JWT case-insensitive
+- IGDD-2420 - Address missing comments causing javadoc failures
+- IGDD-2572 - Bump verison of com.fasterxml.jackson.core:jackson-core
+
 # IZ Gateway Transformation Service 0.15.0
 
 - IGDD-2413 IZG Hub logging issue when credentials are incorrect.
