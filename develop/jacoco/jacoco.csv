@@ -146,8 +146,8 @@ xform,gov.cdc.izgateway.xform,Application.new UserDetailsService() {...},11,0,0,
 xform,gov.cdc.izgateway.xform,Application,281,50,14,0,77,10,22,4,15,4
 xform,gov.cdc.izgateway.xform,XformApplicationController,20,11,2,0,6,4,4,2,3,2
 xform,gov.cdc.izgateway.xform.model,GroupRoleMapping,42,0,2,0,9,0,3,0,2,0
-xform,gov.cdc.izgateway.xform.model,Solution,98,0,8,0,30,0,12,0,8,0
 xform,gov.cdc.izgateway.xform.model,Code,29,0,8,0,6,0,5,0,1,0
+xform,gov.cdc.izgateway.xform.model,Solution,98,0,8,0,30,0,12,0,8,0
 xform,gov.cdc.izgateway.xform.model,AccessControl,3,0,0,0,2,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,User,3,6,0,0,2,3,1,1,1,1
 xform,gov.cdc.izgateway.xform.model,SolutionOperation,0,3,0,0,0,1,0,1,0,1
