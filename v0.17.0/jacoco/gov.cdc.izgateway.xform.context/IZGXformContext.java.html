@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IZGXformContext.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.context</a> &gt; <span class="el_source">IZGXformContext.java</span></div><h1>IZGXformContext.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.context;
+
+import gov.cdc.izgateway.soap.message.FaultMessage;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
+import lombok.Getter;
+import lombok.Setter;
+
+/**
+ * Context object required for a pipeline that uses the Hub or IIS outbound endpoints.
+ * 
+ * @author Audacious Inquiry
+ */
+@Getter
+@Setter
+public class IZGXformContext {
+    private ServiceContext serviceContext;
+    private SubmitSingleMessageRequest submitSingleMessageRequest;
+    private SubmitSingleMessageResponse submitSingleMessageResponse;
+    private FaultMessage faultMessage;
+    
+<span class="nc" id="L22">    public IZGXformContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest) {</span>
+<span class="nc" id="L23">        this.serviceContext = serviceContext;</span>
+<span class="nc" id="L24">        this.submitSingleMessageRequest = submitSingleMessageRequest;</span>
+<span class="nc" id="L25">        this.submitSingleMessageResponse = null;</span>
+<span class="nc" id="L26">    }</span>
+
+<span class="nc" id="L28">    public IZGXformContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest, SubmitSingleMessageResponse submitSingleMessageResponse) {</span>
+<span class="nc" id="L29">        this.serviceContext = serviceContext;</span>
+<span class="nc" id="L30">        this.submitSingleMessageRequest = submitSingleMessageRequest;</span>
+<span class="nc" id="L31">        this.submitSingleMessageResponse = submitSingleMessageResponse;</span>
+<span class="nc" id="L32">    }</span>
+    
+    /**
+     * Get the fault status.
+     * @return true if the context reflects that a fault occured.
+     */
+    public boolean hasFault() {
+<span class="nc bnc" id="L39" title="All 2 branches missed.">    	return faultMessage != null;</span>
+    }
+    
+    /**
+     * See if there is a response (if not, there should be a fault).
+     * @return	true if there is a response.
+     */
+    public boolean hasResponse() {
+<span class="nc bnc" id="L47" title="All 2 branches missed.">    	return submitSingleMessageResponse != null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

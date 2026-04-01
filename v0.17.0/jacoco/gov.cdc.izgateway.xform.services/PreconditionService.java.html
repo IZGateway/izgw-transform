@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PreconditionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.services</a> &gt; <span class="el_source">PreconditionService.java</span></div><h1>PreconditionService.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.services;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import gov.cdc.izgateway.xform.logging.ApiEventLogger;
+import gov.cdc.izgateway.xform.model.PreconditionInfo;
+import gov.cdc.izgateway.xform.model.PreconditionInfoProperty;
+import gov.cdc.izgateway.xform.preconditions.Precondition;
+import jakarta.annotation.Nullable;
+import org.springframework.stereotype.Service;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.*;
+
+@Service
+<span class="fc" id="L17">public class PreconditionService implements XformService&lt;PreconditionInfo&gt; {</span>
+    @Override
+    public PreconditionInfo getObject(UUID id) {
+<span class="nc" id="L20">        return null;</span>
+    }
+
+    @Override
+    public List&lt;PreconditionInfo&gt; getList() {
+
+        // Use reflection to determine the preconditions that exist in the running system
+        // Start with pulling the annotation on the Precondition interface
+        // Then build up array of PreconditionInformation to show fields necessary
+        // when configuring each precondition.
+<span class="nc" id="L30">        Class&lt;?&gt; preconditionClass = Precondition.class;</span>
+<span class="nc" id="L31">        JsonSubTypes subTypesAnnotation = preconditionClass.getAnnotation(JsonSubTypes.class);</span>
+<span class="nc" id="L32">        List&lt;PreconditionInfo&gt; preconditionInfoList = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L34" title="All 2 branches missed.">        if (subTypesAnnotation != null) {</span>
+<span class="nc" id="L35">            JsonSubTypes.Type[] types = subTypesAnnotation.value();</span>
+
+<span class="nc bnc" id="L37" title="All 2 branches missed.">            for (JsonSubTypes.Type type : types) {</span>
+<span class="nc" id="L38">                Class&lt;?&gt; subClass = type.value();</span>
+<span class="nc" id="L39">                PreconditionInfo info = new PreconditionInfo();</span>
+<span class="nc" id="L40">                info.setMethod(type.name());</span>
+
+<span class="nc" id="L42">                Map&lt;String, PreconditionInfoProperty&gt; properties = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L43">                getAllFields(subClass, properties);</span>
+<span class="nc" id="L44">                info.setProperties(properties);</span>
+
+<span class="nc" id="L46">                preconditionInfoList.add(info);</span>
+            }
+        }
+
+<span class="nc" id="L50">        ApiEventLogger.logReadEvent(preconditionInfoList);</span>
+<span class="nc" id="L51">        return preconditionInfoList;</span>
+    }
+
+    @Override
+    public void update(PreconditionInfo obj) {
+        // Preconditions are determined and listed via code reflection, not to be updated in code.
+<span class="nc" id="L57">    }</span>
+
+    @Override
+    public void create(PreconditionInfo obj) {
+        // Preconditions are determined and listed via code reflection, not to be created in code.
+<span class="nc" id="L62">    }</span>
+
+    @Override
+    public void delete(UUID id) {
+        // Preconditions are determined and listed via code reflection, not to be deleted in code.
+<span class="nc" id="L67">    }</span>
+
+    private boolean shouldIncludeField(Field field) {
+        // If a field is annotated with @JsonIgnore in a Precondition do not include this in the output.
+        // If a field is static do not include in the output.  Only non-static fields would be updated in
+        // the state so this will exclude the AspectJ objects that may show up.
+<span class="nc bnc" id="L73" title="All 4 branches missed.">        return !field.isAnnotationPresent(JsonIgnore.class) &amp;&amp; !Modifier.isStatic(field.getModifiers());</span>
+    }
+
+    private void getAllFields(Class&lt;?&gt; clazz, Map&lt;String, PreconditionInfoProperty&gt; properties) {
+<span class="nc bnc" id="L77" title="All 4 branches missed.">        if (clazz == null || clazz == Object.class) {</span>
+<span class="nc" id="L78">            return;</span>
+        }
+
+        // Process current class
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        for (Field field : clazz.getDeclaredFields()) {</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">            if (shouldIncludeField(field)) {</span>
+<span class="nc" id="L84">                PreconditionInfoProperty prop = new PreconditionInfoProperty();</span>
+<span class="nc" id="L85">                prop.setType(field.getType().getSimpleName());</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">                prop.setRequired(!field.isAnnotationPresent(Nullable.class));</span>
+<span class="nc" id="L87">                properties.put(field.getName(), prop);</span>
+            }
+        }
+
+        // Process superclass
+<span class="nc" id="L92">        getAllFields(clazz.getSuperclass(), properties);</span>
+<span class="nc" id="L93">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CertificateBootstrapService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.repository</a> &gt; <span class="el_source">CertificateBootstrapService.java</span></div><h1>CertificateBootstrapService.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.repository;
+
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
+import org.springframework.context.ApplicationListener;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.springframework.lang.Nullable;
+
+import javax.security.auth.x500.X500Principal;
+import java.io.*;
+import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Base64;
+import java.util.Date;
+
+/**
+ * This class is used to bootstrap certificates and keystores/truststores for local testing.
+ * It is only activated if the environment variable XFORM_INIT is set to true.
+ * It starts prior to Spring context initialization to ensure that the keystores/truststores are available
+ * for the application.  This is done by specifying this class in the META-INF/spring.factories file.
+ */
+<span class="fc" id="L38">@Slf4j</span>
+<span class="fc" id="L39">public class CertificateBootstrapService implements ApplicationListener&lt;ApplicationEnvironmentPreparedEvent&gt; {</span>
+    private static final String XFORM_INIT = &quot;XFORM_INIT&quot;;
+    private static final String XFORM_CRYPTO_CLIENT_CERT_FILE = &quot;XFORM_CRYPTO_CLIENT_CERT_FILE&quot;;
+    private static final String XFORM_CRYPTO_CLIENT_KEY_FILE = &quot;XFORM_CRYPTO_CLIENT_KEY_FILE&quot;;
+    private static final String XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE = &quot;XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE&quot;;
+    private static final String XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE = &quot;XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE&quot;;
+    private static final String XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE = &quot;XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE&quot;;
+    private static final String COMMON_PASS = &quot;COMMON_PASS&quot;;
+
+    private static final String CERTIFICATE_ALIAS = &quot;xform.local.testing.only&quot;;
+    private static final String PROVIDER = &quot;BCFIPS&quot;;
+    private static final String SIGNATURE_ALGORITHM = &quot;SHA256withRSA&quot;;
+    private static final String KEY_ALGORITHM = &quot;RSA&quot;;
+    private static final int KEY_SIZE = 2048;
+    private static final String KEYSTORE_TYPE = &quot;BCFKS&quot;;
+
+    private String certPath;
+    private String privateKeyPath;
+    private String trustStorePath;
+    private String trustStorePassword;
+    private String clientTrustStorePath;
+    private String clientTrustStorePassword;
+    private String clientKeyStorePath;
+    private String clientKeyStorePassword;
+
+<span class="fc" id="L64">    private volatile boolean initialized = false;</span>
+
+    /**
+     * Handles the ApplicationEnvironmentPreparedEvent to trigger certificate and keystore/truststore initialization.
+     * @param event the Spring application environment prepared event
+     */
+    @Override
+    public void onApplicationEvent(@Nullable ApplicationEnvironmentPreparedEvent event) {
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (!performInitialization()) return;</span>
+
+<span class="fc" id="L74">        log.info(&quot;CertificateBootstrapService is initializing...&quot;);</span>
+
+        try {
+<span class="fc" id="L77">            createInitialClientCertificateAndTrust();</span>
+<span class="nc" id="L78">        } catch (CertificateBootstrapException e) {</span>
+<span class="nc" id="L79">            throw new RuntimeException(e);</span>
+<span class="fc" id="L80">        }</span>
+
+<span class="fc" id="L82">        log.info(&quot;CertificateBootstrapService has completed.&quot;);</span>
+<span class="fc" id="L83">    }</span>
+
+    /**
+     * Checks if initialization should be performed and loads required environment variables.
+     * @return true if initialization should proceed, false otherwise
+     */
+    private boolean performInitialization() {
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">        if (initialized) {</span>
+<span class="nc" id="L91">            log.debug(&quot;CertificateBootstrapService already initialized, skipping...&quot;);</span>
+<span class="nc" id="L92">            return false;</span>
+        }
+
+<span class="fc" id="L95">        String initValue = getEnv(XFORM_INIT);</span>
+
+<span class="pc bpc" id="L97" title="2 of 4 branches missed.">        if (StringUtils.isEmpty(initValue) || !initValue.equalsIgnoreCase(&quot;true&quot;)) {</span>
+<span class="nc" id="L98">            return false;</span>
+        }
+
+<span class="fc" id="L101">        certPath = getEnvStrict(XFORM_CRYPTO_CLIENT_CERT_FILE);</span>
+<span class="fc" id="L102">        privateKeyPath = getEnvStrict(XFORM_CRYPTO_CLIENT_KEY_FILE);</span>
+<span class="fc" id="L103">        trustStorePath = getEnvStrict(XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE);</span>
+<span class="fc" id="L104">        trustStorePassword = getEnvStrict(COMMON_PASS);</span>
+<span class="fc" id="L105">        clientTrustStorePath = getEnvStrict(XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE);</span>
+<span class="fc" id="L106">        clientTrustStorePassword = getEnvStrict(COMMON_PASS);</span>
+<span class="fc" id="L107">        clientKeyStorePath = getEnvStrict(XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE);</span>
+<span class="fc" id="L108">        clientKeyStorePassword = getEnvStrict(COMMON_PASS);</span>
+
+<span class="fc" id="L110">        return true;</span>
+    }
+
+    /**
+     * Creates the initial client certificate, saves it and the private key, and updates trust/key stores.
+     * @throws CertificateBootstrapException if any error occurs during the process
+     */
+    private void createInitialClientCertificateAndTrust() throws CertificateBootstrapException {
+        try {
+<span class="fc" id="L119">            Path certFile = Paths.get(certPath);</span>
+<span class="fc" id="L120">            Path keyFile = Paths.get(privateKeyPath);</span>
+
+            // Generate new certificate and key pair
+<span class="fc" id="L123">            KeyPair keyPair = generateKeyPair();</span>
+<span class="fc" id="L124">            X509Certificate certificate = generateSelfSignedCertificate(keyPair);</span>
+
+            // Save certificate and private key
+<span class="fc" id="L127">            saveCertificate(certificate, certFile);</span>
+<span class="fc" id="L128">            savePrivateKey(keyPair.getPrivate(), keyFile);</span>
+
+            // Update trust stores and create key store
+<span class="fc" id="L131">            addCertificateToTrustStore(certificate, trustStorePath, trustStorePassword);</span>
+<span class="fc" id="L132">            addCertificateToTrustStore(certificate, clientTrustStorePath, clientTrustStorePassword);</span>
+<span class="fc" id="L133">            addCertificateAndKeyToKeyStore(certificate, keyPair, clientKeyStorePath, clientKeyStorePassword);</span>
+
+<span class="fc" id="L135">            initialized = true;</span>
+<span class="nc" id="L136">        } catch (Exception e) {</span>
+<span class="nc" id="L137">            throw new CertificateBootstrapException(&quot;Certificate bootstrap failed&quot;, e);</span>
+<span class="fc" id="L138">        }</span>
+<span class="fc" id="L139">    }</span>
+
+    /**
+     * Loads an existing keystore or creates a new one if it does not exist.
+     * @param keyStorePath the path to the keystore file
+     * @param password the keystore password
+     * @return the loaded or newly created KeyStore
+     * @throws CertificateBootstrapException if loading or creation fails
+     */
+    private KeyStore loadOrCreateKeyStore(String keyStorePath, String password) throws CertificateBootstrapException {
+        try {
+<span class="fc" id="L150">            File keyStoreFile = new File(keyStorePath);</span>
+<span class="fc" id="L151">            Files.createDirectories(keyStoreFile.toPath().getParent());</span>
+
+<span class="fc" id="L153">            KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE, PROVIDER);</span>
+
+<span class="fc bfc" id="L155" title="All 2 branches covered.">            if (keyStoreFile.exists()) {</span>
+<span class="fc" id="L156">                try (FileInputStream fis = new FileInputStream(keyStoreFile)) {</span>
+<span class="fc" id="L157">                    keyStore.load(fis, password.toCharArray());</span>
+                }
+            } else {
+<span class="fc" id="L160">                keyStore.load(null, password.toCharArray());</span>
+            }
+
+<span class="fc" id="L163">            return keyStore;</span>
+
+<span class="nc" id="L165">        } catch (IOException | NoSuchProviderException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {</span>
+<span class="nc" id="L166">            throw new CertificateBootstrapException(&quot;Failed to load or create KeyStore&quot;, e);</span>
+        }
+    }
+
+    /**
+     * Saves the given KeyStore to the specified file path.
+     * @param keyStore the KeyStore to save
+     * @param keyStorePath the file path to save the KeyStore
+     * @param password the password for the KeyStore
+     * @throws CertificateBootstrapException if saving fails
+     */
+    private void saveKeyStore(KeyStore keyStore, String keyStorePath, String password) throws CertificateBootstrapException {
+        try {
+<span class="fc" id="L179">            FileOutputStream fos = new FileOutputStream(keyStorePath);</span>
+<span class="fc" id="L180">            keyStore.store(fos, password.toCharArray());</span>
+<span class="fc" id="L181">            log.info(&quot;KeyStore saved to {}&quot;, keyStorePath);</span>
+
+<span class="nc" id="L183">        } catch(IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {</span>
+<span class="nc" id="L184">            throw new CertificateBootstrapException(&quot;Failed to save KeyStore&quot;, e);</span>
+<span class="fc" id="L185">        }</span>
+<span class="fc" id="L186">    }</span>
+
+    /**
+     * Adds the given certificate to the specified trust store.
+     * @param certificate the X509 certificate to add
+     * @param trustStorePath the trust store file path
+     * @param password the trust store password
+     * @throws CertificateBootstrapException if the operation fails
+     */
+    private void addCertificateToTrustStore(X509Certificate certificate, String trustStorePath, String password) throws CertificateBootstrapException {
+        try {
+<span class="fc" id="L197">            KeyStore trustStore = loadOrCreateKeyStore(trustStorePath, password);</span>
+
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">            if (trustStore.containsAlias(CERTIFICATE_ALIAS)) {</span>
+<span class="nc" id="L200">                Certificate existingCert = trustStore.getCertificate(CERTIFICATE_ALIAS);</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">                if (existingCert.equals(certificate)) {</span>
+<span class="nc" id="L202">                    return;</span>
+                } else {
+                    // Remove existing certificate if different
+<span class="nc" id="L205">                    trustStore.deleteEntry(CERTIFICATE_ALIAS);</span>
+                }
+            }
+
+<span class="fc" id="L209">            trustStore.setCertificateEntry(CERTIFICATE_ALIAS, certificate);</span>
+<span class="fc" id="L210">            saveKeyStore(trustStore, trustStorePath, password);</span>
+<span class="nc" id="L211">        } catch (KeyStoreException e) {</span>
+<span class="nc" id="L212">            throw new CertificateBootstrapException(&quot;Failed to add certificate to trust store&quot;, e);</span>
+<span class="fc" id="L213">        }</span>
+<span class="fc" id="L214">    }</span>
+
+    /**
+     * Adds the given certificate and private key to the specified key store.
+     * @param certificate the X509 certificate to add
+     * @param keyPair the key pair containing the private key
+     * @param keyStorePath the key store file path
+     * @param password the key store password
+     * @throws CertificateBootstrapException if the operation fails
+     */
+    private void addCertificateAndKeyToKeyStore(X509Certificate certificate, KeyPair keyPair, String keyStorePath, String password) throws CertificateBootstrapException {
+        try {
+<span class="fc" id="L226">            KeyStore keyStore = loadOrCreateKeyStore(keyStorePath, password);</span>
+<span class="fc" id="L227">            keyStore.setKeyEntry(CERTIFICATE_ALIAS, keyPair.getPrivate(), password.toCharArray(), new Certificate[]{certificate});</span>
+<span class="fc" id="L228">            saveKeyStore(keyStore, keyStorePath, password);</span>
+<span class="nc" id="L229">        } catch (KeyStoreException e) {</span>
+<span class="nc" id="L230">            throw new CertificateBootstrapException(&quot;Failed to add cert and key to keystore&quot;, e);</span>
+<span class="fc" id="L231">        }</span>
+<span class="fc" id="L232">    }</span>
+
+    /**
+     * Generates a new RSA key pair using the Bouncy Castle FIPS provider.
+     * @return the generated KeyPair
+     * @throws CertificateBootstrapException if key generation fails
+     */
+    private KeyPair generateKeyPair() throws CertificateBootstrapException {
+        try {
+<span class="fc" id="L241">            KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_ALGORITHM, PROVIDER);</span>
+<span class="fc" id="L242">            keyGen.initialize(KEY_SIZE, new SecureRandom());</span>
+<span class="fc" id="L243">            return keyGen.generateKeyPair();</span>
+<span class="nc" id="L244">        } catch (NoSuchProviderException | NoSuchAlgorithmException e) {</span>
+<span class="nc" id="L245">            throw new CertificateBootstrapException(&quot;Failed to add Bouncy Castle FIPS provider&quot;, e);</span>
+        }
+    }
+
+    /**
+     * Generates a self-signed X509 certificate for the given key pair.
+     * @param keyPair the key pair to use for the certificate
+     * @return the generated X509Certificate
+     * @throws CertificateBootstrapException if certificate generation fails
+     */
+    private X509Certificate generateSelfSignedCertificate(KeyPair keyPair) throws CertificateBootstrapException {
+        try {
+<span class="fc" id="L257">            X500Name subject = new X500Name(&quot;CN=xform.local.testing.only, O=izgateway&quot;);</span>
+<span class="fc" id="L258">            X500Principal principal = new X500Principal(subject.getEncoded());</span>
+
+<span class="fc" id="L260">            LocalDateTime notBefore = LocalDateTime.now();</span>
+<span class="fc" id="L261">            LocalDateTime notAfter = notBefore.plusYears(1);</span>
+
+<span class="fc" id="L263">            JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(</span>
+                    principal,
+<span class="fc" id="L265">                    BigInteger.valueOf(System.currentTimeMillis()),</span>
+<span class="fc" id="L266">                    Date.from(notBefore.atZone(ZoneId.systemDefault()).toInstant()),</span>
+<span class="fc" id="L267">                    Date.from(notAfter.atZone(ZoneId.systemDefault()).toInstant()),</span>
+                    principal,
+<span class="fc" id="L269">                    keyPair.getPublic()</span>
+            );
+
+<span class="fc" id="L272">            ContentSigner signer = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM)</span>
+<span class="fc" id="L273">                    .setProvider(PROVIDER)</span>
+<span class="fc" id="L274">                    .build(keyPair.getPrivate());</span>
+
+<span class="fc" id="L276">            X509CertificateHolder certHolder = certBuilder.build(signer);</span>
+<span class="fc" id="L277">            return new JcaX509CertificateConverter()</span>
+<span class="fc" id="L278">                    .setProvider(PROVIDER)</span>
+<span class="fc" id="L279">                    .getCertificate(certHolder);</span>
+<span class="nc" id="L280">        } catch (IOException | OperatorCreationException | CertificateException e) {</span>
+<span class="nc" id="L281">            throw new CertificateBootstrapException(&quot;Failed to generate self-signed certificate&quot;, e);</span>
+        }
+    }
+
+    /**
+     * Saves the given X509 certificate to a file in PEM format.
+     * @param certificate the certificate to save
+     * @param path the file path to save the certificate
+     * @throws CertificateBootstrapException if saving fails
+     */
+    private void saveCertificate(X509Certificate certificate, Path path) throws CertificateBootstrapException {
+        try {
+<span class="fc" id="L293">            Files.createDirectories(path.getParent());</span>
+<span class="fc" id="L294">            PrintWriter writer = new PrintWriter(new FileWriter(path.toFile()));</span>
+<span class="fc" id="L295">            writer.println(&quot;-----BEGIN CERTIFICATE-----&quot;);</span>
+<span class="fc" id="L296">            writer.println(Base64.getEncoder().encodeToString(certificate.getEncoded()));</span>
+<span class="fc" id="L297">            writer.println(&quot;-----END CERTIFICATE-----&quot;);</span>
+<span class="fc" id="L298">            writer.close();</span>
+<span class="fc" id="L299">            log.info(&quot;Certificate saved to {}&quot;, path);</span>
+<span class="nc" id="L300">        } catch (IOException | CertificateEncodingException e) {</span>
+<span class="nc" id="L301">            throw new CertificateBootstrapException(&quot;Failed to save certificate file&quot;, e);</span>
+<span class="fc" id="L302">        }</span>
+
+<span class="fc" id="L304">    }</span>
+
+    /**
+     * Saves the given private key to a file in PEM format.
+     * @param privateKey the private key to save
+     * @param path the file path to save the private key
+     * @throws CertificateBootstrapException if saving fails
+     */
+    private void savePrivateKey(PrivateKey privateKey, Path path) throws CertificateBootstrapException {
+        try {
+<span class="fc" id="L314">            Files.createDirectories(path.getParent());</span>
+<span class="fc" id="L315">            PrintWriter writer = new PrintWriter(new FileWriter(path.toFile()));</span>
+<span class="fc" id="L316">            writer.println(&quot;-----BEGIN RSA PRIVATE KEY-----&quot;);</span>
+<span class="fc" id="L317">            writer.println(Base64.getEncoder().encodeToString(privateKey.getEncoded()));</span>
+<span class="fc" id="L318">            writer.println(&quot;-----END RSA PRIVATE KEY-----&quot;);</span>
+<span class="fc" id="L319">            writer.close();</span>
+
+<span class="fc" id="L321">            log.info(&quot;Private key saved to {}&quot;, path);</span>
+<span class="nc" id="L322">        } catch (IOException e) {</span>
+<span class="nc" id="L323">            throw new CertificateBootstrapException(&quot;Failed to create directories for private key file&quot;, e);</span>
+<span class="fc" id="L324">        }</span>
+<span class="fc" id="L325">    }</span>
+
+    /**
+     * Get the value of an environment variable.
+     * System.getenv() is used because Spring is not fully initialized yet.
+     * @param variableName The environment variable name to retrieve.
+     * @return The value of the environment variable, or null if not set.
+     */
+    private String getEnv(String variableName) {
+<span class="fc" id="L334">        return System.getenv(variableName);</span>
+    }
+
+    /**
+     * Get the value of an environment variable and will throw an exception if it is not found.
+     * System.getenv() is used because Spring is not fully initialized yet.
+     * @param variableName The environment variable name to retrieve.
+     * @return The value of the environment variable, or null if not set.
+     */
+    private String getEnvStrict(String variableName) {
+<span class="fc" id="L344">        String value = getEnv(variableName);</span>
+<span class="pc bpc" id="L345" title="1 of 2 branches missed.">        if (StringUtils.isEmpty(value)) {</span>
+<span class="nc" id="L346">            throw new IllegalStateException(&quot;Environment variable &quot; + variableName + &quot; is not set&quot;);</span>
+        }
+<span class="fc" id="L348">        return value;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
