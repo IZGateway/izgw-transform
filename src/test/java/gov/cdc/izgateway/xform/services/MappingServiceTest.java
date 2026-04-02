@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link MappingService}, focusing on duplicate detection
- * behavior with the {@code notes} field.
+ * Unit tests for {@link MappingService}, focusing on {@link MappingService#getMapping}
+ * behavior with respect to the {@code notes} field on returned mappings.
  */
 @ExtendWith(MockitoExtension.class)
 class MappingServiceTest {

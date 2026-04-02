@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "6131a82c-9086-43e4-ab9f-b379df7e400b",
+    "_postman_id": "986c2c1a-f533-4966-ad78-4a37ee344f07",
     "name": "TS Integration Test",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "2729094",
-    "_collection_link": "https://go.postman.co/collection/2729094-6131a82c-9086-43e4-ab9f-b379df7e400b?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/2729094-986c2c1a-f533-4966-ad78-4a37ee344f07?source=collection_link"
   },
   "item": [
     {
@@ -3773,6 +3773,7 @@
                           "    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
                           "    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
                           "    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+                          "    pm.expect(response.notes) == pm.collectionVariables.get(\"currentNote\");",
                           "});",
                           "",
                           "utils.testForApiLog(pm, 'CREATE');",
@@ -3780,7 +3781,8 @@
                           ""
                         ],
                         "type": "text/javascript",
-                        "packages": {}
+                        "packages": {},
+                        "requests": {}
                       }
                     },
                     {
@@ -3792,10 +3794,11 @@
                           "pm.collectionVariables.set(\"currentCode\", \"1234-5\");",
                           "pm.collectionVariables.set(\"currentTargetCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
                           "pm.collectionVariables.set(\"currentTargetCode\", \"9876-0\");",
-                          ""
+                          "pm.collectionVariables.set(\"currentNote\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));"
                         ],
                         "type": "text/javascript",
-                        "packages": {}
+                        "packages": {},
+                        "requests": {}
                       }
                     }
                   ],
@@ -3804,7 +3807,7 @@
                     "header": [],
                     "body": {
                       "mode": "raw",
-                      "raw": "{\n    \"active\": {{currentActive}},\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"codeSystem\": \"{{currentCodeSystem}}\",\n    \"code\": \"{{currentCode}}\",\n    \"targetCodeSystem\": \"{{currentTargetCodeSystem}}\",\n    \"targetCode\": \"{{currentTargetCode}}\"\n}\n",
+                      "raw": "{\n    \"active\": {{currentActive}},\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"codeSystem\": \"{{currentCodeSystem}}\",\n    \"code\": \"{{currentCode}}\",\n    \"targetCodeSystem\": \"{{currentTargetCodeSystem}}\",\n    \"targetCode\": \"{{currentTargetCode}}\",\n    \"notes\": \"{{currentNote}}\"\n}\n",
                       "options": {
                         "raw": {
                           "language": "json"
@@ -3909,13 +3912,15 @@
                           "    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
                           "    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
                           "    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+                          "    pm.expect(response.notes) == pm.collectionVariables.get(\"currentNote\");",
                           "});",
                           "",
                           "utils.testForApiLog(pm, 'READ');",
                           ""
                         ],
                         "type": "text/javascript",
-                        "packages": {}
+                        "packages": {},
+                        "requests": {}
                       }
                     },
                     {
@@ -3925,7 +3930,8 @@
                           ""
                         ],
                         "type": "text/javascript",
-                        "packages": {}
+                        "packages": {},
+                        "requests": {}
                       }
                     }
                   ],
@@ -3973,13 +3979,15 @@
                           "    pm.expect(response.targetCodeSystem).to.equal(pm.collectionVariables.get(\"currentTargetCodeSystem\"));",
                           "    pm.expect(response.targetCode).to.equal(pm.collectionVariables.get(\"currentTargetCode\"));",
                           "    pm.expect(response.active) == pm.collectionVariables.get(\"currentActive\");",
+                          "    pm.expect(response.notes) == pm.collectionVariables.get(\"currentNote\");",
                           "});",
                           "",
                           "utils.testForApiLog(pm, 'UPDATE');",
                           ""
                         ],
                         "type": "text/javascript",
-                        "packages": {}
+                        "packages": {},
+                        "requests": {}
                       }
                     },
                     {
@@ -3989,7 +3997,8 @@
                           ""
                         ],
                         "type": "text/javascript",
-                        "packages": {}
+                        "packages": {},
+                        "requests": {}
                       }
                     }
                   ],
