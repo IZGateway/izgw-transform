@@ -3831,6 +3831,85 @@
                   "response": []
                 },
                 {
+                  "name": "Create Mapping - Note Too Long",
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "/*",
+                          "    Attempting to add a note > 2000 characters should result in a 400 status",
+                          "    with a JSON response payload like:",
+                          "",
+                          "{",
+                          "    \"path\": \"/api/v1/mappings\",",
+                          "    \"error\": \"Bad Request\",",
+                          "    \"message\": \"notes: Notes must not exceed 2000 characters\",",
+                          "    \"timestamp\": 1775149556681,",
+                          "    \"status\": 400",
+                          "}",
+                          "*/",
+                          "pm.test(\"returns success code\", function() {",
+                          "    pm.expect(pm.response.code).to.equal(400);",
+                          "});",
+                          "",
+                          "let response = pm.response.json();",
+                          "",
+                          "pm.test(\"returns proper message\", function() {",
+                          "    pm.expect(response.message).to.equal(\"notes: Notes must not exceed 2000 characters\");",
+                          "});"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    },
+                    {
+                      "listen": "prerequest",
+                      "script": {
+                        "exec": [
+                          "pm.collectionVariables.set(\"noteTooLongActive\", pm.variables.replaceIn(\"{{$randomBoolean}}\"));",
+                          "pm.collectionVariables.set(\"noteTooLongCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+                          "pm.collectionVariables.set(\"noteTooLongCode\", \"1234-5\");",
+                          "pm.collectionVariables.set(\"noteTooLongTargetCodeSystem\", pm.variables.replaceIn(\"{{$randomCatchPhrase}}\"));",
+                          "pm.collectionVariables.set(\"noteTooLongTargetCode\", \"9876-0\");",
+                          "pm.collectionVariables.set(\"noteTooLongNote\", \"A\".repeat(2001));"
+                        ],
+                        "type": "text/javascript",
+                        "packages": {},
+                        "requests": {}
+                      }
+                    }
+                  ],
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n    \"active\": {{noteTooLongActive}},\n    \"organizationId\": \"{{currentOrganizationId}}\",\n    \"codeSystem\": \"{{noteTooLongCodeSystem}}\",\n    \"code\": \"{{noteTooLongCode}}\",\n    \"targetCodeSystem\": \"{{noteTooLongTargetCodeSystem}}\",\n    \"targetCode\": \"{{noteTooLongTargetCode}}\",\n    \"notes\": \"{{noteTooLongNote}}\"\n}\n",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{protocol}}://{{host}}:{{port}}/api/v1/mappings",
+                      "protocol": "{{protocol}}",
+                      "host": [
+                        "{{host}}"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "api",
+                        "v1",
+                        "mappings"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
                   "name": "Create Mapping - Dupe Attempt",
                   "event": [
                     {
@@ -28897,6 +28976,66 @@
     },
     {
       "key": "existingActive",
+      "value": ""
+    },
+    {
+      "key": "currentOrganizationId",
+      "value": ""
+    },
+    {
+      "key": "noteTooLongActive",
+      "value": ""
+    },
+    {
+      "key": "noteTooLongCodeSystem",
+      "value": ""
+    },
+    {
+      "key": "noteTooLongCode",
+      "value": ""
+    },
+    {
+      "key": "noteTooLongTargetCodeSystem",
+      "value": ""
+    },
+    {
+      "key": "noteTooLongTargetCode",
+      "value": ""
+    },
+    {
+      "key": "noteTooLongNote",
+      "value": ""
+    },
+    {
+      "key": "currentActive",
+      "value": ""
+    },
+    {
+      "key": "currentCodeSystem",
+      "value": ""
+    },
+    {
+      "key": "currentCode",
+      "value": ""
+    },
+    {
+      "key": "currentTargetCodeSystem",
+      "value": ""
+    },
+    {
+      "key": "currentTargetCode",
+      "value": ""
+    },
+    {
+      "key": "currentNote",
+      "value": ""
+    },
+    {
+      "key": "currentId",
+      "value": ""
+    },
+    {
+      "key": "createdMapping",
       "value": ""
     }
   ]
