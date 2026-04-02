@@ -1,5 +1,6 @@
 package gov.cdc.izgateway.xform.services;
 
+import gov.cdc.izgateway.xform.model.Code;
 import gov.cdc.izgateway.xform.model.Mapping;
 import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import gov.cdc.izgateway.xform.repository.XformRepository;
@@ -17,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link MappingService}, focusing on duplicate detection
- * behavior with the {@code notes} field.
+ * Unit tests for {@link MappingService}, focusing on {@link MappingService#getMapping}
+ * behavior with respect to the {@code notes} field on returned mappings.
  */
 @ExtendWith(MockitoExtension.class)
 class MappingServiceTest {
@@ -64,7 +65,7 @@ class MappingServiceTest {
 
         Mapping result = mappingService.getMapping(
                 ORG_ID,
-                new gov.cdc.izgateway.xform.model.Code("2106-3", "CDCREC"));
+                new Code("2106-3", "CDCREC"));
 
         assertNotNull(result);
         assertEquals("A note about this mapping", result.getNotes());
@@ -79,7 +80,7 @@ class MappingServiceTest {
 
         Mapping result = mappingService.getMapping(
                 ORG_ID,
-                new gov.cdc.izgateway.xform.model.Code("2106-3", "CDCREC"));
+                new Code("2106-3", "CDCREC"));
 
         assertNotNull(result);
         assertNull(result.getNotes());
