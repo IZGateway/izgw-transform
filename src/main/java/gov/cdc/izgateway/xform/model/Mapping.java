@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.xform.model;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
@@ -24,4 +25,6 @@ public class Mapping extends BaseModel implements OrganizationAware {
     private String targetCodeSystem;
     @NotNull(message = "Target code is required")
     private String targetCode;
+    @Size(max = 2000, message = "Notes must not exceed 2000 characters")
+    private String notes;
 }
