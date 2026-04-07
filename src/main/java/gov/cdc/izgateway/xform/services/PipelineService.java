@@ -41,8 +41,8 @@ public class PipelineService extends GenericService<Pipeline>{
     protected boolean isEndpointDuplicate(Pipeline pipeline) {
         return repo.getEntitySet().stream().anyMatch(p ->
                 p.getOrganizationId().equals(pipeline.getOrganizationId()) &&
-                        p.getInboundEndpoint().equalsIgnoreCase(pipeline.getInboundEndpoint()) &&
-                        p.getOutboundEndpoint().equalsIgnoreCase(pipeline.getOutboundEndpoint())
+                        Strings.CI.equals(p.getInboundEndpoint(), pipeline.getInboundEndpoint()) &&
+                        Strings.CI.equals(p.getOutboundEndpoint(), pipeline.getOutboundEndpoint())
         );
     }
     
