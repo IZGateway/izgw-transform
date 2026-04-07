@@ -2,6 +2,8 @@ package gov.cdc.izgateway.xform.services;
 
 import gov.cdc.izgateway.xform.model.Pipeline;
 import gov.cdc.izgateway.xform.repository.RepositoryFactory;
+
+import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
@@ -26,6 +28,17 @@ public class PipelineService extends GenericService<Pipeline>{
 
     @Override
     protected boolean isDuplicate(Pipeline pipeline) {
+        return isPipelineNameDuplicate(pipeline) || isEndpointDuplicate(pipeline);
+    }
+
+    protected boolean isPipelineNameDuplicate(Pipeline pipeline) {
+        return repo.getEntitySet().stream().anyMatch(p ->
+                p.getOrganizationId().equals(pipeline.getOrganizationId()) &&
+                        Strings.CI.equals(p.getPipelineName(), pipeline.getPipelineName())
+        );
+    }
+
+    protected boolean isEndpointDuplicate(Pipeline pipeline) {
         return repo.getEntitySet().stream().anyMatch(p ->
                 p.getOrganizationId().equals(pipeline.getOrganizationId()) &&
                         p.getInboundEndpoint().equalsIgnoreCase(pipeline.getInboundEndpoint()) &&
