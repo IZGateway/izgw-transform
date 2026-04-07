@@ -2,6 +2,8 @@
 
 import gov.cdc.izgateway.xform.model.Pipeline;
 import gov.cdc.izgateway.xform.repository.RepositoryFactory;
+
+import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
@@ -11,25 +13,36 @@ public class PipelineService extends GenericService&lt;Pipeline&gt;{
 
     @Autowired
     public PipelineService(RepositoryFactory repositoryFactory) {
-<span class="fc" id="L14">        super(repositoryFactory.pipelineRepository());</span>
-<span class="fc" id="L15">    }</span>
+<span class="fc" id="L16">        super(repositoryFactory.pipelineRepository());</span>
+<span class="fc" id="L17">    }</span>
 
     public Pipeline getPipelineByOrganizationAndEndpoints(UUID organizationId, String inboundEndpoint, String outboundEndpoint) {
-<span class="nc" id="L18">        return getList()</span>
-<span class="nc" id="L19">                .stream()</span>
-<span class="nc" id="L20">                .filter(</span>
-<span class="nc bnc" id="L21" title="All 2 branches missed.">                        p -&gt; p.getOrganizationId().equals(organizationId)</span>
-<span class="nc bnc" id="L22" title="All 2 branches missed.">                                &amp;&amp; p.getInboundEndpoint().equals(inboundEndpoint)</span>
-<span class="nc bnc" id="L23" title="All 2 branches missed.">                                &amp;&amp; p.getOutboundEndpoint().equals(outboundEndpoint)</span>
-<span class="nc" id="L24">                ).findFirst().orElse(null);</span>
+<span class="nc" id="L20">        return getList()</span>
+<span class="nc" id="L21">                .stream()</span>
+<span class="nc" id="L22">                .filter(</span>
+<span class="nc bnc" id="L23" title="All 2 branches missed.">                        p -&gt; p.getOrganizationId().equals(organizationId)</span>
+<span class="nc bnc" id="L24" title="All 2 branches missed.">                                &amp;&amp; p.getInboundEndpoint().equals(inboundEndpoint)</span>
+<span class="nc bnc" id="L25" title="All 2 branches missed.">                                &amp;&amp; p.getOutboundEndpoint().equals(outboundEndpoint)</span>
+<span class="nc" id="L26">                ).findFirst().orElse(null);</span>
     }
 
     @Override
     protected boolean isDuplicate(Pipeline pipeline) {
-<span class="nc" id="L29">        return repo.getEntitySet().stream().anyMatch(p -&gt;</span>
-<span class="nc bnc" id="L30" title="All 2 branches missed.">                p.getOrganizationId().equals(pipeline.getOrganizationId()) &amp;&amp;</span>
-<span class="nc bnc" id="L31" title="All 2 branches missed.">                        p.getInboundEndpoint().equalsIgnoreCase(pipeline.getInboundEndpoint()) &amp;&amp;</span>
-<span class="nc bnc" id="L32" title="All 2 branches missed.">                        p.getOutboundEndpoint().equalsIgnoreCase(pipeline.getOutboundEndpoint())</span>
+<span class="nc bnc" id="L31" title="All 4 branches missed.">        return isPipelineNameDuplicate(pipeline) || isEndpointDuplicate(pipeline);</span>
+    }
+
+    protected boolean isPipelineNameDuplicate(Pipeline pipeline) {
+<span class="nc" id="L35">        return repo.getEntitySet().stream().anyMatch(p -&gt;</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">                p.getOrganizationId().equals(pipeline.getOrganizationId()) &amp;&amp;</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">                        Strings.CI.equals(p.getPipelineName(), pipeline.getPipelineName())</span>
+        );
+    }
+
+    protected boolean isEndpointDuplicate(Pipeline pipeline) {
+<span class="nc" id="L42">        return repo.getEntitySet().stream().anyMatch(p -&gt;</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">                p.getOrganizationId().equals(pipeline.getOrganizationId()) &amp;&amp;</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">                        p.getInboundEndpoint().equalsIgnoreCase(pipeline.getInboundEndpoint()) &amp;&amp;</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">                        p.getOutboundEndpoint().equalsIgnoreCase(pipeline.getOutboundEndpoint())</span>
         );
     }
     
@@ -39,11 +52,11 @@ public class PipelineService extends GenericService&lt;Pipeline&gt;{
      * @return			True if the solution is in use, false otherwise
      */
     public boolean isSolutionInUse(UUID solutionId) {
-<span class="nc" id="L42">        return repo.getEntitySet().stream()</span>
-<span class="nc" id="L43">                .flatMap(p -&gt; p.getPipes().stream())</span>
-<span class="nc" id="L44">                .filter(pipe -&gt; pipe.getSolutionId().equals(solutionId))</span>
-<span class="nc" id="L45">                .findFirst()</span>
-<span class="nc bnc" id="L46" title="All 2 branches missed.">                .orElse(null) != null;</span>
+<span class="nc" id="L55">        return repo.getEntitySet().stream()</span>
+<span class="nc" id="L56">                .flatMap(p -&gt; p.getPipes().stream())</span>
+<span class="nc" id="L57">                .filter(pipe -&gt; pipe.getSolutionId().equals(solutionId))</span>
+<span class="nc" id="L58">                .findFirst()</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">                .orElse(null) != null;</span>
     }
 
 }
