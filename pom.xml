@@ -5,12 +5,12 @@
 	<parent>
         <groupId>gov.cdc.izgw</groupId>
         <artifactId>izgw-bom</artifactId>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
         <relativePath />
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
 	<artifactId>xform</artifactId>
-    	<version>0.17.0</version>
+    	<version>0.17.1</version>
 	<name>xform</name>
 	<description>IZ Gateway Xform Service</description>
 	<properties>
