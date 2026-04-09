@@ -41,8 +41,8 @@ public class PipelineService extends GenericService&lt;Pipeline&gt;{
     protected boolean isEndpointDuplicate(Pipeline pipeline) {
 <span class="nc" id="L42">        return repo.getEntitySet().stream().anyMatch(p -&gt;</span>
 <span class="nc bnc" id="L43" title="All 2 branches missed.">                p.getOrganizationId().equals(pipeline.getOrganizationId()) &amp;&amp;</span>
-<span class="nc bnc" id="L44" title="All 2 branches missed.">                        p.getInboundEndpoint().equalsIgnoreCase(pipeline.getInboundEndpoint()) &amp;&amp;</span>
-<span class="nc bnc" id="L45" title="All 2 branches missed.">                        p.getOutboundEndpoint().equalsIgnoreCase(pipeline.getOutboundEndpoint())</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">                        Strings.CI.equals(p.getInboundEndpoint(), pipeline.getInboundEndpoint()) &amp;&amp;</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">                        Strings.CI.equals(p.getOutboundEndpoint(), pipeline.getOutboundEndpoint())</span>
         );
     }
     
