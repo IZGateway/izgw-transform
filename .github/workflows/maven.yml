@@ -288,18 +288,18 @@ jobs:
 
       - name: Setup certs
         env:
-          AUSTIN_TESTING_CERT: ${{ secrets.AUSTIN_TESTING_CERT }}
-          AUSTIN_TESTING_KEY: ${{ secrets.AUSTIN_TESTING_KEY }}
+          TESTING_CERT: ${{ secrets.TESTING_CERT }}
+          TESTING_KEY: ${{ secrets.TESTING_KEY }}
         run: |
-          echo "$AUSTIN_TESTING_CERT" > testing/newman.pem
+          echo "$TESTING_CERT" > testing/newman.pem
           # Don't upload this file !!!
-          echo "$AUSTIN_TESTING_KEY" > testing/newman.key
+          echo "$TESTING_KEY" > testing/newman.key
                                   
       - name: Execute Functional Tests
         id: FunctionalTests
         working-directory: ./testing/scripts
         env:
-          AUSTIN_TESTING_PASS: ${{ secrets.AUSTIN_TESTING_PASS }}
+          TESTING_PASS: ${{ secrets.TESTING_PASS }}
           JWT_SHARED_SECRET: ${{ secrets.JWT_SHARED_SECRET }}
         run: |
           mkdir ../logs
@@ -311,7 +311,7 @@ jobs:
             "--ssl-extra-ca-certs" ../certs/izgwroot.pem \
             "--ssl-client-cert" ../newman.pem \
             "--ssl-client-key" ../newman.key \
-            "--ssl-client-passphrase" $AUSTIN_TESTING_PASS \
+            "--ssl-client-passphrase" $TESTING_PASS \
             "--insecure"  > ../logs/warmup.log
             
           newman run ../scripts/TS_Integration_Test.postman_collection.json -n 1 \
@@ -321,7 +321,7 @@ jobs:
             "--ssl-extra-ca-certs" ../certs/izgwroot.pem \
             "--ssl-client-cert" ../newman.pem \
             "--ssl-client-key" ../newman.key \
-            "--ssl-client-passphrase" $AUSTIN_TESTING_PASS \
+            "--ssl-client-passphrase" $TESTING_PASS \
             "--insecure" --reporters cli,junitfull --reporter-junitfull-export ../logs/integration-test.xml
 
       - name: Upload test logs
