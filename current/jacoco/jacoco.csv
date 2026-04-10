@@ -12,8 +12,8 @@ xform,gov.cdc.izgateway.xform.repository.dynamodb,GroupRoleMappingRepository,8,0
 xform,gov.cdc.izgateway.xform.repository.dynamodb,UserRepository,8,0,0,0,2,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.file,AccessControlRepository,5,7,0,0,1,4,1,2,1,2
 xform,gov.cdc.izgateway.xform.repository.file,OrganizationRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
-xform,gov.cdc.izgateway.xform.repository.file,MappingRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.file,OperationPreconditionFieldRepository,5,7,0,0,1,3,1,2,1,2
+xform,gov.cdc.izgateway.xform.repository.file,MappingRepository.new TypeReference() {...},3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.file,UserRepository,5,7,0,0,1,3,1,2,1,2
 xform,gov.cdc.izgateway.xform.repository.file,PipelineRepository,5,7,0,0,1,3,1,2,1,2
 xform,gov.cdc.izgateway.xform.repository.file,FileRepositoryFactory,2,157,8,8,1,43,9,9,1,9
