@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MigratorFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.repository.dynamodb.migration</a> &gt; <span class="el_source">MigratorFactory.java</span></div><h1>MigratorFactory.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.repository.dynamodb.migration;
+
+import gov.cdc.izgateway.configuration.DynamoDbConfig;
+import gov.cdc.izgateway.xform.model.BaseModel;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Factory that creates EntityMigrator instances for all configured entity types.
+ * This eliminates the need for individual migrator @Component classes.
+ */
+<span class="nc" id="L19">@Slf4j</span>
+@Configuration
+@ConditionalOnExpression(&quot;'${spring.database:}'.equalsIgnoreCase('migrate')&quot;)
+public class MigratorFactory {
+
+    private final DynamoDbEnhancedClient dynamoDbClient;
+    private final String tableName;
+    private final MigrationConfiguration migrationConfig;
+
+    public MigratorFactory(DynamoDbEnhancedClient dynamoDbClient,
+                           DynamoDbConfig dynamoDbConfig,
+<span class="nc" id="L30">                           MigrationConfiguration migrationConfig) {</span>
+<span class="nc" id="L31">        this.dynamoDbClient = dynamoDbClient;</span>
+<span class="nc" id="L32">        this.tableName = dynamoDbConfig.getDynamodbTable();</span>
+<span class="nc" id="L33">        this.migrationConfig = migrationConfig;</span>
+<span class="nc" id="L34">    }</span>
+
+    /**
+     * Creates EntityMigrator instances for all configured entity types.
+     * Spring will automatically inject this list into DataMigrationService.
+     */
+    @Bean
+    public List&lt;EntityMigrator&lt;?&gt;&gt; entityMigrators() {
+<span class="nc" id="L42">        return migrationConfig.getEntityConfigurations()</span>
+<span class="nc" id="L43">                .entrySet()</span>
+<span class="nc" id="L44">                .stream()</span>
+<span class="nc" id="L45">                .map(entry -&gt; createMigrator(entry.getKey(), entry.getValue()))</span>
+<span class="nc" id="L46">                .collect(Collectors.toList());</span>
+    }
+
+    /**
+     * Creates a generic migrator for the specified entity type.
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    private &lt;T extends BaseModel&gt; EntityMigrator&lt;T&gt; createMigrator(Class&lt;T&gt; entityClass, String filePath) {
+<span class="nc" id="L54">        log.info(&quot;Creating migrator for {} with file path: {}&quot;, entityClass.getSimpleName(), filePath);</span>
+<span class="nc" id="L55">        return new GenericEntityMigrator&lt;&gt;(entityClass, filePath, dynamoDbClient, tableName);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
