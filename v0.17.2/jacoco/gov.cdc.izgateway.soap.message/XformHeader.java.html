@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>XformHeader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.soap.message</a> &gt; <span class="el_source">XformHeader.java</span></div><h1>XformHeader.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.soap.message;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import gov.cdc.izgateway.common.HasDestinationUri;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
+// TODO: Refactor this with IZG Core
+
+@Data 
+@Schema(description=&quot;The Hub Request header in the SOAP message&quot;)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class XformHeader implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+    @Schema(description=&quot;The transformed request.&quot;)
+    private String transformedRequest;
+    @Schema(description=&quot;The original response prior to xform.&quot;)
+    private String originalResponse;
+
+<span class="nc" id="L29">	private static List&lt;Pair&lt;String, Function&lt;SoapMessage, String&gt;&gt;&gt; pairs = Arrays.asList(</span>
+<span class="nc" id="L30">            Pair.of(&quot;TransformedRequest&quot;, (Function&lt;SoapMessage, String&gt;)(m -&gt; m.getXformHeader().getTransformedRequest())),</span>
+<span class="nc" id="L31">            Pair.of(&quot;OriginalResponse&quot;, (Function&lt;SoapMessage, String&gt;)(m -&gt; m.getXformHeader().getOriginalResponse()))</span>
+		);
+		
+	@JsonIgnore
+	public static List&lt;Pair&lt;String, Function&lt;SoapMessage, String&gt;&gt;&gt; getKeyValueSuppliers() {
+<span class="nc" id="L36">		return pairs;</span>
+	}
+
+	@JsonIgnore
+	public boolean isEmpty() {
+<span class="nc" id="L41">		return StringUtils.isAllEmpty(transformedRequest, originalResponse);</span>
+	}
+	
+	public XformHeader clear() {
+<span class="nc" id="L45">		transformedRequest = originalResponse = null;</span>
+<span class="nc" id="L46">		return this;</span>
+	}
+
+	public XformHeader copyFrom(XformHeader that) {
+<span class="nc" id="L50">        this.transformedRequest = that.transformedRequest;</span>
+<span class="nc" id="L51">        this.originalResponse = that.originalResponse;</span>
+<span class="nc" id="L52">		return this;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
