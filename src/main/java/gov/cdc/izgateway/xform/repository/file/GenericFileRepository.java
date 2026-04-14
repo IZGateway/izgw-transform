@@ -14,11 +14,21 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Generic file-backed repository for configuration entities.
+ *
+ * @param <T> Model type stored in the repository
+ */
 public abstract class GenericFileRepository<T extends BaseModel> implements XformRepository<T> {
 
 
     protected LinkedHashSet<T> entities;
     protected String filePath;
+    /**
+     * Provide the type reference used to deserialize the stored entities.
+     *
+     * @return Type reference for a linked hash set of entities
+     */
     protected abstract TypeReference<LinkedHashSet<T>> getTypeReference();
 
     @Override

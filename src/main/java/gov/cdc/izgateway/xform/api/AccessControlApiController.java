@@ -18,12 +18,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
+/**
+ * REST API for managing access control entries.
+ */
 @Log
 @Lazy(false)
 @RestController
 public class AccessControlApiController extends BaseApiController {
     private final AccessControlService accessControlService;
 
+    /**
+     * Create the access control API controller.
+     *
+     * @param accessControlService Service for access control operations
+     * @param registry Registry to register this controller for access control
+     */
     @Autowired
     public AccessControlApiController(
             AccessControlService accessControlService,
@@ -33,6 +42,15 @@ public class AccessControlApiController extends BaseApiController {
         registry.register(this);
     }
 
+    /**
+     * List access control entries with optional pagination.
+     *
+     * @param nextCursor Cursor for the next page
+     * @param prevCursor Cursor for the previous page
+     * @param includeInactive Whether to include inactive entries
+     * @param limit Maximum number of entries to return
+     * @return A serialized page of access control entries
+     */
     @RolesAllowed({Roles.ADMIN})
     @GetMapping("/api/v1/access-controls")
     public ResponseEntity<String> getAccessControlList(
@@ -49,6 +67,12 @@ public class AccessControlApiController extends BaseApiController {
         }
     }
 
+    /**
+     * Fetch a specific access control entry by id.
+     *
+     * @param uuid Access control id
+     * @return The access control entry if found
+     */
     @RolesAllowed({Roles.ADMIN})
     @GetMapping("/api/v1/access-controls/{uuid}")
     public ResponseEntity<AccessControl> getAccessControlByUUID(@PathVariable UUID uuid) {
@@ -59,6 +83,13 @@ public class AccessControlApiController extends BaseApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    /**
+     * Update an access control entry.
+     *
+     * @param uuid Access control id
+     * @param updatedAccessControl Updated access control data
+     * @return The updated access control entry
+     */
     @RolesAllowed({Roles.ADMIN})
     @PutMapping("/api/v1/access-controls/{uuid}")
     public ResponseEntity<AccessControl> updateAccessControl(
@@ -70,6 +101,12 @@ public class AccessControlApiController extends BaseApiController {
         return new ResponseEntity<>(updatedAccessControl, HttpStatus.OK);
     }
 
+    /**
+     * Create a new access control entry.
+     *
+     * @param accessControl New access control entry
+     * @return The created access control entry
+     */
     @RolesAllowed({Roles.ADMIN})
     @PostMapping("/api/v1/access-controls")
     public ResponseEntity<AccessControl> createAccessControl(
@@ -79,6 +116,12 @@ public class AccessControlApiController extends BaseApiController {
         return new ResponseEntity<>(accessControl, HttpStatus.OK);
     }
 
+    /**
+     * Delete an access control entry.
+     *
+     * @param uuid Access control id
+     * @return HTTP 204 if deleted
+     */
     @RolesAllowed({Roles.ADMIN})
     @DeleteMapping("/api/v1/access-controls/{uuid}")
     public ResponseEntity<AccessControl> deleteAccessControl(

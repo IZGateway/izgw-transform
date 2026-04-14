@@ -7,8 +7,9 @@ import gov.cdc.izgateway.soap.fault.Fault;
 import gov.cdc.izgateway.soap.fault.MessageSupport;
 
 /**
- * @author Audacious Inquiry
  * Represents faults related to the Transformation controller.
+ *
+ * @author Audacious Inquiry
  */
 public class HubControllerFault extends Fault {
     private static final long serialVersionUID = 1L;
