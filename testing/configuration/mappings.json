@@ -5,7 +5,8 @@
   "codeSystem" : "CDCREC",
   "code" : "2106-3",
   "targetCodeSystem" : "CDCREC3",
-  "targetCode" : "NEWCODE!"
+  "targetCode" : "NEWCODE!",
+  "notes" : "Maps race code 2106-3 to new code system"
 }, {
   "id" : "e69ea576-045f-43a1-8472-ad090ca8655b",
   "active" : true,
@@ -21,7 +22,8 @@
   "codeSystem" : "MYCODESYSTEM",
   "code" : "UNKNOWN2",
   "targetCodeSystem" : "CDCREC",
-  "targetCode" : "NEWCODE2"
+  "targetCode" : "NEWCODE2",
+  "notes" : "Line one of the note\nLine two of the note"
 }, {
   "id" : "e2f1c811-b8d3-455a-8c7e-521e5929a884",
   "active" : true,
