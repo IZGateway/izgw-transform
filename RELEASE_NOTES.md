@@ -1,3 +1,11 @@
+# IZ Gateway Transformation Service 0.17.2
+
+- Dependency updates and base Docker image update
+
+# IZ Gateway Transformation Service 0.17.1
+
+- Dependency updates and base Docker image update
+
 # IZ Gateway Transformation Service 0.17.0
 
 - IGDD-2629 ca.uhn.hapi.fhir:org.hl7.fhir.convertors version bump
