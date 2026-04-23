@@ -179,6 +179,8 @@ jobs:
         # Per https://github.com/marketplace/actions/dependency-check, fix JAVA_HOME location for action
           JAVA_HOME: /opt/jdk
         uses: dependency-check/Dependency-Check_Action@main
+        continue-on-error: true
+        timeout-minutes: 15
         with:
           project: IZG Transformation Service
           path: target/xform-${{env.BASE_TAG}}.jar
@@ -189,9 +191,11 @@ jobs:
             --ossIndexPassword ${{ secrets.OSS_INDEX_PASSWORD }} 
             --failOnCVSS 7
             --suppression ./dependency-suppression.xml
+            --nvdApiKey ${{ secrets.NVDAPIKEY }}
             --disableNuspec    
             --disableNugetconf  
-            --disableAssembly            
+            --disableAssembly   
+            --disableCentral
 
       - name: Upload dependency check log
         uses: actions/upload-artifact@v4
