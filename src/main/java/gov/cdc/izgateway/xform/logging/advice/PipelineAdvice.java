@@ -1,11 +1,13 @@
 package gov.cdc.izgateway.xform.logging.advice;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class PipelineAdvice extends PipelineAdviceDTO {
     private ArrayList<SolutionAdvice> solutionAdviceList = new ArrayList<>();
     private ArrayList<PreconditionAdviceDTO> preconditionAdviceList = new ArrayList<>();
