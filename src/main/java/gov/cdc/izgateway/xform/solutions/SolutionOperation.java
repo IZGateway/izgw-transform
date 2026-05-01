@@ -5,11 +5,13 @@ import gov.cdc.izgateway.xform.exceptions.OperationException;
 import gov.cdc.izgateway.xform.exceptions.SolutionOperationException;
 import gov.cdc.izgateway.xform.operations.Operation;
 import gov.cdc.izgateway.xform.preconditions.Precondition;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 public class SolutionOperation {
     private final List<Precondition> preconditions;
     private final List<Operation> operations;
@@ -49,6 +51,7 @@ public class SolutionOperation {
     public void execute(ServiceContext context) throws SolutionOperationException {
 
         if (passedPreconditions(context)) {
+            log.debug("Solution-level precondition passed");
             for (Operation op : operations) {
                 try {
                     op.execute(context);
@@ -60,6 +63,8 @@ public class SolutionOperation {
                             e.getCause());
                 }
             }
+        } else {
+            log.debug("Solution-level precondition failed");
         }
     }
 }
