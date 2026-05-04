@@ -41,7 +41,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890\r""".replace("\n","");
 		// Make a copy of the list when setting it.
 		List<Operation> sortedList = new ArrayList<>(misorderedList);  // First make a copy of misordered list.
 		modelOp.setOperationList(sortedList);
-		SolutionOperation actualOp = new SolutionOperation(modelOp);
+		SolutionOperation actualOp = new SolutionOperation(modelOp, "TestSolution", "request");
 		// Now sortedList is actually sorted.
 		
 		// Verify the list is no longer misordered.
