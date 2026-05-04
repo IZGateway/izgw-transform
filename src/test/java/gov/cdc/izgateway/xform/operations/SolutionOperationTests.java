@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import ca.uhn.hl7v2.HL7Exception;
 import gov.cdc.izgateway.xform.context.ServiceContext;
+import gov.cdc.izgateway.xform.enums.DataFlowDirection;
 import gov.cdc.izgateway.xform.enums.DataType;
 import gov.cdc.izgateway.xform.exceptions.SolutionOperationException;
 import gov.cdc.izgateway.xform.solutions.SolutionOperation;
@@ -41,7 +42,7 @@ PV1|1|I|Ward123^Room456^Bed789|||||||||||||||||1234567890\r""".replace("\n","");
 		// Make a copy of the list when setting it.
 		List<Operation> sortedList = new ArrayList<>(misorderedList);  // First make a copy of misordered list.
 		modelOp.setOperationList(sortedList);
-		SolutionOperation actualOp = new SolutionOperation(modelOp, "TestSolution", "request");
+		SolutionOperation actualOp = new SolutionOperation(modelOp, "TestSolution", DataFlowDirection.REQUEST);
 		// Now sortedList is actually sorted.
 		
 		// Verify the list is no longer misordered.

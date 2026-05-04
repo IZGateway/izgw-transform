@@ -27,11 +27,11 @@ public class Solution implements Advisable, Transformable {
         String solutionName = configuration.getSolutionName();
 
         for (gov.cdc.izgateway.xform.model.SolutionOperation so : configuration.getRequestOperations()) {
-            requestOperations.add(new SolutionOperation(so, solutionName, "request"));
+            requestOperations.add(new SolutionOperation(so, solutionName, DataFlowDirection.REQUEST));
         }
 
         for (gov.cdc.izgateway.xform.model.SolutionOperation so : configuration.getResponseOperations()) {
-            responseOperations.add(new SolutionOperation(so, solutionName, "response"));
+            responseOperations.add(new SolutionOperation(so, solutionName, DataFlowDirection.RESPONSE));
         }
     }
 

@@ -1,6 +1,7 @@
 package gov.cdc.izgateway.xform.solutions;
 
 import gov.cdc.izgateway.xform.context.ServiceContext;
+import gov.cdc.izgateway.xform.enums.DataFlowDirection;
 import gov.cdc.izgateway.xform.exceptions.OperationException;
 import gov.cdc.izgateway.xform.exceptions.SolutionOperationException;
 import gov.cdc.izgateway.xform.operations.Operation;
@@ -16,9 +17,9 @@ public class SolutionOperation {
     private final List<Precondition> preconditions;
     private final List<Operation> operations;
     private final String solutionName;
-    private final String direction;
+    private final DataFlowDirection direction;
 
-    public SolutionOperation(gov.cdc.izgateway.xform.model.SolutionOperation solutionOperation, String solutionName, String direction) {
+    public SolutionOperation(gov.cdc.izgateway.xform.model.SolutionOperation solutionOperation, String solutionName, DataFlowDirection direction) {
         this.solutionName = solutionName;
         this.direction = direction;
         preconditions = Objects.requireNonNullElse(solutionOperation.getPreconditions(), Collections.emptyList());
