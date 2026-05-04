@@ -102,7 +102,7 @@ xform,gov.cdc.izgateway.xform.logging.advice,XformAdviceDTO,15,0,0,0,7,0,2,0,2,0
 xform,gov.cdc.izgateway.xform.logging.advice,OperationAdviceDTO,9,0,0,0,4,0,2,0,2,0
 xform,gov.cdc.izgateway.xform.logging.advice,XformAdviceCollector,23,0,2,0,11,0,5,0,4,0
 xform,gov.cdc.izgateway.xform.logging.advice,AdviceUtil,16,0,4,0,2,0,4,0,2,0
-xform,gov.cdc.izgateway.xform.logging.advice,SolutionAdvice,78,0,6,0,21,0,9,0,6,0
+xform,gov.cdc.izgateway.xform.logging.advice,SolutionAdvice,82,0,6,0,22,0,10,0,7,0
 xform,gov.cdc.izgateway.xform.camel.converters,HubConverters,76,7,0,0,17,2,3,2,3,2
 xform,gov.cdc.izgateway.xform.camel.constants,EndpointUris,3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.dynamodb.migration,MigratorFactory,54,0,0,0,13,0,5,0,5,0
@@ -120,7 +120,7 @@ xform,gov.cdc.izgateway.xform.context,IZGXformContext,38,0,4,0,12,0,6,0,4,0
 xform,gov.cdc.izgateway.soap.message,XformHeader,59,0,0,0,10,0,7,0,7,0
 xform,gov.cdc.izgateway.soap.message,SoapMessage,475,0,85,0,95,0,64,0,15,0
 xform,gov.cdc.izgateway.xform.solutions,Solution,122,0,8,0,24,0,9,0,5,0
-xform,gov.cdc.izgateway.xform.solutions,SolutionOperation,46,89,9,7,12,22,7,6,0,5
+xform,gov.cdc.izgateway.xform.solutions,SolutionOperation,43,81,9,7,11,20,7,5,0,4
 xform,gov.cdc.izgateway.xform.endpoints.fhir,IDIMatch,1077,0,208,0,222,0,131,0,27,0
 xform,gov.cdc.izgateway.xform.endpoints.fhir,UnexpectedException,6,0,0,0,2,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.endpoints.fhir,FhirController,1702,16,201,0,380,6,137,2,36,2
