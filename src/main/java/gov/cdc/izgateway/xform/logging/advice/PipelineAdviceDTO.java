@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import java.util.UUID;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 public class PipelineAdviceDTO extends XformAdviceDTO {
     public PipelineAdviceDTO() {
     }

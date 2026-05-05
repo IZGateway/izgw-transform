@@ -40,7 +40,7 @@ public class SolutionAdvice extends SolutionAdviceDTO {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SolutionAdvice other) {
+        if (obj instanceof SolutionAdviceDTO other) {
             return this.getId().equals(other.getId());
         }
 
