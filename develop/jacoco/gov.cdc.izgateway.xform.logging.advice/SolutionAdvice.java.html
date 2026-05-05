@@ -40,11 +40,16 @@ public class SolutionAdvice extends SolutionAdviceDTO {
 
     @Override
     public boolean equals(Object obj) {
-<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (obj instanceof SolutionAdvice other) {</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (obj instanceof SolutionAdviceDTO other) {</span>
 <span class="nc" id="L44">            return this.getId().equals(other.getId());</span>
         }
 
 <span class="nc" id="L47">        return false;</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L52">        return this.getId().hashCode();</span>
     }
 
 }

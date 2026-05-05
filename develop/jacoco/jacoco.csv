@@ -102,7 +102,7 @@ xform,gov.cdc.izgateway.xform.logging.advice,XformAdviceDTO,15,0,0,0,7,0,2,0,2,0
 xform,gov.cdc.izgateway.xform.logging.advice,OperationAdviceDTO,9,0,0,0,4,0,2,0,2,0
 xform,gov.cdc.izgateway.xform.logging.advice,XformAdviceCollector,23,0,2,0,11,0,5,0,4,0
 xform,gov.cdc.izgateway.xform.logging.advice,AdviceUtil,16,0,4,0,2,0,4,0,2,0
-xform,gov.cdc.izgateway.xform.logging.advice,SolutionAdvice,78,0,6,0,21,0,9,0,6,0
+xform,gov.cdc.izgateway.xform.logging.advice,SolutionAdvice,82,0,6,0,22,0,10,0,7,0
 xform,gov.cdc.izgateway.xform.camel.converters,HubConverters,76,7,0,0,17,2,3,2,3,2
 xform,gov.cdc.izgateway.xform.camel.constants,EndpointUris,3,0,0,0,1,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.repository.dynamodb.migration,MigratorFactory,54,0,0,0,13,0,5,0,5,0
