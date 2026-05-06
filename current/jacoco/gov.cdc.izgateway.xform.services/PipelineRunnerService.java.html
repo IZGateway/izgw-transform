@@ -59,11 +59,11 @@ public class PipelineRunnerService implements Advisable, Transformable {
 <span class="nc" id="L59">            log.debug(&quot;Executing Pipe: {}&quot;, solutionName);</span>
 <span class="nc bnc" id="L60" title="All 2 branches missed.">            if (Boolean.TRUE.equals(preconditionsPassed(pipe))) {</span>
                 // Create &amp; Execute Solution
-<span class="nc" id="L62">            	log.debug(&quot;Precondition passed for {}&quot;, solutionName);</span>
+<span class="nc" id="L62">            	log.debug(&quot;Pipeline-level precondition passed for {}&quot;, solutionName);</span>
 <span class="nc" id="L63">                Solution solution = new Solution(solutionModel);</span>
 <span class="nc" id="L64">                solution.execute(context);</span>
 <span class="nc" id="L65">            } else {</span>
-<span class="nc" id="L66">            	log.debug(&quot;Precondition failed on {}&quot;, solutionName);</span>
+<span class="nc" id="L66">            	log.debug(&quot;Pipeline-level precondition failed for {}&quot;, solutionName);</span>
             }
 <span class="nc" id="L68">            log.debug(&quot;&quot;);</span>
 <span class="nc" id="L69">        }</span>
