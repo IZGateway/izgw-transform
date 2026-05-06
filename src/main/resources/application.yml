@@ -76,6 +76,7 @@ security:
 springdoc:
   swagger-ui:
     path: /swagger/ui.html
+    version: 5.32.5
   api-docs:
     path: /swagger/api-docs
   paths-to-match: /api/**
