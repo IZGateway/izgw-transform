@@ -59,11 +59,11 @@ public class PipelineRunnerService implements Advisable, Transformable {
             log.debug("Executing Pipe: {}", solutionName);
             if (Boolean.TRUE.equals(preconditionsPassed(pipe))) {
                 // Create & Execute Solution
-            	log.debug("Precondition passed for {}", solutionName);
+            	log.debug("Pipeline-level precondition passed for {}", solutionName);
                 Solution solution = new Solution(solutionModel);
                 solution.execute(context);
             } else {
-            	log.debug("Precondition failed on {}", solutionName);
+            	log.debug("Pipeline-level precondition failed for {}", solutionName);
             }
             log.debug("");
         }

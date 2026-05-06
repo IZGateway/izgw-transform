@@ -1,20 +1,27 @@
 package gov.cdc.izgateway.xform.solutions;
 
 import gov.cdc.izgateway.xform.context.ServiceContext;
+import gov.cdc.izgateway.xform.enums.DataFlowDirection;
 import gov.cdc.izgateway.xform.exceptions.OperationException;
 import gov.cdc.izgateway.xform.exceptions.SolutionOperationException;
 import gov.cdc.izgateway.xform.operations.Operation;
 import gov.cdc.izgateway.xform.preconditions.Precondition;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 public class SolutionOperation {
     private final List<Precondition> preconditions;
     private final List<Operation> operations;
+    private final String solutionName;
+    private final DataFlowDirection direction;
 
-    public SolutionOperation(gov.cdc.izgateway.xform.model.SolutionOperation solutionOperation) {
+    public SolutionOperation(gov.cdc.izgateway.xform.model.SolutionOperation solutionOperation, String solutionName, DataFlowDirection direction) {
+        this.solutionName = solutionName;
+        this.direction = direction;
         preconditions = Objects.requireNonNullElse(solutionOperation.getPreconditions(), Collections.emptyList());
         operations = Objects.requireNonNullElse(solutionOperation.getOperationList(), Collections.emptyList());
         // Ensure that SolutionOperation list is sorted by order
@@ -49,6 +56,7 @@ public class SolutionOperation {
     public void execute(ServiceContext context) throws SolutionOperationException {
 
         if (passedPreconditions(context)) {
+            log.debug("Solution-level precondition passed for {} ({})", solutionName, direction);
             for (Operation op : operations) {
                 try {
                     op.execute(context);
@@ -60,6 +68,8 @@ public class SolutionOperation {
                             e.getCause());
                 }
             }
+        } else {
+            log.debug("Solution-level precondition failed for {} ({})", solutionName, direction);
         }
     }
 }

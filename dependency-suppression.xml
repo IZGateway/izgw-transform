@@ -59,4 +59,17 @@
         <packageUrl regex="true">^pkg:maven/com\.ibm\.icu/icu4j@.*$</packageUrl>
         <cve>CVE-2025-5222</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+        protobuf-java-4.34.1.jar: CVE-2026-0994 is a false positive. The vulnerability is in the Python
+        protobuf library's json_format.ParseDict() function — specifically a recursion-depth counter bug
+        in Python's json_format.py. That code does not exist in the Java implementation. The NVD CPE
+        cpe:/a:google:protobuf is language-agnostic and incorrectly matches the Java artifact.
+        The fix versions cited (5.29.6, 6.33.5) are Python package versions; there is no corresponding
+        Java fix because there is no vulnerability in the Java library.
+        Added: 2026-04-23
+        ]]></notes>
+        <sha1>e3b07cd3be66ec918b9fa4db9863c86d5eeea891</sha1>
+        <cve>CVE-2026-0994</cve>
+    </suppress>
 </suppressions>
