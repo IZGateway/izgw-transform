@@ -1,3 +1,11 @@
+# IZ Gateway Transformation Service 0.18.0
+
+- IGDD-2394 IZG Core: set up release automation
+- IGDD-2693 Research automated dependency update failure in izgw-bom
+- IGDD-2530 Update precondition logging to provide more details
+- IGDD-2100 Fix build warnings during compilation phase due to Lombok expectations
+- IGDD-2839 Specify swagger version 
+
 # IZ Gateway Transformation Service 0.17.2
 
 - Dependency updates and base Docker image update
