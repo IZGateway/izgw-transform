@@ -7,10 +7,12 @@ import gov.cdc.izgateway.logging.markers.MarkerObjectFieldName;
 import gov.cdc.izgateway.logging.markers.Markers2;
 import gov.cdc.izgateway.xform.logging.advice.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Data
+@EqualsAndHashCode(callSuper = false)
 @MarkerObjectFieldName("transactionData")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class XformTransactionData extends TransactionData {
