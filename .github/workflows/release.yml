@@ -39,7 +39,6 @@ permissions:
 jobs:
   release:
     # Workflow must be dispatched from the chosen base-branch.
-    if: github.ref == format('refs/heads/{0}', inputs.base-branch)
     uses: ./.github/workflows/_release_common.yml
     secrets: inherit
     with:
