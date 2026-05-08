@@ -33,8 +33,18 @@ permissions:
   pull-requests: read
 
 jobs:
+  validate-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate hotfix branch
+        run: |
+          if [[ "${GITHUB_REF}" != refs/heads/hotfix/* ]]; then
+            echo "::error::This workflow must be dispatched from a hotfix/* branch. Current ref: ${GITHUB_REF}"
+            exit 1
+          fi
+
   hotfix:
-    if: startsWith(github.ref, 'refs/heads/hotfix/')
+    needs: validate-branch
     uses: ./.github/workflows/_release_common.yml
     secrets: inherit
     with:
