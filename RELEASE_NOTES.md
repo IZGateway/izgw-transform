@@ -1,3 +1,12 @@
+# IZ Gateway Transformation Service 0.19.0
+
+Released 2026-05-08.
+
+- chore: temp disable dependency checker ([#251](https://github.com/IZGateway/izgw-transform/pull/251))
+- chore: Bump izgw-bom to release version ([#250](https://github.com/IZGateway/izgw-transform/pull/250))
+- DO NOT MERGE - testing release automation ([#249](https://github.com/IZGateway/izgw-transform/pull/249))
+- Sync release notes for 0.18.0 to develop ([#248](https://github.com/IZGateway/izgw-transform/pull/248))
+
 # IZ Gateway Transformation Service 0.18.0
 
 - IGDD-2394 IZG Core: set up release automation
