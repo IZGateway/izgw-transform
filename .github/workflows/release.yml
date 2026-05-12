@@ -2,7 +2,7 @@
 # Run this from the develop branch (or developalm for testing) via the Actions UI / gh workflow run.
 # It dispatches into _release_common.yml.
 
-name: Release
+name: Release - Standard
 
 on:
   workflow_dispatch:

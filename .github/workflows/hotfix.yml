@@ -2,7 +2,7 @@
 # Workflow must be dispatched from a hotfix/* branch (created manually from trunk-branch).
 # It dispatches into _release_common.yml with release-type=hotfix.
 
-name: Hotfix
+name: Release - Hotfix
 
 on:
   workflow_dispatch:
