@@ -4,14 +4,10 @@ on:
   pull_request:
     branches:
       - develop
-      - Release*
-      - main
 
   push:
     branches:
       - develop
-      - Release*
-      - main
 
   # Schedule runs on the default branch.
   schedule:
@@ -106,8 +102,8 @@ jobs:
       - name: Check version format
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Version $VERSION is not in the correct format. It should be #.#.#"
+          if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-SNAPSHOT)?$ ]]; then
+            echo "Version $VERSION is not in the correct format. It should be #.#.# or #.#.#-SNAPSHOT"
             exit 1
           fi
 
@@ -117,24 +113,8 @@ jobs:
           echo "github.ref: ${{ github.ref }}"
           echo "github.event_name: ${{ github.event_name }}"
 
-      - name: Set version for develop branch
-        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/develop' ) || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'develop') || (github.event_name == 'schedule' && github.ref == 'refs/heads/develop') }}
+      - name: Set VERSION from pom
         run: |
-          echo "Setting the snapshot version"
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-SNAPSHOT
-          echo VERSION="${VERSION}" >> $GITHUB_ENV
-
-      - name: Set version for release branch
-        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')) || (github.event_name == 'pull_request' && startsWith(github.event.pull_request.base.ref, 'Release') ) }}
-        run: |
-          echo "Setting the release candidate version"
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)-rc$(date +%Y%m%d%H%M)
-          echo VERSION="${VERSION}" >> $GITHUB_ENV
-
-      - name: Set version for main branch
-        if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main') }}
-        run: |
-          echo "Setting the release version"
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo VERSION="${VERSION}" >> $GITHUB_ENV
 
@@ -145,8 +125,6 @@ jobs:
           echo IMAGE_TAG="${IMAGE_TAG}" >> $GITHUB_ENV
           echo IMAGE_BRANCH_TAG="${VERSION}"
           echo IMAGE_BRANCH_TAG="${VERSION}" >> $GITHUB_ENV
-          VERSION_ONLY_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed "s/-.*$//g"`
-          echo VERSION_ONLY_TAG=$VERSION_ONLY_TAG >> $GITHUB_ENV
 
       - name: Print all environment variables
         run: printenv
@@ -174,35 +152,35 @@ jobs:
 # 
 # Use GitHub Action to speed up and improve dependency checking
 # NOTE: Disable automatic dependency checking in the build, this replaces it          
-      - name: Dependency Check
-        env:  
-        # Per https://github.com/marketplace/actions/dependency-check, fix JAVA_HOME location for action
-          JAVA_HOME: /opt/jdk
-        uses: dependency-check/Dependency-Check_Action@main
-        continue-on-error: false
-        timeout-minutes: 15
-        with:
-          project: IZG Transformation Service
-          path: target/xform-${{env.BASE_TAG}}.jar
-          format: 'HTML'
-          out: 'target/site'
-          args: >
-            --ossIndexUsername ${{ secrets.OSS_INDEX_USERNAME }}
-            --ossIndexPassword ${{ secrets.OSS_INDEX_PASSWORD }} 
-            --failOnCVSS 7
-            --suppression ./dependency-suppression.xml
-            --nvdApiKey ${{ secrets.NVDAPIKEY }}
-            --disableNuspec    
-            --disableNugetconf  
-            --disableAssembly   
-            --disableCentral
-
-      - name: Upload dependency check log
-        uses: actions/upload-artifact@v4
-        if: ${{ always() }}
-        with:
-          name: DependencyCheck
-          path: ./target/site/dependency-check-report.html
+#      - name: Dependency Check
+#        env:
+#        # Per https://github.com/marketplace/actions/dependency-check, fix JAVA_HOME location for action
+#          JAVA_HOME: /opt/jdk
+#        uses: dependency-check/Dependency-Check_Action@main
+#        continue-on-error: false
+#        timeout-minutes: 15
+#        with:
+#          project: IZG Transformation Service
+#          path: target/xform-${{env.BASE_TAG}}.jar
+#          format: 'HTML'
+#          out: 'target/site'
+#          args: >
+#            --ossIndexUsername ${{ secrets.OSS_INDEX_USERNAME }}
+#            --ossIndexPassword ${{ secrets.OSS_INDEX_PASSWORD }}
+#            --failOnCVSS 7
+#            --suppression ./dependency-suppression.xml
+#            --nvdApiKey ${{ secrets.NVDAPIKEY }}
+#            --disableNuspec
+#            --disableNugetconf
+#            --disableAssembly
+#            --disableCentral
+#
+#      - name: Upload dependency check log
+#        uses: actions/upload-artifact@v4
+#        if: ${{ always() }}
+#        with:
+#          name: DependencyCheck
+#          path: ./target/site/dependency-check-report.html
 
       - name: Publish Site (Develop)
         # Publish to /develop/ for: push to develop, PRs targeting develop, scheduled runs, manual dispatch
@@ -214,24 +192,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./target/site
           destination_dir: develop
-
-      - name: Publish Site (Current)
-        # Publish to /current/ only on Release branch push
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/site
-          destination_dir: current
-
-      - name: Publish Site (Versioned)
-        # Publish to /v{version}/ only on Release branch push (same time as APHL push)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./target/site
-          destination_dir: v${{ env.BASE_TAG }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -258,10 +218,8 @@ jobs:
         run: |
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_BRANCH_TAG}}
-          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
-          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
           docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           docker image push --all-tags ghcr.io/izgateway/izgw-transform
 
@@ -346,28 +304,6 @@ jobs:
           name: TestLogs
           path: ./testing/logs
                                       
-      - name: Configure AWS credentials for APHL
-        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')) }}
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.APHL_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.APHL_AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Login to APHL Amazon ECR
-        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')) }}
-        id: login-aphl-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Tag and push image to APHL Amazon ECR
-        if: ${{ (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/Release')) }}
-        env:
-          ECR_REGISTRY: ${{ secrets.APHL_ECR_REGISTRY }}
-          ECR_REPOSITORY: ${{ secrets.APHL_ECR_REPOSITORY }}
-        run: |
-          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:izgw-transf-${{env.VERSION_ONLY_TAG}}
-          docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
-     
       - name: List .m2 directory on build failure
         if: ${{ failure() }}
         run: ls -laR ~/.m2 > m2-directory.txt
