@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ValidationExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.exceptions</a> &gt; <span class="el_source">ValidationExceptionHandler.java</span></div><h1>ValidationExceptionHandler.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.exceptions;
+
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * This class is used to tweak the standard error message provided by MethodArgumentNotValidException.
+ * That is tripped when an invalid message is sent to the APIs used to configure the system.
+ * The default message is a bit too generic to tell the caller _what_ was incorrect in their supplied
+ * data.
+ * By default, the _message_ will say something like:
+ *   Validation failed for object='solution'. Error count: 1
+ * This change will make that error more descriptive, something like:
+ *   requestOperations: Request Operations List is required (can be empty)
+ * The above example would be if you tried to add a Solution that did not have the Request Operations
+ * specified.
+ */
+@ControllerAdvice
+<span class="fc" id="L29">public class ValidationExceptionHandler {</span>
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleValidationExceptions(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request) {
+<span class="nc" id="L34">        Map&lt;String, Object&gt; errors = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L36">        errors.put(&quot;timestamp&quot;, System.currentTimeMillis());</span>
+<span class="nc" id="L37">        errors.put(&quot;status&quot;, HttpStatus.BAD_REQUEST.value());</span>
+<span class="nc" id="L38">        errors.put(&quot;error&quot;, &quot;Bad Request&quot;);</span>
+<span class="nc" id="L39">        errors.put(&quot;path&quot;, request.getRequestURI());</span>
+
+        // Get all the field errors in the inbound data
+<span class="nc" id="L42">        List&lt;FieldError&gt; fieldErrors = ex.getBindingResult().getFieldErrors();</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (!fieldErrors.isEmpty()) {</span>
+<span class="nc" id="L44">            String errorMessage = fieldErrors.stream()</span>
+<span class="nc" id="L45">                    .map(error -&gt; error.getField() + &quot;: &quot; + error.getDefaultMessage())</span>
+<span class="nc" id="L46">                    .collect(Collectors.joining(&quot;; &quot;));</span>
+<span class="nc" id="L47">            errors.put(&quot;message&quot;, errorMessage);</span>
+        }
+
+<span class="nc" id="L50">        return new ResponseEntity&lt;&gt;(errors, HttpStatus.BAD_REQUEST);</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
