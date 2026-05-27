@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccessControlApiController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.api</a> &gt; <span class="el_source">AccessControlApiController.java</span></div><h1>AccessControlApiController.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.api;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.xform.model.AccessControl;
+import gov.cdc.izgateway.xform.security.Roles;
+import gov.cdc.izgateway.xform.services.AccessControlService;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.Valid;
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+import java.util.logging.Level;
+
+/**
+ * REST API for managing access control entries.
+ */
+<span class="fc" id="L24">@Log</span>
+@Lazy(false)
+@RestController
+public class AccessControlApiController extends BaseApiController {
+    private final AccessControlService accessControlService;
+
+    /**
+     * Create the access control API controller.
+     *
+     * @param accessControlService Service for access control operations
+     * @param registry Registry to register this controller for access control
+     */
+    @Autowired
+    public AccessControlApiController(
+            AccessControlService accessControlService,
+            AccessControlRegistry registry
+<span class="fc" id="L40">    ) {</span>
+<span class="fc" id="L41">        this.accessControlService = accessControlService;</span>
+<span class="fc" id="L42">        registry.register(this);</span>
+<span class="fc" id="L43">    }</span>
+
+    /**
+     * List access control entries with optional pagination.
+     *
+     * @param nextCursor Cursor for the next page
+     * @param prevCursor Cursor for the previous page
+     * @param includeInactive Whether to include inactive entries
+     * @param limit Maximum number of entries to return
+     * @return A serialized page of access control entries
+     */
+    @RolesAllowed({Roles.ADMIN})
+    @GetMapping(&quot;/api/v1/access-controls&quot;)
+    public ResponseEntity&lt;String&gt; getAccessControlList(
+            @RequestParam(required = false) String nextCursor,
+            @RequestParam(required = false) String prevCursor,
+            @RequestParam(defaultValue = &quot;false&quot;) Boolean includeInactive,
+            @RequestParam(defaultValue = &quot;10&quot;) int limit
+    ) {
+        try {
+<span class="nc" id="L63">            return processList(accessControlService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
+<span class="nc" id="L64">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L65">            log.log(Level.SEVERE, e.getMessage(), e);</span>
+<span class="nc" id="L66">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+        }
+    }
+
+    /**
+     * Fetch a specific access control entry by id.
+     *
+     * @param uuid Access control id
+     * @return The access control entry if found
+     */
+    @RolesAllowed({Roles.ADMIN})
+    @GetMapping(&quot;/api/v1/access-controls/{uuid}&quot;)
+    public ResponseEntity&lt;AccessControl&gt; getAccessControlByUUID(@PathVariable UUID uuid) {
+<span class="nc" id="L79">        AccessControl entity = accessControlService.getObject(uuid);</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (entity == null) {</span>
+<span class="nc" id="L81">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+        }
+<span class="nc" id="L83">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
+    }
+
+    /**
+     * Update an access control entry.
+     *
+     * @param uuid Access control id
+     * @param updatedAccessControl Updated access control data
+     * @return The updated access control entry
+     */
+    @RolesAllowed({Roles.ADMIN})
+    @PutMapping(&quot;/api/v1/access-controls/{uuid}&quot;)
+    public ResponseEntity&lt;AccessControl&gt; updateAccessControl(
+            @PathVariable UUID uuid,
+            @RequestBody @Valid AccessControl updatedAccessControl
+    ) {
+<span class="nc" id="L99">        updatedAccessControl.setId(uuid);</span>
+<span class="nc" id="L100">        accessControlService.update(updatedAccessControl);</span>
+<span class="nc" id="L101">        return new ResponseEntity&lt;&gt;(updatedAccessControl, HttpStatus.OK);</span>
+    }
+
+    /**
+     * Create a new access control entry.
+     *
+     * @param accessControl New access control entry
+     * @return The created access control entry
+     */
+    @RolesAllowed({Roles.ADMIN})
+    @PostMapping(&quot;/api/v1/access-controls&quot;)
+    public ResponseEntity&lt;AccessControl&gt; createAccessControl(
+            @Valid @RequestBody() AccessControl accessControl
+    ) {
+<span class="nc" id="L115">        accessControlService.create(accessControl);</span>
+<span class="nc" id="L116">        return new ResponseEntity&lt;&gt;(accessControl, HttpStatus.OK);</span>
+    }
+
+    /**
+     * Delete an access control entry.
+     *
+     * @param uuid Access control id
+     * @return HTTP 204 if deleted
+     */
+    @RolesAllowed({Roles.ADMIN})
+    @DeleteMapping(&quot;/api/v1/access-controls/{uuid}&quot;)
+    public ResponseEntity&lt;AccessControl&gt; deleteAccessControl(
+            @PathVariable UUID uuid
+    ) {
+<span class="nc" id="L130">        accessControlService.delete(uuid);</span>
+<span class="nc" id="L131">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
