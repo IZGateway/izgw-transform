@@ -190,9 +190,9 @@ jobs:
             --failOnCVSS 7
             --suppression ./dependency-suppression.xml
             --nvdApiKey ${{ secrets.NVDAPIKEY }}
-            --disableNuspec    
-            --disableNugetconf  
-            --disableAssembly   
+            --disableNuspec
+            --disableNugetconf
+            --disableAssembly
             --disableOssIndex
             --disableCentral
 
