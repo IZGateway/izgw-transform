@@ -1,3 +1,7 @@
+# IZ Gateway Transformation Service 0.18.2
+
+- Dependency updates and Docker Base Image update
+
 # IZ Gateway Transformation Service 0.18.1
 
 - IGDD-2881 CVE-2026-4890 - dnsmasq
