@@ -187,6 +187,8 @@ jobs:
           format: 'HTML'
           out: 'target/site'
           args: >
+            --ossIndexUsername ${{ secrets.OSS_INDEX_USERNAME }}
+            --ossIndexPassword ${{ secrets.OSS_INDEX_PASSWORD }}
             --failOnCVSS 7
             --suppression ./dependency-suppression.xml
             --nvdApiKey ${{ secrets.NVDAPIKEY }}
