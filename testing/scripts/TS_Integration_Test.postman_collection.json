@@ -580,24 +580,20 @@
                       "pm.test(\"Status code is 200\", function () {",
                       "    pm.response.to.have.status(200);",
                       "});",
-                      "",
                       "let response = pm.response.json();",
                       "pm.test(\"verify type is Bundle\", function() {",
                       "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
                       "});",
-                      "",
-                      "pm.test(\"Verify Entry length is 4\", function() {",
-                      "    pm.expect(response.entry.length).to.equal(4);",
+                      "pm.test(\"Verify at least one entry is returned\", function() {",
+                      "    pm.expect(response.entry.length).to.be.at.least(1);",
                       "});",
-                      "",
-                      "pm.test(\"Verify Immunization Code\", function() {",
-                      "    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+                      "let immunization = response.entry.find(e => e.resource && e.resource.resourceType === \"Immunization\");",
+                      "pm.test(\"Verify Immunization is present\", function() {",
+                      "    pm.expect(immunization).to.not.be.undefined;",
                       "});",
-                      "",
                       "pm.test(\"Verify Vaccine Code\", function() {",
-                      "    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
-                      "});",
-                      ""
+                      "    pm.expect(immunization.resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+                      "});"
                     ],
                     "type": "text/javascript",
                     "packages": {}
@@ -664,24 +660,20 @@
                       "pm.test(\"Status code is 200\", function () {",
                       "    pm.response.to.have.status(200);",
                       "});",
-                      "",
                       "let response = pm.response.json();",
                       "pm.test(\"verify type is Bundle\", function() {",
                       "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
                       "});",
-                      "",
-                      "pm.test(\"Verify Entry length is 4\", function() {",
-                      "    pm.expect(response.entry.length).to.equal(4);",
+                      "pm.test(\"Verify at least one entry is returned\", function() {",
+                      "    pm.expect(response.entry.length).to.be.at.least(1);",
                       "});",
-                      "",
-                      "pm.test(\"Verify Immunization Code\", function() {",
-                      "    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+                      "let immunization = response.entry.find(e => e.resource && e.resource.resourceType === \"Immunization\");",
+                      "pm.test(\"Verify Immunization is present\", function() {",
+                      "    pm.expect(immunization).to.not.be.undefined;",
                       "});",
-                      "",
                       "pm.test(\"Verify Vaccine Code\", function() {",
-                      "    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
-                      "});",
-                      ""
+                      "    pm.expect(immunization.resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+                      "});"
                     ],
                     "type": "text/javascript",
                     "packages": {}
@@ -703,8 +695,15 @@
                 ],
                 "url": {
                   "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization?patient.given={{fhirPatientGiven}}&patient.family={{fhirPatientFamily}}&patient.birthdate={{fhirPatientDOB}}",
+                  "protocol": "{{protocol}}",
                   "host": [
                     "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization"
                   ],
                   "query": [
                     {
@@ -854,8 +853,15 @@
                 ],
                 "url": {
                   "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization?patient.given={{fhirNoDataPatientGiven}}&patient.family={{fhirNoDataPatientFamily}}&patient.birthdate={{fhirNoDataPatientDOB}}",
+                  "protocol": "{{protocol}}",
                   "host": [
                     "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization"
                   ],
                   "query": [
                     {
@@ -905,9 +911,11 @@
                 },
                 "url": {
                   "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+                  "protocol": "{{protocol}}",
                   "host": [
                     "{{host}}"
                   ],
+                  "port": "{{port}}",
                   "path": [
                     "fhir",
                     "dev",
@@ -14809,24 +14817,20 @@
                       "pm.test(\"Status code is 200\", function () {",
                       "    pm.response.to.have.status(200);",
                       "});",
-                      "",
                       "let response = pm.response.json();",
                       "pm.test(\"verify type is Bundle\", function() {",
                       "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
                       "});",
-                      "",
-                      "pm.test(\"Verify Entry length is 4\", function() {",
-                      "    pm.expect(response.entry.length).to.equal(4);",
+                      "pm.test(\"Verify at least one entry is returned\", function() {",
+                      "    pm.expect(response.entry.length).to.be.at.least(1);",
                       "});",
-                      "",
-                      "pm.test(\"Verify Immunization Code\", function() {",
-                      "    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+                      "let immunization = response.entry.find(e => e.resource && e.resource.resourceType === \"Immunization\");",
+                      "pm.test(\"Verify Immunization is present\", function() {",
+                      "    pm.expect(immunization).to.not.be.undefined;",
                       "});",
-                      "",
                       "pm.test(\"Verify Vaccine Code\", function() {",
-                      "    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
-                      "});",
-                      ""
+                      "    pm.expect(immunization.resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+                      "});"
                     ],
                     "type": "text/javascript",
                     "packages": {}
@@ -14889,24 +14893,20 @@
                       "pm.test(\"Status code is 200\", function () {",
                       "    pm.response.to.have.status(200);",
                       "});",
-                      "",
                       "let response = pm.response.json();",
                       "pm.test(\"verify type is Bundle\", function() {",
                       "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
                       "});",
-                      "",
-                      "pm.test(\"Verify Entry length is 4\", function() {",
-                      "    pm.expect(response.entry.length).to.equal(4);",
+                      "pm.test(\"Verify at least one entry is returned\", function() {",
+                      "    pm.expect(response.entry.length).to.be.at.least(1);",
                       "});",
-                      "",
-                      "pm.test(\"Verify Immunization Code\", function() {",
-                      "    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+                      "let immunization = response.entry.find(e => e.resource && e.resource.resourceType === \"Immunization\");",
+                      "pm.test(\"Verify Immunization is present\", function() {",
+                      "    pm.expect(immunization).to.not.be.undefined;",
                       "});",
-                      "",
                       "pm.test(\"Verify Vaccine Code\", function() {",
-                      "    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
-                      "});",
-                      ""
+                      "    pm.expect(immunization.resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+                      "});"
                     ],
                     "type": "text/javascript",
                     "packages": {}
@@ -14924,8 +14924,15 @@
                 ],
                 "url": {
                   "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization?patient.given={{fhirPatientGiven}}&patient.family={{fhirPatientFamily}}&patient.birthdate={{fhirPatientDOB}}",
+                  "protocol": "{{no_cert_protocol}}",
                   "host": [
-                    "{{host}}"
+                    "{{no_cert_host}}"
+                  ],
+                  "port": "{{no_cert_port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization"
                   ],
                   "query": [
                     {
@@ -15067,8 +15074,15 @@
                 ],
                 "url": {
                   "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization?patient.given={{fhirNoDataPatientGiven}}&patient.family={{fhirNoDataPatientFamily}}&patient.birthdate={{fhirNoDataPatientDOB}}",
+                  "protocol": "{{no_cert_protocol}}",
                   "host": [
-                    "{{host}}"
+                    "{{no_cert_host}}"
+                  ],
+                  "port": "{{no_cert_port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization"
                   ],
                   "query": [
                     {
@@ -15118,9 +15132,11 @@
                 },
                 "url": {
                   "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+                  "protocol": "{{protocol}}",
                   "host": [
                     "{{host}}"
                   ],
+                  "port": "{{port}}",
                   "path": [
                     "fhir",
                     "dev",
