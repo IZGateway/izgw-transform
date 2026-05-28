@@ -15131,12 +15131,12 @@
                   ]
                 },
                 "url": {
-                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
-                  "protocol": "{{protocol}}",
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
+                  "protocol": "{{no_cert_protocol}}",
                   "host": [
-                    "{{host}}"
+                    "{{no_cert_host}}"
                   ],
-                  "port": "{{port}}",
+                  "port": "{{no_cert_port}}",
                   "path": [
                     "fhir",
                     "dev",

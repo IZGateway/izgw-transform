@@ -53,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -314,6 +315,20 @@ public class FhirController {
         HttpServletRequest req
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
         return processQuery(req, destinationId);
+    }
+
+    @RequestMapping(
+        value = {
+            "/{destinationId}/Immunization",
+            "/{destinationId}/ImmunizationRecommendation",
+            "/{destinationId}/Patient"
+        },
+        method = RequestMethod.POST
+    )
+    public ResponseEntity<Void> iisSearchPostWithoutSuffix(@PathVariable String destinationId) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+            .allow(HttpMethod.GET, HttpMethod.HEAD)
+            .build();
     }
     
     /**
