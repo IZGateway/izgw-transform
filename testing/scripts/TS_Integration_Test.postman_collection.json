@@ -638,7 +638,7 @@
                   ]
                 },
                 "url": {
-                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization/_search",
                   "protocol": "{{protocol}}",
                   "host": [
                     "{{host}}"
@@ -647,7 +647,81 @@
                   "path": [
                     "fhir",
                     "dev",
-                    "Immunization"
+                    "Immunization",
+                    "_search"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_07a FHIR GET Query Returns Data",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Entry length is 4\", function() {",
+                      "    pm.expect(response.entry.length).to.equal(4);",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Immunization Code\", function() {",
+                      "    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Vaccine Code\", function() {",
+                      "    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+                      "});",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization?patient.given={{fhirPatientGiven}}&patient.family={{fhirPatientFamily}}&patient.birthdate={{fhirPatientDOB}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "patient.given",
+                      "value": "{{fhirPatientGiven}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "patient.family",
+                      "value": "{{fhirPatientFamily}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "patient.birthdate",
+                      "value": "{{fhirPatientDOB}}",
+                      "disabled": false
+                    }
                   ]
                 }
               },
@@ -718,7 +792,7 @@
                   ]
                 },
                 "url": {
-                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization/_search",
                   "protocol": "{{protocol}}",
                   "host": [
                     "{{host}}"
@@ -727,11 +801,133 @@
                   "path": [
                     "fhir",
                     "dev",
-                    "Immunization"
+                    "Immunization",
+                    "_search"
                   ]
                 }
               },
               "response": []
+            },
+            {
+              "name": "TS_TC_08a FHIR GET Query Returns No Data",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Entry length is 2\", function() {",
+                      "    pm.expect(response.entry.length).to.equal(2);",
+                      "});",
+                      "",
+                      "pm.test(\"Verify NF is returned indicating no data found\", function() {",
+                      "    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+                      "});",
+                      "",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization?patient.given={{fhirNoDataPatientGiven}}&patient.family={{fhirNoDataPatientFamily}}&patient.birthdate={{fhirNoDataPatientDOB}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "patient.given",
+                      "value": "{{fhirNoDataPatientGiven}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "patient.family",
+                      "value": "{{fhirNoDataPatientFamily}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "patient.birthdate",
+                      "value": "{{fhirNoDataPatientDOB}}",
+                      "disabled": false
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_09 FHIR POST without _search Returns 405",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "patient.given",
+                      "value": "{{fhirPatientGiven}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "patient.family",
+                      "value": "{{fhirPatientFamily}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "patient.birthdate",
+                      "value": "{{fhirPatientDOB}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 405 - POST without /_search is not a valid FHIR search\", function () {",
+                      "    pm.response.to.have.status(405);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
             }
           ],
           "auth": {
@@ -14667,7 +14863,7 @@
                   ]
                 },
                 "url": {
-                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization/_search",
                   "protocol": "{{no_cert_protocol}}",
                   "host": [
                     "{{no_cert_host}}"
@@ -14676,7 +14872,77 @@
                   "path": [
                     "fhir",
                     "dev",
-                    "Immunization"
+                    "Immunization",
+                    "_search"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_07a FHIR GET Query Returns Data with JWT",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Entry length is 4\", function() {",
+                      "    pm.expect(response.entry.length).to.equal(4);",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Immunization Code\", function() {",
+                      "    pm.expect(response.entry[3].resource.resourceType).to.equal(\"Immunization\");",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Vaccine Code\", function() {",
+                      "    pm.expect(response.entry[3].resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+                      "});",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-xform-organization",
+                    "value": "0d15449b-fb08-4013-8985-20c148b353fe",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization?patient.given={{fhirPatientGiven}}&patient.family={{fhirPatientFamily}}&patient.birthdate={{fhirPatientDOB}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "patient.given",
+                      "value": "{{fhirPatientGiven}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "patient.family",
+                      "value": "{{fhirPatientFamily}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "patient.birthdate",
+                      "value": "{{fhirPatientDOB}}",
+                      "disabled": false
+                    }
                   ]
                 }
               },
@@ -14743,7 +15009,7 @@
                   ]
                 },
                 "url": {
-                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization",
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization/_search",
                   "protocol": "{{no_cert_protocol}}",
                   "host": [
                     "{{no_cert_host}}"
@@ -14752,11 +15018,129 @@
                   "path": [
                     "fhir",
                     "dev",
-                    "Immunization"
+                    "Immunization",
+                    "_search"
                   ]
                 }
               },
               "response": []
+            },
+            {
+              "name": "TS_TC_08a FHIR GET Query Returns No Data with JWT",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Entry length is 2\", function() {",
+                      "    pm.expect(response.entry.length).to.equal(2);",
+                      "});",
+                      "",
+                      "pm.test(\"Verify NF is returned indicating no data found\", function() {",
+                      "    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+                      "});",
+                      "",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-xform-organization",
+                    "value": "0d15449b-fb08-4013-8985-20c148b353fe",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization?patient.given={{fhirNoDataPatientGiven}}&patient.family={{fhirNoDataPatientFamily}}&patient.birthdate={{fhirNoDataPatientDOB}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "patient.given",
+                      "value": "{{fhirNoDataPatientGiven}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "patient.family",
+                      "value": "{{fhirNoDataPatientFamily}}",
+                      "disabled": false
+                    },
+                    {
+                      "key": "patient.birthdate",
+                      "value": "{{fhirNoDataPatientDOB}}",
+                      "disabled": false
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_09 FHIR POST without _search Returns 405",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "patient.given",
+                      "value": "{{fhirPatientGiven}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "patient.family",
+                      "value": "{{fhirPatientFamily}}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "patient.birthdate",
+                      "value": "{{fhirPatientDOB}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 405 - POST without /_search is not a valid FHIR search\", function () {",
+                      "    pm.response.to.have.status(405);",
+                      "});"
+                    ]
+                  }
+                }
+              ]
             }
           ]
         },
