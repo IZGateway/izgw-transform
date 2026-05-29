@@ -779,7 +779,11 @@ public class FhirController {
         
         // Update the bundle type to searchset from message.
         bundle.setType(BundleType.SEARCHSET);
-        String requested = StringUtils.substringAfterLast(req.getRequestURI(), "/");
+        String uri = req.getRequestURI();
+        if (uri.endsWith("/_search")) {
+            uri = StringUtils.substringBeforeLast(uri, "/_search");
+        }
+        String requested = StringUtils.substringAfterLast(uri, "/");
         if ("$match".equals(requested)) {
             requested = PATIENT;
         }
