@@ -123,7 +123,7 @@ xform,gov.cdc.izgateway.xform.solutions,Solution,129,0,8,0,25,0,9,0,5,0
 xform,gov.cdc.izgateway.xform.solutions,SolutionOperation,50,99,9,7,12,24,7,6,0,5
 xform,gov.cdc.izgateway.xform.endpoints.fhir,IDIMatch,1077,0,208,0,222,0,131,0,27,0
 xform,gov.cdc.izgateway.xform.endpoints.fhir,UnexpectedException,6,0,0,0,2,0,1,0,1,0
-xform,gov.cdc.izgateway.xform.endpoints.fhir,FhirController,1702,16,201,0,380,6,137,2,36,2
+xform,gov.cdc.izgateway.xform.endpoints.fhir,FhirController,1702,32,201,0,380,9,138,3,37,3
 xform,gov.cdc.izgateway.xform.endpoints.fhir,RequestWithModifiableParameters,160,0,12,0,31,0,18,0,12,0
 xform,gov.cdc.izgateway.xform.endpoints.fhir,FaultException,68,0,6,0,18,0,8,0,5,0
 xform,gov.cdc.izgateway.xform.configuration,XformConfig,28,12,0,0,4,5,4,1,4,1
