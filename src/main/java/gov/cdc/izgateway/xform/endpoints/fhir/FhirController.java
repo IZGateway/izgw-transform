@@ -2,6 +2,7 @@ package gov.cdc.izgateway.xform.endpoints.fhir;
 
 import gov.cdc.izgateway.security.AccessControlRegistry;
 import gov.cdc.izgw.v2tofhir.converter.MessageParser;
+import gov.cdc.izgw.v2tofhir.converter.Parser;
 import gov.cdc.izgw.v2tofhir.datatype.HumanNameParser;
 import gov.cdc.izgw.v2tofhir.segment.PIDParser;
 import gov.cdc.izgw.v2tofhir.utils.QBPUtils;
@@ -21,6 +22,7 @@ import java.util.ServiceConfigurationError;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Bundle;
@@ -51,9 +53,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -216,16 +220,11 @@ public class FhirController {
         description = "An internal error occured while processing the request",
         content = {@Content}
     )
-    @RequestMapping(
+    @GetMapping(
     	value = { 
             "/{destinationId}/Immunization", 
             "/{destinationId}/ImmunizationRecommendation",
             "/{destinationId}/Patient"
-        },
-        method = { 
-            RequestMethod.GET,    // Typical web based query 
-            RequestMethod.POST, // Safer because POST parameters don't wind up in access logs
-            RequestMethod.HEAD    // Used with SMART and other auth mechanisms.
         },
         produces = {
             "application/fhir+xml", 
@@ -242,20 +241,112 @@ public class FhirController {
         HttpServletRequest req
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
     	String summary = req.getParameter("_summary");
-    	String count = req.getParameter("_count");
     	if (Arrays.asList("summary", "count").contains(summary)) {
-    		return connectionTest(count);
+    		return connectionTest();
     	}
         return processQuery(req, destinationId);
+    }
+
+    /**
+     * FHIR R4-conformant POST search via the {@code /_search} suffix.
+     * Accepts search parameters as an {@code application/x-www-form-urlencoded} body,
+     * which prevents patient demographics from appearing in server access logs.
+     * Equivalent to a GET search on the base resource URL.
+     *
+     * @param destinationId    The destination for the FHIR Request.  This takes the place of the
+     * destinationId element shown below in Soap Messages.
+     *
+    * <pre>{@code
+    * <HubRequestHeader xmlns="urn:cdc:iisb:hub:2014">
+    *   <DestinationId>dev</DestinationId>
+    * </HubRequestHeader>
+    * }</pre>
+     *
+     * @param req    The HttpServletRequest to get the request parameters from.
+     * @return    A FHIR Bundle containing the search results, or an OperationOutcome resource if there
+     * was an exception, fault or error processing the message.
+     * @throws FaultException When a SoapFault is reported.
+     * @throws HL7Exception When a message cannot be parsed.
+     * @throws UnexpectedException When something goes wrong that shouldn't have
+     * @throws SecurityFault When a security fault occurs
+     */
+    @Operation(
+        summary = "Request an Immunization History or Immunization Recommendation via FHIR POST search",
+        description = "FHIR R4-conformant POST search using the /_search suffix"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "The request completed normally",
+        content = {
+            @Content(mediaType = "application/json"),
+            @Content(mediaType = "application/xml"),
+            @Content(mediaType = "application/yml")
+        }
+    )
+    @ApiResponse(
+        responseCode = "400",
+        description = "An error occured while processing the request",
+        content = {@Content}
+    )
+    @ApiResponse(
+        responseCode = "500",
+        description = "An internal error occured while processing the request",
+        content = {@Content}
+    )
+    @RequestMapping(
+    	value = { 
+            "/{destinationId}/Immunization/_search",
+            "/{destinationId}/ImmunizationRecommendation/_search",
+            "/{destinationId}/Patient/_search"
+        },
+        method = { RequestMethod.POST, RequestMethod.HEAD },
+        produces = {
+            "application/fhir+xml", 
+            "application/fhir+json", 
+            "application/fhir+yaml",
+            "application/xml",
+            "application/json", 
+            "application/yaml",
+            "text/xml"
+        }
+    )
+    public ResponseEntity<Bundle> iisSearchPost(
+        @PathVariable String destinationId,
+        HttpServletRequest req
+    ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
+        return processQuery(req, destinationId);
+    }
+
+    /**
+     * Rejects {@code POST} on the bare resource URL with {@code 405 Method Not Allowed}.
+     *
+     * <p>In FHIR R4, {@code POST /{type}} is a <em>create</em> operation, not a search.
+     * FHIR-conformant clients must use {@code POST /{type}/_search} for form-encoded
+     * parameter searches, or {@code GET /{type}?params} for query-string searches.</p>
+     *
+     * @param destinationId the destination identifier (unused; required for path matching)
+     * @return 405 response with {@code Allow: GET, HEAD} header
+     */
+    @RequestMapping(
+        value = {
+            "/{destinationId}/Immunization",
+            "/{destinationId}/ImmunizationRecommendation",
+            "/{destinationId}/Patient"
+        },
+        method = RequestMethod.POST
+    )
+    public ResponseEntity<Void> iisSearchPostWithoutSuffix(@PathVariable String destinationId) {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+            .allow(HttpMethod.GET, HttpMethod.HEAD)
+            .build();
     }
     
     /**
      * This exists to allow query connector to validate authentication
      * parameters when connecting via /Patients?_summary=count&_count=1
-     * @param count	Not used
      * @return	A SearchSet Bundle reporting 100 patients available.
      */
-    private ResponseEntity<Bundle> connectionTest(String count) {
+    private ResponseEntity<Bundle> connectionTest() {
 		Bundle b = new Bundle();
 		b.setId(new IdType(b.fhirType() + "/" + ULID.random()));
 		b.setType(BundleType.SEARCHSET);
@@ -477,7 +568,7 @@ public class FhirController {
                 TokenParam t = new TokenParam();
                 t.setSystem(identifier.getSystem());
                 t.setValue(identifier.getValue());
-                wrapper.addParameter(Patient.SP_IDENTIFIER, t.getValueAsQueryToken(null));
+                wrapper.addParameter(Patient.SP_IDENTIFIER, t.getValueAsQueryToken());
             }
         }
         setNameParameters(wrapper, patient);
@@ -517,7 +608,7 @@ public class FhirController {
         if (patient.hasBirthDate()) {
             DateParam birthDate = new DateParam();
             birthDate.setValue(patient.getBirthDate());
-            String value = StringUtils.substringBefore(birthDate.getValueAsQueryToken(null), "T");
+            String value = StringUtils.substringBefore(birthDate.getValueAsQueryToken(), "T");
             wrapper.addParameter(Patient.SP_BIRTHDATE, value);
         }
         if (patient.hasMultipleBirth()) {
@@ -580,7 +671,7 @@ public class FhirController {
         HttpServletRequest req, 
         String destinationId
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
-        String queryType = StringUtils.contains(req.getRequestURI(), "ImmunizationRecommendation") ? IzQuery.RECOMMENDATION : IzQuery.HISTORY;
+        String queryType = Strings.CS.contains(req.getRequestURI(), "ImmunizationRecommendation") ? IzQuery.RECOMMENDATION : IzQuery.HISTORY;
         
         // Create the request and set the destination
         SubmitSingleMessageRequest request = new SubmitSingleMessageRequest();
@@ -599,7 +690,7 @@ public class FhirController {
             
             setMSHValues(qbp);
             
-            boolean isPatient = StringUtils.contains(req.getRequestURI(), "/Patient");
+            boolean isPatient = Strings.CS.contains(req.getRequestURI(), "/Patient");
 
     		@SuppressWarnings("unused")
     		IzQuery query = setQueryParameters(req, qbp, isPatient);
@@ -698,7 +789,11 @@ public class FhirController {
         
         // Update the bundle type to searchset from message.
         bundle.setType(BundleType.SEARCHSET);
-        String requested = StringUtils.substringAfterLast(req.getRequestURI(), "/");
+        String uri = req.getRequestURI();
+        if (uri.endsWith("/_search")) {
+            uri = StringUtils.substringBeforeLast(uri, "/_search");
+        }
+        String requested = StringUtils.substringAfterLast(uri, "/");
         if ("$match".equals(requested)) {
             requested = PATIENT;
         }
@@ -736,7 +831,7 @@ public class FhirController {
     
     private void removeInfrastructureCreatedResources(List<Resource> resources, List<Include> includes, List<Include> revIncludes,
             Iterator<BundleEntryComponent> it, Resource r) {
-        if (r != null && r.getUserData(MessageParser.SOURCE) != null) {
+        if (r != null && r.getUserData(Parser.SOURCE) != null) {
             // Some DatatypeConverter and MessageParser created resources have limited utility.  
             // What we should we do with those depends on what resources the
             // user asks to include.  These infrastructure crafted resources can be white-listed
@@ -749,7 +844,7 @@ public class FhirController {
             // _include=Resource:source:Organization
             // MessageParser created DocumentReference/Provenance
             // _include=Resource:source:DocumentReference
-            String source = r.getUserData(MessageParser.SOURCE).toString();
+            String source = r.getUserData(Parser.SOURCE).toString();
             if (
                 // ANY Source requested
                 // DatatypeConverter created resources including Organization, Practitioner, RelatedPerson, and Location
@@ -777,7 +872,7 @@ public class FhirController {
     private boolean matchesSource(List<Include> includes, String target) {
         for (Include include: includes) {
             if ("Resource".equals(include.getParamType()) 
-            	&& MessageParser.SOURCE.equals(include.getParamName())
+            	&& Parser.SOURCE.equals(include.getParamName())
             	&& Arrays.asList("*", target, null).contains(include.getParamTargetType())
             ) {
                 return true;
