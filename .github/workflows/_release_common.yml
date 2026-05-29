@@ -48,26 +48,26 @@ jobs:
     steps:
       - name: Generate Release Automation App Token
         id: app-token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets.RELEASE_AUTOMATION_APP_ID }}
           private-key: ${{ secrets.RELEASE_AUTOMATION_APP_KEY }}
 
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           token: ${{ steps.app-token.outputs.token }}
           fetch-depth: 0
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
 
       - name: Set up Maven
-        uses: stCarolas/setup-maven@v5
+        uses: stCarolas/setup-maven@v5.1
         with:
           maven-version: 3.9.0
 
@@ -319,38 +319,37 @@ jobs:
             -Dimage.tag="$RELEASE_VERSION" \
             -DskipDependencyCheck=true
 
-#      - name: Run OWASP Dependency Check
-#        env:
-#          JAVA_HOME: /opt/jdk
-#        uses: dependency-check/Dependency-Check_Action@main
-#        continue-on-error: false
-#        timeout-minutes: 15
-#        with:
-#          project: IZ Gateway Transformation Service
-#          path: target/xform-${{ inputs.release-version }}-${{ github.run_number }}.jar
-#          format: 'HTML'
-#          out: 'target/site'
-#          args: >
-#            --ossIndexUsername ${{ secrets.OSS_INDEX_USERNAME }}
-#            --ossIndexPassword ${{ secrets.OSS_INDEX_PASSWORD }}
-#            --failOnCVSS 7
-#            --suppression ./dependency-suppression.xml
-#            --nvdApiKey ${{ secrets.NVDAPIKEY }}
-#            --disableNuspec
-#            --disableNugetconf
-#            --disableAssembly
-#            --disableCentral
-#
-#      - name: Upload dependency check report
-#        uses: actions/upload-artifact@v4
-#        if: ${{ always() }}
-#        with:
-#          name: dependency-check-report
-#          path: ./target/site/dependency-check-report.html
-#          if-no-files-found: ignore
+      - name: Run OWASP Dependency Check
+        env:
+          JAVA_HOME: /opt/jdk
+        uses: dependency-check/Dependency-Check_Action@main
+        continue-on-error: false
+        timeout-minutes: 15
+        with:
+          project: IZ Gateway Transformation Service
+          path: target/xform-${{ inputs.release-version }}-${{ github.run_number }}.jar
+          format: 'HTML'
+          out: 'target/site'
+          args: >
+            --disableOssIndex
+            --failOnCVSS 7
+            --suppression ./dependency-suppression.xml
+            --nvdApiKey ${{ secrets.NVDAPIKEY }}
+            --disableNuspec
+            --disableNugetconf
+            --disableAssembly
+            --disableCentral
+
+      - name: Upload dependency check report
+        uses: actions/upload-artifact@v7
+        if: ${{ always() }}
+        with:
+          name: dependency-check-report
+          path: ./target/site/dependency-check-report.html
+          if-no-files-found: ignore
 
       - name: Configure AWS credentials (dev account)
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -361,7 +360,7 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -387,7 +386,7 @@ jobs:
 
       - name: Configure AWS credentials for APHL
         if: ${{ !inputs.dry-run }}
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           aws-access-key-id: ${{ secrets.APHL_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.APHL_AWS_SECRET_ACCESS_KEY }}
@@ -426,14 +425,14 @@ jobs:
           fi
 
       - name: Publish Site (Current)
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ steps.app-token.outputs.token }}
           publish_dir: ./target/site
           destination_dir: ${{ steps.site-dirs.outputs.current_dir }}
 
       - name: Publish Site (Versioned)
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v4.1.0
         with:
           github_token: ${{ steps.app-token.outputs.token }}
           publish_dir: ./target/site
