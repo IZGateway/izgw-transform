@@ -317,6 +317,16 @@ public class FhirController {
         return processQuery(req, destinationId);
     }
 
+    /**
+     * Rejects {@code POST} on the bare resource URL with {@code 405 Method Not Allowed}.
+     *
+     * <p>In FHIR R4, {@code POST /{type}} is a <em>create</em> operation, not a search.
+     * FHIR-conformant clients must use {@code POST /{type}/_search} for form-encoded
+     * parameter searches, or {@code GET /{type}?params} for query-string searches.</p>
+     *
+     * @param destinationId the destination identifier (unused; required for path matching)
+     * @return 405 response with {@code Allow: GET, HEAD} header
+     */
     @RequestMapping(
         value = {
             "/{destinationId}/Immunization",
