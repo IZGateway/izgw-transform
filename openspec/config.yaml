@@ -1,0 +1,97 @@
+# openspec/config.yaml
+# Generated from codebase analysis on 2026-05-30
+
+schema: spec-driven
+
+context: |
+  Domain: IZ Gateway Transformation Service ("xform") — intercepts HL7 v2 (SOAP) and
+    FHIR immunization messages in the IZ Gateway, runs configurable org/jurisdiction
+    transformations, forwards to downstream Hub or IIS. Open-source, self-hostable.
+  Users: Public-health jurisdictions, IIS operators, providers exchanging immunization data.
+
+  Tech Stack:
+    Language/Build: Java 21, Maven 3.9; artifact gov.cdc.izgateway:xform (parent POM
+      gov.cdc.izgw:izgw-bom, private GitHub Packages).
+    Framework: Spring Boot 3.5.8, Apache Camel 4.16.0, HAPI HL7v2 (hapi-structures-v251),
+      izgw-core 3.0.0, v2tofhir.
+    Config store: JSON files (default) or AWS DynamoDB via SPRING_DATABASE
+      (file|dynamodb|migrate); DynamoDB keys = entityType (partition) + sortKey.
+    Infra: Spring Boot fat-jar + Docker image (izgw-transform) on AWS ECS; images to
+      AWS ECR + ghcr.io/izgateway/izgw-transform.
+    CI/CD: GitHub Actions (maven.yml) — package/install/site, OWASP dependency-check
+      (fails CVSS>=7), Docker push, ECS force-new-deployment (dev), Newman/Postman tests.
+
+  Architecture:
+    Pattern: Modular monolith, layered: Controller -> Camel route (XformRouter) ->
+      DataXformService -> PipelineRunnerService -> Pipeline -> Pipes -> Solutions ->
+      SolutionOperations, each gated by Preconditions. AspectJ observability
+      (@CaptureXformAdvice) needs aspectjweaver + spring-instrument javaagents at runtime.
+    API: Inbound SOAP/HL7v2 (IISHubService, IISService) + FHIR REST; REST CRUD config API
+      under /api/v1/* (cursor-paged via BaseApiController).
+    Modules: gov.cdc.izgateway.xform.* — api, services, repository{file,dynamodb},
+      operations, preconditions, solutions, camel{routers,producers,converters},
+      endpoints{hub,fhir}, aspects, security, model, configuration. @ComponentScan also
+      pulls sibling izgw-core packages (soap.net, configuration, security, service.impl).
+    Auth: mTLS client cert (primary) via AccessControlValve + Roles (ADMIN,
+      XFORM_SENDING_SYSTEM, ...); JWT (shared-secret or JWK URI) also supported.
+
+  Standards:
+    Testing: JUnit 5 + @SpringBootTest, run via Maven (surefire sets env + BCFKS keystores
+      under target/). x-loopback:true header short-circuits outbound for round-trip tests.
+    Linting: Checkstyle FAILS build at `validate` phase (ai-checkstyle.xml): cyclomatic
+      complexity, method length<=300, MultipleStringLiterals(max 3-4), DeclarationOrder,
+      EqualsHashCode, HideUtilityClassConstructor. Lombok used.
+    Git: branches feature -> develop -> Release-* -> main; pom version must match #.#.#.
+      Do NOT add Co-Authored-By trailers.
+    Code Style: Java camelCase; Jackson @JsonTypeInfo/@JsonSubTypes with `method`
+      discriminator for Operation and Precondition types.
+    Domain Standards: HL7 v2 immunization, FHIR (HAPI), SOAP/WSDL (IIS Hub).
+
+  Key Constraints:
+    - FIPS only: crypto via BouncyCastle FIPS; keystores are BCFKS (not JKS/PKCS12);
+      approved_only=true; bcpkix/bc/bctls-fips jars unpacked.
+    - New Operation/Precondition subclasses MUST be registered in @JsonSubTypes
+      (Operation.java/Precondition.java) or config JSON deserialization fails silently.
+    - Response-direction pipes execute in REVERSE order (currentDirection == RESPONSE).
+    - Config model (Organization, Pipeline/Pipe, Solution, Operation, Mapping,
+      AccessControl, User...) must work against both file and DynamoDB repositories.
+    - xform.allow-delete-via-api=false by default (DELETE returns 403).
+    - Maintain backward compatibility for downstream Hub/IIS consumers.
+
+rules:
+  proposal:
+    - State which inbound (SOAP/HL7v2, FHIR) and outbound (izghub, iis) paths are affected
+      and whether the config model (Organization/Pipeline/Solution/Operation/Precondition) changes.
+    - Note impact on downstream Hub/IIS consumers and any backward-compatibility risk for
+      existing organization transformation configurations.
+    - Identify whether changes affect both repository backends (file and DynamoDB) and any
+      migration implications (SPRING_DATABASE=migrate).
+    - Reference relevant existing docs (docs/CONFIGURATION_REFERENCE.md,
+      docs/APPLICATION_CONFIGURATION_STORAGE.md, docs/QUICK_START.md).
+  specs:
+    - Write scenarios in Given/When/Then; cover both REQUEST and RESPONSE directions where
+      pipeline ordering matters (response pipes run in reverse).
+    - Use RFC 2119 keywords (MUST/SHALL/SHOULD) for normative requirements.
+    - Reference existing Operation/Precondition `method` discriminators before inventing new
+      types; if a new type is needed, require its registration in @JsonSubTypes.
+    - State backward-compatibility expectations for existing org configs and the SOAP/FHIR
+      message contracts.
+  design:
+    - Reuse the existing flow (Controller -> XformRouter Camel route -> DataXformService ->
+      PipelineRunnerService -> Pipeline/Pipes/Solutions/SolutionOperations); justify any
+      deviation.
+    - Include a sequence diagram for cross-component message flows, including loopback
+      (x-loopback) and response-direction handling.
+    - Address FIPS/BCFKS crypto constraints and AspectJ advice/javaagent implications when
+      touching crypto, SSL reload, or observability.
+    - Cover error handling, both repository backends, and Checkstyle constraints (complexity,
+      method length).
+  tasks:
+    - Pair each implementation task with a JUnit 5 @SpringBootTest task; tests must run via
+      Maven (surefire env/keystore setup).
+    - Include a task to register any new Operation/Precondition subclass in @JsonSubTypes.
+    - Include tasks to update relevant docs/ references and the Postman/Newman collection
+      when APIs change.
+    - Add a task to verify Checkstyle passes (validate phase) and OWASP dependency-check
+      stays under CVSS 7.
+    - Note any security review needed for auth (mTLS/JWT/Roles) or crypto changes.
