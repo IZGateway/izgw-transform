@@ -43,4 +43,48 @@ class SwaggerUiVersionConfigTests {
                 "version field should not be stuck on Springdoc's bundled default "
                         + SPRINGDOC_BUNDLED_DEFAULT + " when the webjar is a different version");
     }
+
+    @Test
+    void alignerOverridesPreExistingConfiguredVersion() {
+        SwaggerUiConfigProperties props = new SwaggerUiConfigProperties();
+        props.setVersion("bogus-pre-existing-pin");
+
+        SwaggerUiVersionConfig.alignVersionFromWebjar(props);
+
+        String expected = new WebJarVersionLocator().version(SwaggerUiVersionConfig.SWAGGER_UI_WEBJAR_NAME);
+        assertEquals(expected, props.getVersion(),
+                "an existing springdoc.swagger-ui.version value must be overridden by the on-classpath webjar version");
+    }
+
+    @Test
+    void nullDetectionLeavesVersionUntouched() {
+        SwaggerUiConfigProperties props = new SwaggerUiConfigProperties();
+        props.setVersion("preserved-on-failure");
+
+        SwaggerUiVersionConfig.alignVersion(props, () -> null);
+
+        assertEquals("preserved-on-failure", props.getVersion());
+    }
+
+    @Test
+    void blankDetectionLeavesVersionUntouched() {
+        SwaggerUiConfigProperties props = new SwaggerUiConfigProperties();
+        props.setVersion("preserved-on-failure");
+
+        SwaggerUiVersionConfig.alignVersion(props, () -> "   ");
+
+        assertEquals("preserved-on-failure", props.getVersion());
+    }
+
+    @Test
+    void exceptionDuringDetectionLeavesVersionUntouchedAndDoesNotPropagate() {
+        SwaggerUiConfigProperties props = new SwaggerUiConfigProperties();
+        props.setVersion("preserved-on-failure");
+
+        SwaggerUiVersionConfig.alignVersion(props, () -> {
+            throw new IllegalStateException("simulated webjar lookup failure");
+        });
+
+        assertEquals("preserved-on-failure", props.getVersion());
+    }
 }

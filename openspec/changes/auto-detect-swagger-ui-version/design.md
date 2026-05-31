@@ -42,16 +42,18 @@ Stakeholders: xform developers (who want zero manual yaml edits on BOM bumps), C
 
 **Rationale:** Runtime detection treats the on-classpath webjar as the source of truth, which is the only value Springdoc's resource handler actually needs to be correct. It is contained entirely within xform (no BOM coordination), self-heals across BOM bumps and Springdoc upgrades alike, and uses only already-present transitive dependencies.
 
-### Decision 2: Apply the override via `SmartInitializingSingleton` (or `@PostConstruct` on the config bean) rather than a `BeanPostProcessor`.
+### Decision 2: Apply the override via a static-`@Bean` `BeanPostProcessor` targeting the `SwaggerUiConfigProperties` bean.
 
-**Choice:** Implement a small `@Configuration` class that constructor-injects `SwaggerUiConfigProperties` and has an `@PostConstruct` (or a `SmartInitializingSingleton` implementation) which calls `setVersion(...)` on it.
+**Choice:** A `@Configuration` class exposes a `static @Bean BeanPostProcessor` whose `postProcessAfterInitialization` recognises `SwaggerUiConfigProperties`, calls a package-private helper that runs `WebJarVersionLocator.version("swagger-ui")`, and unconditionally `setVersion(...)`s the result on the bean. The detector is wrapped in a `Supplier<String>` so tests can drive the null / blank / throwing branches without mocking.
 
 **Alternatives considered:**
-- *`BeanPostProcessor` matching `SwaggerUiConfigProperties`* — works but BPPs are heavier-weight and earlier in the bean lifecycle than necessary; this is a simple post-init override.
-- *`EnvironmentPostProcessor` that injects a property source with `springdoc.swagger-ui.version=<detected>`* — would work but runs very early (before logging is fully configured), making the diagnostic log line harder, and tightly couples to Spring Boot's property-loading internals.
-- *Custom `SwaggerUiConfigProperties` subclass / `@Primary` bean override* — fragile across Springdoc upgrades because Springdoc autoconfigures the bean conditionally.
+- *`@PostConstruct` on an `@Configuration` class that constructor-injects `SwaggerUiConfigProperties`* — initial design choice; abandoned during implementation. **Reason:** `src/main/resources/application.yml` sets `spring.main.lazy-initialization: true`, which means an `@Configuration` class with no consumers is never instantiated and its `@PostConstruct` never fires. (Verified empirically — the `Detected swagger-ui webjar version: …` INFO line was missing from the `XformApplicationTests` boot log under this design.)
+- *`@Lazy(false)` on the same `@Configuration` to force eager init* — would solve the activation problem but leaves the ordering question: any other bean that *consumes* `SwaggerUiConfigProperties.version` (Springdoc's resource-handler configurer) might run before the `@PostConstruct` does, depending on Spring's resolution order. Two beans both depending on `SwaggerUiConfigProperties` have no guaranteed init order.
+- *`SmartInitializingSingleton`* — guaranteed to fire after all singletons are wired, but still after the resource-handler bean has read the version field. Same ordering problem.
+- *`EnvironmentPostProcessor` injecting a property source `springdoc.swagger-ui.version=<detected>`* — would work but runs very early (before logging is fully configured), couples to Spring Boot's property-loading internals, and gains nothing over the BPP approach.
+- *Custom `SwaggerUiConfigProperties` subclass / `@Primary` bean override* — fragile across Springdoc upgrades because Springdoc autoconfigures the bean conditionally and may rename it.
 
-**Rationale:** `SwaggerUiConfigProperties#afterPropertiesSet()` (Springdoc 2.8.17) only sets the version when `StringUtils.isEmpty(version)`, so an unconditional override after init is safe and obvious. The `@Configuration` + `@PostConstruct` pattern is idiomatic Spring Boot and stays small.
+**Rationale:** The BPP approach wins on two fronts at once. (1) BPPs are always eagerly registered and invoked, even when global lazy-init is on, so activation is guaranteed. (2) Mutating the bean inside its own `postProcessAfterInitialization` happens *before any other consumer can read it*, so the resource-handler configurer is guaranteed to see the corrected version. The two reasons compose: the BPP solves both the activation problem (#1) *and* the ordering problem (#2) that a `@PostConstruct` / `@Lazy(false)` combo only solves halfway. The static `@Bean` declaration is the documented pattern for registering `BeanPostProcessor`s without losing them to the `@Configuration` enhancer.
 
 ### Decision 3: Fail soft, not hard.
 
@@ -73,10 +75,10 @@ Stakeholders: xform developers (who want zero manual yaml edits on BOM bumps), C
 
 ## Risks / Trade-offs
 
-- **Risk: Springdoc 3.x renames `SwaggerUiConfigProperties` or changes how it consumes the version.** → Mitigation: the override class is ~20 lines, easy to update during the Springdoc major-version bump. The Springdoc upgrade itself is the gating step for any breaking API change, so this will be caught and fixed alongside.
-- **Risk: `WebJarVersionLocator` lookup fails silently and Springdoc falls back to its bundled default (`5.32.2`).** → Mitigation: Decision 3 + a `WARN` log line make the failure visible. Behavior degrades to the pre-change state, which is no worse than today's status quo.
+- **Risk: Springdoc 3.x renames `SwaggerUiConfigProperties` or changes how it consumes the version.** → Mitigation: the override class is ~30 lines, easy to update during the Springdoc major-version bump. The Springdoc upgrade itself is the gating step for any breaking API change, so this will be caught and fixed alongside.
+- **Risk: `WebJarVersionLocator` lookup fails silently and Springdoc falls back to its bundled default (`5.32.2`).** → Mitigation: Decision 3 + a `WARN` log line make the failure visible. Behavior degrades to the pre-change state, which is no worse than today's status quo. The package-private `Supplier`-based overload (`alignVersion(props, detector)`) lets unit tests directly exercise the null / blank / throwing branches.
 - **Risk: Multiple swagger-ui webjars on the classpath (e.g., a duplicate from a transitive somewhere).** → Mitigation: in practice the izgw-bom narrows this to a single version. `WebJarVersionLocator` returns the version it finds first; if it picks the "wrong" one, the symptom is the same as today (404), and the `WARN` line would surface during diagnosis. Acceptable.
-- **Risk: Startup-order subtleties — `SwaggerUiConfigProperties` isn't fully initialized yet when our override runs.** → Mitigation: `@PostConstruct` runs after the bean's `afterPropertiesSet`, which is when Springdoc applies its bundled default. Our unconditional `setVersion(...)` after that point is correct.
+- **Risk: A BPP that doesn't match the targeted bean type is silently a no-op across Springdoc upgrades.** → Mitigation: the `SwaggerUiVersionContextTests` `@SpringBootTest` asserts `SwaggerUiConfigProperties.version` matches the on-classpath webjar version in the real container — any future regression that breaks bean matching (rename, conditional removal) fails that test.
 - **Trade-off: One extra Java file the team has to maintain.** Acceptable cost compared to a recurring manual yaml-edit chore on every BOM bump.
 - **Trade-off: The fix is xform-local and does not benefit other izgw consumers of the BOM.** Other services with the same drift would each need to adopt the same pattern. Acceptable — when there's a second consumer the right move is to lift this into izgw-core, not pre-emptively.
 

@@ -1,5 +1,7 @@
 package gov.cdc.izgateway.xform.configuration;
 
+import java.util.function.Supplier;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.properties.SwaggerUiConfigProperties;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -46,8 +48,12 @@ public class SwaggerUiVersionConfig {
     }
 
     static void alignVersionFromWebjar(SwaggerUiConfigProperties props) {
+        alignVersion(props, () -> new WebJarVersionLocator().version(SWAGGER_UI_WEBJAR_NAME));
+    }
+
+    static void alignVersion(SwaggerUiConfigProperties props, Supplier<String> detector) {
         try {
-            String detected = new WebJarVersionLocator().version(SWAGGER_UI_WEBJAR_NAME);
+            String detected = detector.get();
             if (detected == null || detected.isBlank()) {
                 log.warn("Could not detect {} webjar version; leaving Springdoc default in place", SWAGGER_UI_WEBJAR_NAME);
                 return;
