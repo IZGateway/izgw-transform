@@ -29,10 +29,14 @@ import org.webjars.WebJarVersionLocator;
  * <p>See openspec change {@code auto-detect-swagger-ui-version}.
  */
 @Slf4j
-@Configuration
-public class SwaggerUiVersionConfig {
+@Configuration(proxyBeanMethods = false)
+public final class SwaggerUiVersionConfig {
 
     static final String SWAGGER_UI_WEBJAR_NAME = "swagger-ui";
+
+    private SwaggerUiVersionConfig() {
+        // Utility-style @Configuration: only a static @Bean factory and static helpers.
+    }
 
     @Bean
     public static BeanPostProcessor swaggerUiVersionAligner() {
