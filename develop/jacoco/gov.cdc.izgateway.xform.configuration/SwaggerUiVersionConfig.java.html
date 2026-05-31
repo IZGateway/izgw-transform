@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SwaggerUiVersionConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.configuration</a> &gt; <span class="el_source">SwaggerUiVersionConfig.java</span></div><h1>SwaggerUiVersionConfig.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.configuration;
+
+import java.util.function.Supplier;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.properties.SwaggerUiConfigProperties;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.webjars.WebJarVersionLocator;
+
+/**
+ * Aligns Springdoc's swagger-ui resource-handler version with the actual
+ * {@code org.webjars:swagger-ui} version present on the classpath.
+ *
+ * &lt;p&gt;Springdoc reads its version from {@code springdoc.swagger-ui.version}
+ * and falls back to a value baked into {@code springdoc.config.properties}
+ * inside the springdoc starter jar. The izgw-bom independently overrides
+ * the {@code org.webjars:swagger-ui} version, so the two drift and the UI
+ * 404s on {@code /swagger/swagger-ui/index.html} after a webjar bump.
+ *
+ * &lt;p&gt;Implemented as a {@link BeanPostProcessor} returned from a static
+ * {@code @Bean} factory so it runs even with the application-wide
+ * {@code spring.main.lazy-initialization=true} (BPPs are always eagerly
+ * registered) and so the version is mutated during the
+ * {@link SwaggerUiConfigProperties} bean's own initialization — before any
+ * other bean (e.g. Springdoc's resource-handler configurer) reads it.
+ *
+ * &lt;p&gt;See openspec change {@code auto-detect-swagger-ui-version}.
+ */
+<span class="fc" id="L31">@Slf4j</span>
+@Configuration
+<span class="nc" id="L33">public class SwaggerUiVersionConfig {</span>
+
+    static final String SWAGGER_UI_WEBJAR_NAME = &quot;swagger-ui&quot;;
+
+    @Bean
+    public static BeanPostProcessor swaggerUiVersionAligner() {
+<span class="fc" id="L39">        return new BeanPostProcessor() {</span>
+            @Override
+            public Object postProcessAfterInitialization(Object bean, String beanName) {
+<span class="fc bfc" id="L42" title="All 2 branches covered.">                if (bean instanceof SwaggerUiConfigProperties props) {</span>
+<span class="fc" id="L43">                    alignVersionFromWebjar(props);</span>
+                }
+<span class="fc" id="L45">                return bean;</span>
+            }
+        };
+    }
+
+    static void alignVersionFromWebjar(SwaggerUiConfigProperties props) {
+<span class="fc" id="L51">        alignVersion(props, () -&gt; new WebJarVersionLocator().version(SWAGGER_UI_WEBJAR_NAME));</span>
+<span class="fc" id="L52">    }</span>
+
+    static void alignVersion(SwaggerUiConfigProperties props, Supplier&lt;String&gt; detector) {
+        try {
+<span class="fc" id="L56">            String detected = detector.get();</span>
+<span class="fc bfc" id="L57" title="All 4 branches covered.">            if (detected == null || detected.isBlank()) {</span>
+<span class="fc" id="L58">                log.warn(&quot;Could not detect {} webjar version; leaving Springdoc default in place&quot;, SWAGGER_UI_WEBJAR_NAME);</span>
+<span class="fc" id="L59">                return;</span>
+            }
+<span class="fc" id="L61">            props.setVersion(detected);</span>
+<span class="fc" id="L62">            log.info(&quot;Detected {} webjar version: {}&quot;, SWAGGER_UI_WEBJAR_NAME, detected);</span>
+<span class="fc" id="L63">        } catch (RuntimeException e) {</span>
+<span class="fc" id="L64">            log.warn(&quot;Failed to detect {} webjar version; leaving Springdoc default in place&quot;, SWAGGER_UI_WEBJAR_NAME, e);</span>
+<span class="fc" id="L65">        }</span>
+<span class="fc" id="L66">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
