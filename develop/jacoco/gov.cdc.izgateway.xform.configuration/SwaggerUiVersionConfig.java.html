@@ -55,13 +55,13 @@ import org.webjars.WebJarVersionLocator;
         try {
 <span class="fc" id="L56">            String detected = detector.get();</span>
 <span class="fc bfc" id="L57" title="All 4 branches covered.">            if (detected == null || detected.isBlank()) {</span>
-<span class="fc" id="L58">                log.warn(&quot;Could not detect {} webjar version; leaving Springdoc default in place&quot;, SWAGGER_UI_WEBJAR_NAME);</span>
+<span class="fc" id="L58">                log.warn(&quot;Could not detect {} webjar version; leaving existing Springdoc swagger-ui version in place&quot;, SWAGGER_UI_WEBJAR_NAME);</span>
 <span class="fc" id="L59">                return;</span>
             }
 <span class="fc" id="L61">            props.setVersion(detected);</span>
 <span class="fc" id="L62">            log.info(&quot;Detected {} webjar version: {}&quot;, SWAGGER_UI_WEBJAR_NAME, detected);</span>
 <span class="fc" id="L63">        } catch (RuntimeException e) {</span>
-<span class="fc" id="L64">            log.warn(&quot;Failed to detect {} webjar version; leaving Springdoc default in place&quot;, SWAGGER_UI_WEBJAR_NAME, e);</span>
+<span class="fc" id="L64">            log.warn(&quot;Failed to detect {} webjar version; leaving existing Springdoc swagger-ui version in place&quot;, SWAGGER_UI_WEBJAR_NAME, e);</span>
 <span class="fc" id="L65">        }</span>
 <span class="fc" id="L66">    }</span>
 }
