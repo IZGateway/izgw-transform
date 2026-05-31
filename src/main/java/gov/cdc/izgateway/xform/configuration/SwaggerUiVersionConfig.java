@@ -55,13 +55,13 @@ public class SwaggerUiVersionConfig {
         try {
             String detected = detector.get();
             if (detected == null || detected.isBlank()) {
-                log.warn("Could not detect {} webjar version; leaving Springdoc default in place", SWAGGER_UI_WEBJAR_NAME);
+                log.warn("Could not detect {} webjar version; leaving existing Springdoc swagger-ui version in place", SWAGGER_UI_WEBJAR_NAME);
                 return;
             }
             props.setVersion(detected);
             log.info("Detected {} webjar version: {}", SWAGGER_UI_WEBJAR_NAME, detected);
         } catch (RuntimeException e) {
-            log.warn("Failed to detect {} webjar version; leaving Springdoc default in place", SWAGGER_UI_WEBJAR_NAME, e);
+            log.warn("Failed to detect {} webjar version; leaving existing Springdoc swagger-ui version in place", SWAGGER_UI_WEBJAR_NAME, e);
         }
     }
 }

@@ -23,8 +23,8 @@ class SwaggerUiVersionConfigTests {
         SwaggerUiVersionConfig.alignVersionFromWebjar(props);
 
         assertEquals(expected, props.getVersion());
-        assertTrue(props.getVersion().matches("\\d+\\.\\d+\\.\\d+"),
-                "detected version must look like X.Y.Z; got " + props.getVersion());
+        assertTrue(props.getVersion().matches("\\d+\\.\\d+\\.\\d+(?:[-+].+)?"),
+                "detected version must look like a semver (X.Y.Z with optional qualifier); got " + props.getVersion());
     }
 
     @Test
