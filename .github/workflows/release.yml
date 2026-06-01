@@ -1,0 +1,50 @@
+# Standard release - cuts a new minor/patch release from base-branch.
+# Run this from the develop branch (or developalm for testing) via the Actions UI / gh workflow run.
+# It dispatches into _release_common.yml.
+
+name: Release - Standard
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'Release version (X.Y.Z, e.g., 0.19.0)'
+        required: true
+        type: string
+      next-snapshot-version:
+        description: 'Next development version (X.Y.Z or X.Y.Z-SNAPSHOT). Leave blank to auto-increment minor version.'
+        required: false
+        type: string
+      base-branch:
+        description: 'Branch to cut the release from (default: develop). Use developalm during testing.'
+        required: false
+        type: string
+        default: 'develop'
+      trunk-branch:
+        description: 'Branch that receives the merge + tag (default: main). Use mainalm during testing.'
+        required: false
+        type: string
+        default: 'main'
+      dry-run:
+        description: 'Skip APHL push, publish Pages under /test/, create GitHub Release as draft.'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  packages: write
+  pull-requests: read
+
+jobs:
+  release:
+    # Workflow must be dispatched from the chosen base-branch.
+    uses: ./.github/workflows/_release_common.yml
+    secrets: inherit
+    with:
+      release-version: ${{ inputs.release-version }}
+      next-snapshot-version: ${{ inputs.next-snapshot-version }}
+      release-type: standard
+      base-branch: ${{ inputs.base-branch }}
+      trunk-branch: ${{ inputs.trunk-branch }}
+      dry-run: ${{ inputs.dry-run }}
