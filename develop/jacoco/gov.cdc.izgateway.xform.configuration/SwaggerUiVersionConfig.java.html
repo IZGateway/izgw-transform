@@ -29,40 +29,44 @@ import org.webjars.WebJarVersionLocator;
  * &lt;p&gt;See openspec change {@code auto-detect-swagger-ui-version}.
  */
 <span class="fc" id="L31">@Slf4j</span>
-@Configuration
-<span class="nc" id="L33">public class SwaggerUiVersionConfig {</span>
+@Configuration(proxyBeanMethods = false)
+public final class SwaggerUiVersionConfig {
 
     static final String SWAGGER_UI_WEBJAR_NAME = &quot;swagger-ui&quot;;
 
+    private SwaggerUiVersionConfig() {
+        // Utility-style @Configuration: only a static @Bean factory and static helpers.
+    }
+
     @Bean
     public static BeanPostProcessor swaggerUiVersionAligner() {
-<span class="fc" id="L39">        return new BeanPostProcessor() {</span>
+<span class="fc" id="L43">        return new BeanPostProcessor() {</span>
             @Override
             public Object postProcessAfterInitialization(Object bean, String beanName) {
-<span class="fc bfc" id="L42" title="All 2 branches covered.">                if (bean instanceof SwaggerUiConfigProperties props) {</span>
-<span class="fc" id="L43">                    alignVersionFromWebjar(props);</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">                if (bean instanceof SwaggerUiConfigProperties props) {</span>
+<span class="fc" id="L47">                    alignVersionFromWebjar(props);</span>
                 }
-<span class="fc" id="L45">                return bean;</span>
+<span class="fc" id="L49">                return bean;</span>
             }
         };
     }
 
     static void alignVersionFromWebjar(SwaggerUiConfigProperties props) {
-<span class="fc" id="L51">        alignVersion(props, () -&gt; new WebJarVersionLocator().version(SWAGGER_UI_WEBJAR_NAME));</span>
-<span class="fc" id="L52">    }</span>
+<span class="fc" id="L55">        alignVersion(props, () -&gt; new WebJarVersionLocator().version(SWAGGER_UI_WEBJAR_NAME));</span>
+<span class="fc" id="L56">    }</span>
 
     static void alignVersion(SwaggerUiConfigProperties props, Supplier&lt;String&gt; detector) {
         try {
-<span class="fc" id="L56">            String detected = detector.get();</span>
-<span class="fc bfc" id="L57" title="All 4 branches covered.">            if (detected == null || detected.isBlank()) {</span>
-<span class="fc" id="L58">                log.warn(&quot;Could not detect {} webjar version; leaving existing Springdoc swagger-ui version in place&quot;, SWAGGER_UI_WEBJAR_NAME);</span>
-<span class="fc" id="L59">                return;</span>
+<span class="fc" id="L60">            String detected = detector.get();</span>
+<span class="fc bfc" id="L61" title="All 4 branches covered.">            if (detected == null || detected.isBlank()) {</span>
+<span class="fc" id="L62">                log.warn(&quot;Could not detect {} webjar version; leaving existing Springdoc swagger-ui version in place&quot;, SWAGGER_UI_WEBJAR_NAME);</span>
+<span class="fc" id="L63">                return;</span>
             }
-<span class="fc" id="L61">            props.setVersion(detected);</span>
-<span class="fc" id="L62">            log.info(&quot;Detected {} webjar version: {}&quot;, SWAGGER_UI_WEBJAR_NAME, detected);</span>
-<span class="fc" id="L63">        } catch (RuntimeException e) {</span>
-<span class="fc" id="L64">            log.warn(&quot;Failed to detect {} webjar version; leaving existing Springdoc swagger-ui version in place&quot;, SWAGGER_UI_WEBJAR_NAME, e);</span>
-<span class="fc" id="L65">        }</span>
-<span class="fc" id="L66">    }</span>
+<span class="fc" id="L65">            props.setVersion(detected);</span>
+<span class="fc" id="L66">            log.info(&quot;Detected {} webjar version: {}&quot;, SWAGGER_UI_WEBJAR_NAME, detected);</span>
+<span class="fc" id="L67">        } catch (RuntimeException e) {</span>
+<span class="fc" id="L68">            log.warn(&quot;Failed to detect {} webjar version; leaving existing Springdoc swagger-ui version in place&quot;, SWAGGER_UI_WEBJAR_NAME, e);</span>
+<span class="fc" id="L69">        }</span>
+<span class="fc" id="L70">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
