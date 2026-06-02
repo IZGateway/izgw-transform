@@ -21,7 +21,7 @@ import java.security.Security;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest
+@SpringBootTest(properties = "springdoc.swagger-ui.version=0.0.0-test-pin")
 class SwaggerUiVersionContextTests {
 
     private static SecureRandom secureRandom;
