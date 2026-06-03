@@ -327,7 +327,7 @@ jobs:
         timeout-minutes: 15
         with:
           project: IZ Gateway Transformation Service
-          path: target/xform-${{ inputs.release-version }}-${{ github.run_number }}.jar
+          path: target/xform-${{ inputs.release-version }}.jar
           format: 'HTML'
           out: 'target/site'
           args: >
