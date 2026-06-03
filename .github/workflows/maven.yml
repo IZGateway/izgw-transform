@@ -217,8 +217,10 @@ jobs:
         run: |
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_BRANCH_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
+          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
           docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
           docker image push --all-tags ghcr.io/izgateway/izgw-transform
 
