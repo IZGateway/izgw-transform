@@ -1,4 +1,6 @@
 gov.cdc.izgateway.xform
+gov.cdc.izgateway.xform.configuration
+gov.cdc.izgateway.xform.endpoints.fhir
 gov.cdc.izgateway.xform.model
 gov.cdc.izgateway.xform.operations
 gov.cdc.izgateway.xform.preconditions
