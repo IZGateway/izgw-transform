@@ -1,3 +1,17 @@
+# IZ Gateway Transformation Service 0.19.0
+
+Released 2026-06-03.
+
+- fix: Path for Owasp scan in release process ([#267](https://github.com/IZGateway/izgw-transform/pull/267))
+- fix: add latest tag back into maven.yml for docker images ([#266](https://github.com/IZGateway/izgw-transform/pull/266))
+- chore: Update dependencies to non-SNAPSHOT to prepare for release ([#265](https://github.com/IZGateway/izgw-transform/pull/265))
+- IGDD-2976 - Swagger UI auto detect ([#264](https://github.com/IZGateway/izgw-transform/pull/264))
+- IGDD-2398 - feat(ci): Setup release automation GitHub Workflows for Xform Service ([#253](https://github.com/IZGateway/izgw-transform/pull/253))
+- openspec: Setup in Xform Service ([#263](https://github.com/IZGateway/izgw-transform/pull/263))
+- ci: upgrade GitHub Actions to Node.js 24 and add Dependabot config ([#257](https://github.com/IZGateway/izgw-transform/pull/257))
+- Sync 0.18.2 hot fix release back to develop ([#261](https://github.com/IZGateway/izgw-transform/pull/261))
+- Sync release notes for 0.18.0 to develop ([#248](https://github.com/IZGateway/izgw-transform/pull/248))
+
 # IZ Gateway Transformation Service 0.18.2
 
 - Dependency updates and Docker Base Image update
