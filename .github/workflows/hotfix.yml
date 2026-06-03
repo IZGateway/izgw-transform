@@ -1,0 +1,55 @@
+# Hotfix release - cuts a patch release from a pre-existing hotfix/X.Y.Z branch.
+# Workflow must be dispatched from a hotfix/* branch (created manually from trunk-branch).
+# It dispatches into _release_common.yml with release-type=hotfix.
+
+name: Release - Hotfix
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'Hotfix version (X.Y.Z, e.g., 0.19.1). Must match the hotfix/X.Y.Z branch this is dispatched from.'
+        required: true
+        type: string
+      base-branch:
+        description: 'Branch that receives the back-merge after release (default: develop). Use developalm during testing.'
+        required: false
+        type: string
+        default: 'develop'
+      trunk-branch:
+        description: 'Branch that receives the merge + tag (default: main). Use mainalm during testing.'
+        required: false
+        type: string
+        default: 'main'
+      dry-run:
+        description: 'Skip APHL push, publish Pages under /test/, create GitHub Release as draft.'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  packages: write
+  pull-requests: read
+
+jobs:
+  validate-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate hotfix branch
+        run: |
+          if [[ "${GITHUB_REF}" != refs/heads/hotfix/* ]]; then
+            echo "::error::This workflow must be dispatched from a hotfix/* branch. Current ref: ${GITHUB_REF}"
+            exit 1
+          fi
+
+  hotfix:
+    needs: validate-branch
+    uses: ./.github/workflows/_release_common.yml
+    secrets: inherit
+    with:
+      release-version: ${{ inputs.release-version }}
+      release-type: hotfix
+      base-branch: ${{ inputs.base-branch }}
+      trunk-branch: ${{ inputs.trunk-branch }}
+      dry-run: ${{ inputs.dry-run }}
