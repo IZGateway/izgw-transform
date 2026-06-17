@@ -1,3 +1,14 @@
+# IZ Gateway Transformation Service 0.19.1
+
+Released 2026-06-17.
+
+- chore: Bump izgw-bom (0f0555afe)
+- chore: Bump izgw-bom (81725a673)
+- chore: prepare release 0.19.1 (497fb4a09)
+- docs: update RELEASE_NOTES.md for release 0.19.1 (a98b8a83d)
+- chore: Don't prepbump release version in pom.xml (41489996b)
+- chore: Hotfix release 0.19.1 (2ba5054bf)
+
 # IZ Gateway Transformation Service 0.19.0
 
 Released 2026-06-03.
