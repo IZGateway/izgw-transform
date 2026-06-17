@@ -1,3 +1,10 @@
+# IZ Gateway Transformation Service 0.19.1
+
+Released 2026-06-17.
+
+- chore: Don't prepbump release version in pom.xml (41489996b)
+- chore: Hotfix release 0.19.1 (2ba5054bf)
+
 # IZ Gateway Transformation Service 0.19.0
 
 Released 2026-06-03.
