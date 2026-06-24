@@ -8,7 +8,7 @@
 
 ## 2. Tests
 
-- [x] 2.1 FHIR controller test: `subject=Patient/<base64 system|value>` produces a QBP_Q11 whose QPD-3 is identical to `patient=Patient/<same>` (QPD-3.1 value, QPD-3.4.1 assigning authority, QPD-3.5 = `MR`), asserted via Terser. Uses base64 of `NV0000|3973565` (`TlYwMDAwfDM5NzM1NjU`). (Plain unit test matching the existing `FhirControllerTests` style — no Spring context needed.)
+- [x] 2.1 FHIR controller test: `subject=Patient/<base64 system|value>` produces a QBP_Q11 whose QPD-3 is identical to `patient=Patient/<same>` (QPD-3.1 value, QPD-3.4.1 assigning authority, QPD-3.5 = `MR`), asserted via Terser. Uses base64 of `TEST|0000001` (`VEVTVHwwMDAwMDAx`). (Plain unit test matching the existing `FhirControllerTests` style — no Spring context needed.)
 - [x] 2.2 Test the Patient-only guard: `subject=Group/<id>` (no other patient params) is dropped and the downstream query throws the existing `IllegalArgumentException` validation (→ 400), not a decode error.
 - [x] 2.3 Test precedence: both `patient=Patient/<idA>` and `subject=Patient/<idB>` present → `patient` retained, `subject` ignored.
 - [x] 2.4 `POST .../_search` form variant applies the same aliasing as GET — covered at the shared chokepoint: both paths call `processQuery` → `normalizeSubjectToPatient`, which operates on the parsed parameter map regardless of HTTP method. Verified by the normalization unit tests (a full MockMvc POST would require a Spring context the existing suite avoids).

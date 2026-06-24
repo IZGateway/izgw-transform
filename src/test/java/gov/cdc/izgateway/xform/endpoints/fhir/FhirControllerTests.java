@@ -34,8 +34,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 class FhirControllerTests {
 
-    /** Base64 (URL) of the FHIR id "NV0000|3973565" (system|value). */
-    private static final String ENCODED_ID = "TlYwMDAwfDM5NzM1NjU";
+    /** Base64 (URL) of the FHIR id "TEST|0000001" (system|value). */
+    private static final String ENCODED_ID = "VEVTVHwwMDAwMDAx";
 
     @Test
     void postWithoutSearchReturnsMethodNotAllowed() {
@@ -91,7 +91,7 @@ class FhirControllerTests {
 
         assertEquals(ENCODED_ID, result.getParameter("patient"));
         // and a bare id must decode to the same QPD-3 a bare patient=<id> would produce, end to end
-        assertArrayEquals(new String[] { "3973565", "NV0000", "MR" }, qpd3(asListMap(result)));
+        assertArrayEquals(new String[] { "0000001", "TEST", "MR" }, qpd3(asListMap(result)));
     }
 
     @Test
@@ -105,7 +105,7 @@ class FhirControllerTests {
 
         assertArrayEquals(fromPatient, fromSubject, "subject= must yield the same QPD-3 as patient=");
         // QPD-3.1 = id value, QPD-3.4.1 = assigning authority, QPD-3.5 = identifier type code
-        assertArrayEquals(new String[] { "3973565", "NV0000", "MR" }, fromSubject);
+        assertArrayEquals(new String[] { "0000001", "TEST", "MR" }, fromSubject);
     }
 
     @Test
@@ -140,7 +140,7 @@ class FhirControllerTests {
     @Test
     void patientIdentifierTakesPrecedenceOverSubject() {
         RequestWithModifiableParameters req = emptyRequest();
-        req.addParameter("patient.identifier", "NV0000|3973565");
+        req.addParameter("patient.identifier", "TEST|0000001");
         req.addParameter("subject", "Patient/" + ENCODED_ID);
 
         HttpServletRequest result = FhirController.normalizeSubjectToPatient(req);
@@ -149,7 +149,7 @@ class FhirControllerTests {
         // otherwise we'd add a second/duplicate QPD-3 identifier.
         assertNull(result.getParameter("patient"), "subject must not alias to patient when patient.identifier is present");
         assertNull(result.getParameter("subject"), "subject is dropped");
-        assertEquals("NV0000|3973565", result.getParameter("patient.identifier"));
+        assertEquals("TEST|0000001", result.getParameter("patient.identifier"));
     }
 
     @Test

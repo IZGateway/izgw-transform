@@ -9,7 +9,7 @@ identifier placed in QPD-3), `patient.identifier`, and the `patient.*` demograph
 resource in FHIR R4 or US Core.
 
 A downstream sender (Skylight, via the eHealth Exchange proxy) sends `subject=Patient/<id>`,
-where `<id>` is the URL-base64 encoding of `system|value` (e.g. something like `NV0000|1234567890`). Because
+where `<id>` is the URL-base64 encoding of `system|value` (e.g. something like `TEST|0000001`). Because
 `subject` is ignored, the query reaches `IzQuery.update()` with no patient identifier and
 fails with `400` — *"A query must contain either a patient.identifier or the patient name and
 birthDate."*
