@@ -64,14 +64,21 @@ validation rather than producing a reference-decode error.
 - **WHEN** the request is processed
 - **THEN** the `patient` parameter SHALL be used and the `subject` value SHALL be ignored
 
-### Requirement: `patient` takes precedence over `subject`
+### Requirement: An existing patient identifier takes precedence over `subject`
 
-When a request supplies both `patient` and `subject`, the service SHALL use `patient` and
-SHALL ignore `subject`, so no duplicate or conflicting patient identifier is added to the
-query.
+When a request already identifies the patient via `patient` (a reference) **or**
+`patient.identifier`, the service SHALL use that and SHALL ignore `subject`, so no
+duplicate or conflicting patient identifier is added to the query (QPD-3).
 
 #### Scenario: both patient and subject supplied
 - **GIVEN** a request that supplies `patient=Patient/<idA>` and `subject=Patient/<idB>`
 - **WHEN** the request is processed
 - **THEN** the resulting QBP_Q11 query SHALL be built from `<idA>` only, identical to a
   request supplying `patient=Patient/<idA>` alone
+
+#### Scenario: both patient.identifier and subject supplied
+- **GIVEN** a request that supplies `patient.identifier=<system|value>` and a
+  `subject=Patient/<id>` reference
+- **WHEN** the request is processed
+- **THEN** `subject` SHALL NOT be aliased to `patient`, and the query SHALL be built from
+  `patient.identifier` only — no second QPD-3 identifier is added

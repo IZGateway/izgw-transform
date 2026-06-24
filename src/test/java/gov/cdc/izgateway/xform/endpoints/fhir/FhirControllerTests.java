@@ -83,13 +83,15 @@ class FhirControllerTests {
     }
 
     @Test
-    void subjectBareIdIsAliasedToPatient() {
+    void subjectBareIdIsAliasedToPatient() throws Exception {
         RequestWithModifiableParameters req = emptyRequest();
         req.addParameter("subject", ENCODED_ID);
 
         HttpServletRequest result = FhirController.normalizeSubjectToPatient(req);
 
         assertEquals(ENCODED_ID, result.getParameter("patient"));
+        // and a bare id must decode to the same QPD-3 a bare patient=<id> would produce, end to end
+        assertArrayEquals(new String[] { "3973565", "NV0000", "MR" }, qpd3(asListMap(result)));
     }
 
     @Test
@@ -133,6 +135,21 @@ class FhirControllerTests {
 
         assertArrayEquals(new String[] { "Patient/AAA" }, result.getParameterValues("patient"));
         assertNull(result.getParameter("subject"));
+    }
+
+    @Test
+    void patientIdentifierTakesPrecedenceOverSubject() {
+        RequestWithModifiableParameters req = emptyRequest();
+        req.addParameter("patient.identifier", "NV0000|3973565");
+        req.addParameter("subject", "Patient/" + ENCODED_ID);
+
+        HttpServletRequest result = FhirController.normalizeSubjectToPatient(req);
+
+        // subject must NOT be aliased when patient.identifier already identifies the patient,
+        // otherwise we'd add a second/duplicate QPD-3 identifier.
+        assertNull(result.getParameter("patient"), "subject must not alias to patient when patient.identifier is present");
+        assertNull(result.getParameter("subject"), "subject is dropped");
+        assertEquals("NV0000|3973565", result.getParameter("patient.identifier"));
     }
 
     @Test

@@ -772,8 +772,10 @@ public class FhirController {
         }
         RequestWithModifiableParameters reqp =
             (req instanceof RequestWithModifiableParameters r) ? r : new RequestWithModifiableParameters(req);
-        // patient wins if both are present; only alias when patient is absent.
-        if (reqp.getParameter(Immunization.SP_PATIENT) == null) {
+        // patient (or patient.identifier) wins if present; only alias when neither is
+        // supplied, so we never add a second/duplicate QPD-3 patient identifier.
+        if (reqp.getParameter(Immunization.SP_PATIENT) == null
+                && reqp.getParameter(IzQuery.PATIENT_LIST) == null) {
             for (String v : subject) {
                 if (isPatientReference(v)) {
                     reqp.addParameter(Immunization.SP_PATIENT, v);
