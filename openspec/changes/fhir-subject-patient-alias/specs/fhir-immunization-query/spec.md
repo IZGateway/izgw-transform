@@ -66,8 +66,8 @@ validation rather than producing a reference-decode error.
 
 ### Requirement: An existing patient identifier takes precedence over `subject`
 
-When a request already identifies the patient via `patient` (a reference) **or**
-`patient.identifier`, the service SHALL use that and SHALL ignore `subject`, so no
+The service SHALL use an existing patient identifier — `patient` (a reference) or
+`patient.identifier` — and SHALL ignore `subject` when one is already present, so no
 duplicate or conflicting patient identifier is added to the query (QPD-3).
 
 #### Scenario: both patient and subject supplied
