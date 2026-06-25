@@ -14,6 +14,18 @@ on:
     - cron: '0 6 * * 1-5'
 
   workflow_dispatch:
+    inputs:
+      is_sql_run:
+        description: 'Build and deploy the sql-support enabled image'
+        required: false
+        default: 'false'
+        type: boolean
+
+  # Triggered automatically when izgw-transform-sql merges to develop
+  workflow_run:
+    workflows: ["Java CI with Maven"]
+    branches: [develop]
+    types: [completed]
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
@@ -144,9 +156,11 @@ jobs:
           SSL_SHARE: ${{ github.workspace }}/target
 
         run: |
+          SQL_PROFILE=${{ (github.event.inputs.is_sql_run == 'true' || github.event.workflow_run.conclusion == 'success') && '-P sql-support,sql-mssql' || '' }}
           env && mvn -B clean package install site -Dbuildno=${{github.run_number}} \
               -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
               -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
+              $SQL_PROFILE \
               -Dimage.tag=$IMAGE_BRANCH_TAG
                 
 #
@@ -215,14 +229,21 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: transformation-service
         run: |
+          IS_SQL=${{ github.event.inputs.is_sql_run == 'true' || github.event.workflow_run.conclusion == 'success' }}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_BRANCH_TAG}}
-          docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
-          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
-          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
-          docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
+          if [ "$IS_SQL" = "true" ]; then
+            docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:sql-dev
+          else
+            docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:latest
+            docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
+            docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
+            docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:latest
+          fi
           docker image push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
-          docker image push --all-tags ghcr.io/izgateway/izgw-transform
+          if [ "$IS_SQL" != "true" ]; then
+            docker image push --all-tags ghcr.io/izgateway/izgw-transform
+          fi
 
         # AWS_REGIONS can be set in GitHub Settings -> Secrets and variables -> Actions -> Variables -> Repository Variables
         # Format: space-separated regions (e.g., "us-east-1 us-west-2")
@@ -246,16 +267,19 @@ jobs:
             ECS_DESIRED_COUNT="1"
           fi
           
+          IS_SQL=${{ github.event.inputs.is_sql_run == 'true' || github.event.workflow_run.conclusion == 'success' }}
+          ECS_CLUSTER=$( [ "$IS_SQL" = "true" ] && echo "xform-service-alb-dev" || echo "xform-service-alb-dev" )
+          ECS_SERVICE=$( [ "$IS_SQL" = "true" ] && echo "xform-service-sql-dev" || echo "xform-service-alb-dev" )
           for region in $AWS_REGIONS; do
-            echo "Update ECS services in $region (starting $ECS_DESIRED_COUNT containers)"
-            aws ecs update-service --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev --force-new-deployment --enable-execute-command --desired-count $ECS_DESIRED_COUNT | jq ".service.deployments[].id" &
+            echo "Update ECS service $ECS_SERVICE in $region (starting $ECS_DESIRED_COUNT containers)"
+            aws ecs update-service --region $region --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment --enable-execute-command --desired-count $ECS_DESIRED_COUNT | jq ".service.deployments[].id" &
           done
-          
+
           wait
-          
+
           for region in $AWS_REGIONS; do
             echo "Wait for ECS service stability in $region"
-            aws ecs wait services-stable --region $region --cluster xform-service-alb-dev --service xform-service-alb-dev &
+            aws ecs wait services-stable --region $region --cluster $ECS_CLUSTER --service $ECS_SERVICE &
           done
           
           wait
@@ -297,6 +321,17 @@ jobs:
             "--ssl-client-key" ../newman.key \
             "--ssl-client-passphrase" $TESTING_PASS \
             "--insecure" --reporters cli,junitfull --reporter-junitfull-export ../logs/integration-test.xml
+
+          IS_SQL=${{ github.event.inputs.is_sql_run == 'true' || github.event.workflow_run.conclusion == 'success' }}
+          if [ "$IS_SQL" = "true" ]; then
+            newman run ../scripts/sql-backend.postman_collection.json -n 1 \
+              "--environment" ../scripts/dev.sql-xform.izgateway.org.postman_environment.json \
+              "--ssl-extra-ca-certs" ../certs/izgwroot.pem \
+              "--ssl-client-cert" ../newman.pem \
+              "--ssl-client-key" ../newman.key \
+              "--ssl-client-passphrase" $TESTING_PASS \
+              "--insecure" --reporters cli,junitfull --reporter-junitfull-export ../logs/sql-integration-test.xml
+          fi
 
       - name: Upload test logs
         uses: actions/upload-artifact@v7
