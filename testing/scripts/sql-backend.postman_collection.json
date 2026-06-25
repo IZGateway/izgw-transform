@@ -1,0 +1,298 @@
+{
+  "info": {
+    "_postman_id": "sql-backend-stage1",
+    "name": "SQL Backend Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Stage 1 — Endpoint Smoke Tests",
+      "item": [
+        {
+          "name": "ST_01 sql-dev single-patient query returns 200 empty Bundle",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Flush log cache before each test",
+                  "pm.sendRequest({",
+                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
+                  "  method: 'DELETE'",
+                  "}, function(err, res) {",
+                  "  console.log('Log cache flushed:', res ? res.status : err);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is a FHIR Bundle', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.resourceType).to.eql('Bundle');",
+                  "  pm.expect(body.type).to.eql('searchset');",
+                  "});",
+                  "",
+                  "// Check log cache for exceptions",
+                  "pm.sendRequest({",
+                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
+                  "  method: 'GET'",
+                  "}, function(err, res) {",
+                  "  if (!err && res) {",
+                  "    var logs = res.json();",
+                  "    var errors = (logs.data || []).filter(function(e) {",
+                  "      return e.level === 'ERROR' || e.level === 'FATAL';",
+                  "    });",
+                  "    pm.test('No uncaught exceptions in log cache', function() {",
+                  "      pm.expect(errors.length).to.eql(0);",
+                  "    });",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/fhir+json" }
+            ],
+            "url": {
+              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15",
+              "host": ["{{sql_base_url}}"],
+              "path": ["sql", "fhir", "dev", "Patient"],
+              "query": [
+                { "key": "family", "value": "Smith" },
+                { "key": "birthdate", "value": "1985-03-15" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "ST_02 _lastUpdated parameter accepted",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest({",
+                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
+                  "  method: 'DELETE'",
+                  "}, function(err, res) {});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 (not 400 — parameter accepted)', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/fhir+json" }
+            ],
+            "url": {
+              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15&_lastUpdated=ge2020-01-01",
+              "host": ["{{sql_base_url}}"],
+              "path": ["sql", "fhir", "dev", "Patient"],
+              "query": [
+                { "key": "family", "value": "Smith" },
+                { "key": "birthdate", "value": "1985-03-15" },
+                { "key": "_lastUpdated", "value": "ge2020-01-01" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "ST_03 invalid _typeFilter returns 400",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest({",
+                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
+                  "  method: 'DELETE'",
+                  "}, function(err, res) {});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 for unsupported _typeFilter', function() {",
+                  "  pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/fhir+json" },
+              { "key": "Prefer", "value": "respond-async" }
+            ],
+            "url": {
+              "raw": "{{sql_base_url}}/bulk/sql/fhir/$export?_typeFilter=Observation%3Fstatus%3Dfinal",
+              "host": ["{{sql_base_url}}"],
+              "path": ["bulk", "sql", "fhir", "$export"],
+              "query": [
+                { "key": "_typeFilter", "value": "Observation?status=final" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "ST_04 bulk export kickoff returns 202",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest({",
+                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
+                  "  method: 'DELETE'",
+                  "}, function(err, res) {});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 202 Accepted', function() {",
+                  "  pm.response.to.have.status(202);",
+                  "});",
+                  "",
+                  "pm.test('Content-Location header present', function() {",
+                  "  pm.expect(pm.response.headers.get('Content-Location')).to.not.be.empty;",
+                  "});",
+                  "",
+                  "// Save job URL for poll test",
+                  "pm.collectionVariables.set('bulk_job_url', pm.response.headers.get('Content-Location'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/fhir+json" },
+              { "key": "Prefer", "value": "respond-async" }
+            ],
+            "url": {
+              "raw": "{{sql_base_url}}/bulk/sql/fhir/$export",
+              "host": ["{{sql_base_url}}"],
+              "path": ["bulk", "sql", "fhir", "$export"]
+            }
+          }
+        },
+        {
+          "name": "ST_05 bulk export poll returns 202 in-progress",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 202 (job in progress)', function() {",
+                  "  pm.response.to.have.status(202);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{bulk_job_url}}",
+              "host": ["{{bulk_job_url}}"]
+            }
+          }
+        },
+        {
+          "name": "ST_06 bulk export DELETE returns 202",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 202 Accepted', function() {",
+                  "  pm.response.to.have.status(202);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{bulk_job_url}}",
+              "host": ["{{bulk_job_url}}"]
+            }
+          }
+        },
+        {
+          "name": "ST_07 hub path still routes correctly (not broken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Hub path returns non-404 (sql module did not break routing)', function() {",
+                  "  pm.expect(pm.response.code).to.not.eql(404);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/fhir+json" }
+            ],
+            "url": {
+              "raw": "{{sql_base_url}}/fhir/dev/Patient?family=Test&birthdate=2000-01-01",
+              "host": ["{{sql_base_url}}"],
+              "path": ["fhir", "dev", "Patient"],
+              "query": [
+                { "key": "family", "value": "Test" },
+                { "key": "birthdate", "value": "2000-01-01" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "bulk_job_url", "value": "" }
+  ]
+}

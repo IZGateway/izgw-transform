@@ -11,9 +11,10 @@ back to a FHIR Bundle using the `v2tofhir` library.
 `Patient` objects against a search `Patient` using the HL7 IDI patient-matching
 algorithm. It already operates on FHIR types — not on raw SQL rows or custom POJOs.
 
-The proposed SQL back-end sits beside the existing IZ Gateway path. Both paths
-share the same FHIR entry point and return FHIR Bundles. The only difference is
-how the search is executed and how the Bundle is assembled.
+The proposed SQL back-end sits beside the existing IZ Gateway path at a distinct
+URL prefix (`/sql/fhir/**`). The existing `/fhir/**` path and `FhirController` are
+not modified. Both paths return FHIR Bundles; the difference is the URL, the
+underlying data source, and the controller that handles the request.
 
 ---
 
@@ -24,32 +25,39 @@ how the search is executed and how the Bundle is assembled.
 - Enable full async Bulk FHIR `$export` from the same SQL database
 - Preserve 100% backward compatibility with the existing IZ Gateway path
 - Require no code changes when no SQL datasource is configured
-- Provide a working integration test fixture using H2 + existing CSV test data
+- Support multiple simultaneous SQL backends (one per `sql-*` destination)
+- Allow backends to be added or reconfigured without redeployment or code change
+- Provide a working integration test and local dev fixture requiring no JDBC driver
+- Support any ANSI SQL-compatible database via a deployer-supplied JDBC driver
 
 **Non-Goals:**
-- Supporting multiple simultaneous SQL databases (one datasource per deployment)
 - Replacing the Apache Camel routing layer for the IZ Gateway path
 - Implementing a full FHIR server on top of the SQL database
 - Paginated single-patient query results (bulk handles population-scale queries)
 - OAuth / SMART on FHIR scoping for the Bulk FHIR endpoint (v1)
+- Documenting EFS or other mount strategies for externalized config (v1)
 
 ---
 
 ## Decisions
 
-### 1. Routing intercept point: FhirController, not Camel
+### 1. Routing: dedicated controllers at distinct URL paths, not Camel and not FhirController dispatch
 
-**Decision**: Route `destination == "sql"` inside `FhirController` before the HL7 V2
-message is built, calling a new `SqlFhirBackend` Spring service directly.
+**Decision**: SQL-backed endpoints are served by dedicated Spring MVC controllers in
+`izgw-transform-sql` at completely distinct URL paths. `FhirController` at `/fhir/**`
+is not modified. `SqlFhirController` owns `/sql/fhir/{name}/**`; `BulkExportController`
+owns `/sql/fhir/$export/**`. There is no path overlap and no shared routing logic.
 
 **Rationale**: The SQL path produces a FHIR Bundle directly — there is no HL7 V2
-message involved. Inserting a Camel component would require bridging FHIR objects
-through Camel's exchange body, adding complexity for no routing benefit. The existing
-Camel layer is an IZ-Gateway-specific concern; SQL is not.
+message involved. Two alternatives were rejected:
 
-**Alternative considered**: New Camel `SqlComponent` in the routing graph. Rejected
-because Camel's exchange model is oriented toward message bytes, not typed Java objects,
-and the SQL path has no use for Camel's transformation or retry features.
+- **Camel `SqlComponent`**: Camel's exchange model is oriented toward message bytes, not
+  typed Java objects. The SQL path has no use for Camel's transformation or retry
+  features.
+- **FhirController dispatch via shared interface**: Any shared interface between
+  `FhirController` (in `izgw-transform`) and SQL backends (in `izgw-transform-sql`)
+  either pollutes `izgw-core` with FHIR types or creates a circular Maven dependency.
+  Path routing eliminates the need for a shared interface entirely.
 
 ---
 
@@ -77,26 +85,41 @@ API and provide no benefit.
 
 ---
 
-### 3. Query interface abstraction: IQueryBackend
+### 3. Routing: Spring MVC path routing, not backend selection inside FhirController
 
-**Decision**: Extract `IQueryBackend` with a single method:
+**Decision**: SQL-backed endpoints are served by dedicated Spring MVC controllers in
+`izgw-transform-sql` that own distinct URL paths. `FhirController` in `izgw-transform`
+is not modified.
 
-```java
-Bundle query(Patient searchPatient, String destinationId, HttpServletRequest req)
-    throws FaultException, HL7Exception, UnexpectedException, SecurityFault;
-```
+- **`SqlFhirController`** owns `/sql/fhir/{name}/**` — mirrors `FhirController`'s
+  query and read mappings for SQL backends, where `{name}` is the backend name
+  (e.g., `dev`, `waiis`). Fully distinct from `/fhir/**`; no path overlap.
+- **`BulkExportController`** owns `/bulk/sql/fhir/$export/**` — the full async Bulk
+  FHIR export lifecycle (kickoff, polling, NDJSON download, DELETE). The
+  `/bulk/{backend}/fhir/` prefix separates bulk capability from single-patient query
+  capability and leaves room for future backends (e.g., `/bulk/izgw/fhir/$export`).
+- **`SqlUnavailableController`** (stub, activated when SQL module is absent) returns
+  `503 Service Unavailable` with an `OperationOutcome` for all `/sql/**` and
+  `/bulk/sql/**` paths so callers receive a meaningful error rather than a 404.
 
-`FhirController` holds a list of `IQueryBackend` implementations ordered by priority,
-selecting the first whose `supports(destinationId)` returns true.
+`IQueryBackend` is an internal interface within `izgw-transform-sql`. It is not shared
+with `izgw-transform` or `izgw-core`. `izgw-transform-sql` depends only on `izgw-core`
+— there is no circular Maven dependency.
 
-**Rationale**: Minimal interface surface. The existing HubController/IIS path is wrapped
-in `IzGatewayQueryBackend implements IQueryBackend`. `SqlFhirBackend implements IQueryBackend`
-handles `"sql"`. The router in `FhirController` is a simple `for` loop.
+**Rationale**: Any approach where `FhirController` dispatches to SQL backends requires
+a shared interface between `izgw-transform` and `izgw-transform-sql`. That shared
+interface must live in `izgw-core` (polluting it with FHIR types) or in a new module.
+Spring MVC path routing eliminates the need for a shared interface entirely: each
+controller owns its URL space, and the SQL module is simply loaded onto the classpath
+via the `sql-support` Maven profile with no compile-time coupling from
+`izgw-transform` to `izgw-transform-sql`.
 
-**Why not a full POJO `IQueryRequest`?**: The search parameters are already captured
-in a FHIR `Patient` resource (constructed by the existing parsing logic). Wrapping that
-in an intermediate POJO before passing it to backends would add a translation layer with
-no benefit. The `Patient` IS the query request for the matching path.
+**Alternative considered and rejected**: Modifying `FhirController` to inject
+`List<IQueryBackend>` and select by `supports(destinationId)`. Rejected because
+`IQueryBackend` would need to be defined outside `izgw-transform-sql` (circular
+dependency if defined there, `izgw-core` pollution if defined there) and because
+`FhirController` is already correct for hub routing and should not be entangled with
+SQL concerns.
 
 ---
 
@@ -124,29 +147,159 @@ it requires redeployment for every schema change. The YAML config supports hot-r
 
 ---
 
-### 5. Bulk FHIR job storage: in-memory (v1)
+### 5. Bulk FHIR job storage: interface-abstracted, in-memory for v1
 
-**Decision**: Store export jobs in a `ConcurrentHashMap` keyed by job UUID. NDJSON
-output is written to `java.io.tmpdir` during generation and served from there.
+**Decision**: Define two interfaces:
 
-**Rationale**: v1 scope is WA DOH's single-instance Azure deployment. In-memory
-job state survives normal operation. Temp files are cleaned up on job DELETE or
-application restart.
+- `BulkExportJobStore` — `create / get / update / delete` job state keyed by job UUID
+- `BulkExportOutputStore` — `write(jobId, fileIndex, InputStream) / stream(jobId, fileIndex, OutputStream) / delete(jobId)`
 
-**Risk**: Jobs are lost on restart. Mitigation: document this limitation; WA DOH
-can re-kick exports if needed. A persistent job store (DynamoDB or SQL) is a natural
-v2 enhancement.
+V1 implements both with in-memory / `java.io.tmpdir`. V2 implements with DynamoDB
+(job state) + S3 (NDJSON output). No business logic changes between versions.
 
-**Alternative considered**: DynamoDB job table (consistent with existing repository
-layer). Deferred to v2 to keep scope bounded.
+**V1 behavior**: `ConcurrentHashMap` for job state; `java.io.tmpdir` for NDJSON files.
+Suitable for WA DOH's single-instance deployment. Jobs and files are lost on restart;
+document this limitation (WA DOH can re-kick exports).
+
+**V2 target (multi-instance / restart-safe)**:
+- Job state → DynamoDB table (consistent with existing repository layer; atomic
+  conditional writes prevent duplicate job execution across instances)
+- NDJSON output → S3 bucket (VPC Gateway Endpoint only — traffic never leaves AWS,
+  bucket policy denies all non-VPC access)
+- Download URLs in the manifest point back to **the service endpoint**
+  (e.g., `GET /fhir/$export/jobs/{id}/files/{n}`), not to S3 directly. The service
+  fetches from S3 and streams to the authenticated client. S3 is never exposed to
+  callers; mTLS access control is preserved end-to-end.
+
+**Why not S3 pre-signed URLs**: Pre-signed URLs bypass mTLS client certificate
+authentication and expose PHI over the public internet to anyone with the URL.
+Routing downloads through the service keeps all access control at the service layer.
 
 ---
 
-### 6. Reserved destination enforcement
+### 6. Reserved path prefix
 
-**Decision**: Add `"sql"` to a `ReservedDestinations` constant set in
-`XformConstants`. The `Destination` validation logic checks this set and rejects
-registration of a destination with a reserved name.
+**Decision**: Reserve `/sql/**` as a protected URL path prefix. The access control
+layer rejects any attempt to register an IIS destination that would conflict with this
+namespace. The `dev` backend is the built-in embedded fixture, accessible at
+`/sql/fhir/dev/**` with no configuration required.
+
+---
+
+### 7. View-based query model
+
+**Decision**: Require the deployer's database to expose exactly two views (names
+configurable per backend):
+- `patient_view` — one row per patient
+- `immunization_view` — one row per immunization event, with a patient ID foreign key
+
+Our queries are simple ANSI SQL:
+```sql
+SELECT * FROM patient_view  WHERE last_name = ? AND birth_date = ?
+SELECT * FROM immunization_view WHERE patient_id = ?
+```
+
+**Rationale**: All schema complexity, underlying table joins, and indexing decisions
+live inside the view definition — the deployer's concern. We never need to know the
+underlying table structure. The resulting SQL is trivially portable across any ANSI
+SQL-compatible database.
+
+---
+
+### 8. `sql-dev` fixture: CSV-backed in-memory, no JDBC driver
+
+**Decision**: The `dev` backend (accessible at `/sql/fhir/dev/**`) does not use an
+embedded SQL database. At startup it loads the existing `IZGW-FHIR-SamplePatientsData.csv`
+and `2019_10_01_imm.csv` test data files into `List<Map<String,String>>`. Patient
+search is a Java stream filter; immunization retrieval is a second filter on patient ID.
+No SQL parser, no JDBC driver, no embedded database dependency.
+
+**Rationale**: The view-based query model reduces our SQL to simple equality/range
+predicates on a flat row. This is trivially reproducible with stream filtering.
+Eliminating the embedded database removes ~2.5 MB from the image and all CVE surface
+associated with an embedded engine.
+
+---
+
+### 9. Backend discovery: Spring property or environment variable (equivalent)
+
+**Decision**: Each SQL backend is declared via a Spring property of the form:
+```
+sql.backend.<name>=/path/to/<name>.yml
+```
+Spring Boot's relaxed binding makes the env var form `SQL_BACKEND_<NAME>` exactly
+equivalent — deployers may use either. At startup, `SqlBackendFactory` reads all
+bound `sql.backend.*` entries and creates one `sql-<name>` backend per entry, loading
+its config from the referenced file. `sql-dev` is built-in and requires no property.
+
+**Examples** (both forms produce identical results):
+```yaml
+# application.yml
+sql:
+  backend:
+    waiis: /opt/config/waiis.yml
+    prod:  /opt/config/prod.yml
+```
+```
+# environment variables
+SQL_BACKEND_WAIIS=/opt/config/waiis.yml
+SQL_BACKEND_PROD=/opt/config/prod.yml
+```
+Both register backends accessible at `/sql/fhir/waiis/**` and `/sql/fhir/prod/**`.
+
+Adding a backend = add a property or env var, provide the config file, restart the
+container task. No code change, no image rebuild.
+
+**Rationale**: Spring's relaxed binding unifies both mechanisms for free. Deployers
+choose the delivery strategy that fits their infrastructure (ECS task environment,
+`application.yml` overlay, Kubernetes ConfigMap, `.env` locally) without any
+difference in application behavior. V1 specifies only this convention; mount/delivery
+strategy is a deployment concern.
+
+---
+
+### 10. JDBC driver packaging
+
+**Decision**: All supported JDBC drivers are declared in `izgw-transform/pom.xml`
+(not `izgw-bom`) and activated via Maven profiles:
+
+| Profile | Driver |
+|---|---|
+| `sql-mssql` | `com.microsoft.sqlserver:mssql-jdbc` |
+| `sql-postgres` | `org.postgresql:postgresql` |
+| `sql-mysql` | `com.mysql:mysql-connector-j` |
+| `sql-oracle` | `com.oracle.database.jdbc:ojdbc11` |
+
+The base image (e.g., APHL) is built with no SQL profile — zero SQL driver JARs.
+Deployment-specific images activate the appropriate profile(s):
+```
+mvn package -P sql-mssql   # WA DOH image
+```
+Driver versions are pinned in `izgw-transform/pom.xml`. A deployer needing an
+unsupported driver may supply it via `loader.path` (documented as an advanced option;
+they own CVE responsibility for externally supplied JARs).
+
+---
+
+### 11. SQL Server integration test target: persistent AWS RDS Express instance
+
+**Decision**: SQL Server integration tests run against a persistent AWS RDS SQL Server
+Express instance shared across CI runs. Test data is loaded once at instance creation;
+all CI test runs are read-only thereafter. The instance runs 24/7 — no stop/start
+scheduling. At ~$20/month for a `db.t3.micro`, the cost is low enough that the
+engineering time to automate scheduling would never pay back.
+
+A Maven profile `sql-server-it` activates `mssql-jdbc` and a `@Tag("sql-server")`
+JUnit category so SQL Server tests are skipped in standard local and PR builds and only
+run when the profile is explicitly activated (e.g., in a nightly or release CI job that
+can reach the RDS instance).
+
+**Rationale**: No H2 is needed. Unit tests for `SqlPatientSearchService` and
+`SqlImmunizationRetrievalService` mock `JdbcTemplate` directly — the queries are too
+simple (single-predicate `SELECT *`) to warrant a SQL engine at the unit test level.
+The `sql-dev` CSV fixture covers fast end-to-end smoke testing in PRs. The RDS instance
+provides the real SQL Server dialect test for release confidence. WA DOH's own Azure
+SQL Server deployment is the final production validation.
 
 ---
 
@@ -157,7 +310,8 @@ registration of a destination with a reserved name.
 | SQL injection via mapping config | All query parameters bound via `JdbcTemplate` named parameters; column names come from config (not user input), validated at startup |
 | H2 dialect incompatibility with SQL Server | Use ANSI SQL-only features in `SqlPatientSearchService`; test with both dialects in CI |
 | IDI match threshold too aggressive (many no-matches) | Default threshold configurable; document recommended values for WA DOH dataset |
-| In-memory Bulk FHIR jobs lost on restart | Document; WA DOH's use case is scheduled batch runs, not real-time |
+| In-memory Bulk FHIR jobs lost on restart | V1: document; WA DOH's use case is scheduled batch runs. V2: DynamoDB + S3 (see Decision 5) |
+| Multi-instance load-balanced deployment breaks in-memory job state | V1: single-instance only. V2: DynamoDB job store + S3 output store resolves this (see Decision 5) |
 | Large NDJSON files blocking temp storage | Apply configurable max-rows-per-file; default to chunked output (e.g., 10,000 rows/file) |
 | FHIRPath evaluation performance for large exports | Pre-resolve common paths to direct setter calls; profile with 6,000-row test dataset |
 

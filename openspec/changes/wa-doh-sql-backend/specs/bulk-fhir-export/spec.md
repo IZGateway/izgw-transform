@@ -5,7 +5,69 @@ HL7 Bulk Data Access specification, enabling WA DOH (and any authorized consumer
 to retrieve all immunization records from the SQL back-end as NDJSON, with
 optional filtering by record creation dateTime or dateTime range.
 
+In this deployment, `[base]` resolves to `/bulk/sql/fhir` — so `POST [base]/$export`
+is `POST /bulk/sql/fhir/$export`, and status/file URLs follow the same prefix. The
+`/bulk/{backend}/fhir/` structure accommodates future backends (e.g., `/bulk/izgw/fhir/`)
+without path conflicts.
+
+The minimum patient demographic requirements that apply to single-patient queries
+(name, DOB, etc.) do NOT apply to `$export`. Bulk export is a population-level
+operation driven solely by temporal filters and resource type selection.
+
 ## Requirements
+
+### Requirement: BulkExportJobStore Interface
+
+A `BulkExportJobStore` interface SHALL abstract all job state persistence so that
+the V1 in-memory implementation and a future V2 DynamoDB implementation are
+interchangeable with no business logic changes.
+
+Methods: `create(BulkExportJob)`, `get(UUID)`, `update(BulkExportJob)`, `delete(UUID)`.
+
+V1 implementation: `InMemoryBulkExportJobStore` using `ConcurrentHashMap<UUID, BulkExportJob>`.
+V2 implementation: DynamoDB-backed (consistent with existing repository layer).
+
+#### Scenario: Job state survives across ALB-routed requests (V2)
+
+WHEN a kick-off request is handled by instance A  
+AND a subsequent status poll or DELETE is routed by the ALB to instance B  
+THEN instance B retrieves the job state from the shared store and responds correctly
+
+#### Scenario: V1 single-instance limitation documented
+
+WHEN the V1 in-memory store is active  
+THEN job state is lost on restart and is not visible across instances  
+AND this limitation is documented in the deployment guide
+
+---
+
+### Requirement: BulkExportOutputStore Interface
+
+A `BulkExportOutputStore` interface SHALL abstract all NDJSON output file storage
+so that V1 local temp files and a future V2 S3-backed store are interchangeable.
+
+Methods: `write(UUID jobId, int fileIndex, InputStream data)`,
+`stream(UUID jobId, int fileIndex, OutputStream out)`, `delete(UUID jobId)`.
+
+V1 implementation: `TempFileBulkExportOutputStore` using `java.io.tmpdir`.
+V2 implementation: S3 bucket accessible only via VPC Gateway Endpoint; downloads
+are always proxied through the service — S3 is never exposed directly to callers,
+preserving mTLS access control end-to-end.
+
+#### Scenario: NDJSON download served regardless of which instance handles request (V2)
+
+WHEN NDJSON files are stored in S3  
+AND a download request is routed to any service instance  
+THEN that instance fetches from S3 and streams to the authenticated client
+
+#### Scenario: V1 temp file limitation documented
+
+WHEN the V1 temp file store is active  
+THEN output files are local to the instance that ran the export job  
+AND requests for those files must reach that same instance (single-instance
+deployment required for V1)
+
+---
 
 ### Requirement: Kick-Off Request
 
@@ -129,3 +191,32 @@ THEN only `Immunization` NDJSON is produced (no Patient file)
 
 WHEN no `_type` parameter is supplied  
 THEN both `Patient` and `Immunization` NDJSON files are produced
+
+---
+
+### Requirement: Per-Type Filtering via `_typeFilter`
+
+The kick-off endpoint SHALL accept the `_typeFilter` parameter per the HL7 Bulk
+Data Access IG. Each value is a URL-encoded FHIR search expression scoped to a
+single resource type (e.g., `Immunization?_lastUpdated=ge2024-01-01`). Filters
+SHALL be applied as SQL WHERE clause predicates on the appropriate table — not
+as post-filters in Java.
+
+#### Scenario: `_typeFilter` applies temporal filter to Immunization
+
+WHEN the kick-off includes `_typeFilter=Immunization%3F_lastUpdated%3Dge2024-01-01`  
+THEN the immunization SQL query includes a WHERE predicate on the `is_last_updated`
+column for that date  
+AND Patient records are not filtered by that predicate
+
+#### Scenario: `_typeFilter` and `_since` both present
+
+WHEN both `_since` and a `_typeFilter` with `_lastUpdated` are present for the
+same resource type  
+THEN the more restrictive of the two bounds is applied (i.e., the later lower bound)
+
+#### Scenario: Unrecognised `_typeFilter` parameter
+
+WHEN a `_typeFilter` expression references a search parameter not supported by
+the SQL backend  
+THEN the server responds with `400 Bad Request` identifying the unsupported parameter

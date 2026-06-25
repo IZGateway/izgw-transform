@@ -10,6 +10,11 @@ them as a typed tabular result for downstream FHIR conversion.
 
 The SQL back-end SHALL execute a parameterized ANSI SQL query that retrieves all
 immunization rows for a given patient ID from the configured immunization table.
+When a `_lastUpdated` `DateRangeParam` is present, a timestamp predicate SHALL
+be added to the WHERE clause against the column declared `is_last_updated: true`
+for the Immunization resource type in the mapping configuration (see
+`temporal-query-filtering` spec). This predicate is applied in SQL — not as a
+post-filter.
 
 #### Scenario: Records found for confirmed patient
 
@@ -48,14 +53,21 @@ the H2 test fixture schema
 
 ---
 
-### Requirement: Result Representation
+### Requirement: Result Representation and Row Mapping
 
-Immunization query results SHALL be represented as a list of typed row objects
-(e.g., `List<Map<String, Object>>` or a dedicated `TabularRow` type) that preserve
-column names and values for downstream processing by the tabular-to-FHIR converter.
+Immunization query results SHALL be represented as `List<Map<String, Object>>`
+preserving column names and values. `SqlImmunizationRowMapper extends SqlTableMapper<Immunization>`
+SHALL convert each row to a FHIR `Immunization` resource using the shared
+column-to-FHIR conversion infrastructure in `SqlTableMapper<T>`.
 
 #### Scenario: Column names preserved
 
 WHEN an immunization query returns rows  
 THEN each row's map keys match the database column names exactly (case-insensitive
 comparison for downstream mapping lookups)
+
+#### Scenario: Row converted to FHIR Immunization
+
+WHEN `SqlImmunizationRowMapper` processes a result row  
+THEN it delegates column mapping to `SqlTableMapper<T>` base logic, producing a
+FHIR `Immunization` resource with all configured fields populated

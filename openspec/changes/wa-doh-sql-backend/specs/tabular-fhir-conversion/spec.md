@@ -1,10 +1,28 @@
 ## Purpose
 
-Convert a tabular SQL result set into a FHIR Bundle using a declarative YAML
-configuration that maps database column names to FHIRPath destination locations
-within FHIR resources, with optional concept mapping for code translation.
+Define the shared column-to-FHIR conversion infrastructure (`SqlTableMapper<T>`),
+its typed specializations (`SqlPatientRowMapper`, `SqlImmunizationRowMapper`), and
+the Bundle assembler (`TabularFhirConverter`) that uses them to convert a tabular
+SQL result set into a FHIR Bundle via a declarative YAML mapping configuration.
 
 ## Requirements
+
+### Requirement: SqlTableMapper Base Class
+
+`SqlTableMapper<T>` SHALL be an abstract class owning all column-to-FHIR
+conversion logic shared across resource types. Concrete subclasses (`SqlPatientRowMapper`,
+`SqlImmunizationRowMapper`) extend it to produce a specific FHIR resource type `T`.
+`TabularFhirConverter` contains no type conversion logic of its own — it delegates
+entirely to registered `SqlTableMapper<?>` instances.
+
+#### Scenario: Shared conversion logic not duplicated
+
+WHEN both `SqlPatientRowMapper` and `SqlImmunizationRowMapper` convert the same
+FHIR datatype (e.g., `CodeableConcept`)  
+THEN both delegate to the same implementation in `SqlTableMapper<T>` — no
+duplication of converter code across subclasses
+
+---
 
 ### Requirement: Column-to-FHIRPath Mapping Configuration
 
@@ -78,21 +96,25 @@ THEN the default value is used for any unmatched raw value
 
 ---
 
-### Requirement: Multi-Resource Bundle Construction
+### Requirement: Multi-Resource Bundle Assembly
 
-The converter SHALL assemble a FHIR Bundle of type `searchset` containing at
-minimum one `Patient` resource and one `Immunization` resource per immunization row.
+`TabularFhirConverter` SHALL assemble a FHIR Bundle of type `searchset` by
+delegating each row to the registered `SqlTableMapper<?>` for the appropriate
+resource type. It contains no type conversion logic — its sole responsibility
+is Bundle construction.
 
 #### Scenario: Patient resource populated once
 
 WHEN multiple immunization rows are processed for the same patient  
-THEN only one `Patient` resource is created in the Bundle  
-AND all Immunization resources reference it via `patient` element
+THEN `TabularFhirConverter` creates exactly one `Patient` resource in the Bundle
+(via `SqlPatientRowMapper`) and all `Immunization` resources reference it via
+the `patient` element
 
 #### Scenario: Immunization resource created per row
 
 WHEN the SQL result set contains N immunization rows  
-THEN the Bundle contains exactly N `Immunization` resources
+THEN `TabularFhirConverter` delegates each row to `SqlImmunizationRowMapper`
+and the Bundle contains exactly N `Immunization` resources
 
 ---
 

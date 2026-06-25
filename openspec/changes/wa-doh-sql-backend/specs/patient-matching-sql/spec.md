@@ -7,30 +7,38 @@ records are retrieved.
 
 ## Requirements
 
-### Requirement: IPatientMatchData Interface
+### Requirement: SqlPatientRowMapper
 
-The IDIMatch algorithm SHALL be refactored to accept an `IPatientMatchData`
-interface rather than a concrete class, with methods covering all demographic
-fields it currently evaluates (name, DOB, gender, address, phone, MRN, etc.).
+`SqlPatientRowMapper extends SqlTableMapper<Patient>` SHALL convert a SQL result
+row (`Map<String, Object>`) to a HAPI FHIR `Patient` object using the shared
+column-to-FHIR conversion infrastructure in `SqlTableMapper<T>`. `IDIMatch` is
+not modified — it continues to operate on FHIR `Patient` objects exactly as it
+does today.
 
-#### Scenario: Existing callers unaffected
+#### Scenario: SQL row converted to FHIR Patient
 
-WHEN the refactor is applied  
-THEN all existing callers of IDIMatch that pass a concrete type implementing
-`IPatientMatchData` continue to compile and behave identically
+WHEN a SQL query returns a candidate patient result row  
+THEN `SqlPatientRowMapper` delegates column mapping to `SqlTableMapper<T>` base
+logic, producing a FHIR `Patient` with demographics populated from the row  
+AND the resulting `Patient` is passed directly to `IDIMatch` without any change
+to the algorithm
 
-#### Scenario: SQL row wrapped as IPatientMatchData
+#### Scenario: Existing IDIMatch callers unaffected
 
-WHEN a SQL query returns a patient result row  
-THEN it is wrapped in an adapter implementing `IPatientMatchData`  
-AND passed to IDIMatch without modification to the algorithm itself
+WHEN `SqlPatientRowMapper` is introduced  
+THEN all existing callers of `IDIMatch` that pass FHIR `Patient` objects continue
+to compile and behave identically — no interface changes are made to `IDIMatch`
 
 ---
 
 ### Requirement: SQL Patient Search Query
 
 The SQL back-end SHALL execute a parameterized ANSI SQL query against the
-configured patient table using the demographic data from `IQueryRequest`.
+configured patient table using the demographic data from the search `Patient`.
+When a `_lastUpdated` `DateRangeParam` is present, a timestamp predicate SHALL
+be added to the WHERE clause against the column declared `is_last_updated: true`
+in the mapping configuration (see `temporal-query-filtering` spec). This predicate
+is applied in SQL — not as a post-filter.
 
 #### Scenario: Query uses parameterized SQL
 

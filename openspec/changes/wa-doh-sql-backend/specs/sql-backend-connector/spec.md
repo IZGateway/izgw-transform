@@ -1,8 +1,9 @@
 ## Purpose
 
-Enable the Transformation Service to connect to an ANSI SQL database via JDBC,
-routing queries addressed to the reserved destination `"sql"` through that connection
-while leaving all existing IZ Gateway routing unchanged.
+Enable the Transformation Service to connect to an ANSI SQL database via JDBC.
+SQL-backed queries are handled by `SqlFhirController` and `BulkExportController`
+in `izgw-transform-sql`, which own distinct URL paths. All existing IZ Gateway
+routing through `FhirController` is unchanged.
 
 ## Requirements
 
@@ -31,18 +32,23 @@ configuration problem
 
 ---
 
-### Requirement: Reserved Destination Name
+### Requirement: Reserved Path Prefix
 
-`"sql"` SHALL be a reserved destination name in the Transformation Service routing layer.
+`/sql/**` SHALL be a reserved URL path prefix. Multiple SQL backends may be active
+simultaneously, each accessible at `/sql/fhir/{name}/**` (e.g., `/sql/fhir/waiis/`,
+`/sql/fhir/prod/`, `/sql/fhir/dev/`). The built-in development fixture is `dev`,
+accessible at `/sql/fhir/dev/**` with no configuration required.
 
-#### Scenario: Query routed to sql destination
+#### Scenario: /sql/fhir path routed to SqlFhirController
 
-WHEN a query arrives with destination `"sql"`  
-THEN it is dispatched to the `SqlBackendConnector` and NOT forwarded to IZ Gateway
+WHEN a FHIR query arrives at `/sql/fhir/{name}/Patient` or similar  
+THEN Spring MVC routes it to `SqlFhirController` in `izgw-transform-sql`  
+AND the request never reaches `FhirController`
 
-#### Scenario: Reserved name protected from IIS registration
+#### Scenario: Reserved path prefix protected from IIS registration
 
-WHEN an attempt is made to register an IIS destination with the name `"sql"`  
+WHEN an attempt is made to register an IIS destination that would conflict with
+the `/sql/**` path namespace  
 THEN the registration SHALL be rejected with an informative error
 
 ---
@@ -67,18 +73,26 @@ THEN patient and immunization queries execute successfully against H2
 
 ---
 
-### Requirement: Test Fixture — H2 Mock Backend
+### Requirement: Development Fixture — `dev` CSV Backend
 
-An H2 in-memory database SHALL be provided as a test fixture, pre-loaded from the
-existing test data files:
+The built-in `dev` backend (accessible at `/sql/fhir/dev/**`) SHALL provide a fully
+functional mock backend requiring no JDBC driver and no embedded database. At startup
+it loads the existing test data files into in-memory `List<Map<String,String>>` structures:
 - `IZGW-FHIR-SamplePatientsData.csv` (6,004 patient records)
 - `izgw-hub/testing/testdata/2019_10_01_imm.csv` (immunization records)
 
-The schema SHALL match the column names referenced in the default mapping configuration.
+Patient search is implemented as a Java stream filter; immunization retrieval is a
+second stream filter on patient ID. No SQL engine, no schema file, no JDBC dependency.
 
-#### Scenario: Integration test uses H2 fixture
+#### Scenario: Integration test uses dev fixture
 
-WHEN an integration test activates the `test` Spring profile  
-THEN the H2 datasource is auto-configured, test data is loaded, and the full
-query-match-retrieve-convert pipeline executes end-to-end without requiring a
-live SQL Server connection
+WHEN an integration test sends a query to `/sql/fhir/dev/Patient`  
+THEN the full query-match-retrieve-convert pipeline executes end-to-end using
+the CSV-backed in-memory data, with no live SQL Server connection required
+
+#### Scenario: dev backend active with no datasource configured
+
+WHEN no `spring.datasource.url` is present  
+THEN the `dev` backend at `/sql/fhir/dev/**` remains available (it does not use
+Spring's datasource infrastructure)  
+AND all other `/sql/fhir/{name}/**` backends are disabled
