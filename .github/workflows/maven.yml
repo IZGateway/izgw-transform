@@ -107,6 +107,16 @@ jobs:
           </toolchains>
           EOF
 
+      - name: Set IS_SQL flag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.is_sql_run }}" = "true" ]; then
+            echo "IS_SQL=true" >> $GITHUB_ENV
+          elif [ "${{ github.event_name }}" = "workflow_run" ] && [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+            echo "IS_SQL=true" >> $GITHUB_ENV
+          else
+            echo "IS_SQL=false" >> $GITHUB_ENV
+          fi
+
       - name: Set BASE_TAG
         run: |
           echo BASE_TAG=`mvn help:evaluate -Dexpression=project.version -q -DforceStdout` >> $GITHUB_ENV
@@ -156,7 +166,7 @@ jobs:
           SSL_SHARE: ${{ github.workspace }}/target
 
         run: |
-          SQL_PROFILE=${{ (github.event.inputs.is_sql_run == 'true' || github.event.workflow_run.conclusion == 'success') && '-P sql-support,sql-mssql' || '' }}
+          SQL_PROFILE=$( [ "$IS_SQL" = "true" ] && echo "-P sql-support,sql-mssql" || echo "" )
           env && mvn -B clean package install site -Dbuildno=${{github.run_number}} \
               -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
               -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
@@ -229,7 +239,6 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: transformation-service
         run: |
-          IS_SQL=${{ github.event.inputs.is_sql_run == 'true' || github.event.workflow_run.conclusion == 'success' }}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_TAG}}
           docker image tag izgw-transform:${{env.IMAGE_TAG}} $ECR_REGISTRY/$ECR_REPOSITORY:${{env.IMAGE_BRANCH_TAG}}
           if [ "$IS_SQL" = "true" ]; then
@@ -267,7 +276,6 @@ jobs:
             ECS_DESIRED_COUNT="1"
           fi
           
-          IS_SQL=${{ github.event.inputs.is_sql_run == 'true' || github.event.workflow_run.conclusion == 'success' }}
           ECS_CLUSTER=$( [ "$IS_SQL" = "true" ] && echo "xform-service-alb-dev" || echo "xform-service-alb-dev" )
           ECS_SERVICE=$( [ "$IS_SQL" = "true" ] && echo "xform-service-sql-dev" || echo "xform-service-alb-dev" )
           for region in $AWS_REGIONS; do
@@ -322,7 +330,6 @@ jobs:
             "--ssl-client-passphrase" $TESTING_PASS \
             "--insecure" --reporters cli,junitfull --reporter-junitfull-export ../logs/integration-test.xml
 
-          IS_SQL=${{ github.event.inputs.is_sql_run == 'true' || github.event.workflow_run.conclusion == 'success' }}
           if [ "$IS_SQL" = "true" ]; then
             newman run ../scripts/sql-backend.postman_collection.json -n 1 \
               "--environment" ../scripts/dev.sql-xform.izgateway.org.postman_environment.json \
