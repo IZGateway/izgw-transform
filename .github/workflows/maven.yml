@@ -16,16 +16,10 @@ on:
   workflow_dispatch:
     inputs:
       is_sql_run:
-        description: 'Build and deploy the sql-support enabled image'
+        description: 'Build and deploy the sql-support enabled image (triggered by izgw-transform-sql CI or manually)'
         required: false
-        default: 'false'
+        default: false
         type: boolean
-
-  # Triggered automatically when izgw-transform-sql merges to develop
-  workflow_run:
-    workflows: ["Java CI with Maven"]
-    branches: [develop]
-    types: [completed]
 
 # Ensure only one build changes dev environment at the same time
 concurrency: dev
@@ -109,9 +103,7 @@ jobs:
 
       - name: Set IS_SQL flag
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.is_sql_run }}" = "true" ]; then
-            echo "IS_SQL=true" >> $GITHUB_ENV
-          elif [ "${{ github.event_name }}" = "workflow_run" ] && [ "${{ github.event.workflow_run.conclusion }}" = "success" ]; then
+          if [ "${{ github.event.inputs.is_sql_run }}" = "true" ]; then
             echo "IS_SQL=true" >> $GITHUB_ENV
           else
             echo "IS_SQL=false" >> $GITHUB_ENV
