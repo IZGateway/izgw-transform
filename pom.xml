@@ -138,6 +138,21 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>sql-support</id>
+			<dependencies>
+				<dependency>
+					<groupId>gov.cdc.izgateway</groupId>
+					<artifactId>izgw-transform-sql</artifactId>
+					<version>0.20.0-SNAPSHOT</version>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
 	<build>
 		<pluginManagement>
 			<plugins>
