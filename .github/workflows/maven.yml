@@ -159,7 +159,9 @@ jobs:
 
         run: |
           SQL_PROFILE=$( [ "$IS_SQL" = "true" ] && echo "-P sql-support,sql-mssql" || echo "" )
-          env && mvn -B clean package install site -Dbuildno=${{github.run_number}} \
+          # Skip site generation for SQL builds — only the JAR/image is needed
+          MVN_GOALS=$( [ "$IS_SQL" = "true" ] && echo "clean package install" || echo "clean package install site" )
+          env && mvn -B $MVN_GOALS -Dbuildno=${{github.run_number}} \
               -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
               -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
               $SQL_PROFILE \
