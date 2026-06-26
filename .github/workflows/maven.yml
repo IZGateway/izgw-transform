@@ -226,14 +226,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Login to GitHub Container Registry (SQL image repo)
-        if: env.IS_SQL == 'true' && secrets.SQL_GHCR_TOKEN != ''
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.SQL_GHCR_TOKEN }}
-
       - name: Tag and push Docker image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -247,7 +239,7 @@ jobs:
             docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform-sql:${{env.IMAGE_TAG}}
             docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform-sql:${{env.IMAGE_BRANCH_TAG}}
             docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform-sql:latest
-            docker image push --all-tags ghcr.io/izgateway/izgw-transform-sql || echo "GHCR push skipped (SQL_GHCR_TOKEN not set)"
+            docker image push --all-tags ghcr.io/izgateway/izgw-transform-sql
           else
             docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_TAG}}
             docker image tag izgw-transform:${{env.IMAGE_TAG}} ghcr.io/izgateway/izgw-transform:${{env.IMAGE_BRANCH_TAG}}
