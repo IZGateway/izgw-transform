@@ -160,8 +160,10 @@ jobs:
         run: |
           SQL_PROFILE=$( [ "$IS_SQL" = "true" ] && echo "-P sql-support,sql-mssql" || echo "" )
           # Skip site generation for SQL builds — only the JAR/image is needed
+          # -U forces snapshot refresh so izgw-transform-sql:0.20.0-SNAPSHOT is always current
           MVN_GOALS=$( [ "$IS_SQL" = "true" ] && echo "clean package install" || echo "clean package install site" )
-          env && mvn -B $MVN_GOALS -Dbuildno=${{github.run_number}} \
+          UPDATE_FLAG=$( [ "$IS_SQL" = "true" ] && echo "-U" || echo "" )
+          env && mvn -B $UPDATE_FLAG $MVN_GOALS -Dbuildno=${{github.run_number}} \
               -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
               -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
               $SQL_PROFILE \
