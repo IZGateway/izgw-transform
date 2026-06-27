@@ -49,12 +49,13 @@
               { "key": "Accept", "value": "application/fhir+json" }
             ],
             "url": {
-              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15",
+              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15&_format=json",
               "host": ["{{sql_base_url}}"],
               "path": ["sql", "fhir", "dev", "Patient"],
               "query": [
                 { "key": "family", "value": "Smith" },
-                { "key": "birthdate", "value": "1985-03-15" }
+                { "key": "birthdate", "value": "1985-03-15" },
+                { "key": "_format", "value": "json" }
               ]
             }
           }
@@ -92,13 +93,14 @@
               { "key": "Accept", "value": "application/fhir+json" }
             ],
             "url": {
-              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15&_lastUpdated=ge2020-01-01",
+              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15&_lastUpdated=ge2020-01-01&_format=json",
               "host": ["{{sql_base_url}}"],
               "path": ["sql", "fhir", "dev", "Patient"],
               "query": [
                 { "key": "family", "value": "Smith" },
                 { "key": "birthdate", "value": "1985-03-15" },
-                { "key": "_lastUpdated", "value": "ge2020-01-01" }
+                { "key": "_lastUpdated", "value": "ge2020-01-01" },
+                { "key": "_format", "value": "json" }
               ]
             }
           }
