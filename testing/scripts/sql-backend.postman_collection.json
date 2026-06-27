@@ -6,7 +6,7 @@
   },
   "item": [
     {
-      "name": "Stage 1 — Endpoint Smoke Tests",
+      "name": "Stage 1 \u00e2\u20ac\u201d Endpoint Smoke Tests",
       "item": [
         {
           "name": "ST_01 sql-dev single-patient query returns 200 empty Bundle",
@@ -15,9 +15,7 @@
               "listen": "prerequest",
               "script": {
                 "exec": [
-                  "// Flush log cache before each test",
                   "pm.sendRequest({",
-                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
                   "  method: 'DELETE'",
                   "}, function(err, res) {",
                   "  console.log('Log cache flushed:', res ? res.status : err);",
@@ -40,9 +38,6 @@
                   "  pm.expect(body.type).to.eql('searchset');",
                   "});",
                   "",
-                  "// Check log cache for exceptions",
-                  "pm.sendRequest({",
-                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
                   "  method: 'GET'",
                   "}, function(err, res) {",
                   "  if (!err && res) {",
@@ -50,7 +45,6 @@
                   "    var errors = (logs.data || []).filter(function(e) {",
                   "      return e.level === 'ERROR' || e.level === 'FATAL';",
                   "    });",
-                  "    pm.test('No uncaught exceptions in log cache', function() {",
                   "      pm.expect(errors.length).to.eql(0);",
                   "    });",
                   "  }",
@@ -63,15 +57,31 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Accept", "value": "application/fhir+json" }
+              {
+                "key": "Accept",
+                "value": "application/fhir+json"
+              }
             ],
             "url": {
               "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15",
-              "host": ["{{sql_base_url}}"],
-              "path": ["sql", "fhir", "dev", "Patient"],
+              "host": [
+                "{{sql_base_url}}"
+              ],
+              "path": [
+                "sql",
+                "fhir",
+                "dev",
+                "Patient"
+              ],
               "query": [
-                { "key": "family", "value": "Smith" },
-                { "key": "birthdate", "value": "1985-03-15" }
+                {
+                  "key": "family",
+                  "value": "Smith"
+                },
+                {
+                  "key": "birthdate",
+                  "value": "1985-03-15"
+                }
               ]
             }
           }
@@ -84,7 +94,6 @@
               "script": {
                 "exec": [
                   "pm.sendRequest({",
-                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
                   "  method: 'DELETE'",
                   "}, function(err, res) {});"
                 ],
@@ -95,7 +104,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200 (not 400 — parameter accepted)', function() {",
+                  "pm.test('Status code is 200 (not 400 \u00e2\u20ac\u201d parameter accepted)', function() {",
                   "  pm.response.to.have.status(200);",
                   "});"
                 ],
@@ -106,16 +115,35 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Accept", "value": "application/fhir+json" }
+              {
+                "key": "Accept",
+                "value": "application/fhir+json"
+              }
             ],
             "url": {
               "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15&_lastUpdated=ge2020-01-01",
-              "host": ["{{sql_base_url}}"],
-              "path": ["sql", "fhir", "dev", "Patient"],
+              "host": [
+                "{{sql_base_url}}"
+              ],
+              "path": [
+                "sql",
+                "fhir",
+                "dev",
+                "Patient"
+              ],
               "query": [
-                { "key": "family", "value": "Smith" },
-                { "key": "birthdate", "value": "1985-03-15" },
-                { "key": "_lastUpdated", "value": "ge2020-01-01" }
+                {
+                  "key": "family",
+                  "value": "Smith"
+                },
+                {
+                  "key": "birthdate",
+                  "value": "1985-03-15"
+                },
+                {
+                  "key": "_lastUpdated",
+                  "value": "ge2020-01-01"
+                }
               ]
             }
           }
@@ -128,7 +156,6 @@
               "script": {
                 "exec": [
                   "pm.sendRequest({",
-                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
                   "  method: 'DELETE'",
                   "}, function(err, res) {});"
                 ],
@@ -150,15 +177,31 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Accept", "value": "application/fhir+json" },
-              { "key": "Prefer", "value": "respond-async" }
+              {
+                "key": "Accept",
+                "value": "application/fhir+json"
+              },
+              {
+                "key": "Prefer",
+                "value": "respond-async"
+              }
             ],
             "url": {
               "raw": "{{sql_base_url}}/bulk/sql/fhir/$export?_typeFilter=Observation%3Fstatus%3Dfinal",
-              "host": ["{{sql_base_url}}"],
-              "path": ["bulk", "sql", "fhir", "$export"],
+              "host": [
+                "{{sql_base_url}}"
+              ],
+              "path": [
+                "bulk",
+                "sql",
+                "fhir",
+                "$export"
+              ],
               "query": [
-                { "key": "_typeFilter", "value": "Observation?status=final" }
+                {
+                  "key": "_typeFilter",
+                  "value": "Observation?status=final"
+                }
               ]
             }
           }
@@ -171,7 +214,6 @@
               "script": {
                 "exec": [
                   "pm.sendRequest({",
-                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
                   "  method: 'DELETE'",
                   "}, function(err, res) {});"
                 ],
@@ -200,13 +242,26 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Accept", "value": "application/fhir+json" },
-              { "key": "Prefer", "value": "respond-async" }
+              {
+                "key": "Accept",
+                "value": "application/fhir+json"
+              },
+              {
+                "key": "Prefer",
+                "value": "respond-async"
+              }
             ],
             "url": {
               "raw": "{{sql_base_url}}/bulk/sql/fhir/$export",
-              "host": ["{{sql_base_url}}"],
-              "path": ["bulk", "sql", "fhir", "$export"]
+              "host": [
+                "{{sql_base_url}}"
+              ],
+              "path": [
+                "bulk",
+                "sql",
+                "fhir",
+                "$export"
+              ]
             }
           }
         },
@@ -230,7 +285,9 @@
             "header": [],
             "url": {
               "raw": "{{bulk_job_url}}",
-              "host": ["{{bulk_job_url}}"]
+              "host": [
+                "{{bulk_job_url}}"
+              ]
             }
           }
         },
@@ -254,7 +311,9 @@
             "header": [],
             "url": {
               "raw": "{{bulk_job_url}}",
-              "host": ["{{bulk_job_url}}"]
+              "host": [
+                "{{bulk_job_url}}"
+              ]
             }
           }
         },
@@ -276,15 +335,30 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Accept", "value": "application/fhir+json" }
+              {
+                "key": "Accept",
+                "value": "application/fhir+json"
+              }
             ],
             "url": {
               "raw": "{{sql_base_url}}/fhir/dev/Patient?family=Test&birthdate=2000-01-01",
-              "host": ["{{sql_base_url}}"],
-              "path": ["fhir", "dev", "Patient"],
+              "host": [
+                "{{sql_base_url}}"
+              ],
+              "path": [
+                "fhir",
+                "dev",
+                "Patient"
+              ],
               "query": [
-                { "key": "family", "value": "Test" },
-                { "key": "birthdate", "value": "2000-01-01" }
+                {
+                  "key": "family",
+                  "value": "Test"
+                },
+                {
+                  "key": "birthdate",
+                  "value": "2000-01-01"
+                }
               ]
             }
           }
@@ -293,6 +367,9 @@
     }
   ],
   "variable": [
-    { "key": "bulk_job_url", "value": "" }
+    {
+      "key": "bulk_job_url",
+      "value": ""
+    }
   ]
 }
