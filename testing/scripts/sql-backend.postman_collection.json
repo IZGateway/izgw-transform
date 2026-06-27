@@ -177,7 +177,8 @@
                   "",
                   "var loc = pm.response.headers.get('Content-Location');",
                   "if (loc) {",
-                  "  pm.collectionVariables.set('bulk_job_url', loc);",
+                  "  var jobId = loc.split('/').pop();",
+                  "  pm.collectionVariables.set('bulk_job_id', jobId);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -216,7 +217,9 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{bulk_job_url}}"
+              "raw": "{{sql_base_url}}/bulk/sql/fhir/$export-status/{{bulk_job_id}}",
+              "host": ["{{sql_base_url}}"],
+              "path": ["bulk", "sql", "fhir", "$export-status", "{{bulk_job_id}}"]
             }
           }
         },
@@ -239,7 +242,9 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{bulk_job_url}}"
+              "raw": "{{sql_base_url}}/bulk/sql/fhir/$export-status/{{bulk_job_id}}",
+              "host": ["{{sql_base_url}}"],
+              "path": ["bulk", "sql", "fhir", "$export-status", "{{bulk_job_id}}"]
             }
           }
         },
@@ -279,7 +284,7 @@
   ],
   "variable": [
     {
-      "key": "bulk_job_url",
+      "key": "bulk_job_id",
       "value": "",
       "type": "string"
     }
