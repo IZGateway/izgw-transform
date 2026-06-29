@@ -83,4 +83,13 @@ RUN mkdir -p /ssl/local && \
 
 ENV XFORM_VERSION=$XFORM_VERSION
 
+# Defaults for local testing against the self-signed keystore baked into /ssl/local/.
+# All of these can be overridden at runtime for production deployments.
+ENV COMMON_PASS=changeit \
+    XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE=/ssl/local/server.bcfks \
+    XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE=/ssl/local/trust.bcfks \
+    XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE=/ssl/local/server.bcfks \
+    XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE=/ssl/local/trust.bcfks \
+    XFORM_CONFIGURATIONS_DIRECTORY=/usr/share/izg-transform/quickstart/configuration
+
 ENTRYPOINT ["/sbin/tini", "--", "/usr/share/izg-transform/entrypoint.sh"]
