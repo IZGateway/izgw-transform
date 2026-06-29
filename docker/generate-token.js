@@ -24,14 +24,14 @@ try {
 }
 
 const now = Math.floor(Date.now() / 1000);
-const oneHour = 3600;
+const thirtyDays = 30 * 24 * 3600;
 
 function makeToken(subject, roles) {
     const header = { alg: 'HS256', typ: 'JWT' };
     const payload = {
         sub: subject,
         iat: now,
-        exp: now + oneHour,
+        exp: now + thirtyDays,
         jti: crypto.randomUUID(),
         roles: roles
     };
@@ -47,7 +47,7 @@ const senderToken = makeToken('sql-test-sender', ['xform-sender']);
 const adminToken  = makeToken('sql-test-admin',  ['xform-sender', 'admin']);
 
 console.log('');
-console.log('=== SQL Backend Test Tokens (valid 1 hour) ===');
+console.log('=== SQL Backend Test Tokens (valid 30 days) ===');
 console.log('');
 console.log('-- Sender token (for patient queries and bulk export):');
 console.log(senderToken);
