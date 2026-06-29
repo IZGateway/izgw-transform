@@ -1,0 +1,391 @@
+{
+  "info": {
+    "_postman_id": "sql-local-test",
+    "name": "SQL Backend - Local Test Endpoint",
+    "description": "Tests for /sql/fhir/test/** against a locally running Docker container.\nRequires JWT tokens from: docker run --rm -e XFORM_JWT_SECRET=<secret> <image> generate-token\nSet jwt_sender_token and jwt_admin_token in the environment before running.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "LT_01 patient query returns 200 searchset Bundle",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "pm.sendRequest({",
+              "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
+              "  method: 'DELETE',",
+              "  header: { Authorization: 'Bearer ' + pm.environment.get('jwt_admin_token') }",
+              "}, function(err, res) {",
+              "  console.log('Log cache flushed:', res ? res.status : err);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response is a FHIR Bundle', function() {",
+              "  var body = pm.response.json();",
+              "  pm.expect(body.resourceType).to.eql('Bundle');",
+              "  pm.expect(body.type).to.eql('searchset');",
+              "});",
+              "",
+              "pm.test('Content-Type is application/fhir+json', function() {",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('fhir+json');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/fhir+json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_sender_token}}" }
+        ],
+        "url": {
+          "raw": "{{sql_base_url}}/sql/fhir/test/Patient?family={{test_patient_family}}&birthdate={{test_patient_birthdate}}&_format=json",
+          "host": ["{{sql_base_url}}"],
+          "path": ["sql", "fhir", "test", "Patient"],
+          "query": [
+            { "key": "family", "value": "{{test_patient_family}}" },
+            { "key": "birthdate", "value": "{{test_patient_birthdate}}" },
+            { "key": "_format", "value": "json" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "LT_02 matching patient returns Patient and Immunization entries",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Bundle has at least one entry', function() {",
+              "  var body = pm.response.json();",
+              "  pm.expect(body.total).to.be.above(0);",
+              "  pm.expect(body.entry).to.not.be.empty;",
+              "});",
+              "",
+              "pm.test('First entry is a Patient resource', function() {",
+              "  var body = pm.response.json();",
+              "  var patient = body.entry.find(function(e) {",
+              "    return e.resource && e.resource.resourceType === 'Patient';",
+              "  });",
+              "  pm.expect(patient).to.not.be.undefined;",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/fhir+json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_sender_token}}" }
+        ],
+        "url": {
+          "raw": "{{sql_base_url}}/sql/fhir/test/Patient?family={{test_patient_family}}&birthdate={{test_patient_birthdate}}&_format=json",
+          "host": ["{{sql_base_url}}"],
+          "path": ["sql", "fhir", "test", "Patient"],
+          "query": [
+            { "key": "family", "value": "{{test_patient_family}}" },
+            { "key": "birthdate", "value": "{{test_patient_birthdate}}" },
+            { "key": "_format", "value": "json" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "LT_03 no-match patient returns empty Bundle",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Bundle total is 0 (no match)', function() {",
+              "  var body = pm.response.json();",
+              "  pm.expect(body.resourceType).to.eql('Bundle');",
+              "  pm.expect(body.total).to.eql(0);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/fhir+json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_sender_token}}" }
+        ],
+        "url": {
+          "raw": "{{sql_base_url}}/sql/fhir/test/Patient?family=ZZZNOMATCH&birthdate=1900-01-01&_format=json",
+          "host": ["{{sql_base_url}}"],
+          "path": ["sql", "fhir", "test", "Patient"],
+          "query": [
+            { "key": "family", "value": "ZZZNOMATCH" },
+            { "key": "birthdate", "value": "1900-01-01" },
+            { "key": "_format", "value": "json" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "LT_04 _lastUpdated filter returns 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200 (_lastUpdated parameter accepted)', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response is a FHIR Bundle', function() {",
+              "  var body = pm.response.json();",
+              "  pm.expect(body.resourceType).to.eql('Bundle');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/fhir+json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_sender_token}}" }
+        ],
+        "url": {
+          "raw": "{{sql_base_url}}/sql/fhir/test/Patient?family={{test_patient_family}}&birthdate={{test_patient_birthdate}}&_lastUpdated={{test_last_updated_from}}&_format=json",
+          "host": ["{{sql_base_url}}"],
+          "path": ["sql", "fhir", "test", "Patient"],
+          "query": [
+            { "key": "family", "value": "{{test_patient_family}}" },
+            { "key": "birthdate", "value": "{{test_patient_birthdate}}" },
+            { "key": "_lastUpdated", "value": "{{test_last_updated_from}}" },
+            { "key": "_format", "value": "json" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "LT_05 missing token returns 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 401 without token', function() {",
+              "  pm.response.to.have.status(401);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/fhir+json" }
+        ],
+        "url": {
+          "raw": "{{sql_base_url}}/sql/fhir/test/Patient?family=Smith&birthdate=1985-03-15&_format=json",
+          "host": ["{{sql_base_url}}"],
+          "path": ["sql", "fhir", "test", "Patient"],
+          "query": [
+            { "key": "family", "value": "Smith" },
+            { "key": "birthdate", "value": "1985-03-15" },
+            { "key": "_format", "value": "json" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "LT_06 bulk export kickoff returns 202 with Content-Location",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 202 Accepted', function() {",
+              "  pm.response.to.have.status(202);",
+              "});",
+              "",
+              "pm.test('Content-Location header present', function() {",
+              "  pm.expect(pm.response.headers.get('Content-Location')).to.not.be.empty;",
+              "});",
+              "",
+              "var loc = pm.response.headers.get('Content-Location');",
+              "if (loc) {",
+              "  var jobId = loc.split('/').pop();",
+              "  pm.collectionVariables.set('bulk_job_id', jobId);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/fhir+json" },
+          { "key": "Prefer", "value": "respond-async" },
+          { "key": "Authorization", "value": "Bearer {{jwt_sender_token}}" }
+        ],
+        "url": {
+          "raw": "{{sql_base_url}}/bulk/sql/fhir/$export",
+          "host": ["{{sql_base_url}}"],
+          "path": ["bulk", "sql", "fhir", "$export"]
+        }
+      }
+    },
+    {
+      "name": "LT_07 bulk export poll returns 202 in-progress",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 202 (job in progress)', function() {",
+              "  pm.response.to.have.status(202);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_sender_token}}" }
+        ],
+        "url": {
+          "raw": "{{sql_base_url}}/bulk/sql/fhir/$export-status/{{bulk_job_id}}",
+          "host": ["{{sql_base_url}}"],
+          "path": ["bulk", "sql", "fhir", "$export-status", "{{bulk_job_id}}"]
+        }
+      }
+    },
+    {
+      "name": "LT_08 bulk export DELETE returns 202",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 202 Accepted', function() {",
+              "  pm.response.to.have.status(202);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_sender_token}}" }
+        ],
+        "url": {
+          "raw": "{{sql_base_url}}/bulk/sql/fhir/$export-status/{{bulk_job_id}}",
+          "host": ["{{sql_base_url}}"],
+          "path": ["bulk", "sql", "fhir", "$export-status", "{{bulk_job_id}}"]
+        }
+      }
+    },
+    {
+      "name": "LT_09 admin token accesses log cache",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Log cache accessible with admin token', function() {",
+              "  pm.expect(pm.response.code).to.not.eql(401);",
+              "  pm.expect(pm.response.code).to.not.eql(403);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_admin_token}}" }
+        ],
+        "url": {
+          "raw": "{{sql_admin_url}}/rest/logs",
+          "host": ["{{sql_admin_url}}"],
+          "path": ["rest", "logs"]
+        }
+      }
+    },
+    {
+      "name": "LT_10 dev endpoint still responds (no regression)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('dev endpoint returns 200', function() {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response is a FHIR Bundle', function() {",
+              "  var body = pm.response.json();",
+              "  pm.expect(body.resourceType).to.eql('Bundle');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Accept", "value": "application/fhir+json" },
+          { "key": "Authorization", "value": "Bearer {{jwt_sender_token}}" }
+        ],
+        "url": {
+          "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15&_format=json",
+          "host": ["{{sql_base_url}}"],
+          "path": ["sql", "fhir", "dev", "Patient"],
+          "query": [
+            { "key": "family", "value": "Smith" },
+            { "key": "birthdate", "value": "1985-03-15" },
+            { "key": "_format", "value": "json" }
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "bulk_job_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

@@ -39,6 +39,9 @@ FHIR client.
 | [FHIR API Reference](fhir-api.md) | Endpoints, operations, query parameters, response format |
 | [FHIR Query → QBP Mapping](fhir-to-qbp.md) | How each FHIR search parameter maps to QPD fields in the IIS query |
 | [RSP → FHIR Resource Mapping](rsp-to-fhir.md) | How IIS response segments map to FHIR resources in the returned Bundle |
+| [SQL FHIR API Reference](../sql-fhir/sql-fhir-api.md) | Single-patient query endpoints at `/sql/fhir/{name}/**` (SQL-backed) |
+| [Bulk FHIR Export API](../sql-fhir/bulk-fhir-api.md) | Async `$export` endpoints at `/bulk/sql/fhir/$export` |
+| [Local Testing Guide](../sql-fhir/local-testing.md) | Running the SQL-enabled image locally with Docker |
 
 ## Supported Resources
 
@@ -70,6 +73,22 @@ to the patient chart that produced it.
 
 This means a resource retrieved today can be re-read tomorrow — as long as the IIS
 still has the data — using a standard FHIR read (`GET /fhir/{dest}/{ResourceType}/{id}`).
+
+## SQL-Backed and Bulk FHIR Interfaces
+
+The `izgw-transform-sql` optional module adds two additional FHIR API surfaces that
+query an ANSI SQL database directly rather than routing through IZ Gateway Hub:
+
+- **Single-patient SQL queries** at `/sql/fhir/{name}/Patient`, `/sql/fhir/{name}/Immunization`, etc.
+- **Bulk FHIR export** at `/bulk/sql/fhir/$export`
+
+These endpoints follow the same FHIR R4 conventions, authentication, and response
+formats as the standard interface. They are only available when the service is built
+with `-P sql-support` and deployed as a SQL-enabled image.
+
+> See [`docs/sql-fhir/`](../sql-fhir/) for the SQL-backed and Bulk FHIR API reference.
+
+---
 
 ## Conventions
 
