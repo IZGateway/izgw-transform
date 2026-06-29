@@ -168,6 +168,7 @@ _Goal: full test suite passes against real SQL Server on AWS RDS._
 
 ## Stage 6 — Documentation and Completion
 
+- [ ] 6.0 Update `REPOSITORY_MAP` environment variable in the `CveRouter` Lambda (`izgw-aws-lambda`) to add `transformation-service-sql` → appropriate Jira component; ECR enhanced scanning is already enabled on the repo (created in 1.23) but findings will not route to Jira until the map is updated
 - [ ] 6.1 Update `testing/configuration/pipelines.json` to include an example `"sql-dev"` destination entry
 - [ ] 6.2 Document all new `sql.*` configuration properties and `izgw-transform-sql` Maven profile options in `README.md` or `docs/`; reference `docs/aws-sql-deployment.md` from Stage 0; write with WA State DOH as the deployment audience
 - [ ] 6.3 Configure Newman step in CI/CD test stage to run `sql-backend` collection against `sql-dev` environment on standard builds; run against `sql-staging` environment post-deploy to staging; run against RDS environment when deploying SQL-enabled image
