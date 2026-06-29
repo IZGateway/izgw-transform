@@ -53,20 +53,24 @@ IZ Gateway path.
   download → DELETE). Queries accept `_since` and optionally a dateTime range. The
   `/bulk/{backend}/fhir/` path prefix separates bulk capability from single-patient
   query capability, leaving room for future backends (e.g., `/bulk/izgw/fhir/$export`).
-- **New**: A lightweight embedded SQL fixture, pre-loaded from the existing
-  `IZGW-FHIR-SamplePatientsData.csv` and `2019_10_01_imm.csv` test data files,
-  provides a mock SQL back-end accessible at `/sql/fhir/dev/**` for integration tests
-  and local dev evaluation with no real database required.
+- **New**: A `dev` CSV fixture (two-file hub format) accessible at `/sql/fhir/dev/**`
+  and a `test` CSV fixture (single-file `all_vax_event` format) at `/sql/fhir/test/**`
+  provide local dev evaluation with no real database required.
+- **New**: Local test capability built into the Docker image: a self-signed BCFKS
+  keystore (`CN=sql.xform.testing.local`) generated at image build time; a
+  `generate-token` Docker command that prints signed JWTs for the `xform-sender` and
+  `admin` roles using a shared HMAC-SHA256 secret. Engineers can mount a CSV extract,
+  run `docker run <image> generate-token`, and query `/sql/fhir/test/**` within minutes
+  with no PKI infrastructure.
 
 ## Capabilities
 
 ### New Capabilities
 
 - `sql-backend-connector`: Spring Boot JDBC datasource integration in `izgw-transform-sql`;
-  SQL endpoints at `/sql/fhir/{name}/**`; stub returns 503 when module absent
-- `query-interface-abstraction`: Spring MVC path routing separating SQL endpoints
-  (`/sql/fhir/**`) from hub endpoints (`/fhir/**`); `SqlPatientRowMapper` for SQL row →
-  FHIR Patient conversion; `FhirController` unchanged
+  per-backend config (`sql.backends.{name}`); SQL endpoints at `/sql/fhir/{name}/**`; stub returns 503 when module absent
+- `query-interface-abstraction`: Spring MVC path routing; `IQueryBackend` registry (named map); `SqlDevBackend` (two-file CSV), `SqlTestBackend` (single-file all\_vax\_event CSV), and `SqlFhirBackend` (JDBC) all implement `IQueryBackend`; `FhirController` unchanged
+- `local-test-capability`: self-signed BCFKS keystore in image; `generate-token` Docker command; `test` endpoint at `/sql/fhir/test/**`; `docs/sql-fhir/local-testing.md`
 - `patient-matching-sql`: SQL patient search query using existing IDIMatch scoring via
   `SqlPatientRowMapper`; singular-match enforcement before proceeding
 - `immunization-retrieval-sql`: Parameterized SQL query for all immunization rows

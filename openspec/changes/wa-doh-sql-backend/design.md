@@ -186,75 +186,114 @@ namespace. The `dev` backend is the built-in embedded fixture, accessible at
 
 ---
 
-### 7. View-based query model
+### 7. View-based query model: one-table denormalized or two-table normalized
 
-**Decision**: Require the deployer's database to expose exactly two views (names
-configurable per backend):
-- `patient_view` — one row per patient
-- `immunization_view` — one row per immunization event, with a patient ID foreign key
+**Decision**: Support both a one-table denormalized model and a two-table normalized
+model via the same ANSI SQL query patterns. The model is selected per backend via
+`sql.backends.{name}.patient-table` and `sql.backends.{name}.immunization-table`.
+When both point to the same table it is denormalized; when they differ it is normalized.
 
-Our queries are simple ANSI SQL:
+For a **normalized** backend (two distinct views):
 ```sql
-SELECT * FROM patient_view  WHERE last_name = ? AND birth_date = ?
-SELECT * FROM immunization_view WHERE patient_id = ?
+SELECT DISTINCT <patient_columns> FROM patient_view  WHERE last_name = :lastName AND birth_date = :dob
+SELECT * FROM immunization_view WHERE patient_id = :patientId
 ```
 
-**Rationale**: All schema complexity, underlying table joins, and indexing decisions
-live inside the view definition — the deployer's concern. We never need to know the
-underlying table structure. The resulting SQL is trivially portable across any ANSI
-SQL-compatible database.
+For a **denormalized** backend (single all\_vax\_event-style table):
+```sql
+SELECT DISTINCT <patient_columns> FROM all_vax_event WHERE last_name = :lastName AND birth_date = :dob
+SELECT * FROM all_vax_event WHERE patient_id = :patientId
+```
+
+The `SELECT DISTINCT <patient_columns>` projection is derived at startup from the
+`Patient` resource entries in `sql-mapping.yml` -- not hardcoded. This ensures the
+DISTINCT deduplicates on demographic columns only, not on immunization-specific columns
+that vary per row. All parameter values are bound as named parameters; column names come
+from the trusted `sql-mapping.yml` (never from user input).
+
+**Rationale**: WA DOH's `all_vax_event` is a single denormalized analytical table
+produced by a Databricks notebook joining ~15 WAIIS source tables. Its 61 columns
+cover both demographics and immunization events. Using one table for both queries
+avoids requiring WA DOH to create two views when one table already exists. The
+`SELECT DISTINCT` approach naturally deduplicates patients without any extra
+application-level logic.
+
+**WA DOH source table**: `tc_iis_prod.analytic_tables.all_vax_event`. Its 61 columns
+are defined in `all_vax_event_enriched_mapping.csv` (reference materials folder).
+The `sql-mapping.yml` is generated from this file and reviewed before use -- see
+tasks 2.3a-2.3b. The `INSERT_STAMP` timestamp column is the `is_last_updated`
+anchor for both `_lastUpdated` filtering and `_since` in bulk export.
 
 ---
 
-### 8. `sql-dev` fixture: CSV-backed in-memory, no JDBC driver
+### 8. CSV-backed backends: `dev` (two-file) and `test` (one-file)
 
-**Decision**: The `dev` backend (accessible at `/sql/fhir/dev/**`) does not use an
-embedded SQL database. At startup it loads the existing `IZGW-FHIR-SamplePatientsData.csv`
-and `2019_10_01_imm.csv` test data files into `List<Map<String,String>>`. Patient
-search is a Java stream filter; immunization retrieval is a second filter on patient ID.
-No SQL parser, no JDBC driver, no embedded database dependency.
+Two CSV-backed `IQueryBackend` implementations provide local testing without any
+database or JDBC driver.
 
-**Rationale**: The view-based query model reduces our SQL to simple equality/range
-predicates on a flat row. This is trivially reproducible with stream filtering.
-Eliminating the embedded database removes ~2.5 MB from the image and all CVE surface
-associated with an embedded engine.
+**`SqlDevBackend`** (accessible at `/sql/fhir/dev/**`): loads two separate CSV files
+in hub test data format -- one patient file, one immunization file with a patient ID
+foreign key. Patient search is a Java stream filter; immunization retrieval is a
+second stream filter on patient ID. Files are bundled in the classpath by default.
+
+**`SqlTestBackend`** (accessible at `/sql/fhir/test/**`): loads a single denormalized
+CSV file in the `all_vax_event` column format. Each row carries both patient demographics
+and one immunization event. Patient search filters rows by demographics and deduplicates
+by patient ID; immunization retrieval returns all rows for the matched patient ID.
+The file path defaults to `/data/all_vax_event.csv` and is overridable via
+`SQL_BACKENDS_TEST_DATA_PATH`, enabling engineers to mount their own CSV extract into
+a running container without an image rebuild.
+
+Both backends implement `IQueryBackend` and are registered by `SqlBackendAutoConfiguration`
+from the `sql.backends` config block. The `test` backend is always registered when the
+SQL module is active; it returns a meaningful 503 if the data file is absent.
+
+**Rationale**: Eliminating the embedded database removes ~2.5 MB from the image and
+all CVE surface associated with an embedded engine. The `test` endpoint gives WA DOH
+the ability to validate a CSV extract locally before connecting to the production
+SQL Server instance.
 
 ---
 
-### 9. Backend discovery: Spring property or environment variable (equivalent)
+### 9. Backend discovery: `sql.backends.{name}` config block
 
-**Decision**: Each SQL backend is declared via a Spring property of the form:
-```
-sql.backend.<name>=/path/to/<name>.yml
-```
-Spring Boot's relaxed binding makes the env var form `SQL_BACKEND_<NAME>` exactly
-equivalent — deployers may use either. At startup, `SqlBackendFactory` reads all
-bound `sql.backend.*` entries and creates one `sql-<name>` backend per entry, loading
-its config from the referenced file. `sql-dev` is built-in and requires no property.
+**Decision**: Each SQL backend is declared as a structured config block under
+`sql.backends.{name}`, where each block carries its own type, data/table paths, and
+mapping config path. Spring Boot's relaxed binding makes environment variable overrides
+natural -- e.g., `SQL_BACKENDS_TEST_DATA_PATH` overrides `sql.backends.test.data-path`.
 
-**Examples** (both forms produce identical results):
 ```yaml
-# application.yml
 sql:
-  backend:
-    waiis: /opt/config/waiis.yml
-    prod:  /opt/config/prod.yml
+  matching-threshold: 0.95
+  backends:
+    dev:
+      type: DEV_CSV
+      patients-path: classpath:sql-dev/patients.csv
+      immunizations-path: classpath:sql-dev/immunizations.csv
+      mapping-config-path: classpath:sql-mapping.yml
+    test:
+      type: CSV
+      data-path: ${SQL_BACKENDS_TEST_DATA_PATH:/data/all_vax_event.csv}
+      mapping-config-path: ${SQL_BACKENDS_TEST_MAPPING_CONFIG_PATH:classpath:sql-mapping.yml}
+    wa-doh:
+      type: JDBC
+      patient-table: all_vax_event
+      immunization-table: all_vax_event
+      patient-id-column: IIS_PATIENT_ID
+      mapping-config-path: /data/sql-mapping.yml
 ```
-```
-# environment variables
-SQL_BACKEND_WAIIS=/opt/config/waiis.yml
-SQL_BACKEND_PROD=/opt/config/prod.yml
-```
-Both register backends accessible at `/sql/fhir/waiis/**` and `/sql/fhir/prod/**`.
 
-Adding a backend = add a property or env var, provide the config file, restart the
-container task. No code change, no image rebuild.
+`SqlBackendAutoConfiguration` reads this map at startup and creates the appropriate
+`IQueryBackend` instance for each entry. The `dev` backend is always registered with
+built-in classpath defaults if not explicitly configured. The `test` backend is
+registered when the SQL module is active. JDBC backends are registered only when a
+`DataSource` bean is present.
 
-**Rationale**: Spring's relaxed binding unifies both mechanisms for free. Deployers
-choose the delivery strategy that fits their infrastructure (ECS task environment,
-`application.yml` overlay, Kubernetes ConfigMap, `.env` locally) without any
-difference in application behavior. V1 specifies only this convention; mount/delivery
-strategy is a deployment concern.
+**Rationale**: Grouping all backend configuration under a single named block (rather
+than a path-only property) makes each backend self-describing -- type, data source,
+and column mapping are co-located. This simplifies validation, logging, and future
+extension (e.g., adding connection pool settings to a JDBC block). The `dev` and `test`
+backends ship with sensible defaults requiring zero configuration for local testing.
 
 ---
 
@@ -300,6 +339,40 @@ simple (single-predicate `SELECT *`) to warrant a SQL engine at the unit test le
 The `sql-dev` CSV fixture covers fast end-to-end smoke testing in PRs. The RDS instance
 provides the real SQL Server dialect test for release confidence. WA DOH's own Azure
 SQL Server deployment is the final production validation.
+
+---
+
+### 12. Local test capability: self-signed BCFKS keystore and JWT token generator
+
+**Decision**: The SQL-enabled Docker image bundles two local-testing aids that require
+no external infrastructure:
+
+1. **Self-signed BCFKS keystore** generated at image build time via `keytool -genkeypair`
+   using the existing `bc-fips-2.1.2.jar`. CN follows the IZ Gateway local-test
+   convention: `CN=sql.xform.testing.local, O=izgateway`. Stored at `/ssl/local/`.
+   Engineers pass `XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE=/ssl/local/server.bcfks`
+   and `COMMON_PASS=changeit` to use it. Production deployments supply their own
+   keystore via the same env vars -- the bundled cert is never used in production.
+
+2. **`generate-token` Docker command**: running `docker run <image> generate-token`
+   invokes a Node.js script (built-in `crypto` only) that prints two signed JWTs:
+   a sender token (`xform-sender` role) and an admin token (`xform-sender` + `admin`).
+   Both are signed with `XFORM_JWT_SECRET` (base64-encoded HMAC-SHA256 key). The
+   engineer generates the secret once with `openssl rand -base64 32`, passes it to
+   both the token generator and the running container, and uses the token as a
+   `Bearer` header.
+
+The `test` endpoint (`/sql/fhir/test/**`) is always registered when the SQL module is
+active. It reads from the CSV file mounted at `/data/all_vax_event.csv` (overridable
+via env var). Engineers mount their own CSV extract at that path.
+
+**Rationale**: mTLS client certificates are the primary access control mechanism in
+production, but they require PKI infrastructure (issuing CA, signed client certs) that
+is impractical for a one-day local evaluation. JWT shared-secret auth is already
+supported in `izgw-core` (`JwtSharedSecretPrincipalProvider`) and is activated by
+setting a single env var. The self-signed BCFKS keystore eliminates the need for an
+EFS-mounted keystore for local runs. Together these reduce the "time to first query"
+for an engineer from days to minutes.
 
 ---
 

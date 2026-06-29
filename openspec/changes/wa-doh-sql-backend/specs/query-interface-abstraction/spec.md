@@ -69,6 +69,33 @@ THEN the stub controller returns `503 Service Unavailable`
 
 ---
 
+### Requirement: Backend Registry Routes by Name
+
+`SqlFhirController` SHALL hold a `Map<String, IQueryBackend>` populated at startup
+by `SqlBackendAutoConfiguration` from the `sql.backends` config. When a request
+arrives for `/sql/fhir/{name}/**`, the controller looks up `{name}` in the registry.
+If no backend is registered for that name, the controller returns `503 Service
+Unavailable` with an `OperationOutcome`.
+
+The `dev` backend SHALL always be registered. The `test` backend SHALL be registered
+when `sql.backends.test` is present in config (default when the SQL module is active).
+JDBC backends SHALL be registered only when a `DataSource` bean is present.
+
+#### Scenario: named backend routes correctly
+
+WHEN a request arrives at `/sql/fhir/test/Patient`  
+AND a `test` backend is registered in the registry  
+THEN `SqlFhirController` delegates to that backend's `query()` method  
+AND the result is serialized as `application/fhir+json`
+
+#### Scenario: unconfigured backend returns 503
+
+WHEN a request arrives at `/sql/fhir/unknown/Patient`  
+AND no backend named `unknown` is in the registry  
+THEN `SqlFhirController` returns `503 Service Unavailable` with an `OperationOutcome`
+
+---
+
 ### Requirement: No Shared Interface Between Modules
 
 `izgw-transform-sql` SHALL depend only on `izgw-core` and Spring. It SHALL NOT

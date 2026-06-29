@@ -60,8 +60,10 @@ _`FhirController` is not modified. The only changes here are wiring the SQL modu
 - [x] 1.20 Register `/sql/**` as a protected path prefix in the access control layer so it cannot be hijacked by IIS destination registration; routing is now path-based rather than destination-name-based
 - [x] 1.21 Verify existing unit and integration tests still pass with no changes to `FhirController`
 - [x] **1C.PR** Open PR `IGDD-3013-wa-doh-sql-backend → develop` in `izgw-transform`; CI passes; existing tests green ✅ PR #271 passing
-- [ ] 1.22 Create Postman collection `sql-backend.postman_collection.json` in `testing/scripts/` with Stage 1 smoke tests: flush log cache before each test; verify `GET /sql/fhir/dev/Patient` returns 200 with empty Bundle; verify `POST /bulk/sql/fhir/$export` returns 202; verify poll returns 202 in-progress; verify DELETE returns 202; verify `/fhir/izgateway/Patient` still routes correctly to hub; query log cache and assert no uncaught exceptions
-- [ ] **1.DEPLOY** Deploy to dev; run Stage 1 Postman smoke tests; all pass before proceeding to Stage 2
+- [x] 1.22 Create Postman collection `sql-backend.postman_collection.json` in `testing/scripts/` with Stage 1 smoke tests; create `dev.sql-xform.izgateway.org.postman_environment.json` ✅
+- [x] 1.23 Add `is_sql_run` `workflow_dispatch` parameter to `maven.yml`; conditions Maven profile, ECR repo (`transformation-service-sql`), ECS service (`xform-service-sql-dev`), and Postman SQL tests on that flag; create `transformation-service-sql` ECR repository with AWS Inspector enhanced scanning ✅
+- [ ] 1.DOC Update `docs/sql-fhir/sql-fhir-api.md` and `docs/sql-fhir/bulk-fhir-api.md` in `izgw-transform-sql` to reflect Stage 1 implementation (endpoints, auth, response shapes, V1 limitations); update `docs/aws-sql-deployment.md` with ECS service, ACM cert, and ECR details from Stage 0
+- [x] **1.DEPLOY** Trigger `workflow_dispatch` with `is_sql_run=true` to deploy SQL-enabled image; verify Stage 1 Postman smoke tests pass ✅ Run 28301935550: 23 requests/54 assertions 0 failed (standard); 11 requests/9 assertions 0 failed (SQL backend)
 
 ---
 
@@ -71,7 +73,10 @@ _Goal: single-patient query against `sql-dev` returns real FHIR data._
 
 - [x] 2.1 Create `SqlMappingConfig` model classes: `SqlMappingConfiguration` (top-level), `ResourceMapping` (per column with optional `is_last_updated: true` flag), `ConceptMapEntry` (`from`/`to`)
 - [x] 2.2 Implement `SqlMappingConfigLoader` that loads `sql-mapping.yml` from classpath or external `sql.mapping.config-path`; use Jackson YAML or SnakeYAML
-- [x] 2.3 Write the default `sql-mapping.yml` in `src/main/resources/` covering patient and immunization CSV columns; mark `Record Creation Date` as `is_last_updated: true` for both resources
+- [x] 2.3 Write placeholder `sql-mapping.yml` using hub test data column names (temporary — replaced by 2.3a–2.3c)
+- [ ] 2.3a Generate draft `sql-mapping.yml` from `all_vax_event_enriched_mapping.csv` (`C:\Users\boonek\OneDrive - PointClickCare\Documents\IZ Gateway\WA DOH Pilot\`) using a script; draft covers all 61 WA DOH `all_vax_event` column names with FHIR resource/element targets from the enriched mapping; mark `INSERT_STAMP` as `is_last_updated: true` for Immunization
+- [ ] **2.3b USER REVIEW** Review generated `sql-mapping.yml` against actual WA DOH schema; verify FHIR element assignments, concept maps (gender, race, anatomical site/route, VFC, series complete), and any columns to omit; correct before proceeding to mapper implementation
+- [ ] 2.3c Write one-time transformation script that converts hub test data (`2019_10_01_pat.csv`, `2019_10_01_imm.csv`) to `all_vax_event` column format; output becomes canonical test dataset used for sql-dev CSV fixture, H2 unit tests, and SQL Server seed data; store output in `src/test/resources/sql-dev/`
 - [x] 2.4 Create `SqlTableMapper<T>` abstract class in `izgw-transform-sql`; defines `T map(Map<String,Object> row, SqlMappingConfiguration config)` and owns all column-to-FHIR conversion logic shared across resource types
 - [x] 2.5 Implement primitive type converters in `SqlTableMapper<T>`: `string`, `integer`, `decimal`, `boolean`, `date`, `dateTime`
 - [x] 2.6 Implement complex type converters in `SqlTableMapper<T>`: `code`, `Coding` (with system), `CodeableConcept` (with system + optional display)
@@ -89,6 +94,7 @@ _Goal: single-patient query against `sql-dev` returns real FHIR data._
 - [x] 2.18 Create `SqlBackendProperties` `@ConfigurationProperties(prefix = "sql")`
 - [ ] 2.19 Add `application.yml` documentation comments for the new `sql.*` config block
 - [ ] 2.20 Add Stage 2 Postman tests to collection: single-patient query against `sql-dev` with known test patient returns Bundle containing Patient and Immunization resources; verify log cache shows no exceptions; verify no-match and ambiguous-match response shapes
+- [ ] 2.DOC Update `docs/sql-fhir/sql-fhir-api.md` with actual patient matching behavior, IDI scoring, singular/no-match/ambiguous response shapes, and column mapping reference; update `docs/sql-fhir/index.md` flow diagram to reflect sql-dev CSV path
 - [ ] **2.DEPLOY** Deploy to dev; run full Postman collection; Stage 1 smoke tests still pass; Stage 2 tests return real data from `sql-dev`
 
 ---
@@ -97,17 +103,34 @@ _Goal: single-patient query against `sql-dev` returns real FHIR data._
 
 _Goal: real JDBC-backed query path and `_lastUpdated` filtering verified._
 
-- [ ] 3.1 Create `SqlPatientSearchService` with `JdbcTemplate`; implement broad ANSI SQL candidate query using name + DOB OR DOB + gender; when `DateRangeParam lastUpdated` is non-null, append timestamp WHERE predicate against `is_last_updated` column from mapping config; all parameters bound via JDBC named parameters (no string concatenation)
-- [ ] 3.2 Call `SqlPatientRowMapper` to convert each candidate row to a FHIR `Patient`
-- [ ] 3.3 Call existing `IDIMatch` static scoring methods on each candidate `Patient` vs the search `Patient`
-- [ ] 3.4 Implement singular-match enforcement: return matched patient ID if exactly one candidate ≥ threshold; return empty Bundle if zero; return ambiguous `OperationOutcome` if two or more
-- [ ] 3.5 Write unit tests for `SqlPatientSearchService` using mocked `JdbcTemplate` returning synthetic `List<Map<String,Object>>` rows; verify correct SQL string, parameter binding, and IDIMatch handoff
-- [ ] 3.6 Create `SqlImmunizationRetrievalService` with `JdbcTemplate`; implement parameterized ANSI SQL query for all immunization rows by patient ID; when `DateRangeParam lastUpdated` is non-null, append timestamp WHERE predicate against `is_last_updated` column for Immunization from mapping config
-- [ ] 3.7 Return results as `List<Map<String,Object>>` with column names preserved
-- [ ] 3.8 Write unit tests for `SqlImmunizationRetrievalService` using mocked `JdbcTemplate`; verify correct SQL and patient ID parameter binding
-- [ ] 3.9 Wire `SqlFhirBackend` fully: `SqlPatientSearchService` → `SqlImmunizationRetrievalService` → `TabularFhirConverter`; return resulting Bundle through `FhirController` response serialization path
+- [x] 3.1 Create `SqlPatientSearchService` with `NamedParameterJdbcTemplate`; broad ANSI SQL candidate query (name+DOB OR DOB+gender); `_lastUpdated` WHERE predicate against `is_last_updated` column from mapping config; all values bound as named parameters
+- [x] 3.2 Call `SqlPatientRowMapper` to convert each candidate row to a FHIR `Patient`
+- [x] 3.3 `PatientMatchScorer` functional interface (default: exact name+DOB, 1.0/0.0); hosting app can register @Primary IDIMatch-based scorer ✅
+- [x] 3.4 Singular-match enforcement in `SqlPatientSearchService`: MATCH/NO_MATCH/AMBIGUOUS via `PatientSearchResult`; ambiguous returns 422 OperationOutcome
+- [x] 3.5 Unit tests for `SqlPatientSearchService` (7 tests): SQL generation, named params, match/no-match/ambiguous, ge/le lastUpdated operators
+- [x] 3.6 Create `SqlImmunizationRetrievalService`; parameterized ANSI SQL query by patient ID; `_lastUpdated` WHERE predicate from Immunization mapping
+- [x] 3.7 Returns `List<Map<String,Object>>` with column names preserved
+- [x] 3.8 Unit tests for `SqlImmunizationRetrievalService` (6 tests): SQL generation, patient ID param, lastUpdated with ge/gt operators
+- [x] 3.9 `SqlFhirBackend` orchestrator wired fully; `SqlFhirController` routes by backend registry map (`IQueryBackend`); parses FHIR search params from request; `PatientSearchResult` (MATCH/NO_MATCH/AMBIGUOUS) and top-level `QueryResult` (Bundle or OperationOutcome) unify all backend return types
+- [x] 3.9a Per-backend config: `SqlBackendConfig` + redesigned `SqlBackendProperties`; `SqlBackendAutoConfiguration` builds backend registry from `sql.backends.{name}` config; always registers `dev` with built-in classpath CSV; registers `test` and JDBC backends from config
+- [x] 3.9b `SqlPatientSearchService` uses `SELECT DISTINCT <patient_columns>` derived from mapping config; supports denormalized single-table and normalized two-table schemas
 - [ ] 3.10 Add Stage 3 Postman tests: `_lastUpdated` temporal filtering on single-patient query; verify via log cache that WHERE clause is present in SQL; verify singular/no-match/ambiguous response shapes; verify `_lastUpdated` absent returns all records
+- [ ] 3.DOC Update `docs/sql-fhir/sql-fhir-api.md` with `_lastUpdated` server-side filtering details and SQL WHERE clause behavior; document `sql-mapping.yml` `is_last_updated` flag and its effect on temporal queries
 - [ ] **3.DEPLOY** Deploy SQL-enabled image to dev with datasource configured; run full Postman collection; Stages 1–2 still pass; Stage 3 temporal filtering tests pass with log cache inspection confirming server-side predicate
+
+---
+
+## Stage T — Local Test Capability
+
+_Goal: a competent engineer can pull the SQL-enabled image, mount a WA DOH all\_vax\_event CSV, and query the `test` endpoint without any database, cloud infrastructure, or client certificates._
+
+- [x] T.1 `SqlTestBackend implements IQueryBackend`: loads a single denormalized CSV file (all\_vax\_event format); patient search deduplicates rows by patient ID; immunization retrieval returns all rows for matched patient; `_lastUpdated` filtering via string comparison on the `is_last_updated` column
+- [x] T.2 `application-sql.yml`: default config wires `dev` (two-file hub fixture) and `test` (one-file WA DOH format) backends; `SQL_BACKENDS_TEST_DATA_PATH` and `SQL_BACKENDS_TEST_MAPPING_CONFIG_PATH` env vars override file paths without image rebuild
+- [x] T.3 `docker/generate-token.js`: Node.js script (built-in `crypto` only, no npm packages); reads `XFORM_JWT_SECRET` (base64); prints sender token (`xform-sender`) and admin token (`xform-sender` + `admin`), each valid one hour
+- [x] T.4 `docker/docker-entrypoint.sh`: replaces hardcoded `ENTRYPOINT` `sh -c "..."` with a proper script that routes `generate-token` argument to `node generate-token.js` and otherwise runs the service unchanged
+- [x] T.5 `Dockerfile`: `keytool -genkeypair` generates a self-signed BCFKS keystore (`CN=sql.xform.testing.local, O=izgateway`) at image build time using the existing bc-fips-2.1.2.jar; trust store is a copy of the same file; stored at `/ssl/local/`; engineers override with production keystores via `XFORM_CRYPTO_STORE_*` env vars
+- [x] T.6 `docs/sql-fhir/local-testing.md`: complete getting-started guide covering secret generation, `generate-token` Docker command, `docker run` with volume mount, and curl queries for Windows (cmd + PowerShell) and Unix/Mac
+- [x] **T.DEPLOY** IS_SQL=true build run 28324803991 passed (9m10s); image deployed to `ghcr.io/izgateway/izgw-transform-sql:latest` and `transformation-service-sql` ECR; `generate-token` entrypoint and self-signed BCFKS keystore confirmed in image
 
 ---
 
@@ -123,6 +146,7 @@ _Goal: full async bulk export lifecycle working end-to-end._
 - [ ] 4.6 Implement NDJSON file serving endpoint `GET /fhir/$export-files/{jobId}/{fileIndex}` with `Content-Type: application/ndjson`; stream via `BulkExportOutputStore.stream()`
 - [ ] 4.7 Update `BulkExportJobStore` job state via `update()` on completion to build manifest JSON with `output` array (type, url, count per file)
 - [ ] 4.8 Add Stage 4 Postman tests: full bulk export lifecycle (kickoff → poll until complete → download each NDJSON file → verify line counts → DELETE); verify `_type=Immunization` omits Patient file; verify `_typeFilter` temporal filtering; verify `_since` alignment with single-patient `_lastUpdated`; log cache inspection throughout
+- [ ] 4.DOC Update `docs/sql-fhir/bulk-fhir-api.md` with confirmed NDJSON chunk sizes, manifest format, `_typeFilter` behavior, and `_since`/`_lastUpdated` alignment; remove V1 limitation stubs that are now implemented
 - [ ] **4.DEPLOY** Deploy to dev; run full Postman collection; Stages 1–3 still pass; Stage 4 bulk export lifecycle passes; NDJSON line counts match expected from `sql-dev` fixture
 
 ---
