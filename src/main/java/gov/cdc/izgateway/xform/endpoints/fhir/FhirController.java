@@ -66,6 +66,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ca.uhn.fhir.model.api.Include;
 import ca.uhn.fhir.rest.param.DateParam;
+import ca.uhn.fhir.rest.param.ReferenceParam;
 import ca.uhn.fhir.rest.param.TokenParam;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.DataTypeException;
@@ -139,6 +140,8 @@ import lombok.extern.slf4j.Slf4j;
 public class FhirController {
 
     private static final String PATIENT = "Patient";
+    /** FHIR search parameter name accepted as a lenient alias for {@code patient}. */
+    private static final String SUBJECT = "subject";
 
     /**
      * Configuration of the V2toFHIR Conversion
@@ -671,6 +674,8 @@ public class FhirController {
         HttpServletRequest req, 
         String destinationId
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
+        // Accept the FHIR `subject` parameter as a lenient alias for `patient`.
+        req = normalizeSubjectToPatient(req);
         String queryType = Strings.CS.contains(req.getRequestURI(), "ImmunizationRecommendation") ? IzQuery.RECOMMENDATION : IzQuery.HISTORY;
         
         // Create the request and set the destination
@@ -742,6 +747,59 @@ public class FhirController {
 		}
 		return query;
 	}
+
+    /**
+     * Rewrite the FHIR {@code subject} search parameter to {@code patient}.
+     *
+     * <p>{@code subject} is not a defined Immunization search parameter, but it is a
+     * common alias for {@code patient} on Patient-typed resources. We accept it
+     * leniently (Postel's law) so senders using {@code subject=} still resolve, then
+     * hand a clean {@code patient=} parameter to the spec-compliant v2tofhir mapping.
+     * This is a non-standard convenience; senders should migrate to {@code patient=}.</p>
+     *
+     * <p>Only references that resolve to a {@code Patient} (or a bare id) are aliased;
+     * an explicitly-typed non-Patient reference (e.g. {@code Group/...}) is dropped so
+     * the request fails the normal "no identifier" validation rather than a decode error.</p>
+     *
+     * @param req    The incoming request.
+     * @return    The original request, or a modifiable wrapper with {@code subject}
+     * rewritten to {@code patient} when a {@code subject} parameter is present.
+     */
+    static HttpServletRequest normalizeSubjectToPatient(HttpServletRequest req) {
+        String[] subject = req.getParameterValues(SUBJECT);
+        if (subject == null || subject.length == 0) {
+            return req;
+        }
+        RequestWithModifiableParameters reqp =
+            (req instanceof RequestWithModifiableParameters r) ? r : new RequestWithModifiableParameters(req);
+        // patient (or patient.identifier) wins if present; only alias when neither is
+        // supplied, so we never add a second/duplicate QPD-3 patient identifier.
+        if (reqp.getParameter(Immunization.SP_PATIENT) == null
+                && reqp.getParameter(IzQuery.PATIENT_LIST) == null) {
+            for (String v : subject) {
+                if (isPatientReference(v)) {
+                    reqp.addParameter(Immunization.SP_PATIENT, v);
+                }
+            }
+        }
+        reqp.removeParameters(SUBJECT);
+        return reqp;
+    }
+
+    /**
+     * @param value    A FHIR reference value (e.g. {@code Patient/123}, a bare id, or a full URL).
+     * @return    true if {@code value} is a Patient reference or a bare id (no resource
+     * type); false for an explicitly-typed non-Patient reference such as {@code Group/...}.
+     */
+    static boolean isPatientReference(String value) {
+        if (value == null || value.isBlank()) {
+            return false;
+        }
+        ReferenceParam ref = new ReferenceParam();
+        ref.setValueAsQueryToken(null, SUBJECT, null, value);
+        String type = ref.getResourceType();
+        return type == null || type.isEmpty() || PATIENT.equals(type);
+    }
 
 	private void setMSHValues(QBP_Q11 qbp) throws DataTypeException {
 		/* These value should be adjusted in the pipeline configuration once the message has been forwarded. */

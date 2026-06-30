@@ -48,6 +48,15 @@ Minimum required parameters (either, not both):
 Additional demographics (`patient.gender`, `patient.address.*`, `patient.phone`, etc.)
 are passed to the IIS as query hints; their use depends on the IIS implementation.
 
+> **`subject` accepted as an alias for `patient` (non-standard).** `subject` is **not** a
+> defined search parameter for the Immunization resource in FHIR R4 or US Core. As a
+> convenience, the service accepts `subject` as an alias for `patient` when its value is a
+> `Patient` reference (e.g. `subject=Patient/...`) or a bare id — it is rewritten to
+> `patient` before the query is built. An explicitly-typed non-Patient reference (e.g.
+> `subject=Group/...`) is ignored. If both `patient` and `subject` are supplied, `patient`
+> takes precedence. This is a vendor convenience to ease integration; **clients should send
+> `patient`**, which is the conformant parameter.
+
 #### Limiting result count
 
 ```
