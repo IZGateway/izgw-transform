@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceContext.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.context</a> &gt; <span class="el_source">ServiceContext.java</span></div><h1>ServiceContext.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.context;
+
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
+import gov.cdc.izgateway.xform.enums.DataFlowDirection;
+import gov.cdc.izgateway.xform.enums.DataType;
+import gov.cdc.izgateway.xform.util.Hl7Utils;
+import lombok.Data;
+
+import java.util.HashMap;
+import java.util.UUID;
+
+@Data
+public class ServiceContext {
+    private UUID organizationId;
+    private String inboundEndpoint;
+    private String outboundEndpoint;
+    private Message requestMessage;
+    private Message responseMessage;
+    private DataFlowDirection currentDirection;
+    private DataType dataType;
+    private HashMap&lt;String, String&gt; state;
+    public String facilityId;
+
+<span class="fc" id="L25">    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, DataType dataType, String facilityId, String rawMessage) throws HL7Exception {</span>
+<span class="fc" id="L26">        this.organizationId = organizationId;</span>
+<span class="fc" id="L27">        this.inboundEndpoint = inboundEndpoint;</span>
+<span class="fc" id="L28">        this.outboundEndpoint = outboundEndpoint;</span>
+<span class="fc" id="L29">        this.dataType = dataType;</span>
+<span class="fc" id="L30">        this.facilityId = facilityId;</span>
+
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if (dataType.equals(DataType.HL7V2)) {</span>
+<span class="fc" id="L33">            this.requestMessage = Hl7Utils.parseHl7v2Message(rawMessage);</span>
+        }
+<span class="fc" id="L35">        this.currentDirection = DataFlowDirection.REQUEST;</span>
+
+<span class="fc" id="L37">        this.state = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L38">    }</span>
+
+    public Message getCurrentMessage() {
+        // TODO - need to generalize &quot;message&quot; here so it can be HL7 or FHIR or whatever
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        if (this.currentDirection == DataFlowDirection.REQUEST) {</span>
+<span class="fc" id="L43">            return this.requestMessage;</span>
+        }
+
+<span class="nc" id="L46">        return this.responseMessage;</span>
+    }
+
+    public void setCurrentMessage(Message message) {
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (this.currentDirection == DataFlowDirection.REQUEST) {</span>
+<span class="fc" id="L51">            this.requestMessage = message;</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        } else if (this.currentDirection == DataFlowDirection.RESPONSE) {</span>
+<span class="nc" id="L53">            this.responseMessage = message;</span>
+        }
+<span class="fc" id="L55">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
