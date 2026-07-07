@@ -1,3 +1,12 @@
+# IZ Gateway Transformation Service 0.20.0
+
+Released 2026-07-07.
+
+- chore: Bump izgw-bom, izgw-core, and v2tofhir ([#272](https://github.com/IZGateway/izgw-transform/pull/272))
+- chore(deps): bump actions/checkout from 6 to 7 ([#269](https://github.com/IZGateway/izgw-transform/pull/269))
+- IGDD-3057 - allow subject alias for patient in FHIR Immunization queries ([#270](https://github.com/IZGateway/izgw-transform/pull/270))
+- ci: pin Docker actions to commit SHAs for supply-chain security ([#268](https://github.com/IZGateway/izgw-transform/pull/268))
+
 # IZ Gateway Transformation Service 0.19.1
 
 Released 2026-06-17.
