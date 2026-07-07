@@ -72,4 +72,21 @@
         <sha1>e3b07cd3be66ec918b9fa4db9863c86d5eeea891</sha1>
         <cve>CVE-2026-0994</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+        httpcore-4.4.16.jar: CVE-2026-54399 and CVE-2026-54428 are false positives on the httpcore 4.x line.
+        Both vulnerabilities are HTTP/2 issues in the HttpComponents Core 5.x codebase (the HPackDecoder /
+        HTTP/2 header handling in httpcore5 / httpcore5-h2), fixed in 5.4.2. The httpcore 4.x line does not
+        contain that HTTP/2 code and is not affected. The NVD CPE cpe:/a:apache:httpcomponents_core uses an
+        upper-bound-only range ("up to and including 5.4.2"), so dependency-check numerically matches
+        4.4.16 (<= 5.4.2) on the shared CPE. 4.4.16 is the terminal 4.x release, so there is no newer 4.x to
+        upgrade to; it is pulled in transitively by izgw-core's OCSP revocation code, which references only a
+        couple of string constants from the 4.x jars. The 5.x artifacts (httpcore5/httpcore5-h2) already
+        resolve to a fixed version (>= 5.4.3).
+        Added: 2026-07-07
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.httpcomponents/httpcore@.*$</packageUrl>
+        <cve>CVE-2026-54399</cve>
+        <cve>CVE-2026-54428</cve>
+    </suppress>
 </suppressions>
