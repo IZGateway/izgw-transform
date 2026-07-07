@@ -23,18 +23,18 @@ public class RequestWithModifiableParameters extends HttpServletRequestWrapper {
     Map&lt;String, List&lt;String&gt;&gt; map;
 
     RequestWithModifiableParameters(HttpServletRequest req) {
-<span class="nc" id="L26">        super(req);</span>
-<span class="nc" id="L27">        map = initParameterMap(req);</span>
-<span class="nc" id="L28">    }</span>
+<span class="fc" id="L26">        super(req);</span>
+<span class="fc" id="L27">        map = initParameterMap(req);</span>
+<span class="fc" id="L28">    }</span>
 
     private static Map&lt;String, List&lt;String&gt;&gt; initParameterMap(HttpServletRequest req) {
-<span class="nc" id="L31">        Map&lt;String, List&lt;String&gt;&gt; m = new LinkedHashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L32" title="All 2 branches missed.">        for (Map.Entry&lt;String, String[]&gt; e: req.getParameterMap().entrySet()) {</span>
+<span class="fc" id="L31">        Map&lt;String, List&lt;String&gt;&gt; m = new LinkedHashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        for (Map.Entry&lt;String, String[]&gt; e: req.getParameterMap().entrySet()) {</span>
 <span class="nc" id="L33">            List&lt;String&gt; l = new ArrayList&lt;&gt;();</span>
 <span class="nc" id="L34">            l.addAll(Arrays.asList(e.getValue()));</span>
 <span class="nc" id="L35">            m.put(e.getKey(), l);</span>
 <span class="nc" id="L36">        }</span>
-<span class="nc" id="L37">        return m;</span>
+<span class="fc" id="L37">        return m;</span>
     }
 
     /**
@@ -45,9 +45,9 @@ public class RequestWithModifiableParameters extends HttpServletRequestWrapper {
      * @param value    The parameter value.
      */
     public void addParameter(String name, String value) {
-<span class="nc" id="L48">        List&lt;String&gt; l = map.computeIfAbsent(name, k -&gt; new ArrayList&lt;&gt;());</span>
-<span class="nc" id="L49">        l.add(value);</span>
-<span class="nc" id="L50">    }</span>
+<span class="fc" id="L48">        List&lt;String&gt; l = map.computeIfAbsent(name, k -&gt; new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L49">        l.add(value);</span>
+<span class="fc" id="L50">    }</span>
     
     /**
      * Remove all parameters for the given parameter.
@@ -55,7 +55,7 @@ public class RequestWithModifiableParameters extends HttpServletRequestWrapper {
      * @return    The values for this parameter.
      */
     public List&lt;String&gt; removeParameters(String name) {
-<span class="nc" id="L58">        return map.remove(name);</span>
+<span class="fc" id="L58">        return map.remove(name);</span>
     }
     
     /**
@@ -74,8 +74,8 @@ public class RequestWithModifiableParameters extends HttpServletRequestWrapper {
     
     @Override
     public String getParameter(String name) {
-<span class="nc" id="L77">        List&lt;String&gt; l = map.get(name);</span>
-<span class="nc bnc" id="L78" title="All 4 branches missed.">        return l == null || l.isEmpty() ? null : l.get(0); </span>
+<span class="fc" id="L77">        List&lt;String&gt; l = map.get(name);</span>
+<span class="pc bpc" id="L78" title="1 of 4 branches missed.">        return l == null || l.isEmpty() ? null : l.get(0); </span>
     }
 
     /**
@@ -83,7 +83,7 @@ public class RequestWithModifiableParameters extends HttpServletRequestWrapper {
      * @return The parameter map in list form instead of array form.
      */
     public Map&lt;String, List&lt;String&gt;&gt; getParameters() {
-<span class="nc" id="L86">        return Collections.unmodifiableMap(map);</span>
+<span class="fc" id="L86">        return Collections.unmodifiableMap(map);</span>
     }
     
     @Override
@@ -102,8 +102,8 @@ public class RequestWithModifiableParameters extends HttpServletRequestWrapper {
 
     @Override
     public String[] getParameterValues(String name) {
-<span class="nc" id="L105">        List&lt;String&gt; l = map.get(name);</span>
-<span class="nc bnc" id="L106" title="All 2 branches missed.">        return l == null ? null : l.toArray(new String[0]);</span>
+<span class="fc" id="L105">        List&lt;String&gt; l = map.get(name);</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        return l == null ? null : l.toArray(new String[0]);</span>
     }
 
     /**
