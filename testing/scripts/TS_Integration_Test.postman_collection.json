@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "986c2c1a-f533-4966-ad78-4a37ee344f07",
+    "_postman_id": "5766507e-c769-444f-bfb6-fe8be41683de",
     "name": "TS Integration Test",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "2729094",
-    "_collection_link": "https://go.postman.co/collection/2729094-986c2c1a-f533-4966-ad78-4a37ee344f07?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/2729094-5766507e-c769-444f-bfb6-fe8be41683de?source=collection_link"
   },
   "item": [
     {
@@ -708,19 +708,196 @@
                   "query": [
                     {
                       "key": "patient.given",
-                      "value": "{{fhirPatientGiven}}",
-                      "disabled": false
+                      "value": "{{fhirPatientGiven}}"
                     },
                     {
                       "key": "patient.family",
-                      "value": "{{fhirPatientFamily}}",
-                      "disabled": false
+                      "value": "{{fhirPatientFamily}}"
                     },
                     {
                       "key": "patient.birthdate",
-                      "value": "{{fhirPatientDOB}}",
-                      "disabled": false
+                      "value": "{{fhirPatientDOB}}"
                     }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_07b FHIR Query Returns Data - patient",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "pm.test(\"Verify at least one entry is returned\", function() {",
+                      "    pm.expect(response.entry.length).to.be.at.least(1);",
+                      "});",
+                      "let immunization = response.entry.find(e => e.resource && e.resource.resourceType === \"Immunization\");",
+                      "pm.test(\"Verify Immunization is present\", function() {",
+                      "    pm.expect(immunization).to.not.be.undefined;",
+                      "});",
+                      "pm.test(\"Verify Vaccine Code\", function() {",
+                      "    pm.expect(immunization.resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Add the patient name only when sending to a *.phiz-project.org host",
+                      "// (onboard, preprod, etc.) — those hubs have catch-and-kill on and need QPD-4.",
+                      "// Everywhere else (dev.xform.izgateway.org, localhost, …) send identifier only.",
+                      "const host = String(pm.variables.get('host') || '');",
+                      "if (/\\.phiz-project\\.org$/i.test(host)) {",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.family', value: pm.variables.get('fhirPatientFamily') });",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.given',  value: pm.variables.get('fhirPatientGiven') });",
+                      "}"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "patient",
+                      "value": "Patient/{{fhirPatientResource}}",
+                      "type": "text",
+                      "uuid": "cb8741af-e375-4f3e-b382-8f47f0f077d2"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization/_search",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization",
+                    "_search"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_07c FHIR Query Returns Data - subject",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "pm.test(\"Verify at least one entry is returned\", function() {",
+                      "    pm.expect(response.entry.length).to.be.at.least(1);",
+                      "});",
+                      "let immunization = response.entry.find(e => e.resource && e.resource.resourceType === \"Immunization\");",
+                      "pm.test(\"Verify Immunization is present\", function() {",
+                      "    pm.expect(immunization).to.not.be.undefined;",
+                      "});",
+                      "pm.test(\"Verify Vaccine Code\", function() {",
+                      "    pm.expect(immunization.resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Add the patient name only when sending to a *.phiz-project.org host",
+                      "// (onboard, preprod, etc.) — those hubs have catch-and-kill on and need QPD-4.",
+                      "// Everywhere else (dev.xform.izgateway.org, localhost, …) send identifier only.",
+                      "const host = String(pm.variables.get('host') || '');",
+                      "if (/\\.phiz-project\\.org$/i.test(host)) {",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.family', value: pm.variables.get('fhirPatientFamily') });",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.given',  value: pm.variables.get('fhirPatientGiven') });",
+                      "}"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "subject",
+                      "value": "Patient/{{fhirPatientResource}}",
+                      "type": "text",
+                      "uuid": "cb8741af-e375-4f3e-b382-8f47f0f077d2"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization/_search",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization",
+                    "_search"
                   ]
                 }
               },
@@ -866,18 +1043,15 @@
                   "query": [
                     {
                       "key": "patient.given",
-                      "value": "{{fhirNoDataPatientGiven}}",
-                      "disabled": false
+                      "value": "{{fhirNoDataPatientGiven}}"
                     },
                     {
                       "key": "patient.family",
-                      "value": "{{fhirNoDataPatientFamily}}",
-                      "disabled": false
+                      "value": "{{fhirNoDataPatientFamily}}"
                     },
                     {
                       "key": "patient.birthdate",
-                      "value": "{{fhirNoDataPatientDOB}}",
-                      "disabled": false
+                      "value": "{{fhirNoDataPatientDOB}}"
                     }
                   ]
                 }
@@ -885,7 +1059,209 @@
               "response": []
             },
             {
+              "name": "TS_TC_08b FHIR Query Returns No Data - patient",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Entry length is 2\", function() {",
+                      "    pm.expect(response.entry.length).to.equal(2);",
+                      "});",
+                      "",
+                      "pm.test(\"Verify NF is returned indicating no data found\", function() {",
+                      "    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+                      "});",
+                      "",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Add the patient name only when sending to a *.phiz-project.org host",
+                      "// (onboard, preprod, etc.) — those hubs have catch-and-kill on and need QPD-4.",
+                      "// Everywhere else (dev.xform.izgateway.org, localhost, …) send identifier only.",
+                      "const host = String(pm.variables.get('host') || '');",
+                      "if (/\\.phiz-project\\.org$/i.test(host)) {",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.family', value: pm.variables.get('fhirNoDataPatientFamily') });",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.given',  value: pm.variables.get('fhirNoDataPatientGiven') });",
+                      "}",
+                      "",
+                      "// Use the no-data patient name so it still clears catch-and-kill but can't match a real patient",
+                      "// for the query since we want it not to be found",
+                      "pm.collectionVariables.set('fakePatientResource', btoa('MYEHR|000000000'));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "patient",
+                      "value": "Patient/{{fakePatientResource}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization/_search",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization",
+                    "_search"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_08c FHIR Query Returns No Data - subject",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Entry length is 2\", function() {",
+                      "    pm.expect(response.entry.length).to.equal(2);",
+                      "});",
+                      "",
+                      "pm.test(\"Verify NF is returned indicating no data found\", function() {",
+                      "    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+                      "});",
+                      "",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Add the patient name only when sending to a *.phiz-project.org host",
+                      "// (onboard, preprod, etc.) — those hubs have catch-and-kill on and need QPD-4.",
+                      "// Everywhere else (dev.xform.izgateway.org, localhost, …) send identifier only.",
+                      "const host = String(pm.variables.get('host') || '');",
+                      "if (/\\.phiz-project\\.org$/i.test(host)) {",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.family', value: pm.variables.get('fhirNoDataPatientFamily') });",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.given',  value: pm.variables.get('fhirNoDataPatientGiven') });",
+                      "}",
+                      "",
+                      "// Use the no-data patient name so it still clears catch-and-kill but can't match a real patient",
+                      "// for the query since we want it not to be found",
+                      "pm.collectionVariables.set('fakePatientResource', btoa('MYEHR|000000000'));",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "subject",
+                      "value": "Patient/{{fakePatientResource}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization/_search",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization",
+                    "_search"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
               "name": "TS_TC_09 FHIR POST without _search Returns 405",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 405 - POST without /_search is not a valid FHIR search\", function () {",
+                      "    pm.response.to.have.status(405);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "POST",
                 "header": [],
@@ -923,19 +1299,7 @@
                   ]
                 }
               },
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test(\"Status code is 405 - POST without /_search is not a valid FHIR search\", function () {",
-                      "    pm.response.to.have.status(405);",
-                      "});"
-                    ]
-                  }
-                }
-              ]
+              "response": []
             }
           ],
           "auth": {
@@ -14937,19 +15301,182 @@
                   "query": [
                     {
                       "key": "patient.given",
-                      "value": "{{fhirPatientGiven}}",
-                      "disabled": false
+                      "value": "{{fhirPatientGiven}}"
                     },
                     {
                       "key": "patient.family",
-                      "value": "{{fhirPatientFamily}}",
-                      "disabled": false
+                      "value": "{{fhirPatientFamily}}"
                     },
                     {
                       "key": "patient.birthdate",
-                      "value": "{{fhirPatientDOB}}",
-                      "disabled": false
+                      "value": "{{fhirPatientDOB}}"
                     }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_07b FHIR Query Returns Data - patient with JWT",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "pm.test(\"Verify at least one entry is returned\", function() {",
+                      "    pm.expect(response.entry.length).to.be.at.least(1);",
+                      "});",
+                      "let immunization = response.entry.find(e => e.resource && e.resource.resourceType === \"Immunization\");",
+                      "pm.test(\"Verify Immunization is present\", function() {",
+                      "    pm.expect(immunization).to.not.be.undefined;",
+                      "});",
+                      "pm.test(\"Verify Vaccine Code\", function() {",
+                      "    pm.expect(immunization.resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Add the patient name only when sending to a *.phiz-project.org host",
+                      "// (onboard, preprod, etc.) — those hubs have catch-and-kill on and need QPD-4.",
+                      "// Everywhere else (dev.xform.izgateway.org, localhost, …) send identifier only.",
+                      "const host = String(pm.variables.get('no_cert_host') || '');",
+                      "if (/\\.phiz-project\\.org$/i.test(host)) {",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.family', value: pm.variables.get('fhirPatientFamily') });",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.given',  value: pm.variables.get('fhirPatientGiven') });",
+                      "}"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-xform-organization",
+                    "value": "0d15449b-fb08-4013-8985-20c148b353fe",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "patient",
+                      "value": "Patient/{{fhirPatientResource}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization/_search",
+                  "protocol": "{{no_cert_protocol}}",
+                  "host": [
+                    "{{no_cert_host}}"
+                  ],
+                  "port": "{{no_cert_port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization",
+                    "_search"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_07c FHIR Query Returns Data - subject with JWT",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "pm.test(\"Verify at least one entry is returned\", function() {",
+                      "    pm.expect(response.entry.length).to.be.at.least(1);",
+                      "});",
+                      "let immunization = response.entry.find(e => e.resource && e.resource.resourceType === \"Immunization\");",
+                      "pm.test(\"Verify Immunization is present\", function() {",
+                      "    pm.expect(immunization).to.not.be.undefined;",
+                      "});",
+                      "pm.test(\"Verify Vaccine Code\", function() {",
+                      "    pm.expect(immunization.resource.vaccineCode.coding[0].code).to.equal(\"208\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Add the patient name only when sending to a *.phiz-project.org host",
+                      "// (onboard, preprod, etc.) — those hubs have catch-and-kill on and need QPD-4.",
+                      "// Everywhere else (dev.xform.izgateway.org, localhost, …) send identifier only.",
+                      "const host = String(pm.variables.get('no_cert_host') || '');",
+                      "if (/\\.phiz-project\\.org$/i.test(host)) {",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.family', value: pm.variables.get('fhirPatientFamily') });",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.given',  value: pm.variables.get('fhirPatientGiven') });",
+                      "}"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-xform-organization",
+                    "value": "0d15449b-fb08-4013-8985-20c148b353fe",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "subject",
+                      "value": "Patient/{{fhirPatientResource}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization/_search",
+                  "protocol": "{{no_cert_protocol}}",
+                  "host": [
+                    "{{no_cert_host}}"
+                  ],
+                  "port": "{{no_cert_port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization",
+                    "_search"
                   ]
                 }
               },
@@ -15087,18 +15614,15 @@
                   "query": [
                     {
                       "key": "patient.given",
-                      "value": "{{fhirNoDataPatientGiven}}",
-                      "disabled": false
+                      "value": "{{fhirNoDataPatientGiven}}"
                     },
                     {
                       "key": "patient.family",
-                      "value": "{{fhirNoDataPatientFamily}}",
-                      "disabled": false
+                      "value": "{{fhirNoDataPatientFamily}}"
                     },
                     {
                       "key": "patient.birthdate",
-                      "value": "{{fhirNoDataPatientDOB}}",
-                      "disabled": false
+                      "value": "{{fhirNoDataPatientDOB}}"
                     }
                   ]
                 }
@@ -15106,7 +15630,194 @@
               "response": []
             },
             {
+              "name": "TS_TC_08b FHIR Query Returns No Data - patient with JWT",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Entry length is 2\", function() {",
+                      "    pm.expect(response.entry.length).to.equal(2);",
+                      "});",
+                      "",
+                      "pm.test(\"Verify NF is returned indicating no data found\", function() {",
+                      "    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+                      "});",
+                      "",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Add the patient name only when sending to a *.phiz-project.org host",
+                      "// (onboard, preprod, etc.) — those hubs have catch-and-kill on and need QPD-4.",
+                      "// Everywhere else (dev.xform.izgateway.org, localhost, …) send identifier only.",
+                      "const host = String(pm.variables.get('no_cert_host') || '');",
+                      "if (/\\.phiz-project\\.org$/i.test(host)) {",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.family', value: pm.variables.get('fhirNoDataPatientFamily') });",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.given',  value: pm.variables.get('fhirNoDataPatientGiven') });",
+                      "}",
+                      "",
+                      "// Use a fixed non-existent identifier so the query returns no data",
+                      "pm.collectionVariables.set('fakePatientResource', btoa('MYEHR|000000000'));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-xform-organization",
+                    "value": "0d15449b-fb08-4013-8985-20c148b353fe",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "patient",
+                      "value": "Patient/{{fakePatientResource}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization/_search",
+                  "protocol": "{{no_cert_protocol}}",
+                  "host": [
+                    "{{no_cert_host}}"
+                  ],
+                  "port": "{{no_cert_port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization",
+                    "_search"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_08c FHIR Query Returns No Data - subject with JWT",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "let response = pm.response.json();",
+                      "pm.test(\"verify type is Bundle\", function() {",
+                      "    pm.expect(response.resourceType).to.equal(\"Bundle\");",
+                      "});",
+                      "",
+                      "pm.test(\"Verify Entry length is 2\", function() {",
+                      "    pm.expect(response.entry.length).to.equal(2);",
+                      "});",
+                      "",
+                      "pm.test(\"Verify NF is returned indicating no data found\", function() {",
+                      "    pm.expect(response.entry[1].resource.issue[0].details.coding[0].code).to.equal(\"NF\");",
+                      "});",
+                      "",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      "// Add the patient name only when sending to a *.phiz-project.org host",
+                      "// (onboard, preprod, etc.) — those hubs have catch-and-kill on and need QPD-4.",
+                      "// Everywhere else (dev.xform.izgateway.org, localhost, …) send identifier only.",
+                      "const host = String(pm.variables.get('no_cert_host') || '');",
+                      "if (/\\.phiz-project\\.org$/i.test(host)) {",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.family', value: pm.variables.get('fhirNoDataPatientFamily') });",
+                      "    pm.request.body.urlencoded.add({ key: 'patient.given',  value: pm.variables.get('fhirNoDataPatientGiven') });",
+                      "}",
+                      "",
+                      "// Use a fixed non-existent identifier so the query returns no data",
+                      "pm.collectionVariables.set('fakePatientResource', btoa('MYEHR|000000000'));"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "x-xform-organization",
+                    "value": "0d15449b-fb08-4013-8985-20c148b353fe",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "subject",
+                      "value": "Patient/{{fakePatientResource}}",
+                      "type": "text"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization/_search",
+                  "protocol": "{{no_cert_protocol}}",
+                  "host": [
+                    "{{no_cert_host}}"
+                  ],
+                  "port": "{{no_cert_port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization",
+                    "_search"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
               "name": "TS_TC_09 FHIR POST without _search Returns 405",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 405 - POST without /_search is not a valid FHIR search\", function () {",
+                      "    pm.response.to.have.status(405);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "POST",
                 "header": [],
@@ -15144,19 +15855,7 @@
                   ]
                 }
               },
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "type": "text/javascript",
-                    "exec": [
-                      "pm.test(\"Status code is 405 - POST without /_search is not a valid FHIR search\", function () {",
-                      "    pm.response.to.have.status(405);",
-                      "});"
-                    ]
-                  }
-                }
-              ]
+              "response": []
             }
           ]
         },
@@ -28095,6 +28794,12 @@
           "pm.collectionVariables.set(\"fhirPatientGiven\", \"MarnyAIRA\");",
           "pm.collectionVariables.set(\"fhirPatientFamily\", \"CuyahogaAIRA\");",
           "pm.collectionVariables.set(\"fhirPatientDOB\", \"1960-05-07\");",
+          "const fhirPatientIdentifier = \"100000317\";",
+          "const fhirPatientSourceCode = \"MYEHR\";",
+          "const fhirPatientResource = btoa(fhirPatientSourceCode + \"|\" + fhirPatientIdentifier);",
+          "pm.collectionVariables.set(\"fhirPatientIdentifier\", fhirPatientIdentifier);",
+          "pm.collectionVariables.set(\"fhirPatientSourceCode\", fhirPatientSourceCode);",
+          "pm.collectionVariables.set(\"fhirPatientResource\", fhirPatientResource);",
           "",
           "// FHIR \"No Data\" Tests",
           "pm.collectionVariables.set(\"fhirNoDataPatientGiven\", \"NogivenAIRA\");",
@@ -29436,6 +30141,22 @@
     },
     {
       "key": "createdMapping",
+      "value": ""
+    },
+    {
+      "key": "fhirPatientIdentifier",
+      "value": ""
+    },
+    {
+      "key": "fhirPatientSourceCode",
+      "value": ""
+    },
+    {
+      "key": "fhirPatientResource",
+      "value": ""
+    },
+    {
+      "key": "fakePatientResource",
       "value": ""
     }
   ]
