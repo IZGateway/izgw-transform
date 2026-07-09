@@ -24,6 +24,9 @@
 		<buildno>${timestamp}</buildno>
 		<xform.testing.common.pass>XFORM_TESTING_COMMON_PASS</xform.testing.common.pass>
 
+		<!-- Override Camel version to fix CVEs (CVE-2026-46455 et al.) -->
+		<camel.version>4.20.0</camel.version>
+
 		<!-- JaCoCo Configuration -->
 		<jacoco.version>0.8.13</jacoco.version>
 		<jacoco.jar>${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}.jar</jacoco.jar>
