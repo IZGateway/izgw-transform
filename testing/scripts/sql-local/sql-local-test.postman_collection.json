@@ -210,12 +210,12 @@
           { "key": "Accept", "value": "application/fhir+json" }
         ],
         "url": {
-          "raw": "{{sql_base_url}}/sql/fhir/test/Patient?family=Smith&birthdate=1985-03-15&_format=json",
+          "raw": "{{sql_base_url}}/sql/fhir/test/Patient?family=FagenAIRA&birthdate=1963-12-26&_format=json",
           "host": ["{{sql_base_url}}"],
           "path": ["sql", "fhir", "test", "Patient"],
           "query": [
-            { "key": "family", "value": "Smith" },
-            { "key": "birthdate", "value": "1985-03-15" },
+            { "key": "family", "value": "FagenAIRA" },
+            { "key": "birthdate", "value": "1963-12-26" },
             { "key": "_format", "value": "json" }
           ]
         }
@@ -369,12 +369,12 @@
           { "key": "Authorization", "value": "Bearer {{jwt_sender_token}}" }
         ],
         "url": {
-          "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15&_format=json",
+          "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=FagenAIRA&birthdate=1963-12-26&_format=json",
           "host": ["{{sql_base_url}}"],
           "path": ["sql", "fhir", "dev", "Patient"],
           "query": [
-            { "key": "family", "value": "Smith" },
-            { "key": "birthdate", "value": "1985-03-15" },
+            { "key": "family", "value": "FagenAIRA" },
+            { "key": "birthdate", "value": "1963-12-26" },
             { "key": "_format", "value": "json" }
           ]
         }

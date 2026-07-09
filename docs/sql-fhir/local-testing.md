@@ -103,13 +103,13 @@ this command with the same `XFORM_JWT_SECRET`.
 ## Step 5: Run the Container
 
 Mount your data folder to `/data` inside the container. The self-signed TLS certificate
-is baked into the image and the service listens on port 444.
+is baked into the image and the service listens on port 443.
 
 **Unix / Mac:**
 ```bash
 docker run -d \
   --name izgw-sql-test \
-  -p 444:444 \
+  -p 443:443 \
   -e XFORM_JWT_SECRET=$XFORM_JWT_SECRET \
   -v ~/izgw-sql-test:/data \
   ghcr.io/izgateway/izgw-transform-sql:latest
@@ -119,7 +119,7 @@ docker run -d \
 ```cmd
 docker run -d ^
   --name izgw-sql-test ^
-  -p 444:444 ^
+  -p 443:443 ^
   -e XFORM_JWT_SECRET=%XFORM_JWT_SECRET% ^
   -v %USERPROFILE%\izgw-sql-test:/data ^
   ghcr.io/izgateway/izgw-transform-sql:latest
@@ -129,7 +129,7 @@ docker run -d ^
 ```powershell
 docker run -d `
   --name izgw-sql-test `
-  -p 444:444 `
+  -p 443:443 `
   -e XFORM_JWT_SECRET=$env:XFORM_JWT_SECRET `
   -v "${env:USERPROFILE}\izgw-sql-test:/data" `
   ghcr.io/izgateway/izgw-transform-sql:latest
@@ -159,21 +159,21 @@ Substitute `<SENDER_TOKEN>` with the sender token printed in Step 4.
 ```bash
 curl -k \
   -H "Authorization: Bearer <SENDER_TOKEN>" \
-  "https://localhost:444/sql/fhir/test/Patient?family=Smith&birthdate=1985-03-15&_format=json"
+  "https://localhost:443/sql/fhir/test/Patient?family=FagenAIRA&birthdate=1963-12-26&_format=json"
 ```
 
 **Windows (Command Prompt):**
 ```cmd
 curl -k ^
   -H "Authorization: Bearer <SENDER_TOKEN>" ^
-  "https://localhost:444/sql/fhir/test/Patient?family=Smith&birthdate=1985-03-15&_format=json"
+  "https://localhost:443/sql/fhir/test/Patient?family=FagenAIRA&birthdate=1963-12-26&_format=json"
 ```
 
 **Windows (PowerShell):**
 ```powershell
 Invoke-RestMethod -SkipCertificateCheck `
   -Headers @{ Authorization = "Bearer <SENDER_TOKEN>" } `
-  -Uri "https://localhost:444/sql/fhir/test/Patient?family=Smith&birthdate=1985-03-15&_format=json"
+  -Uri "https://localhost:443/sql/fhir/test/Patient?family=FagenAIRA&birthdate=1963-12-26&_format=json"
 ```
 
 A matching patient returns a `searchset` Bundle containing a `Patient` resource and one
@@ -189,7 +189,7 @@ mapping file.
 ```bash
 curl -k \
   -H "Authorization: Bearer <SENDER_TOKEN>" \
-  "https://localhost:444/sql/fhir/test/Patient?family=Smith&birthdate=1985-03-15&_lastUpdated=ge2020-01-01&_format=json"
+  "https://localhost:443/sql/fhir/test/Patient?family=FagenAIRA&birthdate=1963-12-26&_lastUpdated=ge2020-01-01&_format=json"
 ```
 
 ---

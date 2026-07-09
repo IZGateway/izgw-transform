@@ -7,9 +7,10 @@
 > response formats, and FHIR operations are identical; only the base URL and data
 > source differ.
 
-> **Implementation status:** Stage 1 endpoints are live at `dev.sql-xform.izgateway.org`.
-> Single-patient queries currently return an empty Bundle (patient matching and
-> immunization retrieval are implemented in Stage 2). Bulk export is fully functional.
+> **Implementation status:** Stage 2 complete. Single-patient queries against the
+> built-in `dev` and `test` backends return real FHIR data from the AIRA RSP test
+> population (6,004 patients, 37,040 immunization events). Bulk export is fully
+> functional. SQL Server / RDS backend (Stage 5) is in progress.
 
 ---
 
@@ -19,8 +20,9 @@
 /sql/fhir/{name}/
 ```
 
-`{name}` is the SQL backend name configured via `sql.backend.<name>` (e.g., `dev`,
-`waiis`, `prod`). The built-in `dev` backend requires no configuration.
+`{name}` is the SQL backend name configured via `sql.backends.{name}` in
+`application-sql.yml` (e.g., `dev`, `test`, `waiis`). The built-in `dev` and `test`
+backends require no configuration and are always available.
 
 ---
 
@@ -44,26 +46,102 @@ Supported resource types: `Patient`, `Immunization`, `ImmunizationRecommendation
 | `birthdate` | date | Patient date of birth (`yyyy-MM-dd`) |
 | `given` | string | Patient given name |
 | `gender` | code | Patient gender (`male`, `female`, `unknown`) |
-| `_lastUpdated` | date prefix | Filter by record insertion timestamp (server-side WHERE clause); supports `ge`, `le`, `gt`, `lt` prefixes and closed ranges |
+| `_lastUpdated` | date prefix | Filter by record insertion timestamp; supports `ge`, `le`, `gt`, `lt` prefixes and closed ranges (see [Temporal Filtering](#lastUpdated-filtering)) |
 
-Patient matching uses the IDI algorithm. **A singular match is required** before
-immunization records are returned:
+---
 
-| Match result | Response |
-|---|---|
-| Exactly one candidate >= threshold | Bundle containing Patient + Immunization resources |
-| No candidates above threshold | Empty Bundle (`total: 0`) |
-| Two or more candidates above threshold | `OperationOutcome` (ambiguous match) |
+### Patient Matching Behavior
 
-#### `_lastUpdated` Filtering
+Matching works in two stages:
 
-`_lastUpdated` is applied as a SQL `WHERE` predicate on the `INSERT_STAMP` column
-(or equivalent `is_last_updated` column from `sql-mapping.yml`) -- not as a
-post-filter. This means only matching rows are fetched from the database.
+1. **Candidate retrieval** -- the service issues a broad query (last name + date of birth)
+   to retrieve all plausible candidates. For CSV backends this is an in-memory stream
+   filter; for JDBC backends it is a parameterized SQL query with a `WHERE` clause.
+
+2. **IDI scoring** -- each candidate is scored 0.0-1.0 against the request demographics
+   using the IDI (Immunization Data Integration) matching algorithm. A score at or above
+   `sql.matching-threshold` (default: **0.95**) qualifies as a match.
+
+**A singular match is required** before immunization records are returned:
+
+| Match result | HTTP | Response body |
+|---|---|---|
+| Exactly one candidate >= threshold | `200 OK` | `Bundle` (type: `searchset`) containing Patient and Immunization entries |
+| No candidates >= threshold | `200 OK` | Empty `Bundle` (`total: 0`, no entries) |
+| Two or more candidates >= threshold | `422 Unprocessable Entity` | `OperationOutcome` (code: `multiple-matches`) |
+
+The threshold is configurable via `sql.matching-threshold`. Lowering it (e.g., `0.85`)
+accepts fuzzier name spellings; raising it toward `1.0` requires a near-exact match.
+
+#### Example: Singular Match
 
 ```
-GET /sql/fhir/waiis/Patient?family=Smith&birthdate=1985-03-15&_lastUpdated=ge2024-01-01
+GET /sql/fhir/dev/Patient?family=FagenAIRA&birthdate=1963-12-26&_format=json
 ```
+
+Response (`200 OK`):
+```json
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 1,
+  "entry": [
+    { "resource": { "resourceType": "Patient", ... } },
+    { "resource": { "resourceType": "Immunization", ... } }
+  ]
+}
+```
+
+#### Example: No Match
+
+```
+GET /sql/fhir/dev/Patient?family=ZZZNOMATCH&birthdate=1900-01-01&_format=json
+```
+
+Response (`200 OK`):
+```json
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 0,
+  "entry": []
+}
+```
+
+#### Example: Ambiguous Match
+
+Response (`422 Unprocessable Entity`):
+```json
+{
+  "resourceType": "OperationOutcome",
+  "issue": [{
+    "severity": "error",
+    "code": "multiple-matches",
+    "diagnostics": "Patient query returned multiple candidates above the match threshold."
+  }]
+}
+```
+
+---
+
+### `_lastUpdated` Filtering
+
+`_lastUpdated` is applied as a server-side predicate on the column marked
+`is_last_updated: true` in `sql-mapping.yml` (typically `INSERT_STAMP`). For CSV
+backends this is a string comparison on the column value; for JDBC backends it
+becomes a SQL `WHERE` clause. Only rows satisfying the predicate are returned --
+it is not a post-filter.
+
+Supported operators: `ge` (>=), `gt` (>), `le` (<=), `lt` (<). Use two parameters
+for a closed range:
+
+```
+GET /sql/fhir/dev/Patient?family=FagenAIRA&birthdate=1963-12-26
+    &_lastUpdated=ge2020-01-01&_lastUpdated=le2024-12-31&_format=json
+```
+
+If no column is marked `is_last_updated: true` in the mapping, the `_lastUpdated`
+parameter is accepted but ignored (no filtering applied).
 
 ---
 
@@ -94,7 +172,7 @@ patients scored by the IDI matching algorithm.
 
 ## Response Format
 
-All endpoints return `application/fhir+json` by default. Specify `Accept` header
+All endpoints return `application/fhir+json` by default. Specify the `Accept` header
 for other formats:
 
 - `application/fhir+json`
@@ -107,10 +185,17 @@ for other formats:
 ## Column Mapping
 
 The mapping from SQL columns to FHIR resource elements is defined in
-`sql-mapping.yml` (classpath) or the path specified by `sql.mapping.config-path`.
-The canonical mapping is generated from
-[`docs/wa-doh-pilot/all_vax_event_enriched_mapping.csv`](../wa-doh-pilot/all_vax_event_enriched_mapping.csv).
+`sql-mapping.yml` (classpath) or the path specified by `mapping-config-path` in the
+backend configuration. Each backend can reference a different mapping file.
 
-The worked WA DOH example mapping is at
-[`src/main/resources/sql-mapping-wadoh.yml`](https://github.com/IZGateway/izgw-transform-sql/blob/develop/src/main/resources/sql-mapping-wadoh.yml)
-in the `izgw-transform-sql` repository.
+The canonical WA DOH mapping targets the `all_vax_event` view published by WAIIS:
+
+- **Mapping file:** `src/main/resources/sql-mapping-wadoh.yml` in `izgw-transform-sql`
+- **Source documentation:** `docs/sql-fhir/wa-doh-all-vax-event-mapping.csv` in `izgw-transform`
+
+The enriched mapping CSV covers all 61 WA DOH `all_vax_event` columns: SQL column
+name, FHIR target path, value type, concept maps (gender, race, ethnicity, route,
+site, VFC eligibility), and which column anchors `_lastUpdated` filtering.
+
+See [Local Testing Guide](local-testing.md) for the full list of key columns and
+their FHIR mappings.

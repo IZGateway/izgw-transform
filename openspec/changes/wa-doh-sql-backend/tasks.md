@@ -76,7 +76,7 @@ _Goal: single-patient query against `sql-dev` returns real FHIR data._
 - [x] 2.3 Write placeholder `sql-mapping.yml` using hub test data column names (temporary — replaced by 2.3a–2.3c)
 - [x] 2.3a Generate draft `sql-mapping-wadoh.yml` from `all_vax_event_enriched_mapping.csv`; covers all 61 WA DOH `all_vax_event` columns with FHIR targets; concept maps for gender and HISTORICAL; INSERT_STAMP marked `is_last_updated: true`; enriched CSV committed to `docs/sql-fhir/wa-doh-all-vax-event-mapping.csv`; `application-sql.yml` test backend now defaults to this mapping; `local-testing.md` updated to reflect WA DOH column names
 - [ ] **2.3b USER REVIEW** Review `sql-mapping-wadoh.yml` against actual WA DOH schema; verify FHIR element assignments, concept maps (gender, HISTORICAL/primarySource, anatomical site/route, VFC eligibility, series complete), and columns to omit; check REVIEW CHECKLIST at top of file for open format questions
-- [ ] 2.3c Write one-time transformation script that converts hub test data (`2019_10_01_pat.csv`, `2019_10_01_imm.csv`) to `all_vax_event` column format; output becomes canonical test dataset used for sql-dev CSV fixture, H2 unit tests, and SQL Server seed data; store output in `src/test/resources/sql-dev/`
+- [x] 2.3c Write one-time transformation script that converts hub test data (`2019_10_01_pat.csv`, `2019_10_01_imm.csv`) to `all_vax_event` column format; output becomes canonical test dataset used for sql-dev CSV fixture, H2 unit tests, and SQL Server seed data; store output in `src/test/resources/sql-dev/`
 - [x] 2.4 Create `SqlTableMapper<T>` abstract class in `izgw-transform-sql`; defines `T map(Map<String,Object> row, SqlMappingConfiguration config)` and owns all column-to-FHIR conversion logic shared across resource types
 - [x] 2.5 Implement primitive type converters in `SqlTableMapper<T>`: `string`, `integer`, `decimal`, `boolean`, `date`, `dateTime`
 - [x] 2.6 Implement complex type converters in `SqlTableMapper<T>`: `code`, `Coding` (with system), `CodeableConcept` (with system + optional display)
@@ -92,9 +92,9 @@ _Goal: single-patient query against `sql-dev` returns real FHIR data._
 - [x] 2.16 Create `SqlDevBackend`: at startup loads CSV files into `List<Map<String,String>>`; patient search via Java stream filter; immunization retrieval via second stream filter; no JDBC
 - [x] 2.17 Create `SqlBackendAutoConfiguration`; wire `SqlDevBackend` as always-available bean; `SqlMappingConfiguration` loaded from `sql-mapping.yml`
 - [x] 2.18 Create `SqlBackendProperties` `@ConfigurationProperties(prefix = "sql")`
-- [ ] 2.19 Add `application.yml` documentation comments for the new `sql.*` config block
-- [ ] 2.20 Add Stage 2 Postman tests to collection: single-patient query against `sql-dev` with known test patient returns Bundle containing Patient and Immunization resources; verify log cache shows no exceptions; verify no-match and ambiguous-match response shapes
-- [ ] 2.DOC Update `docs/sql-fhir/sql-fhir-api.md` with actual patient matching behavior, IDI scoring, singular/no-match/ambiguous response shapes, and column mapping reference; update `docs/sql-fhir/index.md` flow diagram to reflect sql-dev CSV path
+- [x] 2.19 Add `application.yml` documentation comments for the new `sql.*` config block
+- [x] 2.20 Add Stage 2 Postman tests to collection: single-patient query against `sql-dev` with known test patient returns Bundle containing Patient and Immunization resources; verify log cache shows no exceptions; verify no-match and ambiguous-match response shapes
+- [x] 2.DOC Update `docs/sql-fhir/sql-fhir-api.md` with actual patient matching behavior, IDI scoring, singular/no-match/ambiguous response shapes, and column mapping reference; update `docs/sql-fhir/index.md` flow diagram to reflect sql-dev CSV path
 - [ ] **2.DEPLOY** Deploy to dev; run full Postman collection; Stage 1 smoke tests still pass; Stage 2 tests return real data from `sql-dev`
 
 ---

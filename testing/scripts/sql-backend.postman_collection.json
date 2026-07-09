@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "sql-backend-stage1",
+    "_postman_id": "sql-backend-stage1-2",
     "name": "SQL Backend Tests",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -9,7 +9,7 @@
       "name": "Stage 1 - Endpoint Smoke Tests",
       "item": [
         {
-          "name": "ST_01 sql-dev single-patient query returns 200 empty Bundle",
+          "name": "ST_01 no-match query returns 200 empty Bundle",
           "event": [
             {
               "listen": "prerequest",
@@ -37,6 +37,11 @@
                   "  var body = pm.response.json();",
                   "  pm.expect(body.resourceType).to.eql('Bundle');",
                   "  pm.expect(body.type).to.eql('searchset');",
+                  "});",
+                  "",
+                  "pm.test('No-match returns empty Bundle', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.total).to.eql(0);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -49,19 +54,19 @@
               { "key": "Accept", "value": "application/fhir+json" }
             ],
             "url": {
-              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15&_format=json",
+              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=ZZZNOMATCH&birthdate=1900-01-01&_format=json",
               "host": ["{{sql_base_url}}"],
               "path": ["sql", "fhir", "dev", "Patient"],
               "query": [
-                { "key": "family", "value": "Smith" },
-                { "key": "birthdate", "value": "1985-03-15" },
+                { "key": "family", "value": "ZZZNOMATCH" },
+                { "key": "birthdate", "value": "1900-01-01" },
                 { "key": "_format", "value": "json" }
               ]
             }
           }
         },
         {
-          "name": "ST_02 _lastUpdated parameter accepted",
+          "name": "ST_02 _lastUpdated parameter accepted with real patient",
           "event": [
             {
               "listen": "prerequest",
@@ -81,6 +86,12 @@
                 "exec": [
                   "pm.test('Status code is 200 (not 400 - parameter accepted)', function() {",
                   "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('_lastUpdated filter returns non-empty Bundle for known patient', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.resourceType).to.eql('Bundle');",
+                  "  pm.expect(body.total).to.be.above(0);",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -93,12 +104,12 @@
               { "key": "Accept", "value": "application/fhir+json" }
             ],
             "url": {
-              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=Smith&birthdate=1985-03-15&_lastUpdated=ge2020-01-01&_format=json",
+              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=FagenAIRA&birthdate=1963-12-26&_lastUpdated=ge2020-01-01&_format=json",
               "host": ["{{sql_base_url}}"],
               "path": ["sql", "fhir", "dev", "Patient"],
               "query": [
-                { "key": "family", "value": "Smith" },
-                { "key": "birthdate", "value": "1985-03-15" },
+                { "key": "family", "value": "FagenAIRA" },
+                { "key": "birthdate", "value": "1963-12-26" },
                 { "key": "_lastUpdated", "value": "ge2020-01-01" },
                 { "key": "_format", "value": "json" }
               ]
@@ -275,6 +286,165 @@
               "query": [
                 { "key": "family", "value": "Test" },
                 { "key": "birthdate", "value": "2000-01-01" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Stage 2 - sql-dev CSV Fixture",
+      "item": [
+        {
+          "name": "ST2_01 known patient returns Bundle with Patient and Immunization",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest({",
+                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
+                  "  method: 'DELETE'",
+                  "}, function(err, res) {",
+                  "  console.log('Log cache flushed:', res ? res.status : err);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is a FHIR searchset Bundle', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.resourceType).to.eql('Bundle');",
+                  "  pm.expect(body.type).to.eql('searchset');",
+                  "  pm.expect(body.total).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test('Bundle contains a Patient resource', function() {",
+                  "  var body = pm.response.json();",
+                  "  var patient = body.entry && body.entry.find(function(e) {",
+                  "    return e.resource && e.resource.resourceType === 'Patient';",
+                  "  });",
+                  "  pm.expect(patient).to.not.be.undefined;",
+                  "});",
+                  "",
+                  "pm.test('Bundle contains at least one Immunization resource', function() {",
+                  "  var body = pm.response.json();",
+                  "  var imm = body.entry && body.entry.find(function(e) {",
+                  "    return e.resource && e.resource.resourceType === 'Immunization';",
+                  "  });",
+                  "  pm.expect(imm).to.not.be.undefined;",
+                  "});",
+                  "",
+                  "pm.test('Content-Type is application/fhir+json', function() {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('fhir+json');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/fhir+json" }
+            ],
+            "url": {
+              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=FagenAIRA&birthdate=1963-12-26&_format=json",
+              "host": ["{{sql_base_url}}"],
+              "path": ["sql", "fhir", "dev", "Patient"],
+              "query": [
+                { "key": "family", "value": "FagenAIRA" },
+                { "key": "birthdate", "value": "1963-12-26" },
+                { "key": "_format", "value": "json" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "ST2_02 log cache shows no exceptions after patient query",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Log cache endpoint responds', function() {",
+                  "  pm.expect(pm.response.code).to.not.eql(404);",
+                  "});",
+                  "",
+                  "pm.test('No exceptions in log cache after patient query', function() {",
+                  "  var text = pm.response.text();",
+                  "  pm.expect(text).to.not.include('Exception');",
+                  "  pm.expect(text).to.not.include('ERROR');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{sql_admin_url}}/rest/logs",
+              "host": ["{{sql_admin_url}}"],
+              "path": ["rest", "logs"]
+            }
+          }
+        },
+        {
+          "name": "ST2_03 no-match patient returns 200 empty Bundle",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.sendRequest({",
+                  "  url: pm.environment.get('sql_admin_url') + '/rest/logs',",
+                  "  method: 'DELETE'",
+                  "}, function(err, res) {});"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Bundle total is 0 for unrecognised patient', function() {",
+                  "  var body = pm.response.json();",
+                  "  pm.expect(body.resourceType).to.eql('Bundle');",
+                  "  pm.expect(body.total).to.eql(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/fhir+json" }
+            ],
+            "url": {
+              "raw": "{{sql_base_url}}/sql/fhir/dev/Patient?family=ZZZNOMATCH&birthdate=1900-01-01&_format=json",
+              "host": ["{{sql_base_url}}"],
+              "path": ["sql", "fhir", "dev", "Patient"],
+              "query": [
+                { "key": "family", "value": "ZZZNOMATCH" },
+                { "key": "birthdate", "value": "1900-01-01" },
+                { "key": "_format", "value": "json" }
               ]
             }
           }

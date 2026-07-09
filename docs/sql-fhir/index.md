@@ -33,7 +33,7 @@ differences are the URL prefix and the data source:
 | Base URL | `/fhir/{destinationId}/` | `/sql/fhir/{name}/` |
 | Bulk export | Not available | `/bulk/sql/fhir/$export` |
 | Data source | IIS via IZ Gateway Hub | ANSI SQL database via JDBC |
-| Backend config | Hub destination registration | `sql.backend.<name>` property |
+| Backend config | Hub destination registration | `sql.backends.{name}` property |
 | Image | Standard `transformation-service` | SQL-enabled `transformation-service-sql` |
 
 ---
@@ -50,41 +50,55 @@ differences are the URL prefix and the data source:
 
 ## How It Works
 
+### Single-Patient Query
+
+The request flows through three backend types depending on configuration:
+
 ```
 FHIR Client
-    │  GET /sql/fhir/waiis/Patient?family=Smith&birthdate=1985-03-15
-    ▼
+    |  GET /sql/fhir/dev/Patient?family=FagenAIRA&birthdate=1963-12-26
+    v
 SqlFhirController (izgw-transform-sql)
-    │  stream-filters CSV fixture (dev) or queries SQL view (production)
-    ▼
+    |
+    +-- "dev" backend (DEV_CSV): stream-filter patients.csv + immunizations.csv
+    |
+    +-- "test" backend (CSV): stream-filter all_vax_event.csv (one denormalized file)
+    |
+    +-- "waiis" backend (JDBC): SELECT ... FROM all_vax_event WHERE last_name=? AND birth_date=?
+    |
+    v
 SqlPatientSearchService
-    │  SELECT * FROM patient_view WHERE last_name = ? AND birth_date = ?
-    │  IDIMatch scoring — singular match required
-    ▼
+    |  IDI scoring -- singular match required (threshold: 0.95)
+    |
+    +-- No match  --> 200 OK, empty Bundle (total: 0)
+    +-- Ambiguous --> 422 Unprocessable Entity, OperationOutcome
+    +-- Match     -->
+    v
 SqlImmunizationRetrievalService
-    │  SELECT * FROM immunization_view WHERE patient_id = ?
-    ▼
+    |  fetch all immunization rows for matched patient
+    v
 TabularFhirConverter
-    │  maps all_vax_event columns → FHIR Patient + Immunization
-    │  using sql-mapping.yml (generated from all_vax_event_enriched_mapping.csv)
-    ▼
-FHIR Client receives Bundle (SearchSet)
+    |  maps SQL columns -> FHIR Patient + Immunization
+    |  using sql-mapping.yml (column-to-FHIR mapping file)
+    v
+FHIR Client receives Bundle (searchset)
 ```
 
-For Bulk FHIR export the flow is:
+### Bulk FHIR Export
+
 ```
-FHIR Client  →  POST /bulk/sql/fhir/$export  →  202 Accepted + Content-Location
-                     │
-                     ▼
+FHIR Client  ->  POST /bulk/sql/fhir/$export  ->  202 Accepted + Content-Location
+                     |
+                     v
            BulkExportWorker (async)
-                     │  SELECT * FROM immunization_view WHERE INSERT_STAMP >= :since
-                     ▼
+                     |  SELECT * FROM immunization_view WHERE INSERT_STAMP >= :since
+                     v
            NDJSON files (Patient + Immunization, chunked)
-                     │
-                     ▼
-FHIR Client  →  GET /bulk/sql/fhir/$export-status/{jobId}  →  200 + manifest
-FHIR Client  →  GET /bulk/sql/fhir/$export-files/{jobId}/{n}  →  NDJSON stream
-FHIR Client  →  DELETE /bulk/sql/fhir/$export-status/{jobId}  →  202
+                     |
+                     v
+FHIR Client  ->  GET /bulk/sql/fhir/$export-status/{jobId}  ->  200 + manifest
+FHIR Client  ->  GET /bulk/sql/fhir/$export-files/{jobId}/{n}  ->  NDJSON stream
+FHIR Client  ->  DELETE /bulk/sql/fhir/$export-status/{jobId}  ->  202
 ```
 
 ---
@@ -96,23 +110,41 @@ Same requirements as the standard interface:
 - Role **`XFORM_SENDING_SYSTEM`** or **`ADMIN`** required for single-patient queries
 - Role **`XFORM_SENDING_SYSTEM`**, **`ADMIN`**, or **`BULK_EXPORT`** for bulk export
 
+---
+
 ## Configuration
 
-SQL backends are registered via Spring properties or environment variables:
+SQL backends are registered in `application-sql.yml` (or equivalent environment
+variables). The built-in `dev` and `test` backends require no configuration.
+Additional JDBC backends are registered by name:
 
 ```yaml
-# application.yml — registers backend accessible at /sql/fhir/waiis/**
 sql:
-  backend:
-    waiis: /configuration/waiis.yml
+  matching-threshold: 0.95   # IDI score threshold; 1 match required above this value
+
+  backends:
+    # built-in -- always available, no configuration needed
+    dev:
+      type: DEV_CSV
+      patients-path: classpath:sql-dev/patients.csv
+      immunizations-path: classpath:sql-dev/immunizations.csv
+      mapping-config-path: classpath:sql-mapping.yml
+
+    test:
+      type: CSV
+      data-path: ${SQL_BACKENDS_TEST_DATA_PATH:/data/all_vax_event.csv}
+      mapping-config-path: ${SQL_BACKENDS_TEST_MAPPING_CONFIG_PATH:classpath:sql-mapping-wadoh.yml}
+
+    # example JDBC backend -- accessible at /sql/fhir/waiis/**
+    waiis:
+      type: JDBC
+      immunization-table: all_vax_event
+      patient-id-column: ASIIS_PAT_ID
+      mapping-config-path: file:/data/sql-mapping-wadoh.yml
+      # DataSource: spring.datasource.url / username / password
 ```
 
-```
-# or as environment variable
-SQL_BACKEND_WAIIS=/configuration/waiis.yml
-```
-
-The built-in `dev` backend (`/sql/fhir/dev/**`) requires no configuration and loads
-test data from CSV files at startup.
-
-See [`izgw-transform-sql/docs/wa-doh-pilot/`](https://github.com/IZGateway/izgw-transform-sql/tree/develop/docs/wa-doh-pilot/) for WA DOH schema reference materials (notebook, data dictionary, enriched field mapping).
+See [`docs/sql-fhir/local-testing.md`](local-testing.md) for the full environment
+variable reference, and
+[`izgw-transform-sql/docs/wa-doh-pilot/`](https://github.com/IZGateway/izgw-transform-sql/tree/develop/docs/wa-doh-pilot/)
+for WA DOH schema reference materials.

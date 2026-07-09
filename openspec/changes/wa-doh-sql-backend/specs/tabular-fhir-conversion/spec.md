@@ -5,6 +5,11 @@ its typed specializations (`SqlPatientRowMapper`, `SqlImmunizationRowMapper`), a
 the Bundle assembler (`TabularFhirConverter`) that uses them to convert a tabular
 SQL result set into a FHIR Bundle via a declarative YAML mapping configuration.
 
+The canonical mapping configuration (`sql-mapping.yml`) is **generated** from
+`all_vax_event_enriched_mapping.csv` (WA DOH reference materials) and **reviewed
+by the project team** before use — see tasks 2.3a–2.3b. The 61 WA DOH `all_vax_event`
+column names are the authoritative source; the mapping is not hand-authored.
+
 ## Requirements
 
 ### Requirement: SqlTableMapper Base Class
