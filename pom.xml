@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
 	<artifactId>xform</artifactId>
-    	<version>0.20.0-SNAPSHOT</version>
+    	<version>0.21.0-SNAPSHOT</version>
 	<name>xform</name>
 	<description>IZ Gateway Xform Service</description>
 	<properties>
@@ -103,12 +103,12 @@
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>izgw-core</artifactId>
-			<version>3.2.0-SNAPSHOT</version>
+			<version>3.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>v2tofhir</artifactId>
-			<version>2.3.0-SNAPSHOT</version>
+			<version>2.3.0</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.xerial</groupId>
@@ -146,7 +146,7 @@
 				<dependency>
 					<groupId>gov.cdc.izgateway</groupId>
 					<artifactId>izgw-transform-sql</artifactId>
-					<version>0.20.0-SNAPSHOT</version>
+					<version>0.21.0-SNAPSHOT</version>
 					<scope>runtime</scope>
 				</dependency>
 			</dependencies>
