@@ -1,10 +1,12 @@
 <configuration>
     <!-- Disable logback startup reporting -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
-    <springProperty name="logging.console.pretty" source="logging.console.pretty" />
-    <springProperty name="logging.console.enabled" source="logging.console.enabled" />
-    <springProperty name="logging.file.enabled" source="logging.file.enabled" />
-    <springProperty name="logging.memory.enabled" source="logging.memory.enabled" />
+    <!-- Appenders are attached to <root> unconditionally below. logback 1.5.37 removed Janino
+         <if condition="..."> support; its replacement <condition> element loads, but logback's
+         "skip unreferenced appenders" pass prunes an appender whose only <appender-ref> lives
+         inside a conditional (observed: the file appender was dropped as "not referenced").
+         Attaching all three directly is the reliable behavior. -->
+
     
     <!-- Don't try to put these in application.yml, they don't work nicely there -->
     <property name="logging.file.name" value="xform.json" />
@@ -42,13 +44,6 @@
         class="ch.qos.logback.core.ConsoleAppender">
         <encoder
             class="net.logstash.logback.encoder.LogstashEncoder">
-            <if
-                condition='"true".equals(p("logging.console.pretty"))'>
-                <then>
-                    <jsonGeneratorDecorator
-                        class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator" />
-                </then>
-            </if>
             <includeContext>false</includeContext>
         </encoder>
     </appender>
@@ -88,28 +83,9 @@
     <!-- Enable BC Debug Logging by setting level to INFO/DEBUG/TRACE -->
     <logger name="org.bouncycastle.jsse.provider" level="WARN" />
 
-    <!-- Define properties based on System or Environment setting (e.g., 
-        -Dvalue= in JVM startup args, or exactly as written below from environment) -->
-    <root level="WARN"></root>
-    <if condition='"true".equals(p("logging.file.enabled"))'>
-        <then>
-            <root>
-                <appender-ref ref="file" />
-            </root>
-        </then>
-    </if>
-    <if condition='"true".equals(p("logging.console.enabled"))'>
-        <then>
-            <root>
-                <appender-ref ref="console" />
-            </root>
-        </then>
-    </if>
-    <if condition='"true".equals(p("logging.memory.enabled"))'>
-        <then>
-            <root>
-                <appender-ref ref="memory" />
-            </root>
-        </then>
-    </if>
+    <root level="WARN">
+        <appender-ref ref="file" />
+        <appender-ref ref="console" />
+        <appender-ref ref="memory" />
+    </root>
 </configuration>
