@@ -87,6 +87,9 @@ then
 fi
 
 # Start Java application
+XMS=${XFORM_XMS:-4g}
+XMX=${XFORM_XMX:-8g}
+
 java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaagent:lib/spring-instrument-5.3.8.jar \
    -XX:+CreateCoredumpOnCrash -cp "./lib/bcfips/*" \
    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
@@ -95,8 +98,8 @@ java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaage
    -Dorg.bouncycastle.fips.approved_only=true \
    -Dorg.bouncycastle.jsse.client.dh.unrestrictedGroups=true \
    -Djavax.net.ssl.trustStorePassword=changeit \
-   -Xms4g \
-   -Xmx8g \
+   -Xms${XMS} \
+   -Xmx${XMX} \
    -Djava.library.path=lib \
    -jar $jarfilename &
 

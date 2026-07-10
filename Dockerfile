@@ -85,7 +85,11 @@ ENV XFORM_VERSION=$XFORM_VERSION
 
 # Defaults for local testing against the self-signed keystore baked into /ssl/local/.
 # All of these can be overridden at runtime for production deployments.
-ENV COMMON_PASS=changeit \
+# For local testing with limited memory, set XFORM_XMS and XFORM_XMX:
+#   docker run -e XFORM_XMS=256m -e XFORM_XMX=1g ...
+ENV XFORM_XMS=4g \
+    XFORM_XMX=8g \
+    COMMON_PASS=changeit \
     XFORM_CRYPTO_STORE_KEY_TOMCAT_SERVER_FILE=/ssl/local/server.bcfks \
     XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE=/ssl/local/trust.bcfks \
     XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE=/ssl/local/server.bcfks \
