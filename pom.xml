@@ -5,7 +5,7 @@
 	<parent>
         <groupId>gov.cdc.izgw</groupId>
         <artifactId>izgw-bom</artifactId>
-        <version>1.10.0-SNAPSHOT</version>
+        <version>1.12.0-SNAPSHOT</version>
         <relativePath />
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
@@ -23,9 +23,6 @@
 		<image.tag>${project.build.finalName}</image.tag>
 		<buildno>${timestamp}</buildno>
 		<xform.testing.common.pass>XFORM_TESTING_COMMON_PASS</xform.testing.common.pass>
-
-		<!-- Override Camel version to fix CVEs (CVE-2026-46455 et al.) -->
-		<camel.version>4.20.0</camel.version>
 
 		<!-- JaCoCo Configuration -->
 		<jacoco.version>0.8.13</jacoco.version>
