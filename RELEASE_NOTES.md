@@ -1,3 +1,9 @@
+# IZ Gateway Transformation Service 0.20.1
+
+Released 2026-07-10.
+
+- fix: restore logging broken by logback 1.5.37 <if> removal ([#273](https://github.com/IZGateway/izgw-transform/pull/273))
+
 # IZ Gateway Transformation Service 0.20.0
 
 Released 2026-07-07.
