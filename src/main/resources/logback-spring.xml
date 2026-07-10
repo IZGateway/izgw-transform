@@ -1,11 +1,12 @@
 <configuration>
     <!-- Disable logback startup reporting -->
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
-    <!-- scope=context so the values are visible to the <condition> property lookup below;
-         defaultValue=true so a resolution miss fails OPEN (logging on) rather than silently off. -->
-    <springProperty scope="context" name="logging.console.enabled" source="logging.console.enabled" defaultValue="true" />
-    <springProperty scope="context" name="logging.file.enabled" source="logging.file.enabled" defaultValue="true" />
-    <springProperty scope="context" name="logging.memory.enabled" source="logging.memory.enabled" defaultValue="true" />
+    <!-- Appenders are attached to <root> unconditionally below. logback 1.5.37 removed Janino
+         <if condition="..."> support; its replacement <condition> element loads, but logback's
+         "skip unreferenced appenders" pass prunes an appender whose only <appender-ref> lives
+         inside a conditional (observed: the file appender was dropped as "not referenced").
+         Attaching all three directly is the reliable behavior. -->
+
     
     <!-- Don't try to put these in application.yml, they don't work nicely there -->
     <property name="logging.file.name" value="xform.json" />
@@ -82,40 +83,9 @@
     <!-- Enable BC Debug Logging by setting level to INFO/DEBUG/TRACE -->
     <logger name="org.bouncycastle.jsse.provider" level="WARN" />
 
-    <!-- Define properties based on System or Environment setting (e.g., 
-        -Dvalue= in JVM startup args, or exactly as written below from environment) -->
-    <root level="WARN"></root>
-    <if>
-        <condition class="ch.qos.logback.core.boolex.PropertyEqualityCondition">
-            <key>logging.file.enabled</key>
-            <value>true</value>
-        </condition>
-        <then>
-            <root>
-                <appender-ref ref="file" />
-            </root>
-        </then>
-    </if>
-    <if>
-        <condition class="ch.qos.logback.core.boolex.PropertyEqualityCondition">
-            <key>logging.console.enabled</key>
-            <value>true</value>
-        </condition>
-        <then>
-            <root>
-                <appender-ref ref="console" />
-            </root>
-        </then>
-    </if>
-    <if>
-        <condition class="ch.qos.logback.core.boolex.PropertyEqualityCondition">
-            <key>logging.memory.enabled</key>
-            <value>true</value>
-        </condition>
-        <then>
-            <root>
-                <appender-ref ref="memory" />
-            </root>
-        </then>
-    </if>
+    <root level="WARN">
+        <appender-ref ref="file" />
+        <appender-ref ref="console" />
+        <appender-ref ref="memory" />
+    </root>
 </configuration>
