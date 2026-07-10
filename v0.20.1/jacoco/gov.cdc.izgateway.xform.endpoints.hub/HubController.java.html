@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HubController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.endpoints.hub</a> &gt; <span class="el_source">HubController.java</span></div><h1>HubController.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.endpoints.hub;
+
+import ca.uhn.hl7v2.HL7Exception;
+import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.model.IDestination;
+import gov.cdc.izgateway.model.IDestinationId;
+import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.service.IMessageHeaderService;
+import gov.cdc.izgateway.soap.fault.Fault;
+import gov.cdc.izgateway.soap.fault.SecurityFault;
+import gov.cdc.izgateway.soap.fault.UnknownDestinationFault;
+import gov.cdc.izgateway.soap.message.SoapMessage;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
+import gov.cdc.izgateway.xform.camel.constants.EndpointUris;
+import gov.cdc.izgateway.xform.context.IZGXformContext;
+import gov.cdc.izgateway.xform.context.ServiceContext;
+import gov.cdc.izgateway.xform.logging.advice.PipelineAdvice;
+import gov.cdc.izgateway.xform.logging.advice.XformAdviceCollector;
+import gov.cdc.izgateway.xform.model.Destination;
+import gov.cdc.izgateway.xform.model.DestinationId;
+import gov.cdc.izgateway.xform.enums.DataFlowDirection;
+import gov.cdc.izgateway.xform.enums.DataType;
+import gov.cdc.izgateway.xform.security.Roles;
+import gov.cdc.izgateway.xform.services.AccessControlService;
+import gov.cdc.izgateway.xform.services.OrganizationService;
+import gov.cdc.izgateway.xform.util.Hl7Utils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.annotation.security.RolesAllowed;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.CamelExecutionException;
+import org.apache.camel.ProducerTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RolesAllowed({Roles.ADMIN, Roles.XFORM_SENDING_SYSTEM})
+@RequestMapping(&quot;/IISHubService&quot;)
+@Lazy(false)
+<span class="fc" id="L55">@Slf4j</span>
+public class HubController extends BaseController /*SoapControllerBase*/ {
+    private final ProducerTemplate producerTemplate;
+
+    @Value(&quot;${xform.destination.hub.uri:}&quot;)
+    private String destinationUri;
+
+    @Autowired
+    public HubController(
+            IMessageHeaderService mshService,
+            AccessControlRegistry registry,
+            ProducerTemplate producerTemplate,
+            OrganizationService organizationService,
+            AccessControlService accessControlService
+    ) {
+        // The base schema for HUB messages is still the iis-2014 schema, with the exception of HubHeader and certain faults.
+<span class="fc" id="L71">        super(mshService, SoapMessage.IIS2014_NS, &quot;cdc-iis.wsdl&quot;, Arrays.asList(SoapMessage.IIS2014_NS), producerTemplate, organizationService, accessControlService);</span>
+<span class="fc" id="L72">        this.producerTemplate = producerTemplate;</span>
+<span class="fc" id="L73">        registry.register(this);</span>
+
+<span class="fc" id="L75">    }</span>
+
+    @Override
+    protected ResponseEntity&lt;?&gt; submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
+<span class="nc" id="L79">        RequestContext.getDestinationInfo().setId(destinationId);</span>
+<span class="nc" id="L80">        UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();</span>
+
+<span class="nc bnc" id="L82" title="All 2 branches missed.">        if (isLoopback()) {</span>
+<span class="nc" id="L83">        	return loopbackSingleMessage(submitSingleMessage);</span>
+        }
+        	
+<span class="nc" id="L86">        IZGXformContext context = createXformContext(organization, submitSingleMessage);</span>
+
+<span class="nc" id="L88">    	String transformedRequest = null;</span>
+<span class="nc" id="L89">    	SubmitSingleMessageResponse response = null;</span>
+        try {
+<span class="nc" id="L91">    		producerTemplate.sendBody(EndpointUris.DIRECT_HUB_PIPELINE, context);</span>
+<span class="nc" id="L92">        	PipelineAdvice advice = XformAdviceCollector.getTransactionData().getPipelineAdvice();</span>
+<span class="nc" id="L93">    		response = context.getSubmitSingleMessageResponse(); </span>
+        	
+<span class="nc bnc" id="L95" title="All 2 branches missed.">            if (advice != null) {</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">                if (advice.isRequestTransformed()) {</span>
+<span class="nc" id="L97">                	transformedRequest = advice.getTransformedRequest();</span>
+<span class="nc bnc" id="L98" title="All 2 branches missed.">                	if (response != null) {</span>
+<span class="nc" id="L99">                		response.getXformHeader().setTransformedRequest(transformedRequest);</span>
+                	}
+                }
+<span class="nc bnc" id="L102" title="All 4 branches missed.">                if (response != null &amp;&amp; advice.isResponseTransformed()) {</span>
+<span class="nc" id="L103">                	response.getXformHeader().setOriginalResponse(advice.getResponse());</span>
+                }
+            }
+            
+<span class="nc" id="L107">        	response.setHl7Message(context.getServiceContext().getResponseMessage().encode());</span>
+<span class="nc" id="L108">            response.updateAction(isHubWsdl());</span>
+<span class="nc" id="L109">        } catch (CamelExecutionException | HL7Exception e) {</span>
+<span class="nc" id="L110">            throw new HubControllerFault(e.getCause());</span>
+<span class="nc" id="L111">        }</span>
+        
+<span class="nc" id="L113">        return checkResponseEntitySize(new ResponseEntity&lt;&gt;(response, HttpStatus.OK));</span>
+    }
+
+    /**
+     * @return true if this message is requesting loopback processing, false otherwise.
+     */
+    private boolean isLoopback() {
+<span class="nc" id="L120">        List&lt;String&gt; headers = RequestContext.getHttpHeaders().get(&quot;x-loopback&quot;);</span>
+<span class="nc bnc" id="L121" title="All 4 branches missed.">        return headers != null &amp;&amp; headers.stream().anyMatch(v -&gt; &quot;true&quot;.equalsIgnoreCase(v));</span>
+	}
+
+	private ResponseEntity&lt;?&gt; loopbackSingleMessage(SubmitSingleMessageRequest submitSingleMessage) throws Fault  {
+<span class="nc" id="L125">        UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();</span>
+<span class="nc" id="L126">    	IZGXformContext context = createXformContext(organization, submitSingleMessage);</span>
+
+<span class="nc" id="L128">    	String transformedRequest = null;</span>
+<span class="nc" id="L129">    	boolean isResponse = submitSingleMessage.getHl7Message().contains(&quot;MSA|&quot;);</span>
+<span class="nc" id="L130">    	SubmitSingleMessageResponse response = new SubmitSingleMessageResponse(submitSingleMessage, getMessageNamespace(), true);</span>
+    	try {
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        	if (isResponse) {</span>
+        		// Setup for the Response Path
+<span class="nc" id="L134">            	response.setHl7Message(submitSingleMessage.getHl7Message());</span>
+<span class="nc" id="L135">        		context.setSubmitSingleMessageResponse(response);</span>
+<span class="nc" id="L136">        		context.getServiceContext().setCurrentDirection(DataFlowDirection.RESPONSE);</span>
+<span class="nc" id="L137">        		context.getServiceContext().setResponseMessage(Hl7Utils.parseHl7v2Message(response.getHl7Message()));</span>
+        	}
+        	
+<span class="nc" id="L140">    		producerTemplate.sendBody(EndpointUris.LOOPBACK_HUB_PIPELINE, context);</span>
+<span class="nc" id="L141">        	PipelineAdvice advice = XformAdviceCollector.getTransactionData().getPipelineAdvice();</span>
+        	
+<span class="nc bnc" id="L143" title="All 2 branches missed.">            if (advice != null) {</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">                if (advice.isRequestTransformed()) {</span>
+<span class="nc" id="L145">                	transformedRequest = advice.getTransformedRequest();</span>
+<span class="nc" id="L146">            		response.getXformHeader().setTransformedRequest(transformedRequest);</span>
+                }
+<span class="nc bnc" id="L148" title="All 2 branches missed.">                if (advice.isResponseTransformed()) {</span>
+<span class="nc" id="L149">                	response.getXformHeader().setOriginalResponse(advice.getResponse());</span>
+                }
+            }
+<span class="nc bnc" id="L152" title="All 2 branches missed.">            if (isResponse) {</span>
+<span class="nc" id="L153">            	response.setHl7Message(context.getServiceContext().getResponseMessage().encode());</span>
+            } else {
+<span class="nc" id="L155">            	response.setHl7Message(transformedRequest);</span>
+            }
+
+<span class="nc" id="L158">            response.updateAction(isHubWsdl());</span>
+<span class="nc" id="L159">        } catch (CamelExecutionException e) {</span>
+<span class="nc" id="L160">            throw new HubControllerFault(e.getCause());</span>
+<span class="nc" id="L161">        } catch (HL7Exception e) {</span>
+<span class="nc" id="L162">			throw new HubControllerFault(e.getCause());</span>
+<span class="nc" id="L163">		}</span>
+        
+<span class="nc" id="L165">        return checkResponseEntitySize(new ResponseEntity&lt;&gt;(response, HttpStatus.OK));</span>
+	}
+
+	protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+        try {
+<span class="nc" id="L170">            return new ServiceContext(organization,</span>
+                    EndpointUris.IZGTS_IISHubService,
+                    EndpointUris.IZGHUB_IISHubService,
+                    DataType.HL7V2,
+<span class="nc" id="L174">                    submitSingleMessage.getFacilityID(),</span>
+<span class="nc" id="L175">                    submitSingleMessage.getHl7Message());</span>
+<span class="nc" id="L176">        } catch (HL7Exception e) {</span>
+<span class="nc" id="L177">            throw new HubControllerFault(e);</span>
+        }
+    }
+
+    @Override
+    protected IDestination getDestination(String destinationId) throws UnknownDestinationFault {
+<span class="nc" id="L183">        IDestinationId destinationIdObject = new DestinationId();</span>
+<span class="nc" id="L184">        destinationIdObject.setDestId(destinationId);</span>
+<span class="nc" id="L185">        destinationIdObject.setDestType(0);</span>
+
+<span class="nc" id="L187">        IDestination hubDestination = new Destination();</span>
+<span class="nc" id="L188">        hubDestination.setId(destinationIdObject);</span>
+
+<span class="nc" id="L190">        hubDestination.setDestUri(destinationUri);</span>
+
+<span class="nc" id="L192">        return hubDestination;</span>
+    }
+
+    @Override
+    protected boolean isHubWsdl() {
+        // Handles IISHubService
+<span class="nc" id="L198">        return true;</span>
+    }
+
+    @Operation(
+            summary = &quot;Post a message to the SOAP Interface&quot;,
+            description = &quot;Send a request to the SOAP Interface for IZ Gateway&quot;
+    )
+    @ApiResponse(
+            responseCode = &quot;200&quot;,
+            description = &quot;The request completed normally&quot;,
+            content = {
+                    @Content(mediaType = &quot;application/xml&quot;)
+            }
+    )
+    @ApiResponse(
+            responseCode = &quot;500&quot;,
+            description = &quot;A fault occured while processing the request&quot;,
+            content = {@Content}
+    )
+    @PostMapping(
+            produces = {&quot;application/soap+xml&quot;, &quot;application/soap&quot;, &quot;application/xml&quot;, &quot;text/xml&quot;, &quot;text/plain&quot;, &quot;text/html&quot;}
+    )
+    @Override
+    public ResponseEntity&lt;?&gt; submitSoapRequest(@RequestBody SoapMessage soapMessage, @Schema(description = &quot;Throws the fault specified in the header parameter&quot;) @RequestHeader(value = &quot;X-IIS-Hub-Dev-Action&quot;,required = false) String devAction) throws SecurityFault {
+
+<span class="nc" id="L223">        return super.submitSoapRequest(soapMessage, devAction);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

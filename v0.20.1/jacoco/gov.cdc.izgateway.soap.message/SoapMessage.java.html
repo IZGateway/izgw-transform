@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SoapMessage.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.soap.message</a> &gt; <span class="el_source">SoapMessage.java</span></div><h1>SoapMessage.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.soap.message;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
+
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+// TODO: Refactor this with IZG Core
+
+@Schema(description=&quot;A generic SOAP Request message for IZ Gateway&quot;)
+@Data
+@NoArgsConstructor
+public class SoapMessage implements Serializable {
+	private static final long serialVersionUID = 1L;
+	public static final String SOAP_NS = &quot;http://www.w3.org/2003/05/soap-envelope&quot;;
+	public static final String SOAP_PREFIX = &quot;soap&quot;;
+	public static final String HUB_NS = &quot;urn:cdc:iisb:hub:2014&quot;;
+	public static final String HUB_PREFIX = &quot;hub&quot;;
+    public static final String XFORM_NS = &quot;urn:cdc:iisb:hub:xform&quot;;
+    public static final String XFORM_PREFIX = &quot;xform&quot;;
+	public static final String IIS2011_NS = &quot;urn:cdc:iisb:2011&quot;;
+	public static final String IIS_PREFIX = &quot;iis&quot;;
+	public static final String IIS2014_NS = &quot;urn:cdc:iisb:2014&quot;;
+<span class="nc" id="L32">	protected static final Map&lt;String, String&gt; schemaNameMap = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L33">	protected static final String[] SOAP_MEDIA_TYPES = {</span>
+			MediaType.TEXT_PLAIN_VALUE,
+			MediaType.TEXT_HTML_VALUE,	// Postel's law, be forgiving
+			MediaType.TEXT_XML_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			&quot;application/soap&quot;,
+			&quot;application/soap+xml&quot;
+	};
+<span class="nc" id="L41">	protected static final String[] WSDL_MEDIA_TYPES = {</span>
+			MediaType.TEXT_PLAIN_VALUE,
+			MediaType.TEXT_HTML_VALUE,	// Postel's law, be forgiving
+			MediaType.TEXT_XML_VALUE,
+			MediaType.APPLICATION_XML_VALUE,
+			&quot;application/soap+xml&quot;,
+			&quot;application/soap&quot;,
+			&quot;application/wsdl+xml&quot;
+		};
+	
+	/** Marker interface for request messages */
+	public static interface Request {}
+	/** Marker interface for response messages */
+	public static interface Response {}
+<span class="nc" id="L55">	@Schema(description=&quot;The XML Schema this message comes from&quot;)</span>
+	private String schema = IIS2014_NS;
+
+<span class="nc" id="L58">	@Schema(description=&quot;The Hub Request header values found in the soap:Header element if any&quot;)</span>
+	private HubHeader hubHeader = new HubHeader();
+<span class="nc" id="L60">	@Schema(description=&quot;The Web Services Addressing (WSA) values found in the soap:Header element if any&quot;)</span>
+	private WsaHeaders wsaHeaders = new WsaHeaders();
+<span class="nc" id="L62">    @Schema(description=&quot;The Xform Request header values found in the soap:Header element if any&quot;)</span>
+    private XformHeader xformHeader = new XformHeader();
+	/**
+	 * This constructor serves several functions.
+	 * 1. It supports upgrade during marshalling of inbound content from SoapMessage to a more specific type.
+	 * 2. It supports creation of a copy of an inbound messages (from a requstor) to an outbound message (to a destination) using a different schema. 
+	 * 3. It supports initial creation of a response class from a request class for performing work.  The last phase after using the constructor
+	 * for this purpose should be to call relatesTo() to indicate that the newly created message is a reply to the original message.
+	 * 
+	 * @param that	The message to copy from.
+	 * @param schema	The schema to use.
+	 */
+<span class="nc" id="L74">	public SoapMessage(SoapMessage that, String schema, boolean isUpgradeOrSchemaChange) {</span>
+		// Always copy the HubHeader
+<span class="nc" id="L76">		this.hubHeader.copyFrom(that.hubHeader);</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">		if (isUpgradeOrSchemaChange) {</span>
+			// It's an upgrade or schema change
+<span class="nc" id="L79">			this.wsaHeaders.copyFrom(that.wsaHeaders);</span>
+		} else {
+<span class="nc" id="L81">			this.respondingTo(that);</span>
+		}
+<span class="nc bnc" id="L83" title="All 2 branches missed.">		setSchema(schema == null ? that.schema : schema);</span>
+<span class="nc" id="L84">	}</span>
+
+	public void setSchema(String schema) {
+<span class="nc" id="L87">		this.schema = schema;</span>
+<span class="nc" id="L88">	}</span>
+
+	public SoapMessage updateAction(boolean isHub) {
+<span class="nc" id="L91">		String action = getAction(isHub);</span>
+<span class="nc" id="L92">		this.getWsaHeaders().setAction(action);</span>
+<span class="nc" id="L93">		return this;</span>
+	}
+	
+	public String getAction(boolean isHub) {
+<span class="nc" id="L97">		String simpleName = this.getClass().getSimpleName();</span>
+				
+<span class="nc bnc" id="L99" title="All 2 branches missed.">		if (isHub) {</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">			if (this instanceof FaultMessage fm) {</span>
+<span class="nc bnc" id="L101" title="All 7 branches missed.">			    switch (fm.getFaultName()) {</span>
+<span class="nc" id="L102">			    case &quot;UnsupportedOperationFault&quot;: return &quot;urn:cdc:iisb:hub:2014:IISHubPortType:ConnectivityTest:Fault:UnsupportedOperationFault&quot;;</span>
+<span class="nc" id="L103">			    case &quot;DestinationConnectionFault&quot;: return &quot;urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessage:Fault:DestinationConnectionFault&quot;;</span>
+<span class="nc" id="L104">			    case &quot;UnknownDestinationFault&quot;: return &quot;urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessage:Fault:UnknownDestinationFault&quot;;</span>
+<span class="nc" id="L105">			    case &quot;HubClientFault&quot;: return &quot;urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessage:Fault:HubClientFault&quot;;</span>
+<span class="nc" id="L106">			    case &quot;MessageTooLargeFault&quot;: return &quot;urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessage:Fault:MessageTooLargeFault&quot;;</span>
+<span class="nc" id="L107">			    case &quot;SecurityFault&quot;: return &quot;urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessage:Fault:SecurityFault&quot;;</span>
+<span class="nc" id="L108">			    default: return &quot;urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessage:Fault&quot;;</span>
+			    }
+			}
+<span class="nc" id="L111">	    	return &quot;urn:cdc:iisb:hub:2014:IISHubPortType:&quot; + simpleName;</span>
+		}
+		
+<span class="nc bnc" id="L114" title="All 2 branches missed.">		if (is2011Message()) {</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">			if (this instanceof FaultMessage fm) {</span>
+<span class="nc" id="L116">				return &quot;urn:cdc:iisb:2011:Fault:&quot; + to2011name(fm.getFaultName());</span>
+			}
+<span class="nc bnc" id="L118" title="All 5 branches missed.">		    switch (this.getClass().getSimpleName()) {</span>
+<span class="nc" id="L119">		    case &quot;ConnectivityTestRequest&quot;: return &quot;urn:cdc:iisb:2011:connectivityTest&quot;;</span>
+<span class="nc" id="L120">		    case &quot;ConnectivityTestResponse&quot;: return &quot;urn:cdc:iisb:2011:connectivityTestResponse&quot;;</span>
+<span class="nc" id="L121">		    case &quot;SubmitSingleMessageRequest&quot;: return &quot;urn:cdc:iisb:2011:submitSingleMessage&quot;;</span>
+<span class="nc" id="L122">		    case &quot;SubmitSingleMessageResponse&quot;: return &quot;urn:cdc:iisb:2011:submitSingleMessageResponse&quot;;</span>
+<span class="nc" id="L123">		    default: return &quot;urn:cdc:iisb:2011:&quot; + this.to2011name(simpleName);</span>
+		    }
+		}
+
+
+<span class="nc bnc" id="L128" title="All 2 branches missed.">		if (this instanceof FaultMessage fm) {</span>
+<span class="nc bnc" id="L129" title="All 7 branches missed.">		    switch (fm.getFaultName()) {</span>
+<span class="nc" id="L130">		    case &quot;UnsupportedOperationFault&quot;: return &quot;urn:cdc:iisb:2014:IISPortType:ConnectivityTest:Fault:UnsupportedOperationFault&quot;;</span>
+<span class="nc" id="L131">		    case &quot;DestinationConnectionFault&quot;: return &quot;urn:cdc:iisb:2014:IISPortType:SubmitSingleMessage:Fault:DestinationConnectionFault&quot;;</span>
+<span class="nc" id="L132">		    case &quot;UnknownDestinationFault&quot;: return &quot;urn:cdc:iisb:2014:IISPortType:SubmitSingleMessage:Fault:UnknownDestinationFault&quot;;</span>
+<span class="nc" id="L133">		    case &quot;HubClientFault&quot;: return &quot;urn:cdc:iisb:2014:IISPortType:SubmitSingleMessage:Fault:HubClientFault&quot;;</span>
+<span class="nc" id="L134">		    case &quot;MessageTooLargeFault&quot;: return &quot;urn:cdc:iisb:2014:IISPortType:SubmitSingleMessage:Fault:MessageTooLargeFault&quot;;</span>
+<span class="nc" id="L135">		    case &quot;SecurityFault&quot;: return &quot;urn:cdc:iisb:2014:IISPortType:SubmitSingleMessage:Fault:SecurityFault&quot;;</span>
+<span class="nc" id="L136">		    default: return &quot;urn:cdc:iisb:2014:IISPortType:SubmitSingleMessage:Fault&quot; + fm.getFaultName();</span>
+		    }
+	    }
+		    
+<span class="nc" id="L140">		return &quot;urn:cdc:iisb:2014:IISPortType:&quot; + simpleName;</span>
+	}
+	
+	public SoapMessage respondingTo(SoapMessage that) {
+<span class="nc bnc" id="L144" title="All 4 branches missed.">		if (this instanceof Response &amp;&amp; that instanceof Request) {</span>
+<span class="nc" id="L145">			wsaHeaders.respondingTo(that.getWsaHeaders());</span>
+		}
+<span class="nc" id="L147">		return this;</span>
+	}
+	
+<span class="nc" id="L150">	private static List&lt;String&gt; responseNames = Arrays.asList(&quot;Hl7Message&quot;, &quot;EchoBack&quot;);</span>
+<span class="nc" id="L151">	private static Map&lt;String, String&gt; nameMap = new HashMap&lt;&gt;();</span>
+	
+	/**
+	 * Get the name of the element based on the name, the schema and the message type.
+	 * @param name The 2014 WSDL name of the element
+	 * @return The 2014 name if no adjustment is needed, or the original 2011 name if adjusted.
+	 */
+	public String elementName(String name) {
+<span class="nc bnc" id="L159" title="All 2 branches missed.">		if (!is2011Message()) {</span>
+<span class="nc" id="L160">			return name;</span>
+		}
+<span class="nc" id="L162">		return to2011name(name);</span>
+	}
+	
+	/**
+	 * Convert a 2014 SOAP Message Type Name to 2011 WSDL
+	 * @param name The name of the request type	
+	 * @return The 2011 name for the request
+	 */
+	private String to2011name(String name) {
+<span class="nc" id="L171">		String newName = nameMap.get(name);</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">		if (newName != null) {</span>
+<span class="nc" id="L173">			return newName;</span>
+		}
+<span class="nc" id="L175">		StringBuilder b = new StringBuilder(name);</span>
+<span class="nc bnc" id="L176" title="All 4 branches missed.">		if (this instanceof Response &amp;&amp; responseNames.contains(name)) {</span>
+<span class="nc" id="L177">			return &quot;return&quot;;</span>
+		}
+		// Lowercase the initial character
+<span class="nc" id="L180">		b.setCharAt(0, Character.toLowerCase(b.charAt(0)));</span>
+		// Remove the trailing Request on the name 
+<span class="nc bnc" id="L182" title="All 2 branches missed.">		if (name.endsWith(&quot;Request&quot;)) {</span>
+<span class="nc" id="L183">			b.setLength(b.length() - 7);</span>
+		}
+<span class="nc" id="L185">		newName = b.toString();</span>
+<span class="nc" id="L186">		nameMap.put(name, newName);</span>
+<span class="nc" id="L187">		return newName;</span>
+	}
+	
+	public boolean hasDestinationId() {
+<span class="nc bnc" id="L191" title="All 4 branches missed.">		return hubHeader != null &amp;&amp; !StringUtils.isEmpty(hubHeader.getDestinationId());</span>
+	}
+
+	public boolean hasSchema() {
+<span class="nc bnc" id="L195" title="All 2 branches missed.">		return schema != null;</span>
+	}
+
+	@JsonIgnore
+	public boolean is2011Message() {
+<span class="nc" id="L200">		return IIS2011_NS.equals(schema);</span>
+	}
+	@JsonIgnore
+	public boolean is2014Message() {
+<span class="nc bnc" id="L204" title="All 2 branches missed.">		if (IIS2011_NS.equals(schema)) {</span>
+<span class="nc" id="L205">			return false;</span>
+		}
+<span class="nc bnc" id="L207" title="All 4 branches missed.">		if (this instanceof FaultMessage fm &amp;&amp; fm.isHubFault()) {</span>
+<span class="nc" id="L208">			return false;</span>
+		}
+<span class="nc bnc" id="L210" title="All 4 branches missed.">		return hubHeader.isEmpty() || IIS2014_NS.equals(schema);</span>
+	}
+	@JsonIgnore
+	public boolean isHubMessage() {
+<span class="nc bnc" id="L214" title="All 4 branches missed.">		return !is2011Message() &amp;&amp; !is2014Message();</span>
+	}
+	
+	/**
+	 * Extract the text case identifier from the message.
+	 * @return The test case identifier or the empty string if there is none.
+	 */
+	public String findTestCaseIdentifier() {
+<span class="nc bnc" id="L222" title="All 2 branches missed.">		if (!(this instanceof HasHL7Message)) {</span>
+<span class="nc" id="L223">			return &quot;&quot;;</span>
+		}
+		
+<span class="nc" id="L226">		String message = ((HasHL7Message)this).getHl7Message();</span>
+		
+<span class="nc bnc" id="L228" title="All 2 branches missed.">        if (StringUtils.isEmpty(message)) {</span>
+<span class="nc" id="L229">        	return &quot;&quot;;</span>
+        }
+        
+<span class="nc" id="L232">        String[] fields = message.split(&quot;\\|&quot;, 10);</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">        String msh5 = fields.length &gt; 4 ? fields[4] : &quot;&quot;;</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">        String msh6 = fields.length &gt; 5 ? fields[5] : &quot;&quot;;</span>
+
+<span class="nc bnc" id="L236" title="All 6 branches missed.">        if (&quot;TEST&quot;.equalsIgnoreCase(msh5) &amp;&amp; msh6 != null &amp;&amp; msh6.matches(&quot;^TC_[0-9A-Z_]+$|^MOCK.*|^PERF.*$&quot;)) {</span>
+<span class="nc" id="L237">            return msh6;</span>
+        }
+        
+<span class="nc" id="L240">        return &quot;&quot;;</span>
+	}
+
+	@JsonIgnore
+	/**
+	 * Return the length of the message payload.
+	 * @return Return the length of the payload.
+	 */
+	public int length() {
+<span class="nc bnc" id="L249" title="All 2 branches missed.">		if (this instanceof HasEchoBack echo) {</span>
+<span class="nc" id="L250">			return echo.getEchoBack().length();</span>
+		} 
+<span class="nc bnc" id="L252" title="All 2 branches missed.">		if (this instanceof HasHL7Message hl7) {</span>
+<span class="nc" id="L253">			return hl7.getHl7Message().length();</span>
+		}
+<span class="nc" id="L255">		return 0;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

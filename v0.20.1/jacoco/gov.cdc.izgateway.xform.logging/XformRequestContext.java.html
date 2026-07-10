@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>XformRequestContext.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.logging</a> &gt; <span class="el_source">XformRequestContext.java</span></div><h1>XformRequestContext.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.logging;
+
+public class XformRequestContext {
+    private XformRequestContext() {}
+<span class="nc" id="L5">    private static ThreadLocal&lt;Boolean&gt; disableApiLogging = ThreadLocal.withInitial(() -&gt; Boolean.FALSE);</span>
+
+    /**
+     * API logging is only enabled for calls to our API endpoints. This is to prevent logging for internal calls like
+     * those made by the transformation service itself when processing messages.  We will capture logging for the API
+     * calls to log/audit the changes made to the data by end users of the Xform Console, or other systems that call our
+     * API.
+     * @return true if API logging is disabled, false otherwise
+     */
+    public static boolean isApiLoggingDisabled() {
+<span class="nc" id="L15">        return disableApiLogging.get();</span>
+    }
+
+    public static void disableApiLogging() {
+<span class="nc" id="L19">        disableApiLogging.set(Boolean.TRUE);</span>
+<span class="nc" id="L20">    }</span>
+
+    public static void clear() {
+<span class="nc" id="L23">        disableApiLogging.remove();</span>
+<span class="nc" id="L24">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
