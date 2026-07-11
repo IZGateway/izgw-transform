@@ -43,8 +43,9 @@ function makeToken(subject, roles) {
     return sigInput + '.' + sig;
 }
 
-const senderToken = makeToken('sql-test-sender', ['xform-sender']);
-const adminToken  = makeToken('sql-test-admin',  ['xform-sender', 'admin']);
+// Both tokens use the quickstart user subject so they match users.json out of the box.
+const senderToken = makeToken('xform.local.testing.only', ['xform-sender']);
+const adminToken  = makeToken('xform.local.testing.only', ['xform-sender', 'admin']);
 
 console.log('');
 console.log('=== SQL Backend Test Tokens (valid 30 days) ===');

@@ -79,7 +79,26 @@ RUN mkdir -p /ssl/local && \
         -providerpath /usr/share/izg-transform/lib/bcfips/bc-fips-2.1.2.jar \
         -dname "CN=sql.xform.testing.local, O=izgateway" \
         -noprompt && \
-    cp /ssl/local/server.bcfks /ssl/local/trust.bcfks
+    keytool -exportcert \
+        -alias server \
+        -keystore /ssl/local/server.bcfks \
+        -storepass changeit \
+        -storetype BCFKS \
+        -providername BCFIPS \
+        -providerclass org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider \
+        -providerpath /usr/share/izg-transform/lib/bcfips/bc-fips-2.1.2.jar \
+        -file /tmp/server.der -rfc && \
+    keytool -importcert \
+        -alias server \
+        -file /tmp/server.der \
+        -keystore /ssl/local/trust.bcfks \
+        -storepass changeit \
+        -storetype BCFKS \
+        -providername BCFIPS \
+        -providerclass org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider \
+        -providerpath /usr/share/izg-transform/lib/bcfips/bc-fips-2.1.2.jar \
+        -noprompt && \
+    rm /tmp/server.der
 
 ENV XFORM_VERSION=$XFORM_VERSION
 
