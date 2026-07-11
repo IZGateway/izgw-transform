@@ -7,4 +7,10 @@ public final class XformConstants {
     }
 
     public static final String CONTEXT_FACILITY_ID_PATH = "context.FacilityID";
+
+    /**
+     * Reserved URL path prefix for SQL backend endpoints served by izgw-transform-sql.
+     * IIS destination IDs that would conflict with this namespace are rejected at registration.
+     */
+    public static final String SQL_PATH_PREFIX = "/sql/";
 }
