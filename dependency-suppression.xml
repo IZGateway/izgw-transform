@@ -89,4 +89,34 @@
         <cve>CVE-2026-54399</cve>
         <cve>CVE-2026-54428</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+    kotlin-stdlib-1.9.25.jar: CVE-2026-53914 is not exploitable in this service.
+    The vulnerability is a BUILD-TIME issue in Kotlin's build cache metadata (unsafe
+    deserialization, CWE-502) and is only reachable when compiling Kotlin code with
+    Kotlin's build tooling. izgw-transform is a Maven/Java service that runs no Kotlin
+    compiler and no Kotlin build cache, so the vulnerable code path is not present at runtime.
+
+    kotlin-stdlib is present only as a transitive runtime dependency of OkHttp libs, which are
+    pulled in by HAPI's org.hl7.fhir.utilities, for example:
+        v2tofhir -> hapi-fhir-structures-r4:8.10.1 -> org.hl7.fhir.utilities:6.9.12
+                 -> okhttp-jvm:5.3.2 -> kotlin-stdlib:1.9.25
+    OkHttp/kotlin-stdlib are only used by the utilities' HTTP, terminology-server, and
+    remote package-loading classes. izgw-transform performs HL7v2->FHIR conversion only and
+    never invokes those paths: it contains no Kotlin source and no direct okhttp/kotlin usage.
+
+    Verified empirically (2026-07-28): a representative VXU^V04 -> FHIR conversion via the
+    production call `new MessageParser().convert(...)` loaded 2,264 classes with 0 kotlin and
+    0 okhttp classes loaded (164 org.hl7.fhir.r4.model + 70 v2tofhir classes did load).
+    Terminology is resolved locally (V2TOFHIR_TERMINOLOGY_MAPPER not set -> supplier-provided
+    mapper), so no remote tx-server/okhttp path is exercised.
+
+    Scanner shows the inflated NVD 9.8 auto-score; JetBrains (CNA) rates it 6.7 Medium
+    (AV:L/AC:H/PR:H). Fixed in Kotlin 2.4.20, which is not yet GA (betas only as of 2026-07-28).
+    TEMPORARY: remove this suppression once Kotlin 2.4.20 GA is pinned via kotlin-bom in izgw-bom.
+    Added: 2026-07-28 (IGDD-3141)
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib@.*$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
 </suppressions>
