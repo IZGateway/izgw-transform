@@ -2,7 +2,7 @@
 
 public class XformRequestContext {
     private XformRequestContext() {}
-<span class="pc" id="L5">    private static ThreadLocal&lt;Boolean&gt; disableApiLogging = ThreadLocal.withInitial(() -&gt; Boolean.FALSE);</span>
+<span class="nc" id="L5">    private static ThreadLocal&lt;Boolean&gt; disableApiLogging = ThreadLocal.withInitial(() -&gt; Boolean.FALSE);</span>
 
     /**
      * API logging is only enabled for calls to our API endpoints. This is to prevent logging for internal calls like
@@ -12,15 +12,15 @@ public class XformRequestContext {
      * @return true if API logging is disabled, false otherwise
      */
     public static boolean isApiLoggingDisabled() {
-<span class="fc" id="L15">        return disableApiLogging.get();</span>
+<span class="nc" id="L15">        return disableApiLogging.get();</span>
     }
 
     public static void disableApiLogging() {
-<span class="fc" id="L19">        disableApiLogging.set(Boolean.TRUE);</span>
-<span class="fc" id="L20">    }</span>
+<span class="nc" id="L19">        disableApiLogging.set(Boolean.TRUE);</span>
+<span class="nc" id="L20">    }</span>
 
     public static void clear() {
-<span class="fc" id="L23">        disableApiLogging.remove();</span>
-<span class="fc" id="L24">    }</span>
+<span class="nc" id="L23">        disableApiLogging.remove();</span>
+<span class="nc" id="L24">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
