@@ -89,4 +89,29 @@
         <cve>CVE-2026-54399</cve>
         <cve>CVE-2026-54428</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+        kotlin-stdlib-1.9.25.jar: CVE-2026-53914 is not exploitable in this service.
+        The vulnerability is a BUILD-TIME issue in Kotlin's build cache metadata (unsafe
+        deserialization, CWE-502), only reachable when compiling Kotlin with Kotlin's build
+        tooling. izgw-transform is a Maven/Java service that runs no Kotlin compiler and no
+        Kotlin build cache, so the vulnerable code path is not present at runtime. kotlin-stdlib
+        is only on the classpath transitively (via okio/okhttp under org.hl7.fhir.utilities);
+        a representative VXU^V04 -> FHIR conversion loaded 0 kotlin and 0 okhttp classes.
+
+        MATCH NOTE: kotlin-stdlib is a Gradle-built jar with no embedded META-INF/maven
+        pom.properties, so the CI scan (dependency-check GitHub Action scanning the assembled
+        fat jar) derives no Maven packageUrl for it and identifies it only by
+        cpe:/a:jetbrains:kotlin. A packageUrl suppression therefore does not match; this rule
+        matches by filePath (the nested jar filename), which works in both the fat-jar and
+        Maven-plugin scans.
+
+        Scanner shows the inflated NVD 9.8 auto-score; JetBrains (CNA) rates it 6.7 Medium
+        (AV:L/AC:H/PR:H). Fixed in Kotlin 2.4.20, not yet GA (betas only as of 2026-07-28).
+        TEMPORARY: remove once Kotlin 2.4.20 GA is pinned via kotlin-bom in izgw-bom.
+        Added: 2026-07-28 (IGDD-3141)
+        ]]></notes>
+        <filePath regex="true">.*kotlin-stdlib-.*\.jar</filePath>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
 </suppressions>

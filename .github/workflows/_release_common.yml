@@ -74,6 +74,9 @@ jobs:
       - name: Set up Toolchain and Maven settings
         shell: bash
         run: |
+          # Capture the build runner hostname so Maven can resolve
+          # %{env.COMPUTERNAME} in docker/webapp/static/build.txt (matches maven.yml).
+          echo COMPUTERNAME=`hostname` >> $GITHUB_ENV
           mkdir -p ~/.m2
           cat << 'EOF' > ~/.m2/toolchains.xml
           <?xml version="1.0" encoding="UTF-8"?>
