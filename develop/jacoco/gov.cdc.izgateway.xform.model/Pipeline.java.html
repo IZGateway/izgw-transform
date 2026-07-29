@@ -20,7 +20,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @DynamoDbBean
-<span class="nc" id="L23">public class Pipeline extends BaseModel implements OrganizationAware {</span>
+<span class="fc" id="L23">public class Pipeline extends BaseModel implements OrganizationAware {</span>
 
     @NotBlank(message = &quot;Pipeline name is required&quot;)
     private String pipelineName;
@@ -52,7 +52,7 @@ import java.util.UUID;
      * Needed to create the getter/setter to work
      */
 
-<span class="nc" id="L55">    private static final ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L55">    private static final ObjectMapper objectMapper = new ObjectMapper();</span>
 
     @JsonIgnore
     @DynamoDbAttribute(&quot;pipes&quot;)
