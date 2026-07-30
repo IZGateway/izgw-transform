@@ -1300,6 +1300,82 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "TS_TC_10 FHIR CapabilityStatement (metadata)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "let cs = pm.response.json();",
+                      "pm.test(\"verify type is CapabilityStatement\", function() {",
+                      "    pm.expect(cs.resourceType).to.equal(\"CapabilityStatement\");",
+                      "});",
+                      "pm.test(\"verify fhirVersion is 4.0.1\", function() {",
+                      "    pm.expect(cs.fhirVersion).to.equal(\"4.0.1\");",
+                      "});",
+                      "pm.test(\"verify format includes application/fhir+json\", function() {",
+                      "    pm.expect(cs.format).to.include(\"application/fhir+json\");",
+                      "});",
+                      "let rest = cs.rest && cs.rest[0];",
+                      "pm.test(\"verify server rest mode\", function() {",
+                      "    pm.expect(rest).to.not.be.undefined;",
+                      "    pm.expect(rest.mode).to.equal(\"server\");",
+                      "});",
+                      "let patient = rest.resource.find(r => r.type === \"Patient\");",
+                      "pm.test(\"verify Patient resource with search-type\", function() {",
+                      "    pm.expect(patient).to.not.be.undefined;",
+                      "    pm.expect(patient.interaction.map(i => i.code)).to.include(\"search-type\");",
+                      "});",
+                      "pm.test(\"verify Patient advertises $match operation\", function() {",
+                      "    let match = patient.operation.find(o => o.name === \"match\");",
+                      "    pm.expect(match).to.not.be.undefined;",
+                      "    pm.expect(match.definition).to.equal(\"http://hl7.org/fhir/OperationDefinition/Patient-match\");",
+                      "});",
+                      "pm.test(\"verify Immunization and ImmunizationRecommendation are searchable\", function() {",
+                      "    [\"Immunization\", \"ImmunizationRecommendation\"].forEach(function(type) {",
+                      "        let res = rest.resource.find(r => r.type === type);",
+                      "        pm.expect(res, type).to.not.be.undefined;",
+                      "        pm.expect(res.interaction.map(i => i.code)).to.include(\"search-type\");",
+                      "    });",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/fhir+json",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/metadata",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "metadata"
+                  ]
+                }
+              },
+              "response": []
             }
           ],
           "auth": {

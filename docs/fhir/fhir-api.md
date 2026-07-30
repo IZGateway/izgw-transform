@@ -161,6 +161,55 @@ Responses:
 
 ---
 
+### Capabilities (metadata)
+
+Return the server's FHIR R4 `CapabilityStatement` (the FHIR *capabilities* interaction).
+
+```
+GET /fhir/{destinationId}/metadata
+```
+
+FHIR R4 requires servers to publish a `CapabilityStatement` at `[base]/metadata`. Clients
+that auto-detect server features — for example the DIBBs Query Connector — read this
+document to discover that the service supports the Patient `$match` operation.
+
+The document is **the same for every `{destinationId}`**: no destination lookup is
+performed, and an unrecognized destination still receives the `CapabilityStatement`
+(there is no `404` for this endpoint). It advertises:
+
+- `status = active`, `fhirVersion = 4.0.1`, `format` including `application/fhir+json`
+- a single `rest` entry (`mode = server`) listing `Patient`, `Immunization`, and
+  `ImmunizationRecommendation` with the `search-type` interaction
+- the Patient `$match` operation (`rest.resource[type=Patient].operation`) named `match`
+  with `definition = http://hl7.org/fhir/OperationDefinition/Patient-match`
+
+Minimal example:
+
+```json
+{
+  "resourceType": "CapabilityStatement",
+  "status": "active",
+  "fhirVersion": "4.0.1",
+  "format": ["application/fhir+json"],
+  "rest": [{
+    "mode": "server",
+    "resource": [
+      { "type": "Patient",
+        "interaction": [{ "code": "search-type" }],
+        "operation": [{ "name": "match",
+          "definition": "http://hl7.org/fhir/OperationDefinition/Patient-match" }] },
+      { "type": "Immunization", "interaction": [{ "code": "search-type" }] },
+      { "type": "ImmunizationRecommendation", "interaction": [{ "code": "search-type" }] }
+    ]
+  }]
+}
+```
+
+Responses:
+- `200 OK` — the `CapabilityStatement` (`application/fhir+json` by default)
+
+---
+
 ## Connection Test
 
 SMART on FHIR and other auth clients test connectivity with:

@@ -11,15 +11,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hl7.fhir.r4.model.CapabilityStatement;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -204,5 +208,115 @@ class FhirControllerTests {
             t.get("/QPD-3-4-1"),
             t.get("/QPD-3-5")
         };
+    }
+
+    // --- CapabilityStatement (/metadata) -------------------------------------------------
+
+    @Test
+    void metadataReturnsCapabilityStatement() {
+        ResponseEntity<CapabilityStatement> response = newController().metadata("dev");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        CapabilityStatement cs = response.getBody();
+        assertNotNull(cs);
+        assertEquals(Enumerations.PublicationStatus.ACTIVE, cs.getStatus());
+    }
+
+    @Test
+    void metadataDeclaresFhirVersionAndJsonFormat() {
+        CapabilityStatement cs = newController().metadata("dev").getBody();
+
+        assertNotNull(cs);
+        assertEquals(Enumerations.FHIRVersion._4_0_1, cs.getFhirVersion());
+        assertTrue(
+            cs.getFormat().stream().anyMatch(f -> "application/fhir+json".equals(f.getValue())),
+            "format should include application/fhir+json"
+        );
+    }
+
+    @Test
+    void metadataAdvertisesSearchableResources() {
+        CapabilityStatement cs = newController().metadata("dev").getBody();
+
+        assertNotNull(cs);
+        assertEquals(1, cs.getRest().size());
+        CapabilityStatement.CapabilityStatementRestComponent rest = cs.getRestFirstRep();
+        assertEquals(CapabilityStatement.RestfulCapabilityMode.SERVER, rest.getMode());
+
+        for (String type : List.of("Patient", "Immunization", "ImmunizationRecommendation")) {
+            CapabilityStatement.CapabilityStatementRestResourceComponent resource =
+                findResource(rest, type);
+            assertNotNull(resource, "missing resource " + type);
+            assertTrue(
+                resource.getInteraction().stream()
+                    .anyMatch(i -> i.getCode() == CapabilityStatement.TypeRestfulInteraction.SEARCHTYPE),
+                type + " should declare the search-type interaction"
+            );
+        }
+    }
+
+    @Test
+    void metadataAdvertisesPatientMatchOperation() {
+        CapabilityStatement cs = newController().metadata("dev").getBody();
+
+        assertNotNull(cs);
+        CapabilityStatement.CapabilityStatementRestResourceComponent patient =
+            findResource(cs.getRestFirstRep(), "Patient");
+        assertNotNull(patient);
+
+        CapabilityStatement.CapabilityStatementRestResourceOperationComponent match =
+            patient.getOperation().stream()
+                .filter(op -> "match".equals(op.getName()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(match, "Patient $match operation should be advertised");
+        assertEquals(
+            "http://hl7.org/fhir/OperationDefinition/Patient-match",
+            match.getDefinition()
+        );
+    }
+
+    @Test
+    void metadataIsDestinationAgnostic() {
+        FhirController controller = newController();
+        CapabilityStatement known = controller.metadata("dev").getBody();
+        CapabilityStatement unknown = controller.metadata("some-unknown-destination").getBody();
+
+        assertNotNull(known);
+        assertNotNull(unknown);
+        assertTrue(
+            known.equalsDeep(unknown),
+            "CapabilityStatement should be identical regardless of destinationId"
+        );
+    }
+
+    @Test
+    void metadataIsExplicitlyMapped() throws NoSuchMethodException {
+        GetMapping mapping = FhirController.class
+            .getMethod("metadata", String.class)
+            .getAnnotation(GetMapping.class);
+
+        assertNotNull(mapping);
+        assertArrayEquals(new String[] { "/{destinationId}/metadata" }, mapping.value());
+        assertTrue(
+            Arrays.asList(mapping.produces()).contains("application/fhir+json"),
+            "produces should include application/fhir+json"
+        );
+    }
+
+    private static FhirController newController() {
+        return new FhirController(
+            mock(HubController.class),
+            new FhirController.FhirConfiguration(),
+            mock(AccessControlRegistry.class)
+        );
+    }
+
+    private static CapabilityStatement.CapabilityStatementRestResourceComponent findResource(
+        CapabilityStatement.CapabilityStatementRestComponent rest, String type) {
+        return rest.getResource().stream()
+            .filter(r -> type.equals(r.getType()))
+            .findFirst()
+            .orElse(null);
     }
 }

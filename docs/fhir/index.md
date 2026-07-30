@@ -75,6 +75,8 @@ still has the data — using a standard FHIR read (`GET /fhir/{dest}/{ResourceTy
 
 - All endpoints are under `/fhir/{destinationId}/` where `destinationId` is the IIS
   destination identifier configured in the IZ Gateway Hub.
+- The server publishes a FHIR R4 `CapabilityStatement` at
+  `GET /fhir/{destinationId}/metadata` (advertising the Patient `$match` operation).
 - Requests may use `GET`, `POST /_search`, or `HEAD`.
 - Responses are available as `application/fhir+json`, `application/fhir+xml`,
   `application/fhir+yaml`, and several plain media type aliases.

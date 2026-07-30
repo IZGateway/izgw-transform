@@ -12,9 +12,11 @@ import gov.cdc.izgw.v2tofhir.utils.IzQuery;
 import gov.cdc.izgw.v2tofhir.utils.ParserUtils;
 
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.IllegalFormatCodePointException;
 import java.util.Iterator;
 import java.util.List;
@@ -29,8 +31,10 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Bundle.SearchEntryMode;
+import org.hl7.fhir.r4.model.CapabilityStatement;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.IdType;
@@ -142,6 +146,19 @@ public class FhirController {
     private static final String PATIENT = "Patient";
     /** FHIR search parameter name accepted as a lenient alias for {@code patient}. */
     private static final String SUBJECT = "subject";
+    /** FHIR resource type advertised in the CapabilityStatement. */
+    private static final String IMMUNIZATION = "Immunization";
+    /** FHIR resource type advertised in the CapabilityStatement. */
+    private static final String IMMUNIZATION_RECOMMENDATION = "ImmunizationRecommendation";
+    /** Name of the Patient {@code $match} operation advertised in the CapabilityStatement. */
+    private static final String MATCH_OPERATION = "match";
+    /** Canonical OperationDefinition URL for the Patient {@code $match} operation. */
+    private static final String PATIENT_MATCH_DEFINITION =
+        "http://hl7.org/fhir/OperationDefinition/Patient-match";
+    /** FHIR JSON media type advertised in the CapabilityStatement {@code format}. */
+    private static final String FHIR_JSON = "application/fhir+json";
+    /** Fixed publication date so the (static) CapabilityStatement is deterministic across requests. */
+    private static final Date CAPABILITY_STATEMENT_DATE = Date.from(Instant.parse("2026-07-30T00:00:00Z"));
 
     /**
      * Configuration of the V2toFHIR Conversion
@@ -177,6 +194,93 @@ public class FhirController {
         this.hub = hub;
         this.config = config;
         registry.register(this);
+    }
+
+    /**
+     * Serve the FHIR R4 {@code CapabilityStatement} (conformance) document at the standard
+     * {@code [base]/metadata} location. FHIR R4 requires servers to publish a CapabilityStatement
+     * via the capabilities interaction, and clients such as the DIBBs Query Connector read this
+     * document to auto-detect that the server supports the Patient {@code $match} operation.
+     * <p>
+     * The document is the same regardless of {@code destinationId}: no destination lookup is
+     * performed and unknown destinations still receive the CapabilityStatement (no 404).
+     *
+     * @param destinationId The destination for the FHIR Request. Present for URL consistency with
+     * the other FHIR endpoints; it does not affect the returned document.
+     * @return A FHIR R4 {@code CapabilityStatement} describing the resources, interactions and the
+     * Patient {@code $match} operation supported by this service.
+     */
+    @Operation(
+        summary = "Return the FHIR CapabilityStatement for the IZ Gateway Xform Service",
+        description = "FHIR R4 capabilities interaction served at [base]/metadata"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "The CapabilityStatement was returned",
+        content = {
+            @Content(mediaType = "application/fhir+json"),
+            @Content(mediaType = "application/fhir+xml")
+        }
+    )
+    @GetMapping(
+        value = "/{destinationId}/metadata",
+        produces = {
+            "application/fhir+xml",
+            "application/fhir+json",
+            "application/fhir+yaml",
+            "application/xml",
+            "application/json",
+            "application/yaml",
+            "text/xml"
+        }
+    )
+    public ResponseEntity<CapabilityStatement> metadata(@PathVariable String destinationId) {
+        return new ResponseEntity<>(buildCapabilityStatement(), HttpStatus.OK);
+    }
+
+    /**
+     * Build the destination-agnostic FHIR R4 {@code CapabilityStatement} advertising the FHIR
+     * resources this service exposes as queryable endpoints and the Patient {@code $match} operation.
+     * A fresh instance is built per request to avoid sharing a mutable HAPI resource across threads.
+     *
+     * @return a new {@code CapabilityStatement} instance
+     */
+    private CapabilityStatement buildCapabilityStatement() {
+        CapabilityStatement cs = new CapabilityStatement();
+        cs.setStatus(Enumerations.PublicationStatus.ACTIVE);
+        cs.setDate(CAPABILITY_STATEMENT_DATE);
+        cs.setKind(CapabilityStatement.CapabilityStatementKind.INSTANCE);
+        cs.setFhirVersion(Enumerations.FHIRVersion._4_0_1);
+        cs.addFormat(FHIR_JSON);
+
+        CapabilityStatement.CapabilityStatementRestComponent rest =
+            cs.addRest().setMode(CapabilityStatement.RestfulCapabilityMode.SERVER);
+
+        CapabilityStatement.CapabilityStatementRestResourceComponent patient =
+            addSearchableResource(rest, PATIENT);
+        patient.addOperation()
+            .setName(MATCH_OPERATION)
+            .setDefinition(PATIENT_MATCH_DEFINITION);
+
+        addSearchableResource(rest, IMMUNIZATION);
+        addSearchableResource(rest, IMMUNIZATION_RECOMMENDATION);
+
+        return cs;
+    }
+
+    /**
+     * Add a resource with the {@code search-type} interaction to the given rest component.
+     *
+     * @param rest the server rest component to add the resource to
+     * @param type the FHIR resource type name
+     * @return the added resource component (so callers can attach operations)
+     */
+    private CapabilityStatement.CapabilityStatementRestResourceComponent addSearchableResource(
+        CapabilityStatement.CapabilityStatementRestComponent rest, String type) {
+        CapabilityStatement.CapabilityStatementRestResourceComponent resource = rest.addResource();
+        resource.setType(type);
+        resource.addInteraction().setCode(CapabilityStatement.TypeRestfulInteraction.SEARCHTYPE);
+        return resource;
     }
     
     /**
