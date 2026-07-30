@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -16,15 +18,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleType;
+import org.hl7.fhir.r4.model.DateType;
+import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.OperationOutcome;
+import org.hl7.fhir.r4.model.Parameters;
+import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.Resource;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import gov.cdc.izgateway.configuration.AppProperties;
+import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.security.IzgPrincipal;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageResponse;
 import gov.cdc.izgateway.xform.endpoints.hub.HubController;
+import gov.cdc.izgw.v2tofhir.utils.ContentUtils;
+import gov.cdc.izgw.v2tofhir.utils.FhirIdCodec;
 import gov.cdc.izgw.v2tofhir.utils.IzQuery;
 import gov.cdc.izgw.v2tofhir.utils.QBPUtils;
 
@@ -174,7 +192,174 @@ class FhirControllerTests {
         assertFalse(FhirController.isPatientReference("   "));
     }
 
+    // --- FHIR response content negotiation -----------------------------------------------
+    //
+    // The FHIR endpoints bypass Spring's global content negotiation (which is SOAP-oriented:
+    // it ignores Accept and defaults to XML) by setting Content-Type explicitly via
+    // ContentUtils.getHeaders(). These tests pin that behavior for the paths that build
+    // their own ResponseEntity rather than reusing processQuery's headers.
+
+    private static final String MATCH_URI = "/fhir/dev/Patient/$match";
+
+    /** A minimal RSP_K11 response as returned by an IIS for an immunization history query. */
+    private static final String RSP_MESSAGE = String.join("\r",
+        "MSH|^~\\&|TESTIIS|TESTIIS|TESTAPP|TESTORG|20240101120000||RSP^K11^RSP_K11|X234|P|2.5.1",
+        "MSA|AA|1234",
+        "QAK|Q1|OK|Z34^Request Immunization History^CDCPHINVS",
+        "QPD|Z34^Request Immunization History^CDCPHINVS|Q1|0000001^^^TEST^MR",
+        "PID|1||0000001^^^TEST^MR||CuyahogaAIRA^MarnyAIRA^^^^^L||19600507|F"
+    );
+
+    @AfterEach
+    void clearRequestContext() {
+        RequestContext.clear();
+    }
+
+    @Test
+    void matchHonorsFhirJsonAccept() throws Exception {
+        initRequestContext();
+        FhirController controller = controller(hubReturning(RSP_MESSAGE));
+        HttpServletRequest req = fhirRequest(MATCH_URI, ContentUtils.FHIR_PLUS_JSON_VALUE);
+
+        ResponseEntity<Resource> res = controller.iisPatientMatch("dev", matchParameters(), req);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_JSON_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+        Bundle b = (Bundle) res.getBody();
+        assertNotNull(b);
+        assertEquals(BundleType.SEARCHSET, b.getType());
+        assertTrue(b.getEntry().stream().anyMatch(e -> e.getResource() instanceof Patient),
+            "match result should contain the matched Patient");
+    }
+
+    @Test
+    void matchHonorsXmlAccept() throws Exception {
+        initRequestContext();
+        FhirController controller = controller(hubReturning(RSP_MESSAGE));
+        HttpServletRequest req = fhirRequest(MATCH_URI, "application/xml");
+
+        ResponseEntity<Resource> res = controller.iisPatientMatch("dev", matchParameters(), req);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_XML_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void matchDefaultsToJsonWithoutAccept() throws Exception {
+        initRequestContext();
+        FhirController controller = controller(hubReturning(RSP_MESSAGE));
+        HttpServletRequest req = fhirRequest(MATCH_URI, null);
+
+        ResponseEntity<Resource> res = controller.iisPatientMatch("dev", matchParameters(), req);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_JSON_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void matchHonorsFormatParameter() throws Exception {
+        initRequestContext();
+        FhirController controller = controller(hubReturning(RSP_MESSAGE));
+        // _format must be read from the original request; the internal wrapper's
+        // parameters are reset before the query is built.
+        HttpServletRequest req = fhirRequest(MATCH_URI, null);
+        when(req.getParameter("_format")).thenReturn("xml");
+
+        ResponseEntity<Resource> res = controller.iisPatientMatch("dev", matchParameters(), req);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_XML_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void matchInvalidBodyErrorHonorsAccept() throws Exception {
+        FhirController controller = controller(mock(HubController.class));
+        HttpServletRequest req = fhirRequest(MATCH_URI, ContentUtils.FHIR_PLUS_JSON_VALUE);
+
+        ResponseEntity<Resource> res = controller.iisPatientMatch("dev", new Bundle(), req);
+
+        assertEquals(HttpStatus.BAD_REQUEST, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_JSON_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+        assertTrue(res.getBody() instanceof OperationOutcome);
+    }
+
+    @Test
+    void connectionTestHonorsAccept() throws Exception {
+        FhirController controller = controller(mock(HubController.class));
+        HttpServletRequest req = fhirRequest("/fhir/dev/Patient", ContentUtils.FHIR_PLUS_JSON_VALUE);
+        when(req.getParameter("_summary")).thenReturn("count");
+
+        ResponseEntity<Bundle> res = controller.iisQuery("dev", req);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_JSON_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+        assertNotNull(res.getBody());
+        assertEquals(100, res.getBody().getTotal());
+    }
+
+    @Test
+    void readNotFoundHonorsAccept() throws Exception {
+        FhirController controller = controller(mock(HubController.class));
+        // Decodes cleanly but has no system|value pair, so the read reports not-found
+        // before any downstream query is attempted.
+        String id = FhirIdCodec.encode("TEST");
+        HttpServletRequest req = fhirRequest("/fhir/dev/Patient/" + id, ContentUtils.FHIR_PLUS_JSON_VALUE);
+
+        ResponseEntity<Resource> res = controller.iisRead("dev", id, req);
+
+        assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_JSON_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+        assertTrue(res.getBody() instanceof OperationOutcome);
+    }
+
     // --- helpers -------------------------------------------------------------------------
+
+    private static FhirController controller(HubController hub) {
+        return new FhirController(hub, new FhirController.FhirConfiguration(), mock(AccessControlRegistry.class));
+    }
+
+    private static HubController hubReturning(String hl7Message) throws Exception {
+        HubController hub = mock(HubController.class);
+        doReturn(new ResponseEntity<>(new SubmitSingleMessageResponse(hl7Message), HttpStatus.OK))
+            .when(hub).submitSoapRequest(any(), any());
+        return hub;
+    }
+
+    private static HttpServletRequest fhirRequest(String uri, String accept) {
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getParameterMap()).thenReturn(Collections.emptyMap());
+        when(req.getRequestURI()).thenReturn(uri);
+        when(req.getHeader(HttpHeaders.ACCEPT)).thenReturn(accept);
+        return req;
+    }
+
+    private static Parameters matchParameters() {
+        Patient patient = new Patient();
+        patient.addName(new HumanName().setFamily("CuyahogaAIRA").addGiven("MarnyAIRA"));
+        patient.setBirthDateElement(new DateType("1960-05-07"));
+        Parameters params = new Parameters();
+        params.addParameter().setName("resource").setResource(patient);
+        return params;
+    }
+
+    private static void initRequestContext() {
+        if (AppProperties.getInstance() == null) {
+            // TransactionData's constructor consults the static AppProperties instance,
+            // which Spring registers at startup; the constructor self-registers it.
+            new AppProperties();
+        }
+        RequestContext.init();
+        RequestContext.getSourceInfo().setCommonName("test");
+        IzgPrincipal principal = new IzgPrincipal() {
+            @Override
+            public String getSerialNumberHex() {
+                return null;
+            }
+        };
+        principal.setName("TESTAPP");
+        principal.setOrganization("TESTORG");
+        RequestContext.setPrincipal(principal);
+    }
 
     private static RequestWithModifiableParameters emptyRequest() {
         HttpServletRequest base = mock(HttpServletRequest.class);
