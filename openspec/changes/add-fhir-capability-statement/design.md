@@ -32,7 +32,7 @@ Construct an `org.hl7.fhir.r4.model.CapabilityStatement` programmatically and re
 - **Alternatives considered:** (a) Return a hardcoded JSON string / static resource file — rejected: bypasses the FHIR converter and content negotiation, easy to drift into invalid FHIR, and duplicates media-type handling. (b) Introduce a HAPI `RestfulServer` to auto-generate `/metadata` — rejected: large architectural change, out of scope, and would collide with the existing hand-rolled routes.
 
 ### Decision 2: Static content, built per request by a small private helper
-Populate the statement from constants (status `active`, `fhirVersion 4.0.1`, `format`, the three resources, the `match` operation). Build a fresh instance per request via a private `buildCapabilityStatement()` helper rather than caching a shared singleton.
+Populate the statement from constants (status `active`, `fhirVersion 4.0.1`, `format`, the three resources, the `match` operation — plus the elements R4 requires for validity: a fixed `date`, `kind = instance`, and an `implementation.description`, since kind `instance` mandates `implementation` per invariant cpb-14 and cpb-2 requires one of description/software/implementation). Build a fresh instance per request via a private `buildCapabilityStatement()` helper rather than caching a shared singleton.
 - **Rationale:** The document is tiny and identical for all destinations; building per request avoids sharing a mutable, non-thread-safe HAPI resource across concurrent requests. Keeps the handler within Checkstyle method-length/complexity limits.
 - **Alternatives considered:** Cache one shared `CapabilityStatement` instance — rejected because HAPI model objects are mutable and not designed for concurrent reuse; the micro-optimization isn't worth the thread-safety risk. Caching a pre-serialized JSON string is possible later if profiling ever shows a hotspot (it won't).
 
@@ -69,5 +69,5 @@ Resource type names and interaction/operation codes reused when building the sta
 ## Open Questions
 
 - Should the statement also include a global `rest.operation` named `match` in addition to the Patient resource-level operation, for maximum client compatibility? (Not required by the spec; can be added cheaply if a consumer needs it.)
-- Should optional metadata be populated (`software.name`/`software.version`, `implementation.description`/`url`, `publisher`, `date`) for nicer human-readable output, or kept minimal for now?
+- ~~Should optional metadata be populated (`software.name`/`software.version`, `implementation.description`/`url`, `publisher`, `date`) for nicer human-readable output, or kept minimal for now?~~ **Resolved:** `date`, `kind = instance`, and `implementation.description` are not optional — R4 requires `date`/`kind`, and kind `instance` requires `implementation` (cpb-14). They are populated; `software`, `publisher`, and `implementation.url` remain omitted as genuinely optional.
 - Are the non-JSON representations (`application/fhir+xml`, `+yaml`) actually exercised by any consumer, or is advertising them via `produces` sufficient?

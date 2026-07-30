@@ -25,6 +25,17 @@ The `CapabilityStatement` SHALL declare `fhirVersion` = `4.0.1` and SHALL declar
 - **THEN** `fhirVersion` equals `4.0.1`
 - **AND** `format` includes `application/fhir+json`
 
+### Requirement: R4 required elements and invariants
+
+Beyond `status`, `fhirVersion`, and `format`, the `CapabilityStatement` SHALL populate the remaining elements FHIR R4 requires for a valid resource: `date` (1..1) and `kind` (1..1, value `instance` since this document describes a running server). Because `kind` = `instance`, the statement SHALL include an `implementation` element with a `description` (R4 invariant cpb-14), which also satisfies invariant cpb-2 (at least one of `description`, `software`, or `implementation`).
+
+#### Scenario: Required elements are present
+
+- **WHEN** a client reads the returned `CapabilityStatement`
+- **THEN** `date` is populated
+- **AND** `kind` equals `instance`
+- **AND** `implementation.description` is populated
+
 ### Requirement: Response content type
 
 The endpoint SHALL serialize the `CapabilityStatement` as FHIR JSON and return it with the `application/fhir+json` content type by default. Where a client requests an alternate representation supported by the existing FHIR controller (for example `application/fhir+xml`), the endpoint SHOULD honor that representation consistently with the other FHIR endpoints.

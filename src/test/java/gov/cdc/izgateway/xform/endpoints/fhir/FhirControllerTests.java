@@ -546,6 +546,18 @@ class FhirControllerTests {
     }
 
     @Test
+    void metadataSatisfiesR4RequiredElements() {
+        CapabilityStatement cs = newController().metadata("dev", metadataRequest()).getBody();
+
+        assertNotNull(cs);
+        assertTrue(cs.hasDate(), "date is required (1..1)");
+        assertEquals(CapabilityStatement.CapabilityStatementKind.INSTANCE, cs.getKind());
+        // kind = instance requires implementation (cpb-14); implementation.description is 1..1
+        assertTrue(cs.hasImplementation(), "implementation is required when kind = instance");
+        assertEquals("IZ Gateway Transformation Service", cs.getImplementation().getDescription());
+    }
+
+    @Test
     void metadataDeclaresFhirVersionAndJsonFormat() {
         CapabilityStatement cs = newController().metadata("dev", metadataRequest()).getBody();
 

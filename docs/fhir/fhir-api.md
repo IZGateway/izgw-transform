@@ -212,6 +212,9 @@ performed, and an unrecognized destination still receives the `CapabilityStateme
 (there is no `404` for this endpoint). It advertises:
 
 - `status = active`, `fhirVersion = 4.0.1`, `format` including `application/fhir+json`
+- the remaining elements R4 requires for a valid resource: a fixed `date`,
+  `kind = instance`, and `implementation.description` (required when `kind` is
+  `instance`)
 - a single `rest` entry (`mode = server`) listing `Patient`, `Immunization`, and
   `ImmunizationRecommendation` with the `search-type` interaction
 - the Patient `$match` operation (`rest.resource[type=Patient].operation`) named `match`
@@ -223,6 +226,9 @@ Minimal example:
 {
   "resourceType": "CapabilityStatement",
   "status": "active",
+  "date": "2026-07-30T00:00:00Z",
+  "kind": "instance",
+  "implementation": { "description": "IZ Gateway Transformation Service" },
   "fhirVersion": "4.0.1",
   "format": ["application/fhir+json"],
   "rest": [{

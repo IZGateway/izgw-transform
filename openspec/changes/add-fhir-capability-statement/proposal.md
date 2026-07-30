@@ -5,7 +5,7 @@ FHIR R4 requires that a server SHALL publish a `CapabilityStatement` via the cap
 ## What Changes
 
 - Add a new read-only endpoint `GET /fhir/{destinationId}/metadata` on `FhirController` (`gov.cdc.izgateway.xform.endpoints.fhir`) that returns a FHIR R4 `CapabilityStatement`.
-- The response is `200` with content type `application/fhir+json` (honoring existing FHIR content negotiation for xml/yaml where applicable) and declares `fhirVersion: "4.0.1"` and `format: ["application/fhir+json"]`.
+- The response is `200` with content type `application/fhir+json` (honoring existing FHIR content negotiation for xml/yaml where applicable) and declares `fhirVersion: "4.0.1"` and `format: ["application/fhir+json"]`, plus the other elements R4 requires for a valid resource: `date`, `kind: "instance"`, and `implementation.description` (required when kind is `instance`, per invariants cpb-2/cpb-14).
 - The CapabilityStatement advertises the FHIR resources xform actually exposes as queryable endpoints, with the `search-type` interaction: `Patient`, `Immunization`, `ImmunizationRecommendation`.
 - It advertises the **Patient `$match`** operation as a `Patient` resource-level `operation` named `match` with `definition = http://hl7.org/fhir/OperationDefinition/Patient-match`, which is what DIBBs looks for.
 - The endpoint returns the **same** CapabilityStatement for any `{destinationId}` value — no destination lookup, no `404`/`OperationOutcome` for unknown destinations (mirrors the fixed conformance document contract).

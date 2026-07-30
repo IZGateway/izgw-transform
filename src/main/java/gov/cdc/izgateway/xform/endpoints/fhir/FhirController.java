@@ -159,6 +159,11 @@ public class FhirController {
     private static final String FHIR_JSON = "application/fhir+json";
     /** Fixed publication date so the (static) CapabilityStatement is deterministic across requests. */
     private static final Date CAPABILITY_STATEMENT_DATE = Date.from(Instant.parse("2026-07-30T00:00:00Z"));
+    /**
+     * CapabilityStatement {@code implementation.description}. Required because {@code kind = instance}
+     * (R4 invariant cpb-14); also satisfies cpb-2 (one of description/software/implementation).
+     */
+    private static final String IMPLEMENTATION_DESCRIPTION = "IZ Gateway Transformation Service";
     /** FHIR code system URI for HL7 v2 table 0208 (query response status). */
     private static final String V2_QUERY_STATUS_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0208";
     /** Table 0208 code an IIS reports when a query matches more records than its limit. */
@@ -263,6 +268,8 @@ public class FhirController {
         cs.setStatus(Enumerations.PublicationStatus.ACTIVE);
         cs.setDate(CAPABILITY_STATEMENT_DATE);
         cs.setKind(CapabilityStatement.CapabilityStatementKind.INSTANCE);
+        cs.setImplementation(new CapabilityStatement.CapabilityStatementImplementationComponent()
+            .setDescription(IMPLEMENTATION_DESCRIPTION));
         cs.setFhirVersion(Enumerations.FHIRVersion._4_0_1);
         cs.addFormat(FHIR_JSON);
 
