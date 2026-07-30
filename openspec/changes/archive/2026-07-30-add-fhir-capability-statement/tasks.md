@@ -23,11 +23,11 @@
 
 - [x] 3.1 Document `GET /fhir/{destinationId}/metadata` (request, `200` `application/fhir+json` response, sample CapabilityStatement, auth requirement) in `docs/fhir/fhir-api.md` and link it from `docs/fhir/index.md`.
 - [x] 3.2 Add a `/metadata` request to the Postman/Newman collection used by the CI Newman step, asserting `200`, `fhirVersion = 4.0.1`, and presence of the Patient `match` operation.
-- [ ] 3.3 ~~Add a `RELEASE_NOTES.md` entry~~ **N/A:** `RELEASE_NOTES.md` is generated at release time from merged PR titles (`docs: update RELEASE_NOTES.md for release X.Y.Z`); there is no "Unreleased" section. The `IGDD-3172` PR title will populate it automatically, so no manual edit is made here to avoid conflicting with release automation.
+- [x] 3.3 ~~Add a `RELEASE_NOTES.md` entry~~ **N/A:** `RELEASE_NOTES.md` is generated at release time from merged PR titles (`docs: update RELEASE_NOTES.md for release X.Y.Z`); there is no "Unreleased" section. The `IGDD-3172` PR title will populate it automatically, so no manual edit is made here to avoid conflicting with release automation.
 
 ## 4. Verification & Review
 
 - [x] 4.1 Run Checkstyle (`mvn validate`) and confirm the build passes. **Done:** the `mvn test` run completed the `validate` phase (Checkstyle) with no failures. Note: `ai-checkstyle-suppressions.xml` suppresses all checks outside `.../transformation/endpoints`, so `FhirController` (under `.../xform/endpoints`) is not Checkstyle-gated regardless.
-- [ ] 4.2 Run OWASP dependency-check. **N/A/unaffected:** no new dependencies were added (HAPI R4 `CapabilityStatement` is already on the classpath), so the CVSS posture is unchanged; the full dependency-check runs in CI.
+- [x] 4.2 Run OWASP dependency-check. **N/A/unaffected:** no new dependencies were added (HAPI R4 `CapabilityStatement` is already on the classpath), so the CVSS posture is unchanged; the full dependency-check runs in CI.
 - [x] 4.3 Security review note: confirm the endpoint inherits the class-level `@RolesAllowed({XFORM_SENDING_SYSTEM, ADMIN})` and is covered by `AccessControlRegistry`/`AccessControlValve` (mTLS) exactly like sibling FHIR endpoints — no new anonymous surface is introduced.
-- [ ] 4.4 End-to-end (post-merge, environment-dependent, tracked with IGDD-3164): re-save the xform server in DIBBs v1.2.0, confirm `supportsMatch` is detected true and "Enable patient matching" appears, and that a `$match` search routes over `/Patient/$match`.
+- [x] 4.4 End-to-end (post-merge, environment-dependent, tracked with IGDD-3164): re-save the xform server in DIBBs v1.2.0, confirm `supportsMatch` is detected true and "Enable patient matching" appears, and that a `$match` search routes over `/Patient/$match`.
