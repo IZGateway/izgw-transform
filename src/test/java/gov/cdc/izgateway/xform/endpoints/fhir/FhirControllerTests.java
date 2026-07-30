@@ -20,9 +20,14 @@ import java.util.Set;
 
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
+import org.hl7.fhir.r4.model.CodeableConcept;
+import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.OperationOutcome;
+import org.hl7.fhir.r4.model.OperationOutcome.IssueSeverity;
+import org.hl7.fhir.r4.model.OperationOutcome.IssueType;
+import org.hl7.fhir.r4.model.OperationOutcome.OperationOutcomeIssueComponent;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.Resource;
@@ -310,6 +315,139 @@ class FhirControllerTests {
         assertEquals(HttpStatus.NOT_FOUND, res.getStatusCode());
         assertEquals(ContentUtils.FHIR_PLUS_JSON_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
         assertTrue(res.getBody() instanceof OperationOutcome);
+    }
+
+    // --- $match too-many-matches -> top-level OperationOutcome ---------------------------
+    //
+    // When the IIS reports "too much data found" (QAK-2 = TM) with no patient records,
+    // $match must return a top-level OperationOutcome whose details.text contains the
+    // exact phrase DIBBs Query Connector matches on, with HTTP 422.
+
+    private static final String V2_0208_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0208";
+    private static final String NO_CERTAIN_MATCH_PHRASE = "did not find a certain match";
+
+    /** A Z33-style "too much data found" response: QAK-2 = TM, no patient records. */
+    private static final String RSP_TOO_MANY = String.join("\r",
+        "MSH|^~\\&|TESTIIS|TESTIIS|TESTAPP|TESTORG|20240101120000||RSP^K11^RSP_K11|X235|P|2.5.1",
+        "MSA|AA|1234",
+        "QAK|Q1|TM|Z34^Request Immunization History^CDCPHINVS",
+        "QPD|Z34^Request Immunization History^CDCPHINVS|Q1|0000001^^^TEST^MR"
+    );
+
+    @Test
+    void detectionTriggersOnTmWithNoPatients() {
+        Bundle b = new Bundle();
+        b.addEntry().setResource(outcomeWithCoding(V2_0208_SYSTEM, "TM"));
+
+        OperationOutcomeIssueComponent issue = FhirController.findTooManyMatchesIssue(b);
+
+        assertNotNull(issue);
+        assertEquals("TM", issue.getDetails().getCodingFirstRep().getCode());
+    }
+
+    @Test
+    void detectionMatchesTmCaseInsensitively() {
+        Bundle b = new Bundle();
+        b.addEntry().setResource(outcomeWithCoding(V2_0208_SYSTEM, "tm"));
+
+        assertNotNull(FhirController.findTooManyMatchesIssue(b));
+    }
+
+    @Test
+    void detectionDoesNotTriggerWhenPatientPresent() {
+        // Candidates returned alongside a TM status must never be discarded.
+        Bundle b = new Bundle();
+        b.addEntry().setResource(outcomeWithCoding(V2_0208_SYSTEM, "TM"));
+        b.addEntry().setResource(new Patient());
+
+        assertNull(FhirController.findTooManyMatchesIssue(b));
+    }
+
+    @Test
+    void detectionDoesNotTriggerForOtherQueryStatuses() {
+        for (String code : List.of("OK", "NF", "AE", "AR")) {
+            Bundle b = new Bundle();
+            b.addEntry().setResource(outcomeWithCoding(V2_0208_SYSTEM, code));
+
+            assertNull(FhirController.findTooManyMatchesIssue(b), "must not trigger for " + code);
+        }
+    }
+
+    @Test
+    void detectionDoesNotTriggerForOtherSystemsOrMissingDetails() {
+        Bundle wrongSystem = new Bundle();
+        wrongSystem.addEntry().setResource(outcomeWithCoding("http://example.org/other", "TM"));
+        assertNull(FhirController.findTooManyMatchesIssue(wrongSystem));
+
+        Bundle noDetails = new Bundle();
+        OperationOutcome bare = new OperationOutcome();
+        bare.addIssue().setSeverity(IssueSeverity.INFORMATION);
+        noDetails.addEntry().setResource(bare);
+        assertNull(FhirController.findTooManyMatchesIssue(noDetails));
+
+        assertNull(FhirController.findTooManyMatchesIssue(new Bundle()));
+        assertNull(FhirController.findTooManyMatchesIssue(null));
+    }
+
+    @Test
+    void noCertainMatchOutcomeHasRequiredShape() {
+        OperationOutcomeIssueComponent source = new OperationOutcomeIssueComponent()
+            .setDetails(new CodeableConcept()
+                .addCoding(new Coding(V2_0208_SYSTEM, "TM", "Too much data found")));
+
+        OperationOutcome oo = FhirController.noCertainMatchOutcome(source);
+
+        OperationOutcomeIssueComponent issue = oo.getIssueFirstRep();
+        assertEquals(IssueSeverity.WARNING, issue.getSeverity());
+        assertEquals(IssueType.MULTIPLEMATCHES, issue.getCode());
+        assertTrue(issue.getDetails().getText().contains(NO_CERTAIN_MATCH_PHRASE),
+            "details.text must contain the literal DIBBs trigger phrase");
+        Coding kept = issue.getDetails().getCodingFirstRep();
+        assertEquals(V2_0208_SYSTEM, kept.getSystem());
+        assertEquals("TM", kept.getCode());
+        assertEquals("Too much data found", kept.getDisplay(), "source coding display must survive");
+    }
+
+    @Test
+    void matchTooManyReturnsTopLevelOperationOutcome() throws Exception {
+        initRequestContext();
+        FhirController controller = controller(hubReturning(RSP_TOO_MANY));
+        HttpServletRequest req = fhirRequest(MATCH_URI, ContentUtils.FHIR_PLUS_JSON_VALUE);
+
+        ResponseEntity<Resource> res = controller.iisPatientMatch("dev", matchParameters(), req);
+
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_JSON_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+        assertTrue(res.getBody() instanceof OperationOutcome, "top-level resource must be an OperationOutcome, not a Bundle");
+        OperationOutcome oo = (OperationOutcome) res.getBody();
+        assertTrue(oo.getIssue().stream().anyMatch(i ->
+                i.getDetails().getText() != null && i.getDetails().getText().contains(NO_CERTAIN_MATCH_PHRASE)),
+            "some issue.details.text must contain the DIBBs trigger phrase");
+        assertTrue(oo.getIssue().stream().flatMap(i -> i.getDetails().getCoding().stream())
+                .anyMatch(c -> V2_0208_SYSTEM.equals(c.getSystem()) && "TM".equals(c.getCode())),
+            "the v2-0208 TM coding must be retained for provenance");
+    }
+
+    @Test
+    void matchNoDataFoundStillReturnsBundle() throws Exception {
+        // A true no-match (QAK-2 = NF) keeps the 200 searchset Bundle so DIBBs shows
+        // "No Records Found", distinguishable from the too-many outcome.
+        initRequestContext();
+        FhirController controller = controller(hubReturning(RSP_TOO_MANY.replace("|TM|", "|NF|")));
+        HttpServletRequest req = fhirRequest(MATCH_URI, ContentUtils.FHIR_PLUS_JSON_VALUE);
+
+        ResponseEntity<Resource> res = controller.iisPatientMatch("dev", matchParameters(), req);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertTrue(res.getBody() instanceof Bundle);
+        assertTrue(((Bundle) res.getBody()).getEntry().stream()
+            .noneMatch(e -> e.getResource() instanceof Patient));
+    }
+
+    private static OperationOutcome outcomeWithCoding(String system, String code) {
+        OperationOutcome oo = new OperationOutcome();
+        oo.addIssue().setDetails(new CodeableConcept().addCoding(new Coding(system, code, null)));
+        return oo;
     }
 
     // --- helpers -------------------------------------------------------------------------
