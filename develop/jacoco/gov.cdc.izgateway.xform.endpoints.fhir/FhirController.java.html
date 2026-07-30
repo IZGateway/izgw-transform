@@ -243,9 +243,9 @@ public class FhirController {
         @PathVariable String destinationId,
         HttpServletRequest req
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
-<span class="nc" id="L246">    	String summary = req.getParameter(&quot;_summary&quot;);</span>
-<span class="nc bnc" id="L247" title="All 2 branches missed.">    	if (Arrays.asList(&quot;summary&quot;, &quot;count&quot;).contains(summary)) {</span>
-<span class="nc" id="L248">    		return connectionTest();</span>
+<span class="fc" id="L246">    	String summary = req.getParameter(&quot;_summary&quot;);</span>
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">    	if (Arrays.asList(&quot;summary&quot;, &quot;count&quot;).contains(summary)) {</span>
+<span class="fc" id="L248">    		return connectionTest(req);</span>
     	}
 <span class="nc" id="L250">        return processQuery(req, destinationId);</span>
     }
@@ -347,14 +347,15 @@ public class FhirController {
     /**
      * This exists to allow query connector to validate authentication
      * parameters when connecting via /Patients?_summary=count&amp;_count=1
+     * @param req	The request, used to negotiate the response content type.
      * @return	A SearchSet Bundle reporting 100 patients available.
      */
-    private ResponseEntity&lt;Bundle&gt; connectionTest() {
-<span class="nc" id="L353">		Bundle b = new Bundle();</span>
-<span class="nc" id="L354">		b.setId(new IdType(b.fhirType() + &quot;/&quot; + ULID.random()));</span>
-<span class="nc" id="L355">		b.setType(BundleType.SEARCHSET);</span>
-<span class="nc" id="L356">		b.setTotal(100);</span>
-<span class="nc" id="L357">		return new ResponseEntity&lt;&gt;(b, HttpStatus.OK);</span>
+    private ResponseEntity&lt;Bundle&gt; connectionTest(HttpServletRequest req) {
+<span class="fc" id="L354">		Bundle b = new Bundle();</span>
+<span class="fc" id="L355">		b.setId(new IdType(b.fhirType() + &quot;/&quot; + ULID.random()));</span>
+<span class="fc" id="L356">		b.setType(BundleType.SEARCHSET);</span>
+<span class="fc" id="L357">		b.setTotal(100);</span>
+<span class="fc" id="L358">		return new ResponseEntity&lt;&gt;(b, ContentUtils.getHeaders(req), HttpStatus.OK);</span>
     }
 
     /**
@@ -419,40 +420,40 @@ public class FhirController {
         @PathVariable String id,
         HttpServletRequest req
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
-<span class="nc" id="L422">        String decodedId = null;</span>
+<span class="fc" id="L423">        String decodedId = null;</span>
         try {
-<span class="nc" id="L424">            decodedId = FhirIdCodec.decode(id);</span>
-<span class="nc" id="L425">        } catch (IllegalFormatCodePointException ex) {</span>
-<span class="nc" id="L426">            return notFound(id);</span>
-<span class="nc" id="L427">        }</span>
-<span class="nc" id="L428">        String resourceType = StringUtils.substringBetween(req.getRequestURI(), destinationId + &quot;/&quot;, &quot;/&quot; + id); </span>
+<span class="fc" id="L425">            decodedId = FhirIdCodec.decode(id);</span>
+<span class="nc" id="L426">        } catch (IllegalFormatCodePointException ex) {</span>
+<span class="nc" id="L427">            return notFound(req, id);</span>
+<span class="fc" id="L428">        }</span>
+<span class="fc" id="L429">        String resourceType = StringUtils.substringBetween(req.getRequestURI(), destinationId + &quot;/&quot;, &quot;/&quot; + id); </span>
         
-<span class="nc" id="L430">        String[] idParts = decodedId.split(&quot;\\|&quot;);</span>
-<span class="nc" id="L431">        boolean isPatient = PATIENT.equals(resourceType); </span>
-<span class="nc bnc" id="L432" title="All 2 branches missed.">        int index = isPatient ? 0 : 2;</span>
-<span class="nc bnc" id="L433" title="All 2 branches missed.">        if (idParts.length &lt; index + 2) {</span>
-<span class="nc" id="L434">            return notFound(id);</span>
+<span class="fc" id="L431">        String[] idParts = decodedId.split(&quot;\\|&quot;);</span>
+<span class="fc" id="L432">        boolean isPatient = PATIENT.equals(resourceType); </span>
+<span class="pc bpc" id="L433" title="1 of 2 branches missed.">        int index = isPatient ? 0 : 2;</span>
+<span class="pc bpc" id="L434" title="1 of 2 branches missed.">        if (idParts.length &lt; index + 2) {</span>
+<span class="fc" id="L435">            return notFound(req, id);</span>
         }
-<span class="nc" id="L436">        Identifier ident = new Identifier().setSystem(idParts[index]).setValue(idParts[index + 1]);</span>
+<span class="nc" id="L437">        Identifier ident = new Identifier().setSystem(idParts[index]).setValue(idParts[index + 1]);</span>
         
-<span class="nc" id="L438">        RequestWithModifiableParameters wrapper = new RequestWithModifiableParameters(req);</span>
-<span class="nc bnc" id="L439" title="All 2 branches missed.">        wrapper.addParameter(isPatient ? Patient.SP_IDENTIFIER : IzQuery.PATIENT_LIST, idParts[0] + &quot;|&quot; + idParts[1]);</span>
-<span class="nc" id="L440">        ResponseEntity&lt;Bundle&gt; res = processQuery(wrapper, destinationId);</span>
-<span class="nc" id="L441">        Bundle b = res.getBody();</span>
-<span class="nc bnc" id="L442" title="All 2 branches missed.">        if (b == null) {</span>
+<span class="nc" id="L439">        RequestWithModifiableParameters wrapper = new RequestWithModifiableParameters(req);</span>
+<span class="nc bnc" id="L440" title="All 2 branches missed.">        wrapper.addParameter(isPatient ? Patient.SP_IDENTIFIER : IzQuery.PATIENT_LIST, idParts[0] + &quot;|&quot; + idParts[1]);</span>
+<span class="nc" id="L441">        ResponseEntity&lt;Bundle&gt; res = processQuery(wrapper, destinationId);</span>
+<span class="nc" id="L442">        Bundle b = res.getBody();</span>
+<span class="nc bnc" id="L443" title="All 2 branches missed.">        if (b == null) {</span>
             // Technically this is an error.
-<span class="nc" id="L444">            return notFound(id);</span>
+<span class="nc" id="L445">            return notFound(req, id);</span>
         }
-<span class="nc" id="L446">        Resource resource = b.getEntry().stream()</span>
-<span class="nc" id="L447">            .map(e -&gt; e.getResource())</span>
-<span class="nc bnc" id="L448" title="All 4 branches missed.">            .filter(r -&gt; resourceType.equals(r.fhirType()) &amp;&amp; ident.equalsShallow(getIdentifier(r)))</span>
-<span class="nc" id="L449">            .findFirst()</span>
-<span class="nc" id="L450">            .orElse(null);</span>
+<span class="nc" id="L447">        Resource resource = b.getEntry().stream()</span>
+<span class="nc" id="L448">            .map(e -&gt; e.getResource())</span>
+<span class="nc bnc" id="L449" title="All 4 branches missed.">            .filter(r -&gt; resourceType.equals(r.fhirType()) &amp;&amp; ident.equalsShallow(getIdentifier(r)))</span>
+<span class="nc" id="L450">            .findFirst()</span>
+<span class="nc" id="L451">            .orElse(null);</span>
         
-<span class="nc bnc" id="L452" title="All 2 branches missed.">        if (resource == null) {</span>
-<span class="nc" id="L453">            return notFound(id);</span>
+<span class="nc bnc" id="L453" title="All 2 branches missed.">        if (resource == null) {</span>
+<span class="nc" id="L454">            return notFound(req, id);</span>
         }
-<span class="nc" id="L455">        return new ResponseEntity&lt;&gt;(resource, res.getHeaders(), HttpStatus.OK);</span>
+<span class="nc" id="L456">        return new ResponseEntity&lt;&gt;(resource, res.getHeaders(), HttpStatus.OK);</span>
     }
     
     /**
@@ -507,55 +508,59 @@ public class FhirController {
         @RequestBody Resource body,
         HttpServletRequest req
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
-<span class="nc" id="L510">        IDIMatch.PatientMatchParameters match = new IDIMatch.PatientMatchParameters();</span>
+<span class="fc" id="L511">        IDIMatch.PatientMatchParameters match = new IDIMatch.PatientMatchParameters();</span>
         
-<span class="nc bnc" id="L512" title="All 2 branches missed.">        if (&quot;Parameters&quot;.equals(body.fhirType())) {</span>
-<span class="nc" id="L513">            Parameters params = (Parameters)body;</span>
-<span class="nc" id="L514">            String message = null; </span>
+<span class="fc bfc" id="L513" title="All 2 branches covered.">        if (&quot;Parameters&quot;.equals(body.fhirType())) {</span>
+<span class="fc" id="L514">            Parameters params = (Parameters)body;</span>
+<span class="fc" id="L515">            String message = null; </span>
             try {
-<span class="nc" id="L516">                message = &quot;Parameters.resource must contain a Patient resource&quot;;</span>
-<span class="nc" id="L517">                match.setSearchPatient((Patient)params.getParameter(&quot;resource&quot;).getResource());</span>
+<span class="fc" id="L517">                message = &quot;Parameters.resource must contain a Patient resource&quot;;</span>
+<span class="fc" id="L518">                match.setSearchPatient((Patient)params.getParameter(&quot;resource&quot;).getResource());</span>
                 
-<span class="nc" id="L519">                message = &quot;Parameters.onlySingleMatch must contain a Boolean value&quot;;</span>
-<span class="nc" id="L520">                ParametersParameterComponent param = params.getParameter(&quot;onlySingleMatch&quot;);</span>
-<span class="nc bnc" id="L521" title="All 2 branches missed.">                if (param != null) {</span>
-<span class="nc" id="L522">                	match.setOnlySingleMatch(((BooleanType)param.getValue()).booleanValue());</span>
+<span class="fc" id="L520">                message = &quot;Parameters.onlySingleMatch must contain a Boolean value&quot;;</span>
+<span class="fc" id="L521">                ParametersParameterComponent param = params.getParameter(&quot;onlySingleMatch&quot;);</span>
+<span class="pc bpc" id="L522" title="1 of 2 branches missed.">                if (param != null) {</span>
+<span class="nc" id="L523">                	match.setOnlySingleMatch(((BooleanType)param.getValue()).booleanValue());</span>
                 }
 
-<span class="nc" id="L525">                message = &quot;Parameters.onlyCertainMatches must contain a Boolean value&quot;;</span>
-<span class="nc" id="L526">                param = params.getParameter(&quot;onlyCertainMatches&quot;);</span>
-<span class="nc bnc" id="L527" title="All 2 branches missed.">                if (param != null) {</span>
-<span class="nc" id="L528">                	match.setOnlyCertainMatches(((BooleanType)param.getValue()).booleanValue());</span>
+<span class="fc" id="L526">                message = &quot;Parameters.onlyCertainMatches must contain a Boolean value&quot;;</span>
+<span class="fc" id="L527">                param = params.getParameter(&quot;onlyCertainMatches&quot;);</span>
+<span class="pc bpc" id="L528" title="1 of 2 branches missed.">                if (param != null) {</span>
+<span class="nc" id="L529">                	match.setOnlyCertainMatches(((BooleanType)param.getValue()).booleanValue());</span>
                 }
 
-<span class="nc" id="L531">                message = &quot;Parameters.count must contain an Integer value between 1 and 10&quot;;</span>
-<span class="nc" id="L532">                param = params.getParameter(&quot;count&quot;);</span>
-<span class="nc bnc" id="L533" title="All 2 branches missed.">                if (param != null) { </span>
-<span class="nc" id="L534">                	match.setCount(((IntegerType)param.getValue()).getValue());</span>
-<span class="nc bnc" id="L535" title="All 4 branches missed.">                    if (match.getCount() &lt; 1 || match.getCount() &gt; 10) {</span>
-<span class="nc" id="L536">                        return illegalArguments(message);</span>
+<span class="fc" id="L532">                message = &quot;Parameters.count must contain an Integer value between 1 and 10&quot;;</span>
+<span class="fc" id="L533">                param = params.getParameter(&quot;count&quot;);</span>
+<span class="pc bpc" id="L534" title="1 of 2 branches missed.">                if (param != null) { </span>
+<span class="nc" id="L535">                	match.setCount(((IntegerType)param.getValue()).getValue());</span>
+<span class="nc bnc" id="L536" title="All 4 branches missed.">                    if (match.getCount() &lt; 1 || match.getCount() &gt; 10) {</span>
+<span class="nc" id="L537">                        return illegalArguments(req, message);</span>
                     }
                 }
-<span class="nc" id="L539">            } catch (ClassCastException ex) {</span>
-<span class="nc" id="L540">                return illegalArguments(message);</span>
-<span class="nc" id="L541">            }</span>
-<span class="nc bnc" id="L542" title="All 2 branches missed.">        } else if (PATIENT.equals(body.fhirType())) {</span>
-<span class="nc" id="L543">            match.setSearchPatient((Patient) body);</span>
+<span class="nc" id="L540">            } catch (ClassCastException ex) {</span>
+<span class="nc" id="L541">                return illegalArguments(req, message);</span>
+<span class="fc" id="L542">            }</span>
+<span class="pc bpc" id="L543" title="1 of 2 branches missed.">        } else if (PATIENT.equals(body.fhirType())) {</span>
+<span class="nc" id="L544">            match.setSearchPatient((Patient) body);</span>
         } else {
-<span class="nc" id="L545">            return illegalArguments(&quot;Body invalid, expected Patient or Parameters&quot;);</span>
+<span class="fc" id="L546">            return illegalArguments(req, &quot;Body invalid, expected Patient or Parameters&quot;);</span>
         }
         
         
-<span class="nc" id="L549">        RequestWithModifiableParameters wrapper = new RequestWithModifiableParameters(req);</span>
-<span class="nc" id="L550">        wrapper.resetParameters();</span>
-<span class="nc" id="L551">        wrapper.addParameter(IzQuery.COUNT, Integer.toString(match.getCount()));</span>
-<span class="nc" id="L552">        setParameters(wrapper, match.getSearchPatient());</span>
+<span class="fc" id="L550">        RequestWithModifiableParameters wrapper = new RequestWithModifiableParameters(req);</span>
+<span class="fc" id="L551">        wrapper.resetParameters();</span>
+<span class="fc" id="L552">        wrapper.addParameter(IzQuery.COUNT, Integer.toString(match.getCount()));</span>
+<span class="fc" id="L553">        setParameters(wrapper, match.getSearchPatient());</span>
         
-<span class="nc" id="L554">        Bundle b = this.processQuery(wrapper, destinationId).getBody();</span>
-        
-<span class="nc" id="L556">        IDIMatch.score(b, match);</span>
-        
-<span class="nc" id="L558">        return new ResponseEntity&lt;&gt;(b, HttpStatus.OK);</span>
+<span class="fc" id="L555">        Bundle b = this.processQuery(wrapper, destinationId).getBody();</span>
+
+<span class="fc" id="L557">        IDIMatch.score(b, match);</span>
+
+        // Negotiate the response Content-Type from the original request (the wrapper's
+        // parameters were reset above, which would hide a _format parameter). Setting
+        // it explicitly bypasses the global SOAP-oriented content negotiation, which
+        // ignores the Accept header and defaults to XML.
+<span class="fc" id="L563">        return new ResponseEntity&lt;&gt;(b, ContentUtils.getHeaders(req), HttpStatus.OK);</span>
     }
     
     /**
@@ -566,103 +571,103 @@ public class FhirController {
      * @param patient    The patient to be searched for.
      */
     private static void setParameters(RequestWithModifiableParameters wrapper, Patient patient) {
-<span class="nc bnc" id="L569" title="All 2 branches missed.">        if (patient.hasIdentifier()) {</span>
-<span class="nc bnc" id="L570" title="All 2 branches missed.">            for (Identifier identifier: patient.getIdentifier()) {</span>
-<span class="nc" id="L571">                TokenParam t = new TokenParam();</span>
-<span class="nc" id="L572">                t.setSystem(identifier.getSystem());</span>
-<span class="nc" id="L573">                t.setValue(identifier.getValue());</span>
-<span class="nc" id="L574">                wrapper.addParameter(Patient.SP_IDENTIFIER, t.getValueAsQueryToken());</span>
-<span class="nc" id="L575">            }</span>
+<span class="pc bpc" id="L574" title="1 of 2 branches missed.">        if (patient.hasIdentifier()) {</span>
+<span class="nc bnc" id="L575" title="All 2 branches missed.">            for (Identifier identifier: patient.getIdentifier()) {</span>
+<span class="nc" id="L576">                TokenParam t = new TokenParam();</span>
+<span class="nc" id="L577">                t.setSystem(identifier.getSystem());</span>
+<span class="nc" id="L578">                t.setValue(identifier.getValue());</span>
+<span class="nc" id="L579">                wrapper.addParameter(Patient.SP_IDENTIFIER, t.getValueAsQueryToken());</span>
+<span class="nc" id="L580">            }</span>
         }
-<span class="nc" id="L577">        setNameParameters(wrapper, patient);</span>
-<span class="nc" id="L578">        setBirthDateParameters(wrapper, patient);</span>
-<span class="nc bnc" id="L579" title="All 2 branches missed.">        if (patient.hasGender()) {</span>
-<span class="nc" id="L580">            wrapper.addParameter(Patient.SP_GENDER, patient.getGender().toString());</span>
+<span class="fc" id="L582">        setNameParameters(wrapper, patient);</span>
+<span class="fc" id="L583">        setBirthDateParameters(wrapper, patient);</span>
+<span class="pc bpc" id="L584" title="1 of 2 branches missed.">        if (patient.hasGender()) {</span>
+<span class="nc" id="L585">            wrapper.addParameter(Patient.SP_GENDER, patient.getGender().toString());</span>
         }
-<span class="nc" id="L582">        setAddressParameters(wrapper, patient);</span>
-<span class="nc" id="L583">    }</span>
+<span class="fc" id="L587">        setAddressParameters(wrapper, patient);</span>
+<span class="fc" id="L588">    }</span>
 
     private static void setNameParameters(RequestWithModifiableParameters wrapper, Patient patient) {
-<span class="nc bnc" id="L586" title="All 2 branches missed.">        if (patient.hasName()) {</span>
-<span class="nc" id="L587">            HumanName name = patient.getNameFirstRep();</span>
-<span class="nc bnc" id="L588" title="All 6 branches missed.">            if (name.hasText() &amp;&amp; !name.hasFamily() &amp;&amp; !name.hasGiven()) {</span>
-<span class="nc" id="L589">                name = HumanNameParser.computeFromString(name.getText());</span>
+<span class="pc bpc" id="L591" title="1 of 2 branches missed.">        if (patient.hasName()) {</span>
+<span class="fc" id="L592">            HumanName name = patient.getNameFirstRep();</span>
+<span class="pc bpc" id="L593" title="5 of 6 branches missed.">            if (name.hasText() &amp;&amp; !name.hasFamily() &amp;&amp; !name.hasGiven()) {</span>
+<span class="nc" id="L594">                name = HumanNameParser.computeFromString(name.getText());</span>
             }
-<span class="nc bnc" id="L591" title="All 2 branches missed.">            if (name.hasFamily()) {</span>
-<span class="nc" id="L592">                wrapper.addParameter(Patient.SP_FAMILY, name.getFamily());</span>
+<span class="pc bpc" id="L596" title="1 of 2 branches missed.">            if (name.hasFamily()) {</span>
+<span class="fc" id="L597">                wrapper.addParameter(Patient.SP_FAMILY, name.getFamily());</span>
             }
-<span class="nc bnc" id="L594" title="All 2 branches missed.">            if (name.hasGiven()) {</span>
-<span class="nc bnc" id="L595" title="All 2 branches missed.">                for (StringType given: name.getGiven()) {</span>
-<span class="nc" id="L596">                    wrapper.addParameter(Patient.SP_GIVEN, given.asStringValue());</span>
-<span class="nc" id="L597">                }</span>
+<span class="pc bpc" id="L599" title="1 of 2 branches missed.">            if (name.hasGiven()) {</span>
+<span class="fc bfc" id="L600" title="All 2 branches covered.">                for (StringType given: name.getGiven()) {</span>
+<span class="fc" id="L601">                    wrapper.addParameter(Patient.SP_GIVEN, given.asStringValue());</span>
+<span class="fc" id="L602">                }</span>
             }
-<span class="nc bnc" id="L599" title="All 2 branches missed.">            if (name.hasSuffix()) {</span>
-<span class="nc" id="L600">                wrapper.addParameter(&quot;suffix&quot;, name.getSuffixAsSingleString());</span>
+<span class="pc bpc" id="L604" title="1 of 2 branches missed.">            if (name.hasSuffix()) {</span>
+<span class="nc" id="L605">                wrapper.addParameter(&quot;suffix&quot;, name.getSuffixAsSingleString());</span>
             }
         }
-<span class="nc bnc" id="L603" title="All 2 branches missed.">        if (patient.hasExtension(PIDParser.MOTHERS_MAIDEN_NAME)) {</span>
-<span class="nc" id="L604">            Extension maidenName = patient.getExtensionByUrl(PIDParser.MOTHERS_MAIDEN_NAME);</span>
-<span class="nc" id="L605">            wrapper.addParameter(&quot;mothers-maiden-name&quot;, maidenName.getValueAsPrimitive().getValueAsString());</span>
+<span class="pc bpc" id="L608" title="1 of 2 branches missed.">        if (patient.hasExtension(PIDParser.MOTHERS_MAIDEN_NAME)) {</span>
+<span class="nc" id="L609">            Extension maidenName = patient.getExtensionByUrl(PIDParser.MOTHERS_MAIDEN_NAME);</span>
+<span class="nc" id="L610">            wrapper.addParameter(&quot;mothers-maiden-name&quot;, maidenName.getValueAsPrimitive().getValueAsString());</span>
         }
-<span class="nc" id="L607">    }</span>
+<span class="fc" id="L612">    }</span>
 
 
     private static void setBirthDateParameters(RequestWithModifiableParameters wrapper, Patient patient) {
-<span class="nc bnc" id="L611" title="All 2 branches missed.">        if (patient.hasBirthDate()) {</span>
-<span class="nc" id="L612">            DateParam birthDate = new DateParam();</span>
-<span class="nc" id="L613">            birthDate.setValue(patient.getBirthDate());</span>
-<span class="nc" id="L614">            String value = StringUtils.substringBefore(birthDate.getValueAsQueryToken(), &quot;T&quot;);</span>
-<span class="nc" id="L615">            wrapper.addParameter(Patient.SP_BIRTHDATE, value);</span>
+<span class="pc bpc" id="L616" title="1 of 2 branches missed.">        if (patient.hasBirthDate()) {</span>
+<span class="fc" id="L617">            DateParam birthDate = new DateParam();</span>
+<span class="fc" id="L618">            birthDate.setValue(patient.getBirthDate());</span>
+<span class="fc" id="L619">            String value = StringUtils.substringBefore(birthDate.getValueAsQueryToken(), &quot;T&quot;);</span>
+<span class="fc" id="L620">            wrapper.addParameter(Patient.SP_BIRTHDATE, value);</span>
         }
-<span class="nc bnc" id="L617" title="All 2 branches missed.">        if (patient.hasMultipleBirth()) {</span>
-<span class="nc" id="L618">            PrimitiveType&lt;?&gt; pt = (PrimitiveType&lt;?&gt;) patient.getMultipleBirth();</span>
-<span class="nc bnc" id="L619" title="All 2 branches missed.">            if (pt instanceof BooleanType) {</span>
-<span class="nc" id="L620">                wrapper.addParameter(&quot;multipleBirth-indicator&quot;, pt.asStringValue());</span>
-<span class="nc bnc" id="L621" title="All 2 branches missed.">            } else if (pt instanceof IntegerType) {</span>
-<span class="nc" id="L622">                wrapper.addParameter(&quot;multipleBirth-order&quot;, pt.asStringValue());</span>
+<span class="pc bpc" id="L622" title="1 of 2 branches missed.">        if (patient.hasMultipleBirth()) {</span>
+<span class="nc" id="L623">            PrimitiveType&lt;?&gt; pt = (PrimitiveType&lt;?&gt;) patient.getMultipleBirth();</span>
+<span class="nc bnc" id="L624" title="All 2 branches missed.">            if (pt instanceof BooleanType) {</span>
+<span class="nc" id="L625">                wrapper.addParameter(&quot;multipleBirth-indicator&quot;, pt.asStringValue());</span>
+<span class="nc bnc" id="L626" title="All 2 branches missed.">            } else if (pt instanceof IntegerType) {</span>
+<span class="nc" id="L627">                wrapper.addParameter(&quot;multipleBirth-order&quot;, pt.asStringValue());</span>
             }
         }
-<span class="nc" id="L625">    }</span>
+<span class="fc" id="L630">    }</span>
 
     private static void setAddressParameters(RequestWithModifiableParameters wrapper, Patient patient) {
-<span class="nc bnc" id="L628" title="All 2 branches missed.">        if (patient.hasAddress()) {</span>
-<span class="nc" id="L629">            Address address = patient.getAddressFirstRep();</span>
-<span class="nc bnc" id="L630" title="All 2 branches missed.">            if (address.hasLine()) {</span>
-<span class="nc bnc" id="L631" title="All 2 branches missed.">                for (StringType line : address.getLine()) {</span>
-<span class="nc" id="L632">                    wrapper.addParameter(Patient.SP_ADDRESS, line.asStringValue());</span>
-<span class="nc" id="L633">                }</span>
+<span class="pc bpc" id="L633" title="1 of 2 branches missed.">        if (patient.hasAddress()) {</span>
+<span class="nc" id="L634">            Address address = patient.getAddressFirstRep();</span>
+<span class="nc bnc" id="L635" title="All 2 branches missed.">            if (address.hasLine()) {</span>
+<span class="nc bnc" id="L636" title="All 2 branches missed.">                for (StringType line : address.getLine()) {</span>
+<span class="nc" id="L637">                    wrapper.addParameter(Patient.SP_ADDRESS, line.asStringValue());</span>
+<span class="nc" id="L638">                }</span>
             }
-<span class="nc bnc" id="L635" title="All 2 branches missed.">            if (address.hasCity()) {</span>
-<span class="nc" id="L636">                wrapper.addParameter(Patient.SP_ADDRESS_CITY, address.getCity());</span>
+<span class="nc bnc" id="L640" title="All 2 branches missed.">            if (address.hasCity()) {</span>
+<span class="nc" id="L641">                wrapper.addParameter(Patient.SP_ADDRESS_CITY, address.getCity());</span>
             }
-<span class="nc bnc" id="L638" title="All 2 branches missed.">            if (address.hasState()) {</span>
-<span class="nc" id="L639">                wrapper.addParameter(Patient.SP_ADDRESS_STATE, address.getState());</span>
+<span class="nc bnc" id="L643" title="All 2 branches missed.">            if (address.hasState()) {</span>
+<span class="nc" id="L644">                wrapper.addParameter(Patient.SP_ADDRESS_STATE, address.getState());</span>
             }
-<span class="nc bnc" id="L641" title="All 2 branches missed.">            if (address.hasPostalCode()) {</span>
-<span class="nc" id="L642">                wrapper.addParameter(Patient.SP_ADDRESS_POSTALCODE, address.getPostalCode());</span>
+<span class="nc bnc" id="L646" title="All 2 branches missed.">            if (address.hasPostalCode()) {</span>
+<span class="nc" id="L647">                wrapper.addParameter(Patient.SP_ADDRESS_POSTALCODE, address.getPostalCode());</span>
             }
-<span class="nc bnc" id="L644" title="All 2 branches missed.">            if (address.hasCountry()) {</span>
-<span class="nc" id="L645">                wrapper.addParameter(Patient.SP_ADDRESS_COUNTRY, address.getCountry());</span>
+<span class="nc bnc" id="L649" title="All 2 branches missed.">            if (address.hasCountry()) {</span>
+<span class="nc" id="L650">                wrapper.addParameter(Patient.SP_ADDRESS_COUNTRY, address.getCountry());</span>
             }
         }
-<span class="nc" id="L648">    }</span>
+<span class="fc" id="L653">    }</span>
     
-    private ResponseEntity&lt;Resource&gt; notFound(String id) {
-<span class="nc" id="L651">        OperationOutcome oo = new OperationOutcome();</span>
-<span class="nc" id="L652">        OperationOutcomeIssueComponent issue = oo.addIssue();</span>
-<span class="nc" id="L653">        issue.setCode(IssueType.NOTFOUND);</span>
-<span class="nc" id="L654">        issue.setSeverity(IssueSeverity.ERROR);</span>
-<span class="nc" id="L655">        issue.setDiagnostics(&quot;Resource not found &quot; + id);</span>
-<span class="nc" id="L656">        return new ResponseEntity&lt;&gt;(oo, HttpStatus.NOT_FOUND);</span>
+    private ResponseEntity&lt;Resource&gt; notFound(HttpServletRequest req, String id) {
+<span class="fc" id="L656">        OperationOutcome oo = new OperationOutcome();</span>
+<span class="fc" id="L657">        OperationOutcomeIssueComponent issue = oo.addIssue();</span>
+<span class="fc" id="L658">        issue.setCode(IssueType.NOTFOUND);</span>
+<span class="fc" id="L659">        issue.setSeverity(IssueSeverity.ERROR);</span>
+<span class="fc" id="L660">        issue.setDiagnostics(&quot;Resource not found &quot; + id);</span>
+<span class="fc" id="L661">        return new ResponseEntity&lt;&gt;(oo, ContentUtils.getHeaders(req), HttpStatus.NOT_FOUND);</span>
     }
-    
-    private ResponseEntity&lt;Resource&gt; illegalArguments(String message) {
-<span class="nc" id="L660">        OperationOutcome oo = new OperationOutcome();</span>
-<span class="nc" id="L661">        OperationOutcomeIssueComponent issue = oo.addIssue();</span>
-<span class="nc" id="L662">        issue.setCode(IssueType.INVALID);</span>
-<span class="nc" id="L663">        issue.setSeverity(IssueSeverity.ERROR);</span>
-<span class="nc" id="L664">        issue.setDiagnostics(message);</span>
-<span class="nc" id="L665">        return new ResponseEntity&lt;&gt;(oo, HttpStatus.BAD_REQUEST);</span>
+
+    private ResponseEntity&lt;Resource&gt; illegalArguments(HttpServletRequest req, String message) {
+<span class="fc" id="L665">        OperationOutcome oo = new OperationOutcome();</span>
+<span class="fc" id="L666">        OperationOutcomeIssueComponent issue = oo.addIssue();</span>
+<span class="fc" id="L667">        issue.setCode(IssueType.INVALID);</span>
+<span class="fc" id="L668">        issue.setSeverity(IssueSeverity.ERROR);</span>
+<span class="fc" id="L669">        issue.setDiagnostics(message);</span>
+<span class="fc" id="L670">        return new ResponseEntity&lt;&gt;(oo, ContentUtils.getHeaders(req), HttpStatus.BAD_REQUEST);</span>
     }
     
     /**
@@ -675,77 +680,77 @@ public class FhirController {
         String destinationId
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
         // Accept the FHIR `subject` parameter as a lenient alias for `patient`.
-<span class="nc" id="L678">        req = normalizeSubjectToPatient(req);</span>
-<span class="nc bnc" id="L679" title="All 2 branches missed.">        String queryType = Strings.CS.contains(req.getRequestURI(), &quot;ImmunizationRecommendation&quot;) ? IzQuery.RECOMMENDATION : IzQuery.HISTORY;</span>
+<span class="fc" id="L683">        req = normalizeSubjectToPatient(req);</span>
+<span class="pc bpc" id="L684" title="1 of 2 branches missed.">        String queryType = Strings.CS.contains(req.getRequestURI(), &quot;ImmunizationRecommendation&quot;) ? IzQuery.RECOMMENDATION : IzQuery.HISTORY;</span>
         
         // Create the request and set the destination
-<span class="nc" id="L682">        SubmitSingleMessageRequest request = new SubmitSingleMessageRequest();</span>
-<span class="nc" id="L683">        request.setSchema(SoapMessage.HUB_NS);</span>
-<span class="nc" id="L684">        request.getHubHeader().setDestinationId(destinationId);</span>
-<span class="nc" id="L685">        request.setFacilityID(config.getFacilityId());</span>
+<span class="fc" id="L687">        SubmitSingleMessageRequest request = new SubmitSingleMessageRequest();</span>
+<span class="fc" id="L688">        request.setSchema(SoapMessage.HUB_NS);</span>
+<span class="fc" id="L689">        request.getHubHeader().setDestinationId(destinationId);</span>
+<span class="fc" id="L690">        request.setFacilityID(config.getFacilityId());</span>
         
-<span class="nc" id="L687">        SourceInfo source = RequestContext.getSourceInfo();</span>
-<span class="nc bnc" id="L688" title="All 4 branches missed.">        if (StringUtils.isEmpty(source.getCommonName()) &amp;&amp; AccessControlValve.isLocalHost(source.getIpAddress())) {</span>
-<span class="nc" id="L689">            source.setCommonName(&quot;localhost&quot;);</span>
+<span class="fc" id="L692">        SourceInfo source = RequestContext.getSourceInfo();</span>
+<span class="pc bpc" id="L693" title="3 of 4 branches missed.">        if (StringUtils.isEmpty(source.getCommonName()) &amp;&amp; AccessControlValve.isLocalHost(source.getIpAddress())) {</span>
+<span class="nc" id="L694">            source.setCommonName(&quot;localhost&quot;);</span>
         }
-<span class="nc" id="L691">        SubmitSingleMessageResponse resp = null;</span>
+<span class="fc" id="L696">        SubmitSingleMessageResponse resp = null;</span>
         try {
             // Create the message structure
-<span class="nc" id="L694">            QBP_Q11 qbp = QBPUtils.createMessage(queryType);</span>
+<span class="fc" id="L699">            QBP_Q11 qbp = QBPUtils.createMessage(queryType);</span>
             
-<span class="nc" id="L696">            setMSHValues(qbp);</span>
+<span class="fc" id="L701">            setMSHValues(qbp);</span>
             
-<span class="nc" id="L698">            boolean isPatient = Strings.CS.contains(req.getRequestURI(), &quot;/Patient&quot;);</span>
+<span class="fc" id="L703">            boolean isPatient = Strings.CS.contains(req.getRequestURI(), &quot;/Patient&quot;);</span>
 
     		@SuppressWarnings(&quot;unused&quot;)
-<span class="nc" id="L701">    		IzQuery query = setQueryParameters(req, qbp, isPatient);</span>
+<span class="fc" id="L706">    		IzQuery query = setQueryParameters(req, qbp, isPatient);</span>
             
             // Set the message content
-<span class="nc" id="L704">            request.setHl7Message(qbp.encode());</span>
-<span class="nc" id="L705">            setWsaHeaders(request, qbp);</span>
+<span class="fc" id="L709">            request.setHl7Message(qbp.encode());</span>
+<span class="fc" id="L710">            setWsaHeaders(request, qbp);</span>
             
             // Submit the message. 
-<span class="nc" id="L708">            ResponseEntity&lt;?&gt; entity = hub.submitSoapRequest(request, null);</span>
+<span class="fc" id="L713">            ResponseEntity&lt;?&gt; entity = hub.submitSoapRequest(request, null);</span>
             
             // Return the response
-<span class="nc bnc" id="L711" title="All 2 branches missed.">            if (entity.getBody() instanceof FaultMessage fault) {</span>
-<span class="nc" id="L712">                throw new FaultException(fault);</span>
+<span class="pc bpc" id="L716" title="1 of 2 branches missed.">            if (entity.getBody() instanceof FaultMessage fault) {</span>
+<span class="nc" id="L717">                throw new FaultException(fault);</span>
             }
             
-<span class="nc bnc" id="L715" title="All 2 branches missed.">            if (entity.getBody() instanceof SubmitSingleMessageResponse response) {</span>
-<span class="nc" id="L716">                resp = response;</span>
-<span class="nc" id="L717">                Bundle b = convertResponseToFHIR(response);</span>
-<span class="nc" id="L718">                adjustIdentifiers(b);</span>
-<span class="nc" id="L719">                filter(b, req);</span>
-<span class="nc" id="L720">                return new ResponseEntity&lt;&gt;(b, ContentUtils.getHeaders(req), HttpStatus.OK);</span>
+<span class="pc bpc" id="L720" title="1 of 2 branches missed.">            if (entity.getBody() instanceof SubmitSingleMessageResponse response) {</span>
+<span class="fc" id="L721">                resp = response;</span>
+<span class="fc" id="L722">                Bundle b = convertResponseToFHIR(response);</span>
+<span class="fc" id="L723">                adjustIdentifiers(b);</span>
+<span class="fc" id="L724">                filter(b, req);</span>
+<span class="fc" id="L725">                return new ResponseEntity&lt;&gt;(b, ContentUtils.getHeaders(req), HttpStatus.OK);</span>
             }
             
-<span class="nc" id="L723">            throw new ServiceConfigurationError(</span>
+<span class="nc" id="L728">            throw new ServiceConfigurationError(</span>
                 &quot;The Soap Response was neither SubmitSingleMessageResponse nor FaultMessage&quot;);
-<span class="nc" id="L725">        } catch (HL7Exception e) {</span>
-<span class="nc" id="L726">            log.error(Markers2.append(e), &quot;{} creating message for {}: {}&quot;, </span>
-<span class="nc" id="L727">                e.getClass().getSimpleName(), destinationId, resp.getHl7Message());</span>
-<span class="nc" id="L728">            throw e;</span>
-<span class="nc" id="L729">        } catch (IllegalArgumentException argEx) {</span>
-<span class="nc" id="L730">            log.error(Markers2.append(argEx), </span>
-<span class="nc" id="L731">                &quot;Illegal argument: {}&quot;, argEx.getMessage());</span>
-<span class="nc" id="L732">            throw argEx;</span>
-<span class="nc" id="L733">        } catch (RuntimeException rex) {</span>
-<span class="nc" id="L734">            log.error(Markers2.append(rex), &quot;Unexpected {}: {}&quot;, </span>
-<span class="nc" id="L735">                rex.getClass().getSimpleName(), rex.getMessage());</span>
-<span class="nc" id="L736">            throw new UnexpectedException(rex);</span>
+<span class="nc" id="L730">        } catch (HL7Exception e) {</span>
+<span class="nc" id="L731">            log.error(Markers2.append(e), &quot;{} creating message for {}: {}&quot;, </span>
+<span class="nc" id="L732">                e.getClass().getSimpleName(), destinationId, resp.getHl7Message());</span>
+<span class="nc" id="L733">            throw e;</span>
+<span class="nc" id="L734">        } catch (IllegalArgumentException argEx) {</span>
+<span class="nc" id="L735">            log.error(Markers2.append(argEx), </span>
+<span class="nc" id="L736">                &quot;Illegal argument: {}&quot;, argEx.getMessage());</span>
+<span class="nc" id="L737">            throw argEx;</span>
+<span class="nc" id="L738">        } catch (RuntimeException rex) {</span>
+<span class="nc" id="L739">            log.error(Markers2.append(rex), &quot;Unexpected {}: {}&quot;, </span>
+<span class="nc" id="L740">                rex.getClass().getSimpleName(), rex.getMessage());</span>
+<span class="nc" id="L741">            throw new UnexpectedException(rex);</span>
         }
     }
 
 	private IzQuery setQueryParameters(HttpServletRequest req, QBP_Q11 qbp, boolean isPatient) throws HL7Exception {
 		IzQuery query;
 		// Add request parameters to the QPD Segment
-<span class="nc bnc" id="L743" title="All 2 branches missed.">		if (req instanceof RequestWithModifiableParameters reqp) {</span>
-<span class="nc" id="L744">		    query = QBPUtils.addParamsToQPD(qbp, reqp.getParameters(), isPatient);  // NOSONAR query is for debugging</span>
+<span class="pc bpc" id="L748" title="1 of 2 branches missed.">		if (req instanceof RequestWithModifiableParameters reqp) {</span>
+<span class="fc" id="L749">		    query = QBPUtils.addParamsToQPD(qbp, reqp.getParameters(), isPatient);  // NOSONAR query is for debugging</span>
 		} else {
-<span class="nc" id="L746">		    query = QBPUtils.addRequestParamsToQPD(qbp, req.getParameterMap(), isPatient); // NOSONAR query is for debugging</span>
+<span class="nc" id="L751">		    query = QBPUtils.addRequestParamsToQPD(qbp, req.getParameterMap(), isPatient); // NOSONAR query is for debugging</span>
 		}
-<span class="nc" id="L748">		return query;</span>
+<span class="fc" id="L753">		return query;</span>
 	}
 
     /**
@@ -766,24 +771,24 @@ public class FhirController {
      * rewritten to {@code patient} when a {@code subject} parameter is present.
      */
     static HttpServletRequest normalizeSubjectToPatient(HttpServletRequest req) {
-<span class="fc" id="L769">        String[] subject = req.getParameterValues(SUBJECT);</span>
-<span class="pc bpc" id="L770" title="1 of 4 branches missed.">        if (subject == null || subject.length == 0) {</span>
-<span class="fc" id="L771">            return req;</span>
+<span class="fc" id="L774">        String[] subject = req.getParameterValues(SUBJECT);</span>
+<span class="pc bpc" id="L775" title="1 of 4 branches missed.">        if (subject == null || subject.length == 0) {</span>
+<span class="fc" id="L776">            return req;</span>
         }
         RequestWithModifiableParameters reqp =
-<span class="pc bpc" id="L774" title="1 of 2 branches missed.">            (req instanceof RequestWithModifiableParameters r) ? r : new RequestWithModifiableParameters(req);</span>
+<span class="pc bpc" id="L779" title="1 of 2 branches missed.">            (req instanceof RequestWithModifiableParameters r) ? r : new RequestWithModifiableParameters(req);</span>
         // patient (or patient.identifier) wins if present; only alias when neither is
         // supplied, so we never add a second/duplicate QPD-3 patient identifier.
-<span class="fc bfc" id="L777" title="All 2 branches covered.">        if (reqp.getParameter(Immunization.SP_PATIENT) == null</span>
-<span class="fc bfc" id="L778" title="All 2 branches covered.">                &amp;&amp; reqp.getParameter(IzQuery.PATIENT_LIST) == null) {</span>
-<span class="fc bfc" id="L779" title="All 2 branches covered.">            for (String v : subject) {</span>
-<span class="fc bfc" id="L780" title="All 2 branches covered.">                if (isPatientReference(v)) {</span>
-<span class="fc" id="L781">                    reqp.addParameter(Immunization.SP_PATIENT, v);</span>
+<span class="fc bfc" id="L782" title="All 2 branches covered.">        if (reqp.getParameter(Immunization.SP_PATIENT) == null</span>
+<span class="fc bfc" id="L783" title="All 2 branches covered.">                &amp;&amp; reqp.getParameter(IzQuery.PATIENT_LIST) == null) {</span>
+<span class="fc bfc" id="L784" title="All 2 branches covered.">            for (String v : subject) {</span>
+<span class="fc bfc" id="L785" title="All 2 branches covered.">                if (isPatientReference(v)) {</span>
+<span class="fc" id="L786">                    reqp.addParameter(Immunization.SP_PATIENT, v);</span>
                 }
             }
         }
-<span class="fc" id="L785">        reqp.removeParameters(SUBJECT);</span>
-<span class="fc" id="L786">        return reqp;</span>
+<span class="fc" id="L790">        reqp.removeParameters(SUBJECT);</span>
+<span class="fc" id="L791">        return reqp;</span>
     }
 
     /**
@@ -792,31 +797,31 @@ public class FhirController {
      * type); false for an explicitly-typed non-Patient reference such as {@code Group/...}.
      */
     static boolean isPatientReference(String value) {
-<span class="fc bfc" id="L795" title="All 4 branches covered.">        if (value == null || value.isBlank()) {</span>
-<span class="fc" id="L796">            return false;</span>
+<span class="fc bfc" id="L800" title="All 4 branches covered.">        if (value == null || value.isBlank()) {</span>
+<span class="fc" id="L801">            return false;</span>
         }
-<span class="fc" id="L798">        ReferenceParam ref = new ReferenceParam();</span>
-<span class="fc" id="L799">        ref.setValueAsQueryToken(null, SUBJECT, null, value);</span>
-<span class="fc" id="L800">        String type = ref.getResourceType();</span>
-<span class="pc bpc" id="L801" title="1 of 6 branches missed.">        return type == null || type.isEmpty() || PATIENT.equals(type);</span>
+<span class="fc" id="L803">        ReferenceParam ref = new ReferenceParam();</span>
+<span class="fc" id="L804">        ref.setValueAsQueryToken(null, SUBJECT, null, value);</span>
+<span class="fc" id="L805">        String type = ref.getResourceType();</span>
+<span class="pc bpc" id="L806" title="1 of 6 branches missed.">        return type == null || type.isEmpty() || PATIENT.equals(type);</span>
     }
 
 	private void setMSHValues(QBP_Q11 qbp) throws DataTypeException {
 		/* These value should be adjusted in the pipeline configuration once the message has been forwarded. */
-<span class="nc" id="L806">		QBPUtils.setSendingApplication(qbp, RequestContext.getPrincipal().getName());</span>
-<span class="nc" id="L807">		QBPUtils.setSendingFacility(qbp, RequestContext.getPrincipal().getOrganization());</span>
-<span class="nc" id="L808">		QBPUtils.setReceivingApplication(qbp, config.getReceivingApplication());</span>
-<span class="nc" id="L809">		QBPUtils.setReceivingFacility(qbp, config.getReceivingFacility());</span>
+<span class="fc" id="L811">		QBPUtils.setSendingApplication(qbp, RequestContext.getPrincipal().getName());</span>
+<span class="fc" id="L812">		QBPUtils.setSendingFacility(qbp, RequestContext.getPrincipal().getOrganization());</span>
+<span class="fc" id="L813">		QBPUtils.setReceivingApplication(qbp, config.getReceivingApplication());</span>
+<span class="fc" id="L814">		QBPUtils.setReceivingFacility(qbp, config.getReceivingFacility());</span>
 		// These are fixed values that should normally be used for a query message
-<span class="nc" id="L811">		MSH msh = qbp.getMSH();</span>
+<span class="fc" id="L816">		MSH msh = qbp.getMSH();</span>
 		// Some destinations may require a value of &quot;T&quot; in the onboarding environment, but
 		// all use &quot;P&quot; in production, and most use &quot;P&quot; elsewhere. Set the most useful value
 		// understanding that this can be adjused by the transformation service.
-<span class="nc" id="L815">		msh.getProcessingID().getProcessingID().setValue(&quot;P&quot;);</span>
+<span class="fc" id="L820">		msh.getProcessingID().getProcessingID().setValue(&quot;P&quot;);</span>
 		// These are appropriate values for any endpoint connecting to IZGW
-<span class="nc" id="L817">		msh.getApplicationAcknowledgmentType().setValue(&quot;AL&quot;);</span>
-<span class="nc" id="L818">		msh.getAcceptAcknowledgmentType().setValue(&quot;ER&quot;);</span>
-<span class="nc" id="L819">	}</span>
+<span class="fc" id="L822">		msh.getApplicationAcknowledgmentType().setValue(&quot;AL&quot;);</span>
+<span class="fc" id="L823">		msh.getAcceptAcknowledgmentType().setValue(&quot;ER&quot;);</span>
+<span class="fc" id="L824">	}</span>
     
     /**
      * Create the response
@@ -827,9 +832,9 @@ public class FhirController {
      * 
      */
     private Bundle convertResponseToFHIR(SubmitSingleMessageResponse response) throws HL7Exception {
-<span class="nc" id="L830">        String hl7Message = response.getHl7Message();</span>
-<span class="nc" id="L831">        MessageParser mp = new MessageParser();</span>
-<span class="nc" id="L832">        return mp.convert(hl7Message);</span>
+<span class="fc" id="L835">        String hl7Message = response.getHl7Message();</span>
+<span class="fc" id="L836">        MessageParser mp = new MessageParser();</span>
+<span class="fc" id="L837">        return mp.convert(hl7Message);</span>
     }
 
     /**
@@ -841,55 +846,55 @@ public class FhirController {
      * @return    The filtered bundle (NOTE: it is filtered in place).
      */
     private Bundle filter(Bundle bundle, HttpServletRequest req) {
-<span class="nc" id="L844">        List&lt;Include&gt; includes = toIncludeList(req.getParameterValues(&quot;_include&quot;));</span>
-<span class="nc" id="L845">        List&lt;Include&gt; revIncludes = toIncludeList(req.getParameterValues(&quot;_revinclude&quot;));</span>
+<span class="fc" id="L849">        List&lt;Include&gt; includes = toIncludeList(req.getParameterValues(&quot;_include&quot;));</span>
+<span class="fc" id="L850">        List&lt;Include&gt; revIncludes = toIncludeList(req.getParameterValues(&quot;_revinclude&quot;));</span>
         // Only include resources that were included via _include, or which reference an included resource via _revinclude.
         
         // Update the bundle type to searchset from message.
-<span class="nc" id="L849">        bundle.setType(BundleType.SEARCHSET);</span>
-<span class="nc" id="L850">        String uri = req.getRequestURI();</span>
-<span class="nc bnc" id="L851" title="All 2 branches missed.">        if (uri.endsWith(&quot;/_search&quot;)) {</span>
-<span class="nc" id="L852">            uri = StringUtils.substringBeforeLast(uri, &quot;/_search&quot;);</span>
+<span class="fc" id="L854">        bundle.setType(BundleType.SEARCHSET);</span>
+<span class="fc" id="L855">        String uri = req.getRequestURI();</span>
+<span class="pc bpc" id="L856" title="1 of 2 branches missed.">        if (uri.endsWith(&quot;/_search&quot;)) {</span>
+<span class="nc" id="L857">            uri = StringUtils.substringBeforeLast(uri, &quot;/_search&quot;);</span>
         }
-<span class="nc" id="L854">        String requested = StringUtils.substringAfterLast(uri, &quot;/&quot;);</span>
-<span class="nc bnc" id="L855" title="All 2 branches missed.">        if (&quot;$match&quot;.equals(requested)) {</span>
-<span class="nc" id="L856">            requested = PATIENT;</span>
+<span class="fc" id="L859">        String requested = StringUtils.substringAfterLast(uri, &quot;/&quot;);</span>
+<span class="pc bpc" id="L860" title="1 of 2 branches missed.">        if (&quot;$match&quot;.equals(requested)) {</span>
+<span class="fc" id="L861">            requested = PATIENT;</span>
         }
 
-<span class="nc" id="L859">        List&lt;Resource&gt; resources = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L860">        preFilter(bundle, includes, revIncludes, requested, resources);</span>
+<span class="fc" id="L864">        List&lt;Resource&gt; resources = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L865">        preFilter(bundle, includes, revIncludes, requested, resources);</span>
         
-<span class="nc" id="L862">        markIncludedResources(includes, revIncludes, resources);</span>
+<span class="fc" id="L867">        markIncludedResources(includes, revIncludes, resources);</span>
         
-<span class="nc" id="L864">        cleanupBundleOfUnmarkedResources(bundle);</span>
-<span class="nc" id="L865">        return bundle;</span>
+<span class="fc" id="L869">        cleanupBundleOfUnmarkedResources(bundle);</span>
+<span class="fc" id="L870">        return bundle;</span>
     }
 
     private void preFilter(Bundle bundle, List&lt;Include&gt; includes, List&lt;Include&gt; revIncludes, String requested,
             List&lt;Resource&gt; resources) {
-<span class="nc" id="L870">        Iterator&lt;BundleEntryComponent&gt; it = bundle.getEntry().iterator();</span>
-<span class="nc bnc" id="L871" title="All 2 branches missed.">        while (it.hasNext()) {</span>
-<span class="nc" id="L872">            BundleEntryComponent entry = it.next();</span>
-<span class="nc" id="L873">            Resource r = entry.getResource();</span>
-<span class="nc bnc" id="L874" title="All 4 branches missed.">            if (r != null &amp;&amp; r.fhirType().equals(requested)) {</span>
-<span class="nc" id="L875">                entry.getSearch().setMode(SearchEntryMode.MATCH);</span>
-<span class="nc bnc" id="L876" title="All 2 branches missed.">                if (!resources.contains(r)) {</span>
-<span class="nc" id="L877">                    resources.add(r);</span>
+<span class="fc" id="L875">        Iterator&lt;BundleEntryComponent&gt; it = bundle.getEntry().iterator();</span>
+<span class="fc bfc" id="L876" title="All 2 branches covered.">        while (it.hasNext()) {</span>
+<span class="fc" id="L877">            BundleEntryComponent entry = it.next();</span>
+<span class="fc" id="L878">            Resource r = entry.getResource();</span>
+<span class="pc bpc" id="L879" title="1 of 4 branches missed.">            if (r != null &amp;&amp; r.fhirType().equals(requested)) {</span>
+<span class="fc" id="L880">                entry.getSearch().setMode(SearchEntryMode.MATCH);</span>
+<span class="pc bpc" id="L881" title="1 of 2 branches missed.">                if (!resources.contains(r)) {</span>
+<span class="fc" id="L882">                    resources.add(r);</span>
                 }
-<span class="nc bnc" id="L879" title="All 2 branches missed.">            } else if (r instanceof OperationOutcome) {</span>
-<span class="nc" id="L880">                entry.getSearch().setMode(SearchEntryMode.OUTCOME);</span>
-<span class="nc bnc" id="L881" title="All 2 branches missed.">                if (!resources.contains(r)) {</span>
-<span class="nc" id="L882">                    resources.add(r);</span>
+<span class="fc bfc" id="L884" title="All 2 branches covered.">            } else if (r instanceof OperationOutcome) {</span>
+<span class="fc" id="L885">                entry.getSearch().setMode(SearchEntryMode.OUTCOME);</span>
+<span class="pc bpc" id="L886" title="1 of 2 branches missed.">                if (!resources.contains(r)) {</span>
+<span class="fc" id="L887">                    resources.add(r);</span>
                 }
             } else {
-<span class="nc" id="L885">                removeInfrastructureCreatedResources(resources, includes, revIncludes, it, r);</span>
+<span class="fc" id="L890">                removeInfrastructureCreatedResources(resources, includes, revIncludes, it, r);</span>
             }
-<span class="nc" id="L887">        }</span>
-<span class="nc" id="L888">    }</span>
+<span class="fc" id="L892">        }</span>
+<span class="fc" id="L893">    }</span>
     
     private void removeInfrastructureCreatedResources(List&lt;Resource&gt; resources, List&lt;Include&gt; includes, List&lt;Include&gt; revIncludes,
             Iterator&lt;BundleEntryComponent&gt; it, Resource r) {
-<span class="nc bnc" id="L892" title="All 4 branches missed.">        if (r != null &amp;&amp; r.getUserData(Parser.SOURCE) != null) {</span>
+<span class="pc bpc" id="L897" title="1 of 4 branches missed.">        if (r != null &amp;&amp; r.getUserData(Parser.SOURCE) != null) {</span>
             // Some DatatypeConverter and MessageParser created resources have limited utility.  
             // What we should we do with those depends on what resources the
             // user asks to include.  These infrastructure crafted resources can be white-listed
@@ -902,148 +907,148 @@ public class FhirController {
             // _include=Resource:source:Organization
             // MessageParser created DocumentReference/Provenance
             // _include=Resource:source:DocumentReference
-<span class="nc" id="L905">            String source = r.getUserData(Parser.SOURCE).toString();</span>
-<span class="nc" id="L906">            if (</span>
+<span class="fc" id="L910">            String source = r.getUserData(Parser.SOURCE).toString();</span>
+<span class="fc" id="L911">            if (</span>
                 // ANY Source requested
                 // DatatypeConverter created resources including Organization, Practitioner, RelatedPerson, and Location
                 // MessageParser created resources including DocumentReference and Provenance
-<span class="nc bnc" id="L910" title="All 2 branches missed.">                matchesSource(includes, r.fhirType())</span>
+<span class="pc bpc" id="L915" title="1 of 2 branches missed.">                matchesSource(includes, r.fhirType())</span>
             ) {
                 // Explicitly mark these as included resources.
-<span class="nc" id="L913">                r.setUserData(SearchEntryMode.class.getName(), SearchEntryMode.INCLUDE);</span>
-<span class="nc" id="L914">                resources.add(r);</span>
-<span class="nc" id="L915">                return;</span>
+<span class="nc" id="L918">                r.setUserData(SearchEntryMode.class.getName(), SearchEntryMode.INCLUDE);</span>
+<span class="nc" id="L919">                resources.add(r);</span>
+<span class="nc" id="L920">                return;</span>
             }
             
             // If users reverse include provenance, don't delete the MessageParser crafted Provenance resources.
-<span class="nc bnc" id="L919" title="All 2 branches missed.">            if (source.equals(MessageParser.class.getName()) </span>
-<span class="nc bnc" id="L920" title="All 2 branches missed.">            	&amp;&amp; revIncludes.stream().anyMatch(rinc -&gt; &quot;Provenance&quot;.equals(rinc.getParamType()))) {</span>
+<span class="pc bpc" id="L924" title="1 of 2 branches missed.">            if (source.equals(MessageParser.class.getName()) </span>
+<span class="pc bpc" id="L925" title="1 of 2 branches missed.">            	&amp;&amp; revIncludes.stream().anyMatch(rinc -&gt; &quot;Provenance&quot;.equals(rinc.getParamType()))) {</span>
                 // Let normal include handling mark Provenance reverse includes.
-<span class="nc" id="L922">                return;</span>
+<span class="nc" id="L927">                return;</span>
             }
             // Remove classes crafted by the infrastructure as being generally not useful because
             // the enriched reference (name and identifier) is enough for production use.
-<span class="nc" id="L926">            it.remove();</span>
+<span class="fc" id="L931">            it.remove();</span>
         }
-<span class="nc" id="L928">    }</span>
+<span class="fc" id="L933">    }</span>
 
     private boolean matchesSource(List&lt;Include&gt; includes, String target) {
-<span class="nc bnc" id="L931" title="All 2 branches missed.">        for (Include include: includes) {</span>
-<span class="nc bnc" id="L932" title="All 2 branches missed.">            if (&quot;Resource&quot;.equals(include.getParamType()) </span>
-<span class="nc bnc" id="L933" title="All 2 branches missed.">            	&amp;&amp; Parser.SOURCE.equals(include.getParamName())</span>
-<span class="nc bnc" id="L934" title="All 2 branches missed.">            	&amp;&amp; Arrays.asList(&quot;*&quot;, target, null).contains(include.getParamTargetType())</span>
+<span class="pc bpc" id="L936" title="1 of 2 branches missed.">        for (Include include: includes) {</span>
+<span class="nc bnc" id="L937" title="All 2 branches missed.">            if (&quot;Resource&quot;.equals(include.getParamType()) </span>
+<span class="nc bnc" id="L938" title="All 2 branches missed.">            	&amp;&amp; Parser.SOURCE.equals(include.getParamName())</span>
+<span class="nc bnc" id="L939" title="All 2 branches missed.">            	&amp;&amp; Arrays.asList(&quot;*&quot;, target, null).contains(include.getParamTargetType())</span>
             ) {
-<span class="nc" id="L936">                return true;</span>
+<span class="nc" id="L941">                return true;</span>
             }
-<span class="nc" id="L938">        }</span>
-<span class="nc" id="L939">        return false;</span>
+<span class="nc" id="L943">        }</span>
+<span class="fc" id="L944">        return false;</span>
     }
 
     private void markIncludedResources(List&lt;Include&gt; includes, List&lt;Include&gt; revIncludes, List&lt;Resource&gt; resources) {
         // For each non OperationOutcome resource in the output (which can grow
         // at each iteration of the loop, find the essential to include resources.
-<span class="nc bnc" id="L945" title="All 2 branches missed.">        for (int i = 0; i &lt; resources.size(); i++) {</span>
-<span class="nc" id="L946">            Resource r = resources.get(i);</span>
-<span class="nc bnc" id="L947" title="All 2 branches missed.">            if (r instanceof OperationOutcome) {</span>
-<span class="nc" id="L948">                continue;</span>
+<span class="fc bfc" id="L950" title="All 2 branches covered.">        for (int i = 0; i &lt; resources.size(); i++) {</span>
+<span class="fc" id="L951">            Resource r = resources.get(i);</span>
+<span class="fc bfc" id="L952" title="All 2 branches covered.">            if (r instanceof OperationOutcome) {</span>
+<span class="fc" id="L953">                continue;</span>
             }
             @SuppressWarnings(&quot;unchecked&quot;)
-<span class="nc" id="L951">            Set&lt;Reference&gt; refs = (Set&lt;Reference&gt;) r.getUserData(&quot;References&quot;);</span>
-<span class="nc" id="L952">            checkReferences(includes, resources, r, refs, false);</span>
+<span class="fc" id="L956">            Set&lt;Reference&gt; refs = (Set&lt;Reference&gt;) r.getUserData(&quot;References&quot;);</span>
+<span class="fc" id="L957">            checkReferences(includes, resources, r, refs, false);</span>
             // For each reverse include
             @SuppressWarnings(&quot;unchecked&quot;)
-<span class="nc" id="L955">            Set&lt;Reference&gt; revs = (Set&lt;Reference&gt;) r.getUserData(&quot;Reverses&quot;);</span>
-<span class="nc" id="L956">            checkReferences(revIncludes, resources, r, revs, true);</span>
+<span class="fc" id="L960">            Set&lt;Reference&gt; revs = (Set&lt;Reference&gt;) r.getUserData(&quot;Reverses&quot;);</span>
+<span class="fc" id="L961">            checkReferences(revIncludes, resources, r, revs, true);</span>
         }
-<span class="nc" id="L958">    }</span>
+<span class="fc" id="L963">    }</span>
 
     private void cleanupBundleOfUnmarkedResources(Bundle bundle) {
-<span class="nc" id="L961">        Iterator&lt;BundleEntryComponent&gt; it = bundle.getEntry().iterator();</span>
-<span class="nc bnc" id="L962" title="All 2 branches missed.">        while (it.hasNext()) {</span>
-<span class="nc" id="L963">            BundleEntryComponent entry = it.next();</span>
-<span class="nc" id="L964">            Resource res = entry.getResource();</span>
-<span class="nc bnc" id="L965" title="All 4 branches missed.">            if (res != null &amp;&amp; entry.getSearch().getMode() == null) {</span>
-<span class="nc" id="L966">                SearchEntryMode mode = (SearchEntryMode) res.getUserData(SearchEntryMode.class.getName());</span>
-<span class="nc bnc" id="L967" title="All 2 branches missed.">                if (mode != null) {</span>
-<span class="nc" id="L968">                    entry.getSearch().setMode(mode);</span>
+<span class="fc" id="L966">        Iterator&lt;BundleEntryComponent&gt; it = bundle.getEntry().iterator();</span>
+<span class="fc bfc" id="L967" title="All 2 branches covered.">        while (it.hasNext()) {</span>
+<span class="fc" id="L968">            BundleEntryComponent entry = it.next();</span>
+<span class="fc" id="L969">            Resource res = entry.getResource();</span>
+<span class="pc bpc" id="L970" title="1 of 4 branches missed.">            if (res != null &amp;&amp; entry.getSearch().getMode() == null) {</span>
+<span class="fc" id="L971">                SearchEntryMode mode = (SearchEntryMode) res.getUserData(SearchEntryMode.class.getName());</span>
+<span class="pc bpc" id="L972" title="1 of 2 branches missed.">                if (mode != null) {</span>
+<span class="nc" id="L973">                    entry.getSearch().setMode(mode);</span>
                 }
             }
-<span class="nc bnc" id="L971" title="All 2 branches missed.">            if (entry.getSearch().getMode() == null) {</span>
-<span class="nc" id="L972">                it.remove();</span>
+<span class="fc bfc" id="L976" title="All 2 branches covered.">            if (entry.getSearch().getMode() == null) {</span>
+<span class="fc" id="L977">                it.remove();</span>
             }
-<span class="nc" id="L974">        }</span>
-<span class="nc" id="L975">    }</span>
+<span class="fc" id="L979">        }</span>
+<span class="fc" id="L980">    }</span>
 
     private void checkReferences(List&lt;Include&gt; includes, List&lt;Resource&gt; resources, Resource r, Set&lt;Reference&gt; refs, boolean reverse) {
-<span class="nc bnc" id="L978" title="All 2 branches missed.">        if (refs != null) {</span>
+<span class="fc bfc" id="L983" title="All 2 branches covered.">        if (refs != null) {</span>
             // For each reference that resource has
-<span class="nc bnc" id="L980" title="All 2 branches missed.">            for (Reference ref: refs) {</span>
+<span class="fc bfc" id="L985" title="All 2 branches covered.">            for (Reference ref: refs) {</span>
                 // For each forward include, e.g., _include=Immunization:patient:Patient
-<span class="nc bnc" id="L982" title="All 2 branches missed.">                for (Include include: includes) {</span>
-<span class="nc bnc" id="L983" title="All 2 branches missed.">                    if (includeMatches(include, r, ref, reverse)) {</span>
-<span class="nc" id="L984">                        Resource target = (Resource) ref.getUserData(&quot;Resource&quot;);</span>
-<span class="nc bnc" id="L985" title="All 2 branches missed.">                        if (!resources.contains(target)) {</span>
-<span class="nc" id="L986">                            resources.add(target);</span>
+<span class="pc bpc" id="L987" title="1 of 2 branches missed.">                for (Include include: includes) {</span>
+<span class="nc bnc" id="L988" title="All 2 branches missed.">                    if (includeMatches(include, r, ref, reverse)) {</span>
+<span class="nc" id="L989">                        Resource target = (Resource) ref.getUserData(&quot;Resource&quot;);</span>
+<span class="nc bnc" id="L990" title="All 2 branches missed.">                        if (!resources.contains(target)) {</span>
+<span class="nc" id="L991">                            resources.add(target);</span>
                         }
-<span class="nc" id="L988">                        target.setUserData(SearchEntryMode.class.getName(), SearchEntryMode.MATCH);</span>
+<span class="nc" id="L993">                        target.setUserData(SearchEntryMode.class.getName(), SearchEntryMode.MATCH);</span>
                     }
-<span class="nc" id="L990">                }</span>
-<span class="nc" id="L991">            }</span>
+<span class="nc" id="L995">                }</span>
+<span class="fc" id="L996">            }</span>
         }
-<span class="nc" id="L993">    }</span>
+<span class="fc" id="L998">    }</span>
     
     private boolean includeMatches(Include include, Resource r, Reference ref, boolean reverse) {
         
-<span class="nc bnc" id="L997" title="All 2 branches missed.">        String type = reverse ? include.getParamTargetType() : include.getParamType();</span>
-<span class="nc bnc" id="L998" title="All 4 branches missed.">        if (isNotAny(type) &amp;&amp; !type.equals(r.fhirType())) {</span>
-<span class="nc" id="L999">            return false;     // not a match.</span>
+<span class="nc bnc" id="L1002" title="All 2 branches missed.">        String type = reverse ? include.getParamTargetType() : include.getParamType();</span>
+<span class="nc bnc" id="L1003" title="All 4 branches missed.">        if (isNotAny(type) &amp;&amp; !type.equals(r.fhirType())) {</span>
+<span class="nc" id="L1004">            return false;     // not a match.</span>
         }
-<span class="nc" id="L1001">        String search = include.getParamName();</span>
-<span class="nc bnc" id="L1002" title="All 2 branches missed.">        String searchNameString = ref.getUserString(reverse ? ParserUtils.REVERSE_NAMES : ParserUtils.SEARCH_NAMES);</span>
+<span class="nc" id="L1006">        String search = include.getParamName();</span>
+<span class="nc bnc" id="L1007" title="All 2 branches missed.">        String searchNameString = ref.getUserString(reverse ? ParserUtils.REVERSE_NAMES : ParserUtils.SEARCH_NAMES);</span>
         
-<span class="nc" id="L1004">        List&lt;String&gt; searchNames = Arrays.asList(StringUtils.split(searchNameString, &quot;,&quot;));</span>
-<span class="nc bnc" id="L1005" title="All 4 branches missed.">        if (isNotAny(search) &amp;&amp; !searchNames.contains(search)) {</span>
-<span class="nc" id="L1006">            return false;     // not a match.</span>
+<span class="nc" id="L1009">        List&lt;String&gt; searchNames = Arrays.asList(StringUtils.split(searchNameString, &quot;,&quot;));</span>
+<span class="nc bnc" id="L1010" title="All 4 branches missed.">        if (isNotAny(search) &amp;&amp; !searchNames.contains(search)) {</span>
+<span class="nc" id="L1011">            return false;     // not a match.</span>
         }
         
-<span class="nc bnc" id="L1009" title="All 2 branches missed.">        String target = reverse ? include.getParamType() : include.getParamTargetType();</span>
+<span class="nc bnc" id="L1014" title="All 2 branches missed.">        String target = reverse ? include.getParamType() : include.getParamTargetType();</span>
         
-<span class="nc bnc" id="L1011" title="All 4 branches missed.">        return !isNotAny(target) || target.equals(ref.getReferenceElement().getResourceType());</span>
+<span class="nc bnc" id="L1016" title="All 4 branches missed.">        return !isNotAny(target) || target.equals(ref.getReferenceElement().getResourceType());</span>
     }
     
     private static boolean isNotAny(String includeValue) {
-<span class="nc bnc" id="L1015" title="All 4 branches missed.">    	return includeValue != null &amp;&amp; !&quot;*&quot;.equals(includeValue);</span>
+<span class="nc bnc" id="L1020" title="All 4 branches missed.">    	return includeValue != null &amp;&amp; !&quot;*&quot;.equals(includeValue);</span>
     }
 
     private List&lt;Include&gt; toIncludeList(String... inc) {
-<span class="nc bnc" id="L1019" title="All 4 branches missed.">        if (inc == null || inc.length == 0) {</span>
-<span class="nc" id="L1020">            return Collections.emptyList();</span>
+<span class="pc bpc" id="L1024" title="3 of 4 branches missed.">        if (inc == null || inc.length == 0) {</span>
+<span class="fc" id="L1025">            return Collections.emptyList();</span>
         }
-<span class="nc" id="L1022">        List&lt;Include&gt; l = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L1023" title="All 2 branches missed.">        for (String i: inc) {</span>
-<span class="nc" id="L1024">            i = normalizeInclude(i);</span>
-<span class="nc" id="L1025">            Include include = new Include(i);</span>
-<span class="nc" id="L1026">            l.add(include);</span>
+<span class="nc" id="L1027">        List&lt;Include&gt; l = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L1028" title="All 2 branches missed.">        for (String i: inc) {</span>
+<span class="nc" id="L1029">            i = normalizeInclude(i);</span>
+<span class="nc" id="L1030">            Include include = new Include(i);</span>
+<span class="nc" id="L1031">            l.add(include);</span>
         }
-<span class="nc" id="L1028">        return l;</span>
+<span class="nc" id="L1033">        return l;</span>
     }
 
     private static String normalizeInclude(String i) {
         // normalize missing include values *
-<span class="nc bnc" id="L1033" title="All 3 branches missed.">        switch (StringUtils.countMatches(i, ':')) {</span>
+<span class="nc bnc" id="L1038" title="All 3 branches missed.">        switch (StringUtils.countMatches(i, ':')) {</span>
         case 0:
-<span class="nc" id="L1035">            i += &quot;:*:*&quot;;</span>
-<span class="nc" id="L1036">            break;</span>
+<span class="nc" id="L1040">            i += &quot;:*:*&quot;;</span>
+<span class="nc" id="L1041">            break;</span>
         case 1:
-<span class="nc" id="L1038">            i += &quot;:*&quot;;</span>
-<span class="nc" id="L1039">            break;</span>
+<span class="nc" id="L1043">            i += &quot;:*&quot;;</span>
+<span class="nc" id="L1044">            break;</span>
         default:
             break;
         }
-<span class="nc bnc" id="L1043" title="All 2 branches missed.">        if (i.contains(&quot;::&quot;)) {</span>
-<span class="nc" id="L1044">            i = i.replace(&quot;::&quot;, &quot;:*&quot;);</span>
+<span class="nc bnc" id="L1048" title="All 2 branches missed.">        if (i.contains(&quot;::&quot;)) {</span>
+<span class="nc" id="L1049">            i = i.replace(&quot;::&quot;, &quot;:*&quot;);</span>
         }
-<span class="nc" id="L1046">        return i;</span>
+<span class="nc" id="L1051">        return i;</span>
     }
 
     /**
@@ -1053,147 +1058,147 @@ public class FhirController {
      * @return    The bundle
      */
     private Bundle adjustIdentifiers(Bundle b) {
-<span class="nc" id="L1056">        String lastPatientValue = null;</span>
-<span class="nc bnc" id="L1057" title="All 2 branches missed.">        for (BundleEntryComponent entry : b.getEntry()) {</span>
-<span class="nc" id="L1058">            Resource r = entry.getResource();</span>
-<span class="nc" id="L1059">            Identifier ident = getIdentifier(r);</span>
-<span class="nc bnc" id="L1060" title="All 2 branches missed.">            if (ident == null) {</span>
-<span class="nc" id="L1061">                continue;</span>
+<span class="fc" id="L1061">        String lastPatientValue = null;</span>
+<span class="fc bfc" id="L1062" title="All 2 branches covered.">        for (BundleEntryComponent entry : b.getEntry()) {</span>
+<span class="fc" id="L1063">            Resource r = entry.getResource();</span>
+<span class="fc" id="L1064">            Identifier ident = getIdentifier(r);</span>
+<span class="fc bfc" id="L1065" title="All 2 branches covered.">            if (ident == null) {</span>
+<span class="fc" id="L1066">                continue;</span>
             }
-<span class="nc" id="L1063">            String value = ident.getSystem() + &quot;|&quot; + ident.getValue();</span>
-<span class="nc bnc" id="L1064" title="All 2 branches missed.">            if (r instanceof Patient) {</span>
-<span class="nc" id="L1065">                lastPatientValue = value;    // NOSONAR, lastPatientValue will be used on next iteration</span>
+<span class="fc" id="L1068">            String value = ident.getSystem() + &quot;|&quot; + ident.getValue();</span>
+<span class="pc bpc" id="L1069" title="1 of 2 branches missed.">            if (r instanceof Patient) {</span>
+<span class="fc" id="L1070">                lastPatientValue = value;    // NOSONAR, lastPatientValue will be used on next iteration</span>
             } else {
-<span class="nc" id="L1067">                value = lastPatientValue + &quot;|&quot; + value;</span>
+<span class="nc" id="L1072">                value = lastPatientValue + &quot;|&quot; + value;</span>
             }
-<span class="nc" id="L1069">            String encoded = FhirIdCodec.encode(value);</span>
+<span class="fc" id="L1074">            String encoded = FhirIdCodec.encode(value);</span>
             
-<span class="nc bnc" id="L1071" title="All 2 branches missed.">            if (encoded.length() &gt; 64) {</span>
+<span class="pc bpc" id="L1076" title="1 of 2 branches missed.">            if (encoded.length() &gt; 64) {</span>
                 // Technically, FHIR ids have to be shorter than 64 characters.  We'll ignore that, but log the issue.
-<span class="nc" id="L1073">                log.warn(&quot;Id too long&quot;);</span>
+<span class="nc" id="L1078">                log.warn(&quot;Id too long&quot;);</span>
             }
-<span class="nc" id="L1075">            IdType x = r.getIdElement();</span>
-<span class="nc" id="L1076">            x.setParts(x.getBaseUrl(), x.getResourceType(), encoded, x.getVersionIdPart());</span>
+<span class="fc" id="L1080">            IdType x = r.getIdElement();</span>
+<span class="fc" id="L1081">            x.setParts(x.getBaseUrl(), x.getResourceType(), encoded, x.getVersionIdPart());</span>
             // Correct the singular reference to this resource used in all places where
             // a reference is needed to it.
-<span class="nc" id="L1079">            Reference ref = (Reference) r.getUserData(&quot;Reference&quot;);</span>
-<span class="nc bnc" id="L1080" title="All 2 branches missed.">            if (ref != null) {</span>
-<span class="nc" id="L1081">                x = (IdType) ref.getReferenceElement();</span>
-<span class="nc" id="L1082">                x.setParts(x.getBaseUrl(), x.getResourceType(), encoded, x.getVersionIdPart());</span>
-<span class="nc" id="L1083">                ref.setReferenceElement(x);</span>
+<span class="fc" id="L1084">            Reference ref = (Reference) r.getUserData(&quot;Reference&quot;);</span>
+<span class="pc bpc" id="L1085" title="1 of 2 branches missed.">            if (ref != null) {</span>
+<span class="fc" id="L1086">                x = (IdType) ref.getReferenceElement();</span>
+<span class="fc" id="L1087">                x.setParts(x.getBaseUrl(), x.getResourceType(), encoded, x.getVersionIdPart());</span>
+<span class="fc" id="L1088">                ref.setReferenceElement(x);</span>
             }
-<span class="nc" id="L1085">        }</span>
-<span class="nc" id="L1086">        return b;</span>
+<span class="fc" id="L1090">        }</span>
+<span class="fc" id="L1091">        return b;</span>
     }
 
     private Identifier getIdentifier(Resource r) {
-<span class="nc" id="L1090">        Identifier ident = null;</span>
-<span class="nc bnc" id="L1091" title="All 2 branches missed.">        if (r instanceof Patient p) {</span>
+<span class="fc" id="L1095">        Identifier ident = null;</span>
+<span class="fc bfc" id="L1096" title="All 2 branches covered.">        if (r instanceof Patient p) {</span>
             // Immunization messages must have at least ONE patient identifier.
-<span class="nc" id="L1093">            ident = p.getIdentifierFirstRep();</span>
-<span class="nc bnc" id="L1094" title="All 2 branches missed.">        } else if (r instanceof Immunization iz) {</span>
-<span class="nc" id="L1095">            ident = iz.getIdentifierFirstRep();</span>
-<span class="nc bnc" id="L1096" title="All 2 branches missed.">        } else if (r instanceof ImmunizationRecommendation izr) {</span>
-<span class="nc" id="L1097">            ident = izr.getIdentifierFirstRep();</span>
+<span class="fc" id="L1098">            ident = p.getIdentifierFirstRep();</span>
+<span class="pc bpc" id="L1099" title="1 of 2 branches missed.">        } else if (r instanceof Immunization iz) {</span>
+<span class="nc" id="L1100">            ident = iz.getIdentifierFirstRep();</span>
+<span class="pc bpc" id="L1101" title="1 of 2 branches missed.">        } else if (r instanceof ImmunizationRecommendation izr) {</span>
+<span class="nc" id="L1102">            ident = izr.getIdentifierFirstRep();</span>
         }
-<span class="nc" id="L1099">        return ident;</span>
+<span class="fc" id="L1104">        return ident;</span>
     }
 
     private void setWsaHeaders(SubmitSingleMessageRequest request, QBP_Q11 qbp) {
         // Set a message ID for the message we are crafting.
-<span class="nc" id="L1104">        WsaHeaders headers = request.getWsaHeaders();</span>
-<span class="nc" id="L1105">        headers.setMessageID(qbp.getMSH().getMessageControlID().getValue());</span>
-<span class="nc" id="L1106">        headers.setAction(&quot;urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest&quot;);</span>
-<span class="nc" id="L1107">        headers.setTo(&quot;http://www.w3.org/2005/08/addressing/anonymous&quot;);</span>
-<span class="nc" id="L1108">    }</span>
+<span class="fc" id="L1109">        WsaHeaders headers = request.getWsaHeaders();</span>
+<span class="fc" id="L1110">        headers.setMessageID(qbp.getMSH().getMessageControlID().getValue());</span>
+<span class="fc" id="L1111">        headers.setAction(&quot;urn:cdc:iisb:hub:2014:IISHubPortType:SubmitSingleMessageRequest&quot;);</span>
+<span class="fc" id="L1112">        headers.setTo(&quot;http://www.w3.org/2005/08/addressing/anonymous&quot;);</span>
+<span class="fc" id="L1113">    }</span>
 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity&lt;OperationOutcome&gt; handleException(HttpServletRequest req, IllegalArgumentException iex) {
-<span class="nc" id="L1112">        OperationOutcome oo = new OperationOutcome();</span>
-<span class="nc" id="L1113">        oo.addIssue()</span>
-<span class="nc" id="L1114">            .setCode(IssueType.INVALID)</span>
-<span class="nc" id="L1115">            .setSeverity(IssueSeverity.ERROR)</span>
-<span class="nc" id="L1116">            .addExpression(null)</span>
-<span class="nc" id="L1117">            .setDiagnostics(iex.getMessage());</span>
+<span class="nc" id="L1117">        OperationOutcome oo = new OperationOutcome();</span>
+<span class="nc" id="L1118">        oo.addIssue()</span>
+<span class="nc" id="L1119">            .setCode(IssueType.INVALID)</span>
+<span class="nc" id="L1120">            .setSeverity(IssueSeverity.ERROR)</span>
+<span class="nc" id="L1121">            .addExpression(null)</span>
+<span class="nc" id="L1122">            .setDiagnostics(iex.getMessage());</span>
         
-<span class="nc" id="L1119">        return new ResponseEntity&lt;&gt;(oo, ContentUtils.getHeaders(req), HttpStatus.BAD_REQUEST);</span>
+<span class="nc" id="L1124">        return new ResponseEntity&lt;&gt;(oo, ContentUtils.getHeaders(req), HttpStatus.BAD_REQUEST);</span>
     }
     
     @ExceptionHandler(HL7Exception.class)
     ResponseEntity&lt;OperationOutcome&gt; handleException(HttpServletRequest req, HL7Exception hex) {
-<span class="nc" id="L1124">        OperationOutcome oo = new OperationOutcome();</span>
-<span class="nc" id="L1125">        oo.addIssue()</span>
-<span class="nc" id="L1126">            .setCode(IssueType.INVALID)</span>
-<span class="nc" id="L1127">            .setSeverity(IssueSeverity.FATAL)</span>
-<span class="nc" id="L1128">            .addExpression(null)</span>
-<span class="nc" id="L1129">            .setDiagnostics(hex.getMessage());  </span>
-<span class="nc" id="L1130">        return new ResponseEntity&lt;&gt;(oo, ContentUtils.getHeaders(req), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="nc" id="L1129">        OperationOutcome oo = new OperationOutcome();</span>
+<span class="nc" id="L1130">        oo.addIssue()</span>
+<span class="nc" id="L1131">            .setCode(IssueType.INVALID)</span>
+<span class="nc" id="L1132">            .setSeverity(IssueSeverity.FATAL)</span>
+<span class="nc" id="L1133">            .addExpression(null)</span>
+<span class="nc" id="L1134">            .setDiagnostics(hex.getMessage());  </span>
+<span class="nc" id="L1135">        return new ResponseEntity&lt;&gt;(oo, ContentUtils.getHeaders(req), HttpStatus.INTERNAL_SERVER_ERROR);</span>
     }
 
     @ExceptionHandler(FaultException.class)
     ResponseEntity&lt;OperationOutcome&gt; handleException(HttpServletRequest req, FaultException fex) {
-<span class="nc" id="L1135">        OperationOutcome oo = new OperationOutcome();</span>
-<span class="nc" id="L1136">        FaultMessage fault = fex.getFault();</span>
+<span class="nc" id="L1140">        OperationOutcome oo = new OperationOutcome();</span>
+<span class="nc" id="L1141">        FaultMessage fault = fex.getFault();</span>
 
-<span class="nc" id="L1138">        OperationOutcomeIssueComponent issue = oo.addIssue()</span>
-<span class="nc" id="L1139">            .setCode(IssueType.INVALID)</span>
-<span class="nc" id="L1140">            .setSeverity(IssueSeverity.ERROR)</span>
-<span class="nc" id="L1141">            .setDiagnostics(fault.getDiagnostics());</span>
-<span class="nc bnc" id="L1142" title="All 2 branches missed.">        if (fault.getFault() instanceof UnexpectedExceptionFault uex) {</span>
-<span class="nc" id="L1143">            issue.setDetails(</span>
+<span class="nc" id="L1143">        OperationOutcomeIssueComponent issue = oo.addIssue()</span>
+<span class="nc" id="L1144">            .setCode(IssueType.INVALID)</span>
+<span class="nc" id="L1145">            .setSeverity(IssueSeverity.ERROR)</span>
+<span class="nc" id="L1146">            .setDiagnostics(fault.getDiagnostics());</span>
+<span class="nc bnc" id="L1147" title="All 2 branches missed.">        if (fault.getFault() instanceof UnexpectedExceptionFault uex) {</span>
+<span class="nc" id="L1148">            issue.setDetails(</span>
                 new CodeableConcept()
-<span class="nc" id="L1145">                    .setText(uex.getDiagnostics())</span>
-<span class="nc" id="L1146">                    .addCoding(new Coding(fault.getSchema() + &quot;:Fault&quot;, fault.getFaultName(), null)</span>
+<span class="nc" id="L1150">                    .setText(uex.getDiagnostics())</span>
+<span class="nc" id="L1151">                    .addCoding(new Coding(fault.getSchema() + &quot;:Fault&quot;, fault.getFaultName(), null)</span>
                 )
             );
         } else {
-<span class="nc" id="L1150">            issue.setDetails(</span>
+<span class="nc" id="L1155">            issue.setDetails(</span>
                 new CodeableConcept()
-<span class="nc" id="L1152">                    .setText(fex.getMessage())</span>
-<span class="nc" id="L1153">                    .addCoding(new Coding(fault.getSchema() + &quot;:Fault:&quot; + fault.getFaultName(), fault.getCode(), null)</span>
+<span class="nc" id="L1157">                    .setText(fex.getMessage())</span>
+<span class="nc" id="L1158">                    .addCoding(new Coding(fault.getSchema() + &quot;:Fault:&quot; + fault.getFaultName(), fault.getCode(), null)</span>
                 )
             );
         }
         
-<span class="nc bnc" id="L1158" title="All 2 branches missed.">        if (fault.getFault() instanceof HasDestinationUri huri) {</span>
-<span class="nc" id="L1159">            issue.addExpression(huri.getDestinationUri());</span>
+<span class="nc bnc" id="L1163" title="All 2 branches missed.">        if (fault.getFault() instanceof HasDestinationUri huri) {</span>
+<span class="nc" id="L1164">            issue.addExpression(huri.getDestinationUri());</span>
         }
         
         // Set the retry coding value
-<span class="nc" id="L1163">        RetryStrategy retry = setRetryCoding(issue, fex.getRetryCoding());</span>
+<span class="nc" id="L1168">        RetryStrategy retry = setRetryCoding(issue, fex.getRetryCoding());</span>
         
         // Set event identifier
-<span class="nc" id="L1166">        fex.setEventId(issue);</span>
+<span class="nc" id="L1171">        fex.setEventId(issue);</span>
         // Give them the Original text of the fault if it is present.
-<span class="nc" id="L1168">        fex.setOriginalText(issue);</span>
+<span class="nc" id="L1173">        fex.setOriginalText(issue);</span>
         
-<span class="nc bnc" id="L1170" title="All 2 branches missed.">        return new ResponseEntity&lt;&gt;(oo, ContentUtils.getHeaders(req), retry != null ? retry.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="nc bnc" id="L1175" title="All 2 branches missed.">        return new ResponseEntity&lt;&gt;(oo, ContentUtils.getHeaders(req), retry != null ? retry.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR);</span>
     }
 
     @ExceptionHandler(UnexpectedException.class)
     ResponseEntity&lt;OperationOutcome&gt; handleException(HttpServletRequest req, UnexpectedException uex) {
-<span class="nc" id="L1175">        OperationOutcome oo = new OperationOutcome();</span>
-<span class="nc" id="L1176">        Class&lt;? extends Throwable&gt; throwable = uex.getCause().getClass();</span>
-<span class="nc" id="L1177">        String system = &quot;urn:java:package:&quot; + throwable.getPackageName();</span>
-<span class="nc" id="L1178">        String code = throwable.getSimpleName(); </span>
-<span class="nc" id="L1179">        OperationOutcomeIssueComponent issue = oo.addIssue()</span>
-<span class="nc" id="L1180">            .setCode(IssueType.EXCEPTION)</span>
-<span class="nc" id="L1181">            .setSeverity(IssueSeverity.FATAL)</span>
-<span class="nc" id="L1182">            .setDetails(new CodeableConcept()</span>
-<span class="nc" id="L1183">                .addCoding(new Coding(system, code, null))</span>
-<span class="nc" id="L1184">            ).setDiagnostics(uex.getCause().getMessage());</span>
-<span class="nc" id="L1185">        setRetryCoding(issue, RetryStrategy.CONTACT_SUPPORT);</span>
-<span class="nc" id="L1186">        return new ResponseEntity&lt;&gt;(oo, HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="nc" id="L1180">        OperationOutcome oo = new OperationOutcome();</span>
+<span class="nc" id="L1181">        Class&lt;? extends Throwable&gt; throwable = uex.getCause().getClass();</span>
+<span class="nc" id="L1182">        String system = &quot;urn:java:package:&quot; + throwable.getPackageName();</span>
+<span class="nc" id="L1183">        String code = throwable.getSimpleName(); </span>
+<span class="nc" id="L1184">        OperationOutcomeIssueComponent issue = oo.addIssue()</span>
+<span class="nc" id="L1185">            .setCode(IssueType.EXCEPTION)</span>
+<span class="nc" id="L1186">            .setSeverity(IssueSeverity.FATAL)</span>
+<span class="nc" id="L1187">            .setDetails(new CodeableConcept()</span>
+<span class="nc" id="L1188">                .addCoding(new Coding(system, code, null))</span>
+<span class="nc" id="L1189">            ).setDiagnostics(uex.getCause().getMessage());</span>
+<span class="nc" id="L1190">        setRetryCoding(issue, RetryStrategy.CONTACT_SUPPORT);</span>
+<span class="nc" id="L1191">        return new ResponseEntity&lt;&gt;(oo, ContentUtils.getHeaders(req), HttpStatus.INTERNAL_SERVER_ERROR);</span>
     }
     
     private static RetryStrategy setRetryCoding(OperationOutcomeIssueComponent issue, RetryStrategy retry) {
-<span class="nc bnc" id="L1190" title="All 2 branches missed.">        if (retry == null) {</span>
-<span class="nc" id="L1191">            return null;</span>
+<span class="nc bnc" id="L1195" title="All 2 branches missed.">        if (retry == null) {</span>
+<span class="nc" id="L1196">            return null;</span>
         }
-<span class="nc" id="L1193">        String[] parts = retry.toString().split(&quot;: &quot;);</span>
-<span class="nc" id="L1194">        Coding retryCode = new Coding(SoapMessage.HUB_NS + &quot;:Fault:Retry&quot;, parts[0], parts[1]);</span>
-<span class="nc" id="L1195">        issue.getDetails().addCoding(retryCode);</span>
-<span class="nc" id="L1196">        return retry;</span>
+<span class="nc" id="L1198">        String[] parts = retry.toString().split(&quot;: &quot;);</span>
+<span class="nc" id="L1199">        Coding retryCode = new Coding(SoapMessage.HUB_NS + &quot;:Fault:Retry&quot;, parts[0], parts[1]);</span>
+<span class="nc" id="L1200">        issue.getDetails().addCoding(retryCode);</span>
+<span class="nc" id="L1201">        return retry;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
