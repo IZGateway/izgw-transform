@@ -157,7 +157,41 @@ query to the IIS. Results are scored by match quality and returned as a `Bundle`
 Responses:
 - `200 OK` — Bundle of matched Patient resources with match scores
 - `400 Bad Request` — body is `OperationOutcome` describing invalid input
+- `422 Unprocessable Entity` — too many matches / no certain match (see below)
 - `500 Internal Server Error` — unexpected failure
+
+#### Too many matches (no certain match)
+
+When the IIS reports "too much data found" (a Z33 response with query status
+`TM` in QAK-2) and returns no patient records, `$match` does **not** return a
+Bundle. Instead it returns HTTP `422 Unprocessable Entity` with a top-level
+`OperationOutcome`:
+
+```json
+{
+  "resourceType": "OperationOutcome",
+  "issue": [{
+    "severity": "warning",
+    "code": "multiple-matches",
+    "details": {
+      "coding": [{ "system": "http://terminology.hl7.org/CodeSystem/v2-0208", "code": "TM" }],
+      "text": "The matching operation found one or more possible matches, but did not find a certain match."
+    }
+  }]
+}
+```
+
+This is the FHIR-sanctioned shape for an unsuccessful `$match` (particularly with
+`onlyCertainMatches: true`): the operation cannot produce a certain match, and the
+caller should refine the search demographics. The `details.text` phrase
+`did not find a certain match` is matched literally by DIBBs Query Connector to
+display its "No Certain Match Found" message and must not be reworded. The v2
+table 0208 `TM` coding is retained in `details.coding` for provenance.
+
+A true no-match (query status `NF`, no data found) still returns a `200 OK`
+`searchset` Bundle with zero `Patient` entries, so consumers can distinguish
+"no records" from "too many matches — refine the search". Search and read
+endpoints are unaffected; this shape applies to `$match` only.
 
 ---
 

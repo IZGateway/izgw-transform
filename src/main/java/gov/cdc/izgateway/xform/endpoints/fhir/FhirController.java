@@ -159,6 +159,16 @@ public class FhirController {
     private static final String FHIR_JSON = "application/fhir+json";
     /** Fixed publication date so the (static) CapabilityStatement is deterministic across requests. */
     private static final Date CAPABILITY_STATEMENT_DATE = Date.from(Instant.parse("2026-07-30T00:00:00Z"));
+    /** FHIR code system URI for HL7 v2 table 0208 (query response status). */
+    private static final String V2_QUERY_STATUS_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0208";
+    /** Table 0208 code an IIS reports when a query matches more records than its limit. */
+    private static final String TOO_MUCH_DATA_FOUND = "TM";
+    /**
+     * The substring "did not find a certain match" is matched literally by DIBBs Query
+     * Connector to show its "No Certain Match Found" message — do not reword it.
+     */
+    private static final String NO_CERTAIN_MATCH_TEXT =
+        "The matching operation found one or more possible matches, but did not find a certain match.";
 
     /**
      * Configuration of the V2toFHIR Conversion
@@ -349,7 +359,7 @@ public class FhirController {
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
     	String summary = req.getParameter("_summary");
     	if (Arrays.asList("summary", "count").contains(summary)) {
-    		return connectionTest();
+    		return connectionTest(req);
     	}
         return processQuery(req, destinationId);
     }
@@ -451,14 +461,15 @@ public class FhirController {
     /**
      * This exists to allow query connector to validate authentication
      * parameters when connecting via /Patients?_summary=count&_count=1
+     * @param req	The request, used to negotiate the response content type.
      * @return	A SearchSet Bundle reporting 100 patients available.
      */
-    private ResponseEntity<Bundle> connectionTest() {
+    private ResponseEntity<Bundle> connectionTest(HttpServletRequest req) {
 		Bundle b = new Bundle();
 		b.setId(new IdType(b.fhirType() + "/" + ULID.random()));
 		b.setType(BundleType.SEARCHSET);
 		b.setTotal(100);
-		return new ResponseEntity<>(b, HttpStatus.OK);
+		return new ResponseEntity<>(b, ContentUtils.getHeaders(req), HttpStatus.OK);
     }
 
     /**
@@ -527,7 +538,7 @@ public class FhirController {
         try {
             decodedId = FhirIdCodec.decode(id);
         } catch (IllegalFormatCodePointException ex) {
-            return notFound(id);
+            return notFound(req, id);
         }
         String resourceType = StringUtils.substringBetween(req.getRequestURI(), destinationId + "/", "/" + id); 
         
@@ -535,7 +546,7 @@ public class FhirController {
         boolean isPatient = PATIENT.equals(resourceType); 
         int index = isPatient ? 0 : 2;
         if (idParts.length < index + 2) {
-            return notFound(id);
+            return notFound(req, id);
         }
         Identifier ident = new Identifier().setSystem(idParts[index]).setValue(idParts[index + 1]);
         
@@ -545,7 +556,7 @@ public class FhirController {
         Bundle b = res.getBody();
         if (b == null) {
             // Technically this is an error.
-            return notFound(id);
+            return notFound(req, id);
         }
         Resource resource = b.getEntry().stream()
             .map(e -> e.getResource())
@@ -554,7 +565,7 @@ public class FhirController {
             .orElse(null);
         
         if (resource == null) {
-            return notFound(id);
+            return notFound(req, id);
         }
         return new ResponseEntity<>(resource, res.getHeaders(), HttpStatus.OK);
     }
@@ -566,7 +577,8 @@ public class FhirController {
 	 * @param destinationId    The identifier of the destination IIS
 	 * @param body    The operation parameters, as a Parameters resource, or a Patient resource
 	 * @param req    The HttpServletRequest so we can process parameters.
-	 * @return    A bundle of Patient Resources
+	 * @return    A bundle of Patient Resources, or a top-level OperationOutcome (HTTP 422)
+	 * when the IIS reports more matches than its record limit and no certain match exists
 	 * @throws FaultException    When a fault occurs.
 	 * @throws HL7Exception    When an HL7 Message exception occurs
 	 * @throws UnexpectedException When some other exception occurs
@@ -587,11 +599,21 @@ public class FhirController {
 	    content = {@Content}
 	)
 	@ApiResponse(
+	    responseCode = "422",
+	    description = "The matching operation found possible matches but no certain match"
+	        + " (IIS reported too much data found); the body is a top-level OperationOutcome",
+	    content = {
+	        @Content(mediaType = "application/fhir+json"),
+	        @Content(mediaType = "application/fhir+xml"),
+	        @Content(mediaType = "application/fhir+yaml")
+	    }
+	)
+	@ApiResponse(
 	    responseCode = "500",
 	    description = "An internal error occured while processing the request",
 	    content = {@Content}
 	)
-	@RequestMapping(value= "/{destinationId}/Patient/$match", 
+	@RequestMapping(value= "/{destinationId}/Patient/$match",
 	    method = { 
 	        RequestMethod.POST,    // Typical web based query 
 	        RequestMethod.HEAD    // Used with SMART and other auth mechanisms.
@@ -637,16 +659,16 @@ public class FhirController {
                 if (param != null) { 
                 	match.setCount(((IntegerType)param.getValue()).getValue());
                     if (match.getCount() < 1 || match.getCount() > 10) {
-                        return illegalArguments(message);
+                        return illegalArguments(req, message);
                     }
                 }
             } catch (ClassCastException ex) {
-                return illegalArguments(message);
+                return illegalArguments(req, message);
             }
         } else if (PATIENT.equals(body.fhirType())) {
             match.setSearchPatient((Patient) body);
         } else {
-            return illegalArguments("Body invalid, expected Patient or Parameters");
+            return illegalArguments(req, "Body invalid, expected Patient or Parameters");
         }
         
         
@@ -656,12 +678,70 @@ public class FhirController {
         setParameters(wrapper, match.getSearchPatient());
         
         Bundle b = this.processQuery(wrapper, destinationId).getBody();
-        
+
+        OperationOutcomeIssueComponent tooMany = findTooManyMatchesIssue(b);
+        if (tooMany != null) {
+            return new ResponseEntity<>(noCertainMatchOutcome(tooMany),
+                ContentUtils.getHeaders(req), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
         IDIMatch.score(b, match);
-        
-        return new ResponseEntity<>(b, HttpStatus.OK);
+
+        // Negotiate the response Content-Type from the original request (the wrapper's
+        // parameters were reset above, which would hide a _format parameter). Setting
+        // it explicitly bypasses the global SOAP-oriented content negotiation, which
+        // ignores the Accept header and defaults to XML.
+        return new ResponseEntity<>(b, ContentUtils.getHeaders(req), HttpStatus.OK);
     }
     
+    /**
+     * Detect the "too much data found" $match outcome: the converted response contains
+     * no Patient resources and carries the HL7 table 0208 {@code TM} query status.
+     * Ambiguous responses (patients present, missing details, other status codes) do
+     * not match, falling through to the normal Bundle response.
+     *
+     * @param b    The converted response bundle
+     * @return    The query-status issue carrying the TM coding, or null when this is
+     * not the too-many-matches outcome
+     */
+    static OperationOutcomeIssueComponent findTooManyMatchesIssue(Bundle b) {
+        if (b == null || b.getEntry().stream().anyMatch(e -> e.getResource() instanceof Patient)) {
+            return null;
+        }
+        return b.getEntry().stream()
+            .map(BundleEntryComponent::getResource)
+            .filter(OperationOutcome.class::isInstance)
+            .map(OperationOutcome.class::cast)
+            .flatMap(oo -> oo.getIssue().stream())
+            .filter(issue -> issue.getDetails().getCoding().stream().anyMatch(FhirController::isTooManyCoding))
+            .findFirst()
+            .orElse(null);
+    }
+
+    private static boolean isTooManyCoding(Coding coding) {
+        return V2_QUERY_STATUS_SYSTEM.equals(coding.getSystem())
+            && TOO_MUCH_DATA_FOUND.equalsIgnoreCase(coding.getCode());
+    }
+
+    /**
+     * Build the top-level OperationOutcome returned for the too-many-matches $match
+     * outcome. The details text carries the phrase DIBBs Query Connector matches on;
+     * the source query-status codings are retained for provenance.
+     *
+     * @param source    The detected TM query-status issue
+     * @return    The response OperationOutcome
+     */
+    static OperationOutcome noCertainMatchOutcome(OperationOutcomeIssueComponent source) {
+        OperationOutcome oo = new OperationOutcome();
+        CodeableConcept details = new CodeableConcept().setText(NO_CERTAIN_MATCH_TEXT);
+        source.getDetails().getCoding().forEach(coding -> details.addCoding(coding.copy()));
+        oo.addIssue()
+            .setSeverity(IssueSeverity.WARNING)
+            .setCode(IssueType.MULTIPLEMATCHES)
+            .setDetails(details);
+        return oo;
+    }
+
     /**
      * Set the search parameters for the patient using the input searchPatient
      * as an example.
@@ -751,22 +831,22 @@ public class FhirController {
         }
     }
     
-    private ResponseEntity<Resource> notFound(String id) {
+    private ResponseEntity<Resource> notFound(HttpServletRequest req, String id) {
         OperationOutcome oo = new OperationOutcome();
         OperationOutcomeIssueComponent issue = oo.addIssue();
         issue.setCode(IssueType.NOTFOUND);
         issue.setSeverity(IssueSeverity.ERROR);
         issue.setDiagnostics("Resource not found " + id);
-        return new ResponseEntity<>(oo, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.NOT_FOUND);
     }
-    
-    private ResponseEntity<Resource> illegalArguments(String message) {
+
+    private ResponseEntity<Resource> illegalArguments(HttpServletRequest req, String message) {
         OperationOutcome oo = new OperationOutcome();
         OperationOutcomeIssueComponent issue = oo.addIssue();
         issue.setCode(IssueType.INVALID);
         issue.setSeverity(IssueSeverity.ERROR);
         issue.setDiagnostics(message);
-        return new ResponseEntity<>(oo, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.BAD_REQUEST);
     }
     
     /**
@@ -1287,7 +1367,7 @@ public class FhirController {
                 .addCoding(new Coding(system, code, null))
             ).setDiagnostics(uex.getCause().getMessage());
         setRetryCoding(issue, RetryStrategy.CONTACT_SUPPORT);
-        return new ResponseEntity<>(oo, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
     private static RetryStrategy setRetryCoding(OperationOutcomeIssueComponent issue, RetryStrategy retry) {

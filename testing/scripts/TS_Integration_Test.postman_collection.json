@@ -1,10 +1,10 @@
 {
   "info": {
-    "_postman_id": "5766507e-c769-444f-bfb6-fe8be41683de",
+    "_postman_id": "bbb59221-68c6-48c0-a78d-a632cab945a2",
     "name": "TS Integration Test",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "2729094",
-    "_collection_link": "https://go.postman.co/collection/2729094-5766507e-c769-444f-bfb6-fe8be41683de?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/2729094-bbb59221-68c6-48c0-a78d-a632cab945a2?source=collection_link"
   },
   "item": [
     {
@@ -1372,6 +1372,420 @@
                     "fhir",
                     "dev",
                     "metadata"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_10a FHIR Patient $match (found)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "",
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test(\"resourceType is Bundle\", function () {",
+                      "    pm.expect(jsonData.resourceType).to.eql(\"Bundle\");",
+                      "});",
+                      "",
+                      "// Collect all Patient resource entries",
+                      "const patientEntries = (jsonData.entry || []).filter(function (e) {",
+                      "    return e.resource && e.resource.resourceType === \"Patient\";",
+                      "});",
+                      "",
+                      "pm.test(\"entry includes exactly 1 Patient resource entry\", function () {",
+                      "    pm.expect(patientEntries).to.have.lengthOf(1);",
+                      "});",
+                      "",
+                      "pm.test(\"Patient name has family = fhirPatientFamily\", function () {",
+                      "    const patient = patientEntries[0].resource;",
+                      "    const expectedFamily = pm.variables.get(\"fhirPatientFamily\");",
+                      "    const hasFamily = (patient.name || []).some(function (n) {",
+                      "        return n.family === expectedFamily;",
+                      "    });",
+                      "    pm.expect(hasFamily, \"Expected a name with family = \" + expectedFamily).to.be.true;",
+                      "});",
+                      "",
+                      "pm.test(\"Patient name given contains fhirPatientGiven\", function () {",
+                      "    const patient = patientEntries[0].resource;",
+                      "    const expectedGiven = pm.variables.get(\"fhirPatientGiven\");",
+                      "    const hasGiven = (patient.name || []).some(function (n) {",
+                      "        return Array.isArray(n.given) && n.given.indexOf(expectedGiven) !== -1;",
+                      "    });",
+                      "    pm.expect(hasGiven, \"Expected a name whose given contains \" + expectedGiven).to.be.true;",
+                      "});",
+                      "",
+                      "pm.test(\"Patient birthDate matches fhirPatientDOB\", function () {",
+                      "    const patient = patientEntries[0].resource;",
+                      "    const expectedDOB = pm.variables.get(\"fhirPatientDOB\");",
+                      "    pm.expect(patient.birthDate).to.eql(expectedDOB);",
+                      "});",
+                      "",
+                      "pm.test(\"Patient entry has search.mode = match\", function () {",
+                      "    pm.expect(patientEntries[0].search.mode).to.eql(\"match\");",
+                      "});",
+                      "",
+                      "pm.test(\"Content-Type is FHIR JSON\", function () {",
+                      "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/fhir+json\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disabledSystemHeaders": {
+                  "content-type": true
+                }
+              },
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"resourceType\": \"Parameters\",\n    \"parameter\": [\n        {\n            \"name\": \"resource\",\n            \"resource\": {\n                \"resourceType\": \"Patient\",\n                \"name\": [\n                    {\n                        \"given\": [\n                            \"{{fhirPatientGiven}}\"\n                        ],\n                        \"family\": \"{{fhirPatientFamily}}\"\n                    }\n                ],\n                \"birthDate\": \"{{fhirPatientDOB}}\",\n                \"address\": []\n            }\n        }\n    ]\n}"
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Patient/$match",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Patient",
+                    "$match"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_10b FHIR Patient $match (not found)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "",
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test(\"resourceType is Bundle\", function () {",
+                      "    pm.expect(jsonData.resourceType).to.eql(\"Bundle\");",
+                      "});",
+                      "",
+                      "const entries = jsonData.entry || [];",
+                      "",
+                      "// There should be no Patient resource in the entries",
+                      "const patientEntries = entries.filter(function (e) {",
+                      "    return e.resource && e.resource.resourceType === \"Patient\";",
+                      "});",
+                      "",
+                      "pm.test(\"No Patient resource in entry\", function () {",
+                      "    pm.expect(patientEntries).to.have.lengthOf(0);",
+                      "});",
+                      "",
+                      "// There should be one or more OperationOutcome entries",
+                      "const operationOutcomeEntries = entries.filter(function (e) {",
+                      "    return e.resource && e.resource.resourceType === \"OperationOutcome\";",
+                      "});",
+                      "",
+                      "pm.test(\"entry includes 1 or more OperationOutcome entries\", function () {",
+                      "    pm.expect(operationOutcomeEntries.length).to.be.at.least(1);",
+                      "});",
+                      "",
+                      "// At least one OperationOutcome should have an issue with details.coding.code = NF (Not Found)",
+                      "pm.test(\"An OperationOutcome has issue with details.coding.code = NF\", function () {",
+                      "    const hasNF = operationOutcomeEntries.some(function (e) {",
+                      "        return (e.resource.issue || []).some(function (issue) {",
+                      "            return ((issue.details && issue.details.coding) || []).some(function (coding) {",
+                      "                return coding.code === \"NF\";",
+                      "            });",
+                      "        });",
+                      "    });",
+                      "    pm.expect(hasNF, \"Expected an OperationOutcome issue with details.coding.code = NF\").to.be.true;",
+                      "});",
+                      "",
+                      "pm.test(\"Content-Type is FHIR JSON\", function () {",
+                      "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/fhir+json\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disabledSystemHeaders": {
+                  "content-type": true
+                }
+              },
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"resourceType\": \"Parameters\",\n    \"parameter\": [\n        {\n            \"name\": \"resource\",\n            \"resource\": {\n                \"resourceType\": \"Patient\",\n                \"name\": [\n                    {\n                        \"given\": [\n                            \"{{fhirNoDataPatientGiven}}\"\n                        ],\n                        \"family\": \"{{fhirNoDataPatientFamily}}\"\n                    }\n                ],\n                \"birthDate\": \"{{fhirNoDataPatientDOB}}\",\n                \"address\": []\n            }\n        }\n    ]\n}"
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Patient/$match",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Patient",
+                    "$match"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_10c FHIR Patient $match (XML Response)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "// Response is FHIR XML, so parse it with xml2Json",
+                      "const xmlBody = pm.response.text();",
+                      "const parsed = xml2Json(xmlBody);",
+                      "",
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test(\"Root element is Bundle\", function () {",
+                      "    pm.expect(parsed).to.have.property(\"Bundle\");",
+                      "});",
+                      "",
+                      "// Helper: always return an array for elements that may appear 0, 1, or many times",
+                      "function toArray(v) {",
+                      "    if (v === undefined || v === null) return [];",
+                      "    return Array.isArray(v) ? v : [v];",
+                      "}",
+                      "",
+                      "// Helper: read the FHIR \"value\" attribute off an element (xml2Json puts attributes under $)",
+                      "function attrValue(el) {",
+                      "    if (!el) return undefined;",
+                      "    return el.$ ? el.$.value : undefined;",
+                      "}",
+                      "",
+                      "const bundle = parsed.Bundle || {};",
+                      "const entries = toArray(bundle.entry);",
+                      "",
+                      "// Collect all Patient resources across the entries",
+                      "const patients = entries",
+                      "    .map(function (e) { return e.resource && e.resource.Patient; })",
+                      "    .filter(function (p) { return !!p; });",
+                      "",
+                      "pm.test(\"entry includes exactly 1 Patient resource entry\", function () {",
+                      "    pm.expect(patients).to.have.lengthOf(1);",
+                      "});",
+                      "",
+                      "pm.test(\"Patient name has family = fhirPatientFamily\", function () {",
+                      "    const patient = patients[0];",
+                      "    const expectedFamily = pm.variables.get(\"fhirPatientFamily\");",
+                      "    const names = toArray(patient.name);",
+                      "    const hasFamily = names.some(function (n) {",
+                      "        return attrValue(n.family) === expectedFamily;",
+                      "    });",
+                      "    pm.expect(hasFamily, \"Expected a name with family = \" + expectedFamily).to.be.true;",
+                      "});",
+                      "",
+                      "pm.test(\"Patient name given contains fhirPatientGiven\", function () {",
+                      "    const patient = patients[0];",
+                      "    const expectedGiven = pm.variables.get(\"fhirPatientGiven\");",
+                      "    const names = toArray(patient.name);",
+                      "    const hasGiven = names.some(function (n) {",
+                      "        return toArray(n.given).some(function (g) {",
+                      "            return attrValue(g) === expectedGiven;",
+                      "        });",
+                      "    });",
+                      "    pm.expect(hasGiven, \"Expected a name whose given contains \" + expectedGiven).to.be.true;",
+                      "});",
+                      "",
+                      "pm.test(\"Patient birthDate matches fhirPatientDOB\", function () {",
+                      "    const patient = patients[0];",
+                      "    const expectedDOB = pm.variables.get(\"fhirPatientDOB\");",
+                      "    pm.expect(attrValue(patient.birthDate)).to.eql(expectedDOB);",
+                      "});",
+                      "",
+                      "pm.test(\"Patient entry has search.mode = match\", function () {",
+                      "    const patientEntry = entries.filter(function (e) {",
+                      "        return e.resource && e.resource.Patient;",
+                      "    })[0];",
+                      "    pm.expect(attrValue(patientEntry.search && patientEntry.search.mode)).to.eql(\"match\");",
+                      "});",
+                      "",
+                      "pm.test(\"Content-Type is FHIR XML\", function () {",
+                      "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/fhir+xml\");",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disabledSystemHeaders": {
+                  "content-type": true,
+                  "accept": true
+                }
+              },
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/xml",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/xml",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "<Parameters xmlns='http://hl7.org/fhir'>\n  <parameter>\n    <name value='resource'/>\n    <resource>\n      <Patient>\n        <name>\n          <family value='{{fhirPatientFamily}}'/>\n          <given value='{{fhirPatientGiven}}'/>\n        </name>\n        <birthDate value='{{fhirPatientDOB}}'/>\n        <address/>\n      </Patient>\n    </resource>\n  </parameter>\n</Parameters>"
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Patient/$match",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Patient",
+                    "$match"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_10d FHIR Patient $match (too many)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "",
+                      "pm.test(\"Status code is 422\", function () {",
+                      "    pm.response.to.have.status(422);",
+                      "});",
+                      "",
+                      "pm.test(\"resourceType is OperationOutcome\", function () {",
+                      "    pm.expect(jsonData.resourceType).to.eql(\"OperationOutcome\");",
+                      "});",
+                      "",
+                      "const issues = jsonData.issue || [];",
+                      "",
+                      "pm.test(\"An issue details.text contains 'did not find a certain match'\", function () {",
+                      "    const hasText = issues.some(function (i) {",
+                      "        return i.details && typeof i.details.text === \"string\" &&",
+                      "            i.details.text.indexOf(\"did not find a certain match\") !== -1;",
+                      "    });",
+                      "    pm.expect(hasText, \"Expected an issue with details.text containing 'did not find a certain match'\").to.be.true;",
+                      "});",
+                      "",
+                      "pm.test(\"An issue details.coding has v2-0208 TM code\", function () {",
+                      "    const hasTM = issues.some(function (i) {",
+                      "        const codings = (i.details && Array.isArray(i.details.coding)) ? i.details.coding : [];",
+                      "        return codings.some(function (c) {",
+                      "            return c.code === \"TM\" &&",
+                      "                typeof c.system === \"string\" &&",
+                      "                c.system.indexOf(\"v2-0208\") !== -1;",
+                      "        });",
+                      "    });",
+                      "    pm.expect(hasTM, \"Expected an issue with details.coding containing code 'TM' from a v2-0208 system\").to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disabledSystemHeaders": {
+                  "content-type": true
+                }
+              },
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"resourceType\": \"Parameters\",\n    \"parameter\": [\n        {\n            \"name\": \"resource\",\n            \"resource\": {\n                \"resourceType\": \"Patient\",\n                \"name\": [\n                    {\n                        \"given\": [\n                            \"{{fhirTooManyPatientGiven}}\"\n                        ],\n                        \"family\": \"{{fhirTooManyPatientFamily}}\"\n                    }\n                ],\n                \"birthDate\": \"{{fhirTooManyPatientDOB}}\",\n                \"address\": [\n                    {\n                        \"line\": [\n                            \"{{fhirTooManyPatientAddressLine}}\"\n                        ],\n                        \"city\": \"{{fhirTooManyPatientAddressCity}}\",\n                        \"state\": \"{{fhirTooManyPatientAddressState}}\",\n                        \"postalCode\": \"{{fhirTooManyPatientAddressZip}}\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Patient/$match",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Patient",
+                    "$match"
                   ]
                 }
               },
@@ -28882,6 +29296,15 @@
           "pm.collectionVariables.set(\"fhirNoDataPatientFamily\", \"NofamilyAIRA\");",
           "pm.collectionVariables.set(\"fhirNoDataPatientDOB\", \"1900-01-01\");",
           "",
+          "// FHIR \"Too Many\" Test",
+          "pm.collectionVariables.set(\"fhirTooManyPatientGiven\", \"R\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientFamily\", \"FagenAIRA\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientDOB\", \"2021-01-02\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressLine\", \"1416 Betekende Cir\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressCity\", \"Fargo\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressState\", \"ND\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressZip\", \"58103\");",
+          "",
           "var tooLarge = goodResponse.replace('&|', \"&amp;|\");",
           "var last;",
           "var maxLength = 65536;",
@@ -30233,6 +30656,34 @@
     },
     {
       "key": "fakePatientResource",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientGiven",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientFamily",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientDOB",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressLine",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressCity",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressState",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressZip",
       "value": ""
     }
   ]
