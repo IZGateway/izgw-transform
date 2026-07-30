@@ -537,7 +537,7 @@ class FhirControllerTests {
 
     @Test
     void metadataReturnsCapabilityStatement() {
-        ResponseEntity<CapabilityStatement> response = newController().metadata("dev");
+        ResponseEntity<CapabilityStatement> response = newController().metadata("dev", metadataRequest());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         CapabilityStatement cs = response.getBody();
@@ -547,7 +547,7 @@ class FhirControllerTests {
 
     @Test
     void metadataDeclaresFhirVersionAndJsonFormat() {
-        CapabilityStatement cs = newController().metadata("dev").getBody();
+        CapabilityStatement cs = newController().metadata("dev", metadataRequest()).getBody();
 
         assertNotNull(cs);
         assertEquals(Enumerations.FHIRVersion._4_0_1, cs.getFhirVersion());
@@ -559,7 +559,7 @@ class FhirControllerTests {
 
     @Test
     void metadataAdvertisesSearchableResources() {
-        CapabilityStatement cs = newController().metadata("dev").getBody();
+        CapabilityStatement cs = newController().metadata("dev", metadataRequest()).getBody();
 
         assertNotNull(cs);
         assertEquals(1, cs.getRest().size());
@@ -580,7 +580,7 @@ class FhirControllerTests {
 
     @Test
     void metadataAdvertisesPatientMatchOperation() {
-        CapabilityStatement cs = newController().metadata("dev").getBody();
+        CapabilityStatement cs = newController().metadata("dev", metadataRequest()).getBody();
 
         assertNotNull(cs);
         CapabilityStatement.CapabilityStatementRestResourceComponent patient =
@@ -602,8 +602,8 @@ class FhirControllerTests {
     @Test
     void metadataIsDestinationAgnostic() {
         FhirController controller = newController();
-        CapabilityStatement known = controller.metadata("dev").getBody();
-        CapabilityStatement unknown = controller.metadata("some-unknown-destination").getBody();
+        CapabilityStatement known = controller.metadata("dev", metadataRequest()).getBody();
+        CapabilityStatement unknown = controller.metadata("some-unknown-destination", metadataRequest()).getBody();
 
         assertNotNull(known);
         assertNotNull(unknown);
@@ -616,7 +616,7 @@ class FhirControllerTests {
     @Test
     void metadataIsExplicitlyMapped() throws NoSuchMethodException {
         GetMapping mapping = FhirController.class
-            .getMethod("metadata", String.class)
+            .getMethod("metadata", String.class, HttpServletRequest.class)
             .getAnnotation(GetMapping.class);
 
         assertNotNull(mapping);
@@ -627,12 +627,44 @@ class FhirControllerTests {
         );
     }
 
+    @Test
+    void metadataHonorsFhirJsonAccept() {
+        HttpServletRequest req = fhirRequest("/fhir/dev/metadata", ContentUtils.FHIR_PLUS_JSON_VALUE);
+
+        ResponseEntity<CapabilityStatement> res = newController().metadata("dev", req);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_JSON_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void metadataHonorsXmlAccept() {
+        HttpServletRequest req = fhirRequest("/fhir/dev/metadata", "application/xml");
+
+        ResponseEntity<CapabilityStatement> res = newController().metadata("dev", req);
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_XML_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+    }
+
+    @Test
+    void metadataDefaultsToJsonWithoutAccept() {
+        ResponseEntity<CapabilityStatement> res = newController().metadata("dev", metadataRequest());
+
+        assertEquals(HttpStatus.OK, res.getStatusCode());
+        assertEquals(ContentUtils.FHIR_PLUS_JSON_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
+    }
+
     private static FhirController newController() {
         return new FhirController(
             mock(HubController.class),
             new FhirController.FhirConfiguration(),
             mock(AccessControlRegistry.class)
         );
+    }
+
+    private static HttpServletRequest metadataRequest() {
+        return fhirRequest("/fhir/dev/metadata", null);
     }
 
     private static CapabilityStatement.CapabilityStatementRestResourceComponent findResource(

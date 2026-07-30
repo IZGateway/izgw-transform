@@ -217,6 +217,9 @@ public class FhirController {
      *
      * @param destinationId The destination for the FHIR Request. Present for URL consistency with
      * the other FHIR endpoints; it does not affect the returned document.
+     * @param req The HttpServletRequest, used to negotiate the response content type (honoring
+     * {@code Accept}/{@code _format} and defaulting to {@code application/fhir+json}), bypassing
+     * the global SOAP-oriented content negotiation that otherwise ignores Accept and defaults to XML.
      * @return A FHIR R4 {@code CapabilityStatement} describing the resources, interactions and the
      * Patient {@code $match} operation supported by this service.
      */
@@ -244,8 +247,8 @@ public class FhirController {
             "text/xml"
         }
     )
-    public ResponseEntity<CapabilityStatement> metadata(@PathVariable String destinationId) {
-        return new ResponseEntity<>(buildCapabilityStatement(), HttpStatus.OK);
+    public ResponseEntity<CapabilityStatement> metadata(@PathVariable String destinationId, HttpServletRequest req) {
+        return new ResponseEntity<>(buildCapabilityStatement(), ContentUtils.getHeaders(req), HttpStatus.OK);
     }
 
     /**
