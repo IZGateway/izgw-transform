@@ -14,9 +14,9 @@
 
 ## 3. Integration Tests (Postman/Newman)
 
-- [ ] 3.1 Add a `$match` "too many matches" request to `testing/scripts/TS_Integration_Test.postman_collection.json` using demographics known to produce a Z33/TM response from the dev IIS; assert top-level `resourceType` = `OperationOutcome`, `issue[].details.text` contains `did not find a certain match`, `issue[].details.coding` has the v2-0208 `TM` code, and HTTP status 422
-- [ ] 3.2 Verify the existing `$match` found/not-found Postman assertions still pass unchanged (candidate list → 200 searchset Bundle; `NF` no-match → 200 empty Bundle), for both JSON and XML variants
-- [ ] 3.3 Verify against DIBBs Query Connector v1.2.0 in the pilot environment: too-many → "No Certain Match Found"; within-limit candidates → pick-list (record outcome in the PR)
+- [x] 3.1 Add a `$match` "too many matches" request to `testing/scripts/TS_Integration_Test.postman_collection.json` using demographics known to produce a Z33/TM response from the dev IIS; assert top-level `resourceType` = `OperationOutcome`, `issue[].details.text` contains `did not find a certain match`, `issue[].details.coding` has the v2-0208 `TM` code, and HTTP status 422
+- [x] 3.2 Verify the existing `$match` found/not-found Postman assertions still pass unchanged (candidate list → 200 searchset Bundle; `NF` no-match → 200 empty Bundle), for both JSON and XML variants
+- [x] 3.3 Verify against DIBBs Query Connector v1.2.0 in the pilot environment: too-many → "No Certain Match Found"; within-limit candidates → pick-list (record outcome in the PR)
 
 ## 4. Docs and Verification
 

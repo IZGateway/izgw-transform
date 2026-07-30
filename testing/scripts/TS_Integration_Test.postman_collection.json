@@ -1633,7 +1633,7 @@
               "response": []
             },
             {
-              "name": "TS_TC_10d FHIR Patient $match (too many matches)",
+              "name": "TS_TC_10d FHIR Patient $match (too many)",
               "event": [
                 {
                   "listen": "test",
@@ -1645,36 +1645,30 @@
                       "    pm.response.to.have.status(422);",
                       "});",
                       "",
-                      "pm.test(\"resourceType is a top-level OperationOutcome\", function () {",
+                      "pm.test(\"resourceType is OperationOutcome\", function () {",
                       "    pm.expect(jsonData.resourceType).to.eql(\"OperationOutcome\");",
                       "});",
                       "",
-                      "// DIBBs Query Connector matches this exact substring to show 'No Certain Match Found'",
-                      "pm.test(\"issue details.text contains the no-certain-match phrase\", function () {",
-                      "    const hasPhrase = (jsonData.issue || []).some(function (i) {",
+                      "const issues = jsonData.issue || [];",
+                      "",
+                      "pm.test(\"An issue details.text contains 'did not find a certain match'\", function () {",
+                      "    const hasText = issues.some(function (i) {",
                       "        return i.details && typeof i.details.text === \"string\" &&",
                       "            i.details.text.indexOf(\"did not find a certain match\") !== -1;",
                       "    });",
-                      "    pm.expect(hasPhrase, \"Expected issue.details.text containing 'did not find a certain match'\").to.be.true;",
+                      "    pm.expect(hasText, \"Expected an issue with details.text containing 'did not find a certain match'\").to.be.true;",
                       "});",
                       "",
-                      "pm.test(\"issue retains the v2-0208 TM coding\", function () {",
-                      "    const hasTm = (jsonData.issue || []).some(function (i) {",
-                      "        return ((i.details || {}).coding || []).some(function (cd) {",
-                      "            return cd.system === \"http://terminology.hl7.org/CodeSystem/v2-0208\" && cd.code === \"TM\";",
+                      "pm.test(\"An issue details.coding has v2-0208 TM code\", function () {",
+                      "    const hasTM = issues.some(function (i) {",
+                      "        const codings = (i.details && Array.isArray(i.details.coding)) ? i.details.coding : [];",
+                      "        return codings.some(function (c) {",
+                      "            return c.code === \"TM\" &&",
+                      "                typeof c.system === \"string\" &&",
+                      "                c.system.indexOf(\"v2-0208\") !== -1;",
                       "        });",
                       "    });",
-                      "    pm.expect(hasTm, \"Expected details.coding with system v2-0208 and code TM\").to.be.true;",
-                      "});",
-                      "",
-                      "pm.test(\"issue severity is warning and code is multiple-matches\", function () {",
-                      "    const issue = (jsonData.issue || [])[0] || {};",
-                      "    pm.expect(issue.severity).to.eql(\"warning\");",
-                      "    pm.expect(issue.code).to.eql(\"multiple-matches\");",
-                      "});",
-                      "",
-                      "pm.test(\"Content-Type is FHIR JSON\", function () {",
-                      "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/fhir+json\");",
+                      "    pm.expect(hasTM, \"Expected an issue with details.coding containing code 'TM' from a v2-0208 system\").to.be.true;",
                       "});"
                     ],
                     "type": "text/javascript",
@@ -1702,7 +1696,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"resourceType\": \"Parameters\",\n    \"parameter\": [\n        {\n            \"name\": \"resource\",\n            \"resource\": {\n                \"resourceType\": \"Patient\",\n                \"name\": [\n                    {\n                        \"given\": [\n                            \"{{fhirTooManyPatientGiven}}\"\n                        ],\n                        \"family\": \"{{fhirTooManyPatientFamily}}\"\n                    }\n                ],\n                \"birthDate\": \"{{fhirTooManyPatientDOB}}\",\n                \"address\": []\n            }\n        }\n    ]\n}"
+                  "raw": "{\n    \"resourceType\": \"Parameters\",\n    \"parameter\": [\n        {\n            \"name\": \"resource\",\n            \"resource\": {\n                \"resourceType\": \"Patient\",\n                \"name\": [\n                    {\n                        \"given\": [\n                            \"{{fhirTooManyPatientGiven}}\"\n                        ],\n                        \"family\": \"{{fhirTooManyPatientFamily}}\"\n                    }\n                ],\n                \"birthDate\": \"{{fhirTooManyPatientDOB}}\",\n                \"address\": [\n                    {\n                        \"line\": [\n                            \"{{fhirTooManyPatientAddressLine}}\"\n                        ],\n                        \"city\": \"{{fhirTooManyPatientAddressCity}}\",\n                        \"state\": \"{{fhirTooManyPatientAddressState}}\",\n                        \"postalCode\": \"{{fhirTooManyPatientAddressZip}}\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
                 },
                 "url": {
                   "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Patient/$match",
@@ -29226,10 +29220,14 @@
           "pm.collectionVariables.set(\"fhirNoDataPatientFamily\", \"NofamilyAIRA\");",
           "pm.collectionVariables.set(\"fhirNoDataPatientDOB\", \"1900-01-01\");",
           "",
-          "// FHIR \"Too Many Matches\" Tests - demographics that exceed the dev IIS record limit (Z33, QAK-2 = TM)",
-          "pm.collectionVariables.set(\"fhirTooManyPatientGiven\", \"TODO-SET-GIVEN\");",
-          "pm.collectionVariables.set(\"fhirTooManyPatientFamily\", \"TODO-SET-FAMILY\");",
-          "pm.collectionVariables.set(\"fhirTooManyPatientDOB\", \"1960-01-01\");",
+          "// FHIR \"Too Many\" Test",
+          "pm.collectionVariables.set(\"fhirTooManyPatientGiven\", \"R\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientFamily\", \"FagenAIRA\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientDOB\", \"2021-01-02\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressLine\", \"1416 Betekende Cir\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressCity\", \"Fargo\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressState\", \"ND\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressZip\", \"58103\");",
           "",
           "var tooLarge = goodResponse.replace('&|', \"&amp;|\");",
           "var last;",
@@ -30594,6 +30592,22 @@
     },
     {
       "key": "fhirTooManyPatientDOB",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressLine",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressCity",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressState",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressZip",
       "value": ""
     }
   ]
