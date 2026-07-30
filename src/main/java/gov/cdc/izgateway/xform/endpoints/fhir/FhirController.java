@@ -498,7 +498,11 @@ public class FhirController {
 	    responseCode = "422",
 	    description = "The matching operation found possible matches but no certain match"
 	        + " (IIS reported too much data found); the body is a top-level OperationOutcome",
-	    content = { @Content(mediaType = "application/json")}
+	    content = {
+	        @Content(mediaType = "application/fhir+json"),
+	        @Content(mediaType = "application/fhir+xml"),
+	        @Content(mediaType = "application/fhir+yaml")
+	    }
 	)
 	@ApiResponse(
 	    responseCode = "500",
