@@ -1631,6 +1631,89 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "TS_TC_10d FHIR Patient $match (too many)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const jsonData = pm.response.json();",
+                      "",
+                      "pm.test(\"Status code is 422\", function () {",
+                      "    pm.response.to.have.status(422);",
+                      "});",
+                      "",
+                      "pm.test(\"resourceType is OperationOutcome\", function () {",
+                      "    pm.expect(jsonData.resourceType).to.eql(\"OperationOutcome\");",
+                      "});",
+                      "",
+                      "const issues = jsonData.issue || [];",
+                      "",
+                      "pm.test(\"An issue details.text contains 'did not find a certain match'\", function () {",
+                      "    const hasText = issues.some(function (i) {",
+                      "        return i.details && typeof i.details.text === \"string\" &&",
+                      "            i.details.text.indexOf(\"did not find a certain match\") !== -1;",
+                      "    });",
+                      "    pm.expect(hasText, \"Expected an issue with details.text containing 'did not find a certain match'\").to.be.true;",
+                      "});",
+                      "",
+                      "pm.test(\"An issue details.coding has v2-0208 TM code\", function () {",
+                      "    const hasTM = issues.some(function (i) {",
+                      "        const codings = (i.details && Array.isArray(i.details.coding)) ? i.details.coding : [];",
+                      "        return codings.some(function (c) {",
+                      "            return c.code === \"TM\" &&",
+                      "                typeof c.system === \"string\" &&",
+                      "                c.system.indexOf(\"v2-0208\") !== -1;",
+                      "        });",
+                      "    });",
+                      "    pm.expect(hasTM, \"Expected an issue with details.coding containing code 'TM' from a v2-0208 system\").to.be.true;",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disabledSystemHeaders": {
+                  "content-type": true
+                }
+              },
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"resourceType\": \"Parameters\",\n    \"parameter\": [\n        {\n            \"name\": \"resource\",\n            \"resource\": {\n                \"resourceType\": \"Patient\",\n                \"name\": [\n                    {\n                        \"given\": [\n                            \"{{fhirTooManyPatientGiven}}\"\n                        ],\n                        \"family\": \"{{fhirTooManyPatientFamily}}\"\n                    }\n                ],\n                \"birthDate\": \"{{fhirTooManyPatientDOB}}\",\n                \"address\": [\n                    {\n                        \"line\": [\n                            \"{{fhirTooManyPatientAddressLine}}\"\n                        ],\n                        \"city\": \"{{fhirTooManyPatientAddressCity}}\",\n                        \"state\": \"{{fhirTooManyPatientAddressState}}\",\n                        \"postalCode\": \"{{fhirTooManyPatientAddressZip}}\"\n                    }\n                ]\n            }\n        }\n    ]\n}"
+                },
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Patient/$match",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Patient",
+                    "$match"
+                  ]
+                }
+              },
+              "response": []
             }
           ],
           "auth": {
@@ -29137,6 +29220,15 @@
           "pm.collectionVariables.set(\"fhirNoDataPatientFamily\", \"NofamilyAIRA\");",
           "pm.collectionVariables.set(\"fhirNoDataPatientDOB\", \"1900-01-01\");",
           "",
+          "// FHIR \"Too Many\" Test",
+          "pm.collectionVariables.set(\"fhirTooManyPatientGiven\", \"R\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientFamily\", \"FagenAIRA\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientDOB\", \"2021-01-02\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressLine\", \"1416 Betekende Cir\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressCity\", \"Fargo\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressState\", \"ND\");",
+          "pm.collectionVariables.set(\"fhirTooManyPatientAddressZip\", \"58103\");",
+          "",
           "var tooLarge = goodResponse.replace('&|', \"&amp;|\");",
           "var last;",
           "var maxLength = 65536;",
@@ -30488,6 +30580,34 @@
     },
     {
       "key": "fakePatientResource",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientGiven",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientFamily",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientDOB",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressLine",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressCity",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressState",
+      "value": ""
+    },
+    {
+      "key": "fhirTooManyPatientAddressZip",
       "value": ""
     }
   ]

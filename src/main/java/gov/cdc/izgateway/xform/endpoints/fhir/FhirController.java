@@ -142,6 +142,16 @@ public class FhirController {
     private static final String PATIENT = "Patient";
     /** FHIR search parameter name accepted as a lenient alias for {@code patient}. */
     private static final String SUBJECT = "subject";
+    /** FHIR code system URI for HL7 v2 table 0208 (query response status). */
+    private static final String V2_QUERY_STATUS_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0208";
+    /** Table 0208 code an IIS reports when a query matches more records than its limit. */
+    private static final String TOO_MUCH_DATA_FOUND = "TM";
+    /**
+     * The substring "did not find a certain match" is matched literally by DIBBs Query
+     * Connector to show its "No Certain Match Found" message — do not reword it.
+     */
+    private static final String NO_CERTAIN_MATCH_TEXT =
+        "The matching operation found one or more possible matches, but did not find a certain match.";
 
     /**
      * Configuration of the V2toFHIR Conversion
@@ -463,7 +473,8 @@ public class FhirController {
 	 * @param destinationId    The identifier of the destination IIS
 	 * @param body    The operation parameters, as a Parameters resource, or a Patient resource
 	 * @param req    The HttpServletRequest so we can process parameters.
-	 * @return    A bundle of Patient Resources
+	 * @return    A bundle of Patient Resources, or a top-level OperationOutcome (HTTP 422)
+	 * when the IIS reports more matches than its record limit and no certain match exists
 	 * @throws FaultException    When a fault occurs.
 	 * @throws HL7Exception    When an HL7 Message exception occurs
 	 * @throws UnexpectedException When some other exception occurs
@@ -484,11 +495,21 @@ public class FhirController {
 	    content = {@Content}
 	)
 	@ApiResponse(
+	    responseCode = "422",
+	    description = "The matching operation found possible matches but no certain match"
+	        + " (IIS reported too much data found); the body is a top-level OperationOutcome",
+	    content = {
+	        @Content(mediaType = "application/fhir+json"),
+	        @Content(mediaType = "application/fhir+xml"),
+	        @Content(mediaType = "application/fhir+yaml")
+	    }
+	)
+	@ApiResponse(
 	    responseCode = "500",
 	    description = "An internal error occured while processing the request",
 	    content = {@Content}
 	)
-	@RequestMapping(value= "/{destinationId}/Patient/$match", 
+	@RequestMapping(value= "/{destinationId}/Patient/$match",
 	    method = { 
 	        RequestMethod.POST,    // Typical web based query 
 	        RequestMethod.HEAD    // Used with SMART and other auth mechanisms.
@@ -554,6 +575,12 @@ public class FhirController {
         
         Bundle b = this.processQuery(wrapper, destinationId).getBody();
 
+        OperationOutcomeIssueComponent tooMany = findTooManyMatchesIssue(b);
+        if (tooMany != null) {
+            return new ResponseEntity<>(noCertainMatchOutcome(tooMany),
+                ContentUtils.getHeaders(req), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
         IDIMatch.score(b, match);
 
         // Negotiate the response Content-Type from the original request (the wrapper's
@@ -563,6 +590,54 @@ public class FhirController {
         return new ResponseEntity<>(b, ContentUtils.getHeaders(req), HttpStatus.OK);
     }
     
+    /**
+     * Detect the "too much data found" $match outcome: the converted response contains
+     * no Patient resources and carries the HL7 table 0208 {@code TM} query status.
+     * Ambiguous responses (patients present, missing details, other status codes) do
+     * not match, falling through to the normal Bundle response.
+     *
+     * @param b    The converted response bundle
+     * @return    The query-status issue carrying the TM coding, or null when this is
+     * not the too-many-matches outcome
+     */
+    static OperationOutcomeIssueComponent findTooManyMatchesIssue(Bundle b) {
+        if (b == null || b.getEntry().stream().anyMatch(e -> e.getResource() instanceof Patient)) {
+            return null;
+        }
+        return b.getEntry().stream()
+            .map(BundleEntryComponent::getResource)
+            .filter(OperationOutcome.class::isInstance)
+            .map(OperationOutcome.class::cast)
+            .flatMap(oo -> oo.getIssue().stream())
+            .filter(issue -> issue.getDetails().getCoding().stream().anyMatch(FhirController::isTooManyCoding))
+            .findFirst()
+            .orElse(null);
+    }
+
+    private static boolean isTooManyCoding(Coding coding) {
+        return V2_QUERY_STATUS_SYSTEM.equals(coding.getSystem())
+            && TOO_MUCH_DATA_FOUND.equalsIgnoreCase(coding.getCode());
+    }
+
+    /**
+     * Build the top-level OperationOutcome returned for the too-many-matches $match
+     * outcome. The details text carries the phrase DIBBs Query Connector matches on;
+     * the source query-status codings are retained for provenance.
+     *
+     * @param source    The detected TM query-status issue
+     * @return    The response OperationOutcome
+     */
+    static OperationOutcome noCertainMatchOutcome(OperationOutcomeIssueComponent source) {
+        OperationOutcome oo = new OperationOutcome();
+        CodeableConcept details = new CodeableConcept().setText(NO_CERTAIN_MATCH_TEXT);
+        source.getDetails().getCoding().forEach(coding -> details.addCoding(coding.copy()));
+        oo.addIssue()
+            .setSeverity(IssueSeverity.WARNING)
+            .setCode(IssueType.MULTIPLEMATCHES)
+            .setDetails(details);
+        return oo;
+    }
+
     /**
      * Set the search parameters for the patient using the input searchPatient
      * as an example.
