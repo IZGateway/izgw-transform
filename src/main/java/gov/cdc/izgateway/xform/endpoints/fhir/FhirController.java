@@ -245,7 +245,7 @@ public class FhirController {
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
     	String summary = req.getParameter("_summary");
     	if (Arrays.asList("summary", "count").contains(summary)) {
-    		return connectionTest();
+    		return connectionTest(req);
     	}
         return processQuery(req, destinationId);
     }
@@ -347,14 +347,15 @@ public class FhirController {
     /**
      * This exists to allow query connector to validate authentication
      * parameters when connecting via /Patients?_summary=count&_count=1
+     * @param req	The request, used to negotiate the response content type.
      * @return	A SearchSet Bundle reporting 100 patients available.
      */
-    private ResponseEntity<Bundle> connectionTest() {
+    private ResponseEntity<Bundle> connectionTest(HttpServletRequest req) {
 		Bundle b = new Bundle();
 		b.setId(new IdType(b.fhirType() + "/" + ULID.random()));
 		b.setType(BundleType.SEARCHSET);
 		b.setTotal(100);
-		return new ResponseEntity<>(b, HttpStatus.OK);
+		return new ResponseEntity<>(b, ContentUtils.getHeaders(req), HttpStatus.OK);
     }
 
     /**
@@ -423,7 +424,7 @@ public class FhirController {
         try {
             decodedId = FhirIdCodec.decode(id);
         } catch (IllegalFormatCodePointException ex) {
-            return notFound(id);
+            return notFound(req, id);
         }
         String resourceType = StringUtils.substringBetween(req.getRequestURI(), destinationId + "/", "/" + id); 
         
@@ -431,7 +432,7 @@ public class FhirController {
         boolean isPatient = PATIENT.equals(resourceType); 
         int index = isPatient ? 0 : 2;
         if (idParts.length < index + 2) {
-            return notFound(id);
+            return notFound(req, id);
         }
         Identifier ident = new Identifier().setSystem(idParts[index]).setValue(idParts[index + 1]);
         
@@ -441,7 +442,7 @@ public class FhirController {
         Bundle b = res.getBody();
         if (b == null) {
             // Technically this is an error.
-            return notFound(id);
+            return notFound(req, id);
         }
         Resource resource = b.getEntry().stream()
             .map(e -> e.getResource())
@@ -450,7 +451,7 @@ public class FhirController {
             .orElse(null);
         
         if (resource == null) {
-            return notFound(id);
+            return notFound(req, id);
         }
         return new ResponseEntity<>(resource, res.getHeaders(), HttpStatus.OK);
     }
@@ -533,16 +534,16 @@ public class FhirController {
                 if (param != null) { 
                 	match.setCount(((IntegerType)param.getValue()).getValue());
                     if (match.getCount() < 1 || match.getCount() > 10) {
-                        return illegalArguments(message);
+                        return illegalArguments(req, message);
                     }
                 }
             } catch (ClassCastException ex) {
-                return illegalArguments(message);
+                return illegalArguments(req, message);
             }
         } else if (PATIENT.equals(body.fhirType())) {
             match.setSearchPatient((Patient) body);
         } else {
-            return illegalArguments("Body invalid, expected Patient or Parameters");
+            return illegalArguments(req, "Body invalid, expected Patient or Parameters");
         }
         
         
@@ -552,10 +553,14 @@ public class FhirController {
         setParameters(wrapper, match.getSearchPatient());
         
         Bundle b = this.processQuery(wrapper, destinationId).getBody();
-        
+
         IDIMatch.score(b, match);
-        
-        return new ResponseEntity<>(b, HttpStatus.OK);
+
+        // Negotiate the response Content-Type from the original request (the wrapper's
+        // parameters were reset above, which would hide a _format parameter). Setting
+        // it explicitly bypasses the global SOAP-oriented content negotiation, which
+        // ignores the Accept header and defaults to XML.
+        return new ResponseEntity<>(b, ContentUtils.getHeaders(req), HttpStatus.OK);
     }
     
     /**
@@ -647,22 +652,22 @@ public class FhirController {
         }
     }
     
-    private ResponseEntity<Resource> notFound(String id) {
+    private ResponseEntity<Resource> notFound(HttpServletRequest req, String id) {
         OperationOutcome oo = new OperationOutcome();
         OperationOutcomeIssueComponent issue = oo.addIssue();
         issue.setCode(IssueType.NOTFOUND);
         issue.setSeverity(IssueSeverity.ERROR);
         issue.setDiagnostics("Resource not found " + id);
-        return new ResponseEntity<>(oo, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.NOT_FOUND);
     }
-    
-    private ResponseEntity<Resource> illegalArguments(String message) {
+
+    private ResponseEntity<Resource> illegalArguments(HttpServletRequest req, String message) {
         OperationOutcome oo = new OperationOutcome();
         OperationOutcomeIssueComponent issue = oo.addIssue();
         issue.setCode(IssueType.INVALID);
         issue.setSeverity(IssueSeverity.ERROR);
         issue.setDiagnostics(message);
-        return new ResponseEntity<>(oo, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.BAD_REQUEST);
     }
     
     /**
@@ -1183,7 +1188,7 @@ public class FhirController {
                 .addCoding(new Coding(system, code, null))
             ).setDiagnostics(uex.getCause().getMessage());
         setRetryCoding(issue, RetryStrategy.CONTACT_SUPPORT);
-        return new ResponseEntity<>(oo, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
     private static RetryStrategy setRetryCoding(OperationOutcomeIssueComponent issue, RetryStrategy retry) {
