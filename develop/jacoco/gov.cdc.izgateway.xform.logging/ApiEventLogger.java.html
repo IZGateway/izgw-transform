@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-<span class="nc" id="L10">@Slf4j</span>
+<span class="fc" id="L10">@Slf4j</span>
 public class ApiEventLogger {
 
     public static &lt;T&gt; void logReadEvent(T data) {
@@ -15,10 +15,10 @@ public class ApiEventLogger {
 <span class="nc" id="L15">    }</span>
 
     public static &lt;T&gt; void logReadEvent(List&lt;T&gt; data) {
-<span class="nc bnc" id="L18" title="All 4 branches missed.">        if (data != null &amp;&amp; !data.isEmpty()) {</span>
-<span class="nc" id="L19">            logApiEvent(&quot;READ&quot;, getClassName(data.get(0)), null, null, null);</span>
+<span class="pc bpc" id="L18" title="2 of 4 branches missed.">        if (data != null &amp;&amp; !data.isEmpty()) {</span>
+<span class="fc" id="L19">            logApiEvent(&quot;READ&quot;, getClassName(data.get(0)), null, null, null);</span>
         }
-<span class="nc" id="L21">    }</span>
+<span class="fc" id="L21">    }</span>
 
     public static &lt;T&gt; void logDeleteEvent(T dataToDelete) {
 <span class="nc" id="L24">        logApiEvent(&quot;DELETE&quot;, getClassName(dataToDelete), getId(dataToDelete), null, dataToDelete);</span>
@@ -33,8 +33,8 @@ public class ApiEventLogger {
 <span class="nc" id="L33">    }</span>
 
     private static &lt;T&gt; void logApiEvent(String eventDescription, String objectName, String objectId, T newData, T existingData) {
-<span class="nc bnc" id="L36" title="All 2 branches missed.">        if ( XformRequestContext.isApiLoggingDisabled() ) {</span>
-<span class="nc" id="L37">            return;</span>
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        if ( XformRequestContext.isApiLoggingDisabled() ) {</span>
+<span class="fc" id="L37">            return;</span>
         }
 
 <span class="nc" id="L40">        XformApiDetail data = new XformApiDetail();</span>
@@ -51,7 +51,7 @@ public class ApiEventLogger {
 <span class="nc" id="L51">    }</span>
 
     private static &lt;T&gt; String getClassName(T data) {
-<span class="nc bnc" id="L54" title="All 2 branches missed.">        return data == null ? null : data.getClass().getSimpleName();</span>
+<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        return data == null ? null : data.getClass().getSimpleName();</span>
     }
 
     private static &lt;T&gt; String getId(T data) {
