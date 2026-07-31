@@ -23,6 +23,7 @@ public class PipelineService extends GenericService<Pipeline>{
                         p -> p.getOrganizationId().equals(organizationId)
                                 && p.getInboundEndpoint().equals(inboundEndpoint)
                                 && p.getOutboundEndpoint().equals(outboundEndpoint)
+                                && Boolean.TRUE.equals(p.getActive())
                 ).findFirst().orElse(null);
     }
 

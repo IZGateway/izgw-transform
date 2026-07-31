@@ -12,9 +12,11 @@ import gov.cdc.izgw.v2tofhir.utils.IzQuery;
 import gov.cdc.izgw.v2tofhir.utils.ParserUtils;
 
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.IllegalFormatCodePointException;
 import java.util.Iterator;
 import java.util.List;
@@ -29,8 +31,10 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
 import org.hl7.fhir.r4.model.Bundle.SearchEntryMode;
+import org.hl7.fhir.r4.model.CapabilityStatement;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
+import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.IdType;
@@ -142,6 +146,34 @@ public class FhirController {
     private static final String PATIENT = "Patient";
     /** FHIR search parameter name accepted as a lenient alias for {@code patient}. */
     private static final String SUBJECT = "subject";
+    /** FHIR resource type advertised in the CapabilityStatement. */
+    private static final String IMMUNIZATION = "Immunization";
+    /** FHIR resource type advertised in the CapabilityStatement. */
+    private static final String IMMUNIZATION_RECOMMENDATION = "ImmunizationRecommendation";
+    /** Name of the Patient {@code $match} operation advertised in the CapabilityStatement. */
+    private static final String MATCH_OPERATION = "match";
+    /** Canonical OperationDefinition URL for the Patient {@code $match} operation. */
+    private static final String PATIENT_MATCH_DEFINITION =
+        "http://hl7.org/fhir/OperationDefinition/Patient-match";
+    /** FHIR JSON media type advertised in the CapabilityStatement {@code format}. */
+    private static final String FHIR_JSON = "application/fhir+json";
+    /** Fixed publication date so the (static) CapabilityStatement is deterministic across requests. */
+    private static final Date CAPABILITY_STATEMENT_DATE = Date.from(Instant.parse("2026-07-30T00:00:00Z"));
+    /**
+     * CapabilityStatement {@code implementation.description}. Required because {@code kind = instance}
+     * (R4 invariant cpb-14); also satisfies cpb-2 (one of description/software/implementation).
+     */
+    private static final String IMPLEMENTATION_DESCRIPTION = "IZ Gateway Transformation Service";
+    /** FHIR code system URI for HL7 v2 table 0208 (query response status). */
+    private static final String V2_QUERY_STATUS_SYSTEM = "http://terminology.hl7.org/CodeSystem/v2-0208";
+    /** Table 0208 code an IIS reports when a query matches more records than its limit. */
+    private static final String TOO_MUCH_DATA_FOUND = "TM";
+    /**
+     * The substring "did not find a certain match" is matched literally by DIBBs Query
+     * Connector to show its "No Certain Match Found" message — do not reword it.
+     */
+    private static final String NO_CERTAIN_MATCH_TEXT =
+        "The matching operation found one or more possible matches, but did not find a certain match.";
 
     /**
      * Configuration of the V2toFHIR Conversion
@@ -177,6 +209,98 @@ public class FhirController {
         this.hub = hub;
         this.config = config;
         registry.register(this);
+    }
+
+    /**
+     * Serve the FHIR R4 {@code CapabilityStatement} (conformance) document at the standard
+     * {@code [base]/metadata} location. FHIR R4 requires servers to publish a CapabilityStatement
+     * via the capabilities interaction, and clients such as the DIBBs Query Connector read this
+     * document to auto-detect that the server supports the Patient {@code $match} operation.
+     * <p>
+     * The document is the same regardless of {@code destinationId}: no destination lookup is
+     * performed and unknown destinations still receive the CapabilityStatement (no 404).
+     *
+     * @param destinationId The destination for the FHIR Request. Present for URL consistency with
+     * the other FHIR endpoints; it does not affect the returned document.
+     * @param req The HttpServletRequest, used to negotiate the response content type (honoring
+     * {@code Accept}/{@code _format} and defaulting to {@code application/fhir+json}), bypassing
+     * the global SOAP-oriented content negotiation that otherwise ignores Accept and defaults to XML.
+     * @return A FHIR R4 {@code CapabilityStatement} describing the resources, interactions and the
+     * Patient {@code $match} operation supported by this service.
+     */
+    @Operation(
+        summary = "Return the FHIR CapabilityStatement for the IZ Gateway Xform Service",
+        description = "FHIR R4 capabilities interaction served at [base]/metadata"
+    )
+    @ApiResponse(
+        responseCode = "200",
+        description = "The CapabilityStatement was returned",
+        content = {
+            @Content(mediaType = "application/fhir+json"),
+            @Content(mediaType = "application/fhir+xml")
+        }
+    )
+    @GetMapping(
+        value = "/{destinationId}/metadata",
+        produces = {
+            "application/fhir+xml",
+            "application/fhir+json",
+            "application/fhir+yaml",
+            "application/xml",
+            "application/json",
+            "application/yaml",
+            "text/xml"
+        }
+    )
+    public ResponseEntity<CapabilityStatement> metadata(@PathVariable String destinationId, HttpServletRequest req) {
+        return new ResponseEntity<>(buildCapabilityStatement(), ContentUtils.getHeaders(req), HttpStatus.OK);
+    }
+
+    /**
+     * Build the destination-agnostic FHIR R4 {@code CapabilityStatement} advertising the FHIR
+     * resources this service exposes as queryable endpoints and the Patient {@code $match} operation.
+     * A fresh instance is built per request to avoid sharing a mutable HAPI resource across threads.
+     *
+     * @return a new {@code CapabilityStatement} instance
+     */
+    private CapabilityStatement buildCapabilityStatement() {
+        CapabilityStatement cs = new CapabilityStatement();
+        cs.setStatus(Enumerations.PublicationStatus.ACTIVE);
+        cs.setDate(CAPABILITY_STATEMENT_DATE);
+        cs.setKind(CapabilityStatement.CapabilityStatementKind.INSTANCE);
+        cs.setImplementation(new CapabilityStatement.CapabilityStatementImplementationComponent()
+            .setDescription(IMPLEMENTATION_DESCRIPTION));
+        cs.setFhirVersion(Enumerations.FHIRVersion._4_0_1);
+        cs.addFormat(FHIR_JSON);
+
+        CapabilityStatement.CapabilityStatementRestComponent rest =
+            cs.addRest().setMode(CapabilityStatement.RestfulCapabilityMode.SERVER);
+
+        CapabilityStatement.CapabilityStatementRestResourceComponent patient =
+            addSearchableResource(rest, PATIENT);
+        patient.addOperation()
+            .setName(MATCH_OPERATION)
+            .setDefinition(PATIENT_MATCH_DEFINITION);
+
+        addSearchableResource(rest, IMMUNIZATION);
+        addSearchableResource(rest, IMMUNIZATION_RECOMMENDATION);
+
+        return cs;
+    }
+
+    /**
+     * Add a resource with the {@code search-type} interaction to the given rest component.
+     *
+     * @param rest the server rest component to add the resource to
+     * @param type the FHIR resource type name
+     * @return the added resource component (so callers can attach operations)
+     */
+    private CapabilityStatement.CapabilityStatementRestResourceComponent addSearchableResource(
+        CapabilityStatement.CapabilityStatementRestComponent rest, String type) {
+        CapabilityStatement.CapabilityStatementRestResourceComponent resource = rest.addResource();
+        resource.setType(type);
+        resource.addInteraction().setCode(CapabilityStatement.TypeRestfulInteraction.SEARCHTYPE);
+        return resource;
     }
     
     /**
@@ -245,7 +369,7 @@ public class FhirController {
     ) throws FaultException, HL7Exception, UnexpectedException, SecurityFault {
     	String summary = req.getParameter("_summary");
     	if (Arrays.asList("summary", "count").contains(summary)) {
-    		return connectionTest();
+    		return connectionTest(req);
     	}
         return processQuery(req, destinationId);
     }
@@ -347,14 +471,15 @@ public class FhirController {
     /**
      * This exists to allow query connector to validate authentication
      * parameters when connecting via /Patients?_summary=count&_count=1
+     * @param req	The request, used to negotiate the response content type.
      * @return	A SearchSet Bundle reporting 100 patients available.
      */
-    private ResponseEntity<Bundle> connectionTest() {
+    private ResponseEntity<Bundle> connectionTest(HttpServletRequest req) {
 		Bundle b = new Bundle();
 		b.setId(new IdType(b.fhirType() + "/" + ULID.random()));
 		b.setType(BundleType.SEARCHSET);
 		b.setTotal(100);
-		return new ResponseEntity<>(b, HttpStatus.OK);
+		return new ResponseEntity<>(b, ContentUtils.getHeaders(req), HttpStatus.OK);
     }
 
     /**
@@ -423,7 +548,7 @@ public class FhirController {
         try {
             decodedId = FhirIdCodec.decode(id);
         } catch (IllegalFormatCodePointException ex) {
-            return notFound(id);
+            return notFound(req, id);
         }
         String resourceType = StringUtils.substringBetween(req.getRequestURI(), destinationId + "/", "/" + id); 
         
@@ -431,7 +556,7 @@ public class FhirController {
         boolean isPatient = PATIENT.equals(resourceType); 
         int index = isPatient ? 0 : 2;
         if (idParts.length < index + 2) {
-            return notFound(id);
+            return notFound(req, id);
         }
         Identifier ident = new Identifier().setSystem(idParts[index]).setValue(idParts[index + 1]);
         
@@ -441,7 +566,7 @@ public class FhirController {
         Bundle b = res.getBody();
         if (b == null) {
             // Technically this is an error.
-            return notFound(id);
+            return notFound(req, id);
         }
         Resource resource = b.getEntry().stream()
             .map(e -> e.getResource())
@@ -450,7 +575,7 @@ public class FhirController {
             .orElse(null);
         
         if (resource == null) {
-            return notFound(id);
+            return notFound(req, id);
         }
         return new ResponseEntity<>(resource, res.getHeaders(), HttpStatus.OK);
     }
@@ -462,7 +587,8 @@ public class FhirController {
 	 * @param destinationId    The identifier of the destination IIS
 	 * @param body    The operation parameters, as a Parameters resource, or a Patient resource
 	 * @param req    The HttpServletRequest so we can process parameters.
-	 * @return    A bundle of Patient Resources
+	 * @return    A bundle of Patient Resources, or a top-level OperationOutcome (HTTP 422)
+	 * when the IIS reports more matches than its record limit and no certain match exists
 	 * @throws FaultException    When a fault occurs.
 	 * @throws HL7Exception    When an HL7 Message exception occurs
 	 * @throws UnexpectedException When some other exception occurs
@@ -483,11 +609,21 @@ public class FhirController {
 	    content = {@Content}
 	)
 	@ApiResponse(
+	    responseCode = "422",
+	    description = "The matching operation found possible matches but no certain match"
+	        + " (IIS reported too much data found); the body is a top-level OperationOutcome",
+	    content = {
+	        @Content(mediaType = "application/fhir+json"),
+	        @Content(mediaType = "application/fhir+xml"),
+	        @Content(mediaType = "application/fhir+yaml")
+	    }
+	)
+	@ApiResponse(
 	    responseCode = "500",
 	    description = "An internal error occured while processing the request",
 	    content = {@Content}
 	)
-	@RequestMapping(value= "/{destinationId}/Patient/$match", 
+	@RequestMapping(value= "/{destinationId}/Patient/$match",
 	    method = { 
 	        RequestMethod.POST,    // Typical web based query 
 	        RequestMethod.HEAD    // Used with SMART and other auth mechanisms.
@@ -533,16 +669,16 @@ public class FhirController {
                 if (param != null) { 
                 	match.setCount(((IntegerType)param.getValue()).getValue());
                     if (match.getCount() < 1 || match.getCount() > 10) {
-                        return illegalArguments(message);
+                        return illegalArguments(req, message);
                     }
                 }
             } catch (ClassCastException ex) {
-                return illegalArguments(message);
+                return illegalArguments(req, message);
             }
         } else if (PATIENT.equals(body.fhirType())) {
             match.setSearchPatient((Patient) body);
         } else {
-            return illegalArguments("Body invalid, expected Patient or Parameters");
+            return illegalArguments(req, "Body invalid, expected Patient or Parameters");
         }
         
         
@@ -552,12 +688,70 @@ public class FhirController {
         setParameters(wrapper, match.getSearchPatient());
         
         Bundle b = this.processQuery(wrapper, destinationId).getBody();
-        
+
+        OperationOutcomeIssueComponent tooMany = findTooManyMatchesIssue(b);
+        if (tooMany != null) {
+            return new ResponseEntity<>(noCertainMatchOutcome(tooMany),
+                ContentUtils.getHeaders(req), HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
         IDIMatch.score(b, match);
-        
-        return new ResponseEntity<>(b, HttpStatus.OK);
+
+        // Negotiate the response Content-Type from the original request (the wrapper's
+        // parameters were reset above, which would hide a _format parameter). Setting
+        // it explicitly bypasses the global SOAP-oriented content negotiation, which
+        // ignores the Accept header and defaults to XML.
+        return new ResponseEntity<>(b, ContentUtils.getHeaders(req), HttpStatus.OK);
     }
     
+    /**
+     * Detect the "too much data found" $match outcome: the converted response contains
+     * no Patient resources and carries the HL7 table 0208 {@code TM} query status.
+     * Ambiguous responses (patients present, missing details, other status codes) do
+     * not match, falling through to the normal Bundle response.
+     *
+     * @param b    The converted response bundle
+     * @return    The query-status issue carrying the TM coding, or null when this is
+     * not the too-many-matches outcome
+     */
+    static OperationOutcomeIssueComponent findTooManyMatchesIssue(Bundle b) {
+        if (b == null || b.getEntry().stream().anyMatch(e -> e.getResource() instanceof Patient)) {
+            return null;
+        }
+        return b.getEntry().stream()
+            .map(BundleEntryComponent::getResource)
+            .filter(OperationOutcome.class::isInstance)
+            .map(OperationOutcome.class::cast)
+            .flatMap(oo -> oo.getIssue().stream())
+            .filter(issue -> issue.getDetails().getCoding().stream().anyMatch(FhirController::isTooManyCoding))
+            .findFirst()
+            .orElse(null);
+    }
+
+    private static boolean isTooManyCoding(Coding coding) {
+        return V2_QUERY_STATUS_SYSTEM.equals(coding.getSystem())
+            && TOO_MUCH_DATA_FOUND.equalsIgnoreCase(coding.getCode());
+    }
+
+    /**
+     * Build the top-level OperationOutcome returned for the too-many-matches $match
+     * outcome. The details text carries the phrase DIBBs Query Connector matches on;
+     * the source query-status codings are retained for provenance.
+     *
+     * @param source    The detected TM query-status issue
+     * @return    The response OperationOutcome
+     */
+    static OperationOutcome noCertainMatchOutcome(OperationOutcomeIssueComponent source) {
+        OperationOutcome oo = new OperationOutcome();
+        CodeableConcept details = new CodeableConcept().setText(NO_CERTAIN_MATCH_TEXT);
+        source.getDetails().getCoding().forEach(coding -> details.addCoding(coding.copy()));
+        oo.addIssue()
+            .setSeverity(IssueSeverity.WARNING)
+            .setCode(IssueType.MULTIPLEMATCHES)
+            .setDetails(details);
+        return oo;
+    }
+
     /**
      * Set the search parameters for the patient using the input searchPatient
      * as an example.
@@ -647,22 +841,22 @@ public class FhirController {
         }
     }
     
-    private ResponseEntity<Resource> notFound(String id) {
+    private ResponseEntity<Resource> notFound(HttpServletRequest req, String id) {
         OperationOutcome oo = new OperationOutcome();
         OperationOutcomeIssueComponent issue = oo.addIssue();
         issue.setCode(IssueType.NOTFOUND);
         issue.setSeverity(IssueSeverity.ERROR);
         issue.setDiagnostics("Resource not found " + id);
-        return new ResponseEntity<>(oo, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.NOT_FOUND);
     }
-    
-    private ResponseEntity<Resource> illegalArguments(String message) {
+
+    private ResponseEntity<Resource> illegalArguments(HttpServletRequest req, String message) {
         OperationOutcome oo = new OperationOutcome();
         OperationOutcomeIssueComponent issue = oo.addIssue();
         issue.setCode(IssueType.INVALID);
         issue.setSeverity(IssueSeverity.ERROR);
         issue.setDiagnostics(message);
-        return new ResponseEntity<>(oo, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.BAD_REQUEST);
     }
     
     /**
@@ -1183,7 +1377,7 @@ public class FhirController {
                 .addCoding(new Coding(system, code, null))
             ).setDiagnostics(uex.getCause().getMessage());
         setRetryCoding(issue, RetryStrategy.CONTACT_SUPPORT);
-        return new ResponseEntity<>(oo, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(oo, ContentUtils.getHeaders(req), HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
     private static RetryStrategy setRetryCoding(OperationOutcomeIssueComponent issue, RetryStrategy retry) {
