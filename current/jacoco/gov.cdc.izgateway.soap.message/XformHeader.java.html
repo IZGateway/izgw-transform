@@ -26,9 +26,9 @@ public class XformHeader implements Serializable {
     @Schema(description=&quot;The original response prior to xform.&quot;)
     private String originalResponse;
 
-<span class="nc" id="L29">	private static List&lt;Pair&lt;String, Function&lt;SoapMessage, String&gt;&gt;&gt; pairs = Arrays.asList(</span>
-<span class="nc" id="L30">            Pair.of(&quot;TransformedRequest&quot;, (Function&lt;SoapMessage, String&gt;)(m -&gt; m.getXformHeader().getTransformedRequest())),</span>
-<span class="nc" id="L31">            Pair.of(&quot;OriginalResponse&quot;, (Function&lt;SoapMessage, String&gt;)(m -&gt; m.getXformHeader().getOriginalResponse()))</span>
+<span class="fc" id="L29">	private static List&lt;Pair&lt;String, Function&lt;SoapMessage, String&gt;&gt;&gt; pairs = Arrays.asList(</span>
+<span class="pc" id="L30">            Pair.of(&quot;TransformedRequest&quot;, (Function&lt;SoapMessage, String&gt;)(m -&gt; m.getXformHeader().getTransformedRequest())),</span>
+<span class="pc" id="L31">            Pair.of(&quot;OriginalResponse&quot;, (Function&lt;SoapMessage, String&gt;)(m -&gt; m.getXformHeader().getOriginalResponse()))</span>
 		);
 		
 	@JsonIgnore

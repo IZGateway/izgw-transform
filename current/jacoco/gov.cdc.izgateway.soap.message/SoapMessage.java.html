@@ -29,8 +29,8 @@ public class SoapMessage implements Serializable {
 	public static final String IIS2011_NS = &quot;urn:cdc:iisb:2011&quot;;
 	public static final String IIS_PREFIX = &quot;iis&quot;;
 	public static final String IIS2014_NS = &quot;urn:cdc:iisb:2014&quot;;
-<span class="nc" id="L32">	protected static final Map&lt;String, String&gt; schemaNameMap = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L33">	protected static final String[] SOAP_MEDIA_TYPES = {</span>
+<span class="fc" id="L32">	protected static final Map&lt;String, String&gt; schemaNameMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L33">	protected static final String[] SOAP_MEDIA_TYPES = {</span>
 			MediaType.TEXT_PLAIN_VALUE,
 			MediaType.TEXT_HTML_VALUE,	// Postel's law, be forgiving
 			MediaType.TEXT_XML_VALUE,
@@ -38,7 +38,7 @@ public class SoapMessage implements Serializable {
 			&quot;application/soap&quot;,
 			&quot;application/soap+xml&quot;
 	};
-<span class="nc" id="L41">	protected static final String[] WSDL_MEDIA_TYPES = {</span>
+<span class="fc" id="L41">	protected static final String[] WSDL_MEDIA_TYPES = {</span>
 			MediaType.TEXT_PLAIN_VALUE,
 			MediaType.TEXT_HTML_VALUE,	// Postel's law, be forgiving
 			MediaType.TEXT_XML_VALUE,
@@ -84,8 +84,8 @@ public class SoapMessage implements Serializable {
 <span class="nc" id="L84">	}</span>
 
 	public void setSchema(String schema) {
-<span class="nc" id="L87">		this.schema = schema;</span>
-<span class="nc" id="L88">	}</span>
+<span class="fc" id="L87">		this.schema = schema;</span>
+<span class="fc" id="L88">	}</span>
 
 	public SoapMessage updateAction(boolean isHub) {
 <span class="nc" id="L91">		String action = getAction(isHub);</span>
@@ -147,8 +147,8 @@ public class SoapMessage implements Serializable {
 <span class="nc" id="L147">		return this;</span>
 	}
 	
-<span class="nc" id="L150">	private static List&lt;String&gt; responseNames = Arrays.asList(&quot;Hl7Message&quot;, &quot;EchoBack&quot;);</span>
-<span class="nc" id="L151">	private static Map&lt;String, String&gt; nameMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L150">	private static List&lt;String&gt; responseNames = Arrays.asList(&quot;Hl7Message&quot;, &quot;EchoBack&quot;);</span>
+<span class="fc" id="L151">	private static Map&lt;String, String&gt; nameMap = new HashMap&lt;&gt;();</span>
 	
 	/**
 	 * Get the name of the element based on the name, the schema and the message type.
