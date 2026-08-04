@@ -103,7 +103,7 @@
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>izgw-core</artifactId>
-			<version>3.2.0</version>
+			<version>3.3.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
