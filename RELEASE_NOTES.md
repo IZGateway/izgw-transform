@@ -1,3 +1,11 @@
+# IZ Gateway Transformation Service 0.21.0
+
+Released 2026-08-04.
+
+- chore: Update dependencies to released versions (izgw-bom, izgw-core,v2tofhir) in preparation for release ([#280](https://github.com/IZGateway/izgw-transform/pull/280))
+- IGDD-3172 - FHIR CapabilityStatement at /fhir/{destinationId}/metadata ([#279](https://github.com/IZGateway/izgw-transform/pull/279))
+- fix: Add COMPUTERNAME env set in release so that the /build.txt shows ([#274](https://github.com/IZGateway/izgw-transform/pull/274))
+
 # IZ Gateway Transformation Service 0.20.1
 
 Released 2026-07-10.
