@@ -103,7 +103,7 @@
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>izgw-core</artifactId>
-			<version>3.5.0-IGDD-3254_Upgrade_to_bcfips_213-SNAPSHOT</version>
+			<version>3.5.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
