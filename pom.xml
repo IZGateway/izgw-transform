@@ -5,7 +5,7 @@
 	<parent>
         <groupId>gov.cdc.izgw</groupId>
         <artifactId>izgw-bom</artifactId>
-        <version>1.13.0</version>
+        <version>1.14.1-SNAPSHOT</version>
         <relativePath />
 	</parent>
 	<groupId>gov.cdc.izgateway</groupId>
@@ -103,7 +103,7 @@
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
 			<artifactId>izgw-core</artifactId>
-			<version>3.4.0</version>
+			<version>3.5.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.cdc.izgw</groupId>
