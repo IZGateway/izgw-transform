@@ -68,8 +68,19 @@ in the QBP message.
 
 #### Including additional resources
 
-By default the Bundle contains only the requested resource type (e.g., `Immunization`
-records) and any warnings. Use `_include` to add related resources.
+By default the Bundle contains the requested resource type (e.g., `Immunization` records),
+any warnings, and any resource those records reference — the subject `Patient`, the
+administering `Practitioner` and `Location`, the `Organization` behind
+`ImmunizationRecommendation.authority`. Those arrive with `search.mode = include` without being
+asked for, so that every reference in the Bundle resolves within the Bundle. Use `_include` to
+add anything further.
+
+An `ImmunizationRecommendation` query additionally returns the patient's **evaluated history** as
+`include` — the doses the IIS evaluated to produce the forecast. These carry
+`protocolApplied.doseNumber`, `protocolApplied.seriesDoses`, `protocolApplied.authority` and
+`programEligibility`, which the `/Immunization` query cannot return because the Z32 response
+behind it does not carry the source OBX segments. Filter on `search.mode = match` for the
+forecast alone.
 
 **Use case: I want everything — immunization records and all referenced resources**
 
@@ -83,23 +94,25 @@ GET /fhir/{destinationId}/Immunization?family=Smith&given=John&birthdate=2000-01
 `_revinclude=Provenance:target` also includes a `Provenance` record for each result
 identifying the IIS as the data source.
 
-**Use case: I want immunization records and the patient only**
+**Use case: I want immunization records, the patient, and the administering provider**
 
 ```
 GET /fhir/{destinationId}/Immunization?family=Smith&given=John&birthdate=2000-01-01
-    &_include=Immunization:patient
 ```
 
-**Use case: I want immunization records and the administering provider or organization**
+No `_include` needed — a resource the returned records reference is returned with them, so
+`_include=Immunization:patient` and `_include=Immunization:performer` add nothing here. They
+remain valid and harmless.
 
-```
-GET /fhir/{destinationId}/Immunization?family=Smith&given=John&birthdate=2000-01-01
-    &_include=Immunization:patient
-    &_include=Immunization:performer
-```
+One case is not a resource: a reference the conversion built without a resource behind it — a
+`PractitionerRole` pointing at a `Practitioner`, for example — is delivered with no `reference`
+element, keeping its `identifier` and `display`. No `_include` recovers it, because there is no
+resource to return. Read the `identifier` and `display`, or fetch the target from the IIS
+directly.
 
 > In the response Bundle, directly matched resources have `search.mode = match`;
 > included resources have `search.mode = include`; warnings have `search.mode = outcome`.
+> Select `search.mode = match` to get just the resources you queried for.
 
 
 #### Response

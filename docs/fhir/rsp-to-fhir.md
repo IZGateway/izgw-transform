@@ -20,9 +20,66 @@ conversion, `FhirController` performs two post-processing steps:
    [Resource ID Design](index.md#resource-id-design)).
 2. **`filter`** — reduces the bundle to the requested resource type (plus any resources
    requested via `_include` / `_revinclude`), sets `Bundle.type = searchset`, and marks
-   each entry with `search.mode`.
+   each entry with `search.mode`. See [Searchset entries](#searchset-entries) below.
 
 The segment parsers that produce each resource type are listed below.
+
+### Searchset entries
+
+Every entry in a returned bundle carries a `search.mode`; anything that would not get one is
+removed.
+
+| `search.mode` | What it means |
+|---|---|
+| `match` | A resource of the type the query asked for. Clients select these to get the hits. |
+| `include` | A resource added to support a match — an `_include` / `_revinclude` hit, a resource a match references, or a white-listed conversion-created resource. |
+| `outcome` | An `OperationOutcome` reporting a conversion warning or error. |
+
+Two guarantees are worth relying on:
+
+- **Only the requested type is `match`.** A `GET /ImmunizationRecommendation` never labels an
+  `Immunization` as `match`, and vice versa. Joined resources are `include`, per the R4 definition
+  of a resource "added to the results because of a join".
+- **A recommendation query also returns the evaluated history.** A Z42 response carries the
+  patient's evaluated doses alongside the forecast, and those `Immunization` resources are returned
+  as `include`. They are not redundant with a `/Immunization` query: that path sends Z34 and
+  receives Z32, which does not carry `30973-2` (dose number), `59782-3` (doses in series) or
+  `59779-9` (schedule used), so `protocolApplied.doseNumber`, `protocolApplied.seriesDoses` and
+  `protocolApplied.authority` are reachable **only** through the recommendation query. Select
+  `search.mode = "match"` to get just the forecast.
+- **References resolve inside the bundle.** A resource a returned entry references — the subject
+  `Patient`, the `Organization` behind `ImmunizationRecommendation.authority`, an administering
+  `Practitioner` or `Location` — is returned as `include` even when the client did not ask for
+  it, which R4 permits. Where a target cannot be returned, the `reference` element is dropped and
+  the reference is delivered as a logical reference carrying `identifier` and `display`. Either
+  way, no `reference` in the bundle points at a resource absent from the bundle.
+
+Resources the conversion synthesises as a side effect (`Practitioner`, `Location`,
+`Organization`, `RelatedPerson`, `DocumentReference`, `Provenance`) are **not** returned unless
+something in the searchset references them, or the client white-lists them:
+
+```
+_include=Resource:source:*              all conversion-created resources
+_include=Resource:source:Organization   just the named type
+```
+
+`Observation` resources are never returned unless the client asks for them with `_revinclude`,
+on any query. There is little reason to ask on a recommendation query: the forecast `Observation`
+resources carry only what the recommendation itself already carries (`vaccineCode`,
+`forecastStatus`, `dateCriterion`, `doseNumber`, `seriesDoses`, `forecastReason`, `authority`),
+and one IIS response can hold dozens of them — 92 in one real capture.
+
+```
+GET /fhir/{destinationId}/ImmunizationRecommendation?...&_revinclude=Observation
+```
+
+That returns every `Observation` in the response: the forecast ones, plus the dose-level ones
+belonging to the evaluated history. Both arrive as `include`, never as `match`.
+
+Dose-level `Observation` resources link to their `Immunization` via `partOf`, so
+`_revinclude=Observation:part-of` narrows the request to those alone. Forecast `Observation`
+resources have no such link — R4 does not permit `Observation.partOf` to reference an
+`ImmunizationRecommendation` — so they are emitted unlinked and the narrowed form excludes them.
 
 ---
 

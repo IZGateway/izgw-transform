@@ -9,24 +9,38 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
 import org.hl7.fhir.r4.model.Bundle.BundleType;
+import org.hl7.fhir.r4.model.Bundle.SearchEntryMode;
+import org.hl7.fhir.r4.model.Property;
+import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.CapabilityStatement;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Coding;
 import org.hl7.fhir.r4.model.DateType;
 import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.HumanName;
+import org.hl7.fhir.r4.model.Immunization;
+import org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent;
+import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.OperationOutcome.IssueSeverity;
 import org.hl7.fhir.r4.model.OperationOutcome.IssueType;
@@ -219,9 +233,418 @@ class FhirControllerTests {
         "PID|1||0000001^^^TEST^MR||CuyahogaAIRA^MarnyAIRA^^^^^L||19600507|F"
     );
 
+    /**
+     * A Z32 response (evaluated history) for an immunization history query: one patient,
+     * two administered doses, each with an administering performer and facility so the
+     * conversion produces referenced Practitioner/Organization resources.
+     */
+    private static final String RSP_Z32_MESSAGE = String.join("\r",
+        "MSH|^~\\&|TESTIIS|TESTIIS|TESTAPP|TESTORG|20240101120000||RSP^K11^RSP_K11|X235|P|2.5.1|||||||||Z32^CDCPHINVS",
+        "MSA|AA|1234",
+        "QAK|Q1|OK|Z34^Request Immunization History^CDCPHINVS",
+        "QPD|Z34^Request Immunization History^CDCPHINVS|Q1|0000001^^^TEST^MR",
+        "PID|1||0000001^^^TEST^MR||CuyahogaAIRA^MarnyAIRA^^^^^L||19600507|F",
+        "ORC|RE||IZ-1^NDA|||||||^Nurse^Nancy^^^^^^NDA^L||^Clinician^Carl^^^^^^NDA^L",
+        "RXA|0|1|20200101||208^COVID-19 mRNA vaccine^CVX|0.3|mL^milliliters^UCUM|||"
+            + "^Nurse^Nancy^^^^^^NDA^L|^^^TESTFAC^^^^^Test Facility",
+        "OBX|1|CE|64994-7^Vaccine funding program eligibility category^LN|1|"
+            + "V02^VFC eligible Medicaid/Medicaid managed care^HL70064||||||F",
+        "ORC|RE||IZ-2^NDA|||||||^Nurse^Nancy^^^^^^NDA^L||^Clinician^Carl^^^^^^NDA^L",
+        "RXA|0|1|20200201||208^COVID-19 mRNA vaccine^CVX|0.3|mL^milliliters^UCUM|||"
+            + "^Nurse^Nancy^^^^^^NDA^L|^^^TESTFAC^^^^^Test Facility",
+        "OBX|1|CE|64994-7^Vaccine funding program eligibility category^LN|1|"
+            + "V02^VFC eligible Medicaid/Medicaid managed care^HL70064||||||F"
+    );
+
+    /**
+     * A Z42 response (evaluated history + forecast): one patient, two administered doses carrying
+     * the evaluation OBX segments that only a Z42 returns (30973-2 dose number, 59782-3 doses in
+     * series, 59779-9 schedule used, 64994-7 funding eligibility), and one forecast group
+     * (RXA-5 == 998) carrying the forecast OBX segments.
+     */
+    private static final String RSP_Z42_MESSAGE = String.join("\r",
+        "MSH|^~\\&|TESTIIS|TESTIIS|TESTAPP|TESTORG|20240101120000||RSP^K11^RSP_K11|X236|P|2.5.1|||||||||Z42^CDCPHINVS",
+        "MSA|AA|1234",
+        "QAK|Q1|OK|Z44^Request Evaluated History and Forecast^CDCPHINVS",
+        "QPD|Z44^Request Evaluated History and Forecast^CDCPHINVS|Q1|0000001^^^TEST^MR",
+        "PID|1||0000001^^^TEST^MR||CuyahogaAIRA^MarnyAIRA^^^^^L||19600507|F",
+        "ORC|RE||IZ-1^NDA",
+        "RXA|0|1|20200101||208^COVID-19 mRNA vaccine^CVX|0.3|mL^milliliters^UCUM",
+        "OBX|1|CE|30956-7^Vaccine Type^LN|1|208^COVID-19 mRNA vaccine^CVX||||||F",
+        "OBX|2|NM|30973-2^Dose Number in Series^LN|1|1|NA^Not Applicable^HL70353|||||F",
+        "OBX|3|NM|59782-3^Number of doses in primary series^LN|1|2|||||F",
+        "OBX|4|CE|59779-9^Immunization Schedule Used^LN|1|VXC16^ACIP^CDCPHINVS||||||F",
+        "OBX|5|CE|64994-7^Vaccine funding program eligibility category^LN|2|"
+            + "V02^VFC eligible Medicaid/Medicaid managed care^HL70064||||||F|||||VXC40^Vaccine Level^CDCPHINVS",
+        "ORC|RE||IZ-2^NDA",
+        "RXA|0|1|20200201||208^COVID-19 mRNA vaccine^CVX|0.3|mL^milliliters^UCUM",
+        "OBX|1|CE|30956-7^Vaccine Type^LN|1|208^COVID-19 mRNA vaccine^CVX||||||F",
+        "OBX|2|NM|30973-2^Dose Number in Series^LN|1|2|NA^Not Applicable^HL70353|||||F",
+        "OBX|3|NM|59782-3^Number of doses in primary series^LN|1|2|||||F",
+        "OBX|4|CE|59779-9^Immunization Schedule Used^LN|1|VXC16^ACIP^CDCPHINVS||||||F",
+        "OBX|5|CE|64994-7^Vaccine funding program eligibility category^LN|2|"
+            + "V02^VFC eligible Medicaid/Medicaid managed care^HL70064||||||F|||||VXC40^Vaccine Level^CDCPHINVS",
+        "ORC|RE||9999^NDA",
+        "RXA|0|1|20240101||998^No vaccine administered^CVX|999",
+        "OBX|1|CE|30956-7^Vaccine type^LN|1|208^COVID-19 mRNA vaccine^CVX||||||F",
+        "OBX|2|CE|59783-1^Status in immunization series^LN|1|LA13425-1^Complete^LN||||||F",
+        "OBX|3|TS|30981-5^Earliest date to give^LN|1|20240301||||||F",
+        "OBX|4|CE|30982-3^Reason applied by forecast logic^LN|1|"
+            + "LA12836-0^Reason applied by forecast logic^LN||||||F",
+        "OBX|5|CE|59779-9^Immunization Schedule Used^LN|1|VXC16^ACIP^CDCPHINVS||||||F"
+    );
+
     @AfterEach
     void clearRequestContext() {
         RequestContext.clear();
+    }
+
+    // --- searchset filtering -------------------------------------------------------------
+    //
+    // See openspec/changes/fix-fhir-searchset-include-mode. The filter classifies every entry
+    // as match / include / outcome and drops the rest; these tests pin that contract, which
+    // had no coverage at all before this change.
+
+    /**
+     * Asserts the R4 searchset invariant: every populated {@code Reference.reference} on every
+     * entry resolves to an entry in the same bundle. This is the check that would have caught
+     * the withdrawn {@code supportingPatientInformation} link before it shipped.
+     */
+    private static void assertNoDanglingReferences(Bundle bundle) {
+        Set<String> present = new HashSet<>();
+        for (BundleEntryComponent entry : bundle.getEntry()) {
+            Resource r = entry.getResource();
+            if (r != null && r.getIdElement() != null && r.getIdElement().hasIdPart()) {
+                present.add(r.fhirType() + "/" + r.getIdElement().getIdPart());
+            }
+        }
+        List<String> dangling = new ArrayList<>();
+        for (BundleEntryComponent entry : bundle.getEntry()) {
+            Resource r = entry.getResource();
+            if (r == null) {
+                continue;
+            }
+            for (Reference ref : referencesOf(r)) {
+                String value = ref.getReference();
+                if (StringUtils.isNotBlank(value) && !value.startsWith("#")
+                        && !present.contains(normalizeRef(value))) {
+                    dangling.add(r.fhirType() + " -> " + value);
+                }
+            }
+        }
+        assertTrue(dangling.isEmpty(),
+            () -> "bundle contains references to resources not in the bundle: " + dangling
+                + "\npresent: " + present);
+    }
+
+    /** Reduce a reference value to the {@code Type/id} form used as the bundle key. */
+    private static String normalizeRef(String value) {
+        String trimmed = StringUtils.substringBefore(value, "?");
+        String[] parts = StringUtils.split(trimmed, "/");
+        if (parts.length < 2) {
+            return trimmed;
+        }
+        return parts[parts.length - 2] + "/" + parts[parts.length - 1];
+    }
+
+    /** Every Reference held anywhere in a resource, found by walking its element tree. */
+    private static List<Reference> referencesOf(Base base) {
+        List<Reference> found = new ArrayList<>();
+        collectReferences(base, found, new HashSet<>());
+        return found;
+    }
+
+    private static void collectReferences(Base base, List<Reference> found, Set<Base> seen) {
+        if (base == null || !seen.add(base)) {
+            return;
+        }
+        if (base instanceof Reference ref) {
+            found.add(ref);
+            return;   // a Reference's own children (identifier, display) hold no further references
+        }
+        for (Property property : base.children()) {
+            for (Base child : property.getValues()) {
+                collectReferences(child, found, seen);
+            }
+        }
+    }
+
+    private static final String RECOMMENDATION_URI = "/fhir/dev/ImmunizationRecommendation";
+
+    private static final String IMMUNIZATION_URI = "/fhir/dev/Immunization";
+
+    private static Bundle query(String hl7, String uri, Map<String, String[]> params) throws Exception {
+        initRequestContext();
+        Bundle b = controller(hubReturning(hl7)).iisQuery("dev", fhirRequest(uri, null, params)).getBody();
+        assertNotNull(b);
+        return b;
+    }
+
+    // Observations only ever arrive because the caller asked for them. The default recommendation
+    // query returns none (see plainRecommendationQueryIsSelfContainedWithoutObservations), because
+    // the filter never walks the Reverses direction on its own. When the caller does ask with
+    // _revinclude=Observation, the forecast Observations arrive too - reaching them is the caller's
+    // choice, and they are never labelled match.
+
+    @Test
+    void revincludedObservationsAreLabelledIncludeNotMatch() throws Exception {
+        Bundle b = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI,
+            queryParams("_revinclude", "Observation"));
+
+        List<Resource> observations = resourcesOfType(b, "Observation");
+        assertFalse(observations.isEmpty(), "the _revinclude should have retained the dose Observations");
+        assertTrue(entriesWithMode(b, SearchEntryMode.INCLUDE).containsAll(observations),
+            "every revincluded Observation should be search.mode=include, not match");
+    }
+
+    @Test
+    void selectingMatchYieldsOnlyTheRequestedType() throws Exception {
+        Bundle b = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI,
+            queryParams("_revinclude", "Observation"));
+
+        List<Resource> matches = entriesWithMode(b, SearchEntryMode.MATCH);
+        assertFalse(matches.isEmpty(), "the doses should be matches");
+        assertTrue(matches.stream().allMatch(r -> "Immunization".equals(r.fhirType())),
+            () -> "only the requested type should be a match, got: "
+                + matches.stream().map(Resource::fhirType).distinct().toList());
+    }
+
+    @Test
+    void observationsArriveOnlyWhenRevincludedAndNeverAsMatch() throws Exception {
+        // The forecast detail is opt-in: absent by default, retained as include when asked for.
+        Bundle b = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI,
+            queryParams("_revinclude", "Observation"));
+
+        List<Resource> observations = resourcesOfType(b, "Observation");
+        assertFalse(observations.isEmpty(), "the _revinclude should have retained Observations");
+        assertTrue(entriesWithMode(b, SearchEntryMode.INCLUDE).containsAll(observations),
+            "a revincluded Observation is a join, so search.mode=include");
+        assertTrue(entriesWithMode(b, SearchEntryMode.MATCH).stream()
+                .allMatch(r -> "ImmunizationRecommendation".equals(r.fhirType())),
+            "only the forecast the client asked for should be a match");
+        assertNoDanglingReferences(b);
+    }
+
+    @Test
+    void unmatchedIncludeParameterIsNotAnError() throws Exception {
+        Bundle baseline = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI, queryParams());
+        Bundle b = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI,
+            queryParams("_include", "ImmunizationRecommendation:nosuchsearchname"));
+
+        assertEquals(baseline.getEntry().size(), b.getEntry().size(),
+            "an include naming an unregistered search name should retain nothing extra");
+    }
+
+    @Test
+    void recommendationQueryRetainsPatientAndAuthorityOrganization() throws Exception {
+        Bundle b = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI, queryParams());
+
+        assertNoDanglingReferences(b);
+        List<Resource> included = entriesWithMode(b, SearchEntryMode.INCLUDE);
+        assertFalse(resourcesOfType(b, "Patient").isEmpty(), "the subject Patient should be retained");
+        assertFalse(resourcesOfType(b, "Organization").isEmpty(),
+            "the schedule Organization behind authority should be retained");
+        assertTrue(included.containsAll(resourcesOfType(b, "Patient")),
+            "the retained Patient should be search.mode=include");
+        assertTrue(included.containsAll(resourcesOfType(b, "Organization")),
+            "the retained Organization should be search.mode=include");
+        assertTrue(entriesWithMode(b, SearchEntryMode.MATCH).stream()
+                .allMatch(r -> "ImmunizationRecommendation".equals(r.fhirType())),
+            "retaining a referenced resource must not promote it to a match");
+    }
+
+    @Test
+    void recommendationQueryIncludesTheEvaluatedHistory() throws Exception {
+        Bundle b = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI, queryParams());
+
+        List<Resource> doses = resourcesOfType(b, "Immunization");
+        assertEquals(2, doses.size(), "both administered doses should be returned");
+        assertTrue(entriesWithMode(b, SearchEntryMode.INCLUDE).containsAll(doses),
+            "evaluated history should be search.mode=include, not match");
+        assertTrue(entriesWithMode(b, SearchEntryMode.MATCH).stream()
+                .allMatch(r -> "ImmunizationRecommendation".equals(r.fhirType())),
+            "only the forecast the client asked for should be a match");
+        assertNoDanglingReferences(b);
+    }
+
+    @Test
+    void includedHistoryCarriesTheZ42OnlyEvaluationData() throws Exception {
+        Bundle b = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI, queryParams());
+
+        Set<String> orgIds = resourcesOfType(b, "Organization").stream()
+            .map(r -> r.getIdElement().getIdPart()).collect(java.util.stream.Collectors.toSet());
+        for (Resource r : resourcesOfType(b, "Immunization")) {
+            Immunization imm = (Immunization) r;
+            assertFalse(imm.getProtocolApplied().isEmpty(), "protocolApplied should be populated");
+            ImmunizationProtocolAppliedComponent protocol = imm.getProtocolAppliedFirstRep();
+            assertTrue(protocol.hasDoseNumberPositiveIntType(), "doseNumber from OBX 30973-2");
+            assertTrue(protocol.hasSeriesDosesPositiveIntType(), "seriesDoses from OBX 59782-3");
+            assertTrue(orgIds.contains(StringUtils.substringAfterLast(
+                    protocol.getAuthority().getReference(), "/")),
+                "protocolApplied.authority should resolve to an Organization in the bundle");
+            assertFalse(imm.getProgramEligibility().isEmpty(), "programEligibility from OBX 64994-7");
+        }
+    }
+
+    @Test
+    void includedHistoryHasStableDistinctIdentifiers() throws Exception {
+        Bundle b = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI, queryParams());
+
+        List<String> fillerOrderNumbers = resourcesOfType(b, "Immunization").stream()
+            .map(r -> ((Immunization) r).getIdentifierFirstRep().getValue())
+            .sorted()
+            .toList();
+        assertEquals(List.of("IZ-1", "IZ-2"), fillerOrderNumbers,
+            "each dose should carry its own ORC-3 filler order number");
+
+        Set<String> ids = b.getEntry().stream()
+            .map(e -> e.getResource().fhirType() + "/" + e.getResource().getIdElement().getIdPart())
+            .collect(java.util.stream.Collectors.toSet());
+        assertEquals(b.getEntry().size(), ids.size(), "no two entries may collide on Type/id");
+    }
+
+    @Test
+    void immunizationQueryStillReturnsHistoryAsMatch() throws Exception {
+        // The include is scoped to the recommendation path; /Immunization is unchanged.
+        Bundle b = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI, queryParams());
+
+        assertTrue(entriesWithMode(b, SearchEntryMode.MATCH)
+                .containsAll(resourcesOfType(b, "Immunization")),
+            "on /Immunization the doses are the matches, not includes");
+    }
+
+    @Test
+    void plainRecommendationQueryIsSelfContainedWithoutObservations() throws Exception {
+        Bundle b = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI, queryParams());
+
+        assertTrue(resourcesOfType(b, "Observation").isEmpty(),
+            "forecast Observations should stay out of a plain recommendation query");
+        assertNoDanglingReferences(b);
+    }
+
+    @Test
+    void immunizationQueryResolvesItsPatientReference() throws Exception {
+        Bundle b = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI, queryParams());
+
+        assertFalse(resourcesOfType(b, "Immunization").isEmpty(), "the doses should be matches");
+        assertFalse(resourcesOfType(b, "Patient").isEmpty(),
+            "Immunization.patient is 1..1 and must resolve within the bundle");
+        assertNoDanglingReferences(b);
+    }
+
+    @Test
+    void conversionCreatedResourcesStillNeedWhitelistingWhenUnreferenced() throws Exception {
+        // Provenance/DocumentReference are MessageParser artifacts that nothing in the
+        // searchset references, so they are the ones the white-list still governs.
+        Bundle without = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI, queryParams());
+        assertTrue(resourcesOfType(without, "Provenance").isEmpty(),
+            "unreferenced conversion-created resources should be absent by default");
+
+        Bundle with = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI,
+            queryParams("_include", "Resource:source:*"));
+        assertTrue(with.getEntry().size() > without.getEntry().size(),
+            "Resource:source:* should retain the conversion-created resources");
+        assertTrue(entriesWithMode(with, SearchEntryMode.INCLUDE)
+                .containsAll(resourcesOfType(with, "Provenance")),
+            "white-listed resources should be search.mode=include");
+    }
+
+    @Test
+    void unretainableTargetIsReducedToALogicalReference() throws Exception {
+        // PractitionerRole -> Practitioner is built outside v2tofhir's reference bookkeeping, so
+        // there is no target resource to retain. The reference element is dropped rather than
+        // shipped pointing at an id no endpoint serves; identifier/display survive.
+        Bundle b = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI, queryParams());
+
+        List<Resource> roles = resourcesOfType(b, "PractitionerRole");
+        assertFalse(roles.isEmpty(), "the referenced PractitionerRole should be retained");
+        List<Reference> cleared = roles.stream()
+            .flatMap(r -> referencesOf(r).stream())
+            .filter(ref -> !ref.hasReference())
+            .toList();
+        assertFalse(cleared.isEmpty(), "the unresolvable Practitioner reference should be cleared");
+        assertNoDanglingReferences(b);
+    }
+
+    @Test
+    void outcomesSurviveAndBundleIsASearchset() throws Exception {
+        Bundle b = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI, queryParams());
+
+        assertEquals(BundleType.SEARCHSET, b.getType());
+        assertFalse(entriesWithMode(b, SearchEntryMode.OUTCOME).isEmpty(),
+            "conversion OperationOutcomes should survive with mode=outcome");
+        assertTrue(b.getEntry().stream().allMatch(e -> e.getSearch().getMode() != null),
+            "every retained entry must carry a search mode");
+    }
+
+    @Test
+    void namedTypeWhitelistRetainsOnlyThatType() throws Exception {
+        // Naming one type is enough - the caller does not have to ask for Resource:source:*.
+        // It is not necessarily *narrower* than the wildcard on this fixture: the MessageParser
+        // Provenance targets the other conversion-created resources, so the no-dangling-references
+        // rule pulls them in behind it either way.
+        Bundle baseline = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI, queryParams());
+        Bundle named = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI,
+            queryParams("_include", "Resource:source:Provenance"));
+
+        assertTrue(resourcesOfType(baseline, "Provenance").isEmpty(),
+            "without the white-list the Provenance stays out");
+        assertFalse(resourcesOfType(named, "Provenance").isEmpty(),
+            "naming the type should white-list it");
+        assertTrue(entriesWithMode(named, SearchEntryMode.INCLUDE)
+                .containsAll(resourcesOfType(named, "Provenance")),
+            "a white-listed resource is search.mode=include");
+    }
+
+    @Test
+    void partOfRevincludeNarrowsToTheHistoryObservations() throws Exception {
+        // Documented in docs/fhir/rsp-to-fhir.md: the unqualified _revinclude=Observation returns
+        // the forecast Observations too, and Observation:part-of is how a caller excludes them.
+        Bundle all = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI,
+            queryParams("_revinclude", "Observation"));
+        Bundle narrowed = query(RSP_Z42_MESSAGE, RECOMMENDATION_URI,
+            queryParams("_revinclude", "Observation:part-of"));
+
+        List<Resource> narrowedObs = resourcesOfType(narrowed, "Observation");
+        assertFalse(narrowedObs.isEmpty(), "the dose Observations link via partOf and should arrive");
+        assertTrue(resourcesOfType(all, "Observation").size() > narrowedObs.size(),
+            "the unqualified form should also return the unlinked forecast Observations");
+        assertTrue(narrowedObs.stream().noneMatch(r -> ((Observation) r).getPartOf().isEmpty()),
+            "Observation:part-of should retain only Observations carrying a partOf link");
+    }
+
+    @Test
+    void matchOperationLabelsThePatientAsMatch() throws Exception {
+        // $match has no resource type in the path; the filter resolves the requested type to
+        // Patient, so the matched Patient is the match rather than an unlabelled entry.
+        initRequestContext();
+        Bundle b = (Bundle) controller(hubReturning(RSP_MESSAGE))
+            .iisPatientMatch("dev", matchParameters(), fhirRequest(MATCH_URI, null)).getBody();
+
+        assertNotNull(b);
+        List<Resource> patients = resourcesOfType(b, "Patient");
+        assertFalse(patients.isEmpty(), "the matched Patient should be returned");
+        assertTrue(entriesWithMode(b, SearchEntryMode.MATCH).containsAll(patients),
+            "on $match the Patient is the match");
+        assertTrue(b.getEntry().stream().allMatch(e -> e.getSearch().getMode() != null),
+            "every retained entry must carry a search mode");
+    }
+
+    /** The resources in a bundle carrying the given search mode. */
+    private static List<Resource> entriesWithMode(Bundle bundle, SearchEntryMode mode) {
+        return bundle.getEntry().stream()
+            .filter(e -> e.getResource() != null && e.getSearch() != null
+                && mode.equals(e.getSearch().getMode()))
+            .map(BundleEntryComponent::getResource)
+            .toList();
+    }
+
+
+    private static List<Resource> resourcesOfType(Bundle bundle, String fhirType) {
+        return bundle.getEntry().stream()
+            .map(BundleEntryComponent::getResource)
+            .filter(r -> r != null && fhirType.equals(r.fhirType()))
+            .toList();
     }
 
     @Test
@@ -468,11 +891,37 @@ class FhirControllerTests {
     }
 
     private static HttpServletRequest fhirRequest(String uri, String accept) {
+        return fhirRequest(uri, accept, Collections.emptyMap());
+    }
+
+    /**
+     * A mock request carrying query parameters, so searchset tests can drive
+     * {@code _include} / {@code _revinclude} and the patient identifier the query needs.
+     * Absent parameters read back as null, matching a real request.
+     */
+    private static HttpServletRequest fhirRequest(String uri, String accept, Map<String, String[]> params) {
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getParameterMap()).thenReturn(Collections.emptyMap());
+        when(req.getParameterMap()).thenReturn(params);
         when(req.getRequestURI()).thenReturn(uri);
         when(req.getHeader(HttpHeaders.ACCEPT)).thenReturn(accept);
+        when(req.getParameterValues(anyString()))
+            .thenAnswer(i -> params.get(i.getArgument(0, String.class)));
+        when(req.getParameter(anyString())).thenAnswer(i -> {
+            String[] values = params.get(i.getArgument(0, String.class));
+            return values == null || values.length == 0 ? null : values[0];
+        });
         return req;
+    }
+
+    /** Query parameters selecting the fixture patient, plus any extras under test. */
+    private static Map<String, String[]> queryParams(String... extras) {
+        Map<String, String[]> params = new LinkedHashMap<>();
+        params.put(IzQuery.PATIENT_LIST, new String[] {"TEST|0000001"});
+        for (int i = 0; i < extras.length; i += 2) {
+            params.merge(extras[i], new String[] {extras[i + 1]},
+                (a, b) -> Stream.concat(Arrays.stream(a), Arrays.stream(b)).toArray(String[]::new));
+        }
+        return params;
     }
 
     private static Parameters matchParameters() {
