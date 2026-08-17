@@ -155,6 +155,17 @@ public class FhirController {
 
     /** User-data key under which v2tofhir stores a Reference's target resource. */
     private static final String RESOURCE_KEY = "Resource";
+    /**
+     * The resource-type token in the {@code _include=Resource:source:<type>} white-list parameter,
+     * used as a pseudo-type meaning "any resource the conversion created".
+     *
+     * <p>This spells the same as {@link #RESOURCE_KEY} by coincidence and must not be merged with
+     * it. This one is part of the URL syntax callers type, documented in
+     * {@code docs/fhir/rsp-to-fhir.md}; {@code RESOURCE_KEY} is an internal v2tofhir user-data key
+     * that v2tofhir is free to rename. Sharing one constant would let a rename of either silently
+     * change the other.</p>
+     */
+    private static final String SOURCE_INCLUDE_TYPE = "Resource";
     /** Canonical OperationDefinition URL for the Patient {@code $match} operation. */
     private static final String PATIENT_MATCH_DEFINITION =
         "http://hl7.org/fhir/OperationDefinition/Patient-match";
@@ -1129,7 +1140,7 @@ public class FhirController {
 
     private boolean matchesSource(List<Include> includes, String target) {
         for (Include include: includes) {
-            if ("Resource".equals(include.getParamType()) 
+            if (SOURCE_INCLUDE_TYPE.equals(include.getParamType())
             	&& Parser.SOURCE.equals(include.getParamName())
             	&& Arrays.asList("*", target, null).contains(include.getParamTargetType())
             ) {
