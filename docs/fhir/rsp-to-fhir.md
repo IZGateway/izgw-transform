@@ -32,49 +32,107 @@ removed.
 | `search.mode` | What it means |
 |---|---|
 | `match` | A resource of the type the query asked for. Clients select these to get the hits. |
-| `include` | A resource added to support a match — an `_include` / `_revinclude` hit, a resource a match references, or a white-listed conversion-created resource. |
+| `include` | A resource the client asked for with `_include` / `_revinclude`, or white-listed with `_include=Resource:source:...`. |
 | `outcome` | An `OperationOutcome` reporting a conversion warning or error. |
 
-Two guarantees are worth relying on:
+Three rules govern what a bundle holds:
 
+- **You get only what you asked for.** The bundle holds the requested type, `OperationOutcome`
+  entries, and whatever an `_include` / `_revinclude` reached. Nothing else. A resource is **not**
+  returned because a returned entry references it, and not because the RSP message happened to carry
+  it. The shape of a response is predictable from the query alone.
 - **Only the requested type is `match`.** A `GET /ImmunizationRecommendation` never labels an
   `Immunization` as `match`, and vice versa. Joined resources are `include`, per the R4 definition
   of a resource "added to the results because of a join".
-- **A recommendation query also returns the evaluated history.** A Z42 response carries the
-  patient's evaluated doses alongside the forecast, and those `Immunization` resources are returned
-  as `include`. They are not redundant with a `/Immunization` query: that path sends Z34 and
-  receives Z32, which does not carry `30973-2` (dose number), `59782-3` (doses in series) or
-  `59779-9` (schedule used), so `protocolApplied.doseNumber`, `protocolApplied.seriesDoses` and
-  `protocolApplied.authority` are reachable **only** through the recommendation query. Select
-  `search.mode = "match"` to get just the forecast.
-- **References resolve inside the bundle.** A resource a returned entry references — the subject
-  `Patient`, the `Organization` behind `ImmunizationRecommendation.authority`, an administering
-  `Practitioner` or `Location` — is returned as `include` even when the client did not ask for
-  it, which R4 permits. Where a target cannot be returned, the `reference` element is dropped and
-  the reference is delivered as a logical reference carrying `identifier` and `display`. Either
-  way, no `reference` in the bundle points at a resource absent from the bundle.
+- **A reference may point outside the bundle.** A reference is delivered exactly as the conversion
+  produced it — the `reference` value, plus `identifier` and `display` where it has them. Nothing is
+  stripped or rewritten. This service serves no read endpoint for a reference target, so a client
+  resolves it by asking for the target with `_include` or against its own data. A few references
+  arrive with none of the three populated; that is how the conversion produced them, and the
+  searchset does not synthesise content for them.
+
+#### `_revinclude` resolves only from a resource already in the bundle
+
+The conversion records a reverse reference on the resource being *pointed at*, so a `_revinclude` is
+resolved by walking the resources already retained. Reaching a resource that points at another
+non-requested resource therefore takes a forward `_include` first:
+
+```
+# returns no Observation - they reference the Patient, which is not in the bundle
+GET /fhir/{destinationId}/ImmunizationRecommendation?...&_revinclude=Observation
+
+# returns them - the Patient is now in the bundle to anchor the reverse hit
+GET /fhir/{destinationId}/ImmunizationRecommendation?...
+    &_include=ImmunizationRecommendation:patient&_revinclude=Observation
+```
+
+Any retained resource the sought resource references will serve as the anchor, not only the one whose
+search name the parameter names — the conversion accumulates every reverse search name onto one
+canonical reference per resource. So qualifying a `_revinclude` narrows *which resources* come back,
+not which path the lookup travels. A search name the conversion never registered matches nothing and
+is not an error.
+
+#### Conversion-created resources
 
 Resources the conversion synthesises as a side effect (`Practitioner`, `Location`,
-`Organization`, `RelatedPerson`, `DocumentReference`, `Provenance`) are **not** returned unless
-something in the searchset references them, or the client white-lists them:
+`Organization`, `RelatedPerson`, `DocumentReference`, `Provenance`) are **not** returned unless a
+forward `_include` reaches them as the target of a reference, or the client white-lists them:
 
 ```
 _include=Resource:source:*              all conversion-created resources
 _include=Resource:source:Organization   just the named type
 ```
 
-`Observation` resources are never returned unless the client asks for them with `_revinclude`,
-on any query. There is little reason to ask on a recommendation query: the forecast `Observation`
-resources carry only what the recommendation itself already carries (`vaccineCode`,
-`forecastStatus`, `dateCriterion`, `doseNumber`, `seriesDoses`, `forecastReason`, `authority`),
-and one IIS response can hold dozens of them — 92 in one real capture.
+A white-listed resource is returned but is not itself walked, so a `_revinclude` never reaches
+anything through it. `_revinclude=Provenance` returns no `Provenance`, even alongside
+`_include=Resource:source:DocumentReference` — the `Provenance` points at the `DocumentReference`, and
+a white-listed `DocumentReference` anchors nothing. Use `_include=Resource:source:Provenance`.
+
+#### Getting the Z42 evaluated history
+
+A Z42 response carries the patient's evaluated doses alongside the forecast. Those `Immunization`
+resources are not returned by a plain recommendation query, and they are not redundant with a
+`/Immunization` query: that path sends Z34 and receives Z32, which does not carry `30973-2` (dose
+number), `59782-3` (doses in series), `59779-9` (schedule used) or `64994-7` (funding eligibility), so
+`protocolApplied.doseNumber`, `protocolApplied.seriesDoses`, `protocolApplied.authority` and
+`programEligibility` are reachable **only** through the recommendation query. Ask for them:
 
 ```
-GET /fhir/{destinationId}/ImmunizationRecommendation?...&_revinclude=Observation
+GET /fhir/{destinationId}/ImmunizationRecommendation?...
+    &_include=ImmunizationRecommendation:patient
+    &_revinclude=Immunization:patient
+    &_include=Immunization:authority
+```
+
+| Entry | `search.mode` | Why |
+|---|---|---|
+| `ImmunizationRecommendation` | `match` | the requested type |
+| `OperationOutcome` | `outcome` | conversion warnings, always returned |
+| `Patient` | `include` | `_include=ImmunizationRecommendation:patient` |
+| `Immunization` (one per dose) | `include` | `_revinclude=Immunization:patient`, anchored on the `Patient` |
+| `Organization` | `include` | `_include=Immunization:authority` |
+
+The `_include` on `patient` is not optional — drop it and the `_revinclude` has nothing to resolve
+from. `_include=Immunization:authority` is what makes `protocolApplied.authority` resolve inside the
+bundle; the schedule `Organization` is registered on the `Immunization`, not on the
+`ImmunizationRecommendation`. Select `search.mode = "match"` for the forecast alone.
+
+`Observation` resources are never returned unless the client asks for them with `_revinclude` **and**
+retains a resource they reference, on any query. There is little reason to ask on a recommendation
+query: the forecast `Observation` resources carry only what the recommendation itself already carries
+(`vaccineCode`, `forecastStatus`, `dateCriterion`, `doseNumber`, `seriesDoses`, `forecastReason`,
+`authority`), and one IIS response can hold dozens of them — 92 in one real capture.
+
+```
+GET /fhir/{destinationId}/ImmunizationRecommendation?...
+    &_include=ImmunizationRecommendation:patient
+    &_revinclude=Observation
 ```
 
 That returns every `Observation` in the response: the forecast ones, plus the dose-level ones
-belonging to the evaluated history. Both arrive as `include`, never as `match`.
+belonging to the evaluated history. Both arrive as `include`, never as `match`. The forward `_include`
+is what anchors the reverse lookup — the `Observation` reference the `Patient`, so without it the
+`_revinclude` returns nothing.
 
 Dose-level `Observation` resources link to their `Immunization` via `partOf`, so
 `_revinclude=Observation:part-of` narrows the request to those alone. Forecast `Observation`

@@ -17,18 +17,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.IllegalFormatCodePointException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.hl7.fhir.r4.model.Address;
-import org.hl7.fhir.r4.model.Base;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
@@ -53,7 +50,6 @@ import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.Parameters.ParametersParameterComponent;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.PrimitiveType;
-import org.hl7.fhir.r4.model.Property;
 import org.hl7.fhir.r4.model.Reference;
 import org.hl7.fhir.r4.model.Resource;
 import org.hl7.fhir.r4.model.StringType;
@@ -1063,81 +1059,29 @@ public class FhirController {
         markIncludedResources(includes, revIncludes, resources);
         
         cleanupBundleOfUnmarkedResources(bundle);
-
-        clearUnresolvableReferences(bundle);
         return bundle;
-    }
-
-    /**
-     * Drop the {@code reference} element of any reference that still points outside the bundle,
-     * keeping {@code identifier} and {@code display} so the client can still read the target.
-     *
-     * <p>{@link #retainReferencedResources} closes the reference graph v2tofhir bookkeeps in
-     * user data, which covers everything built through {@code ParserUtils.toReference}. A
-     * reference built directly (a plain {@code new Reference(...)}) is valid FHIR but invisible to
-     * that bookkeeping, so it cannot be resolved to a resource to retain. Rather than ship a
-     * pointer to an id no endpoint here serves, reduce it to a logical reference — legal in R4,
-     * and it still satisfies a 1..1 cardinality because the element itself remains.</p>
-     */
-    private void clearUnresolvableReferences(Bundle bundle) {
-        Set<String> present = new HashSet<>();
-        for (BundleEntryComponent entry : bundle.getEntry()) {
-            Resource r = entry.getResource();
-            if (r != null && r.getIdElement().hasIdPart()) {
-                present.add(r.fhirType() + "/" + r.getIdElement().getIdPart());
-            }
-        }
-        for (BundleEntryComponent entry : bundle.getEntry()) {
-            forEachReference(entry.getResource(), new HashSet<>(), ref -> {
-                String value = ref.getReference();
-                if (StringUtils.isNotBlank(value) && !value.startsWith("#")
-                        && !present.contains(toRelativeReference(value))) {
-                    ref.setReference(null);
-                }
-            });
-        }
-    }
-
-    /** Reduce a reference value, absolute or relative, to the {@code Type/id} bundle key. */
-    private static String toRelativeReference(String value) {
-        String[] parts = StringUtils.split(StringUtils.substringBefore(value, "?"), "/");
-        if (parts.length < 2) {
-            return value;
-        }
-        return parts[parts.length - 2] + "/" + parts[parts.length - 1];
-    }
-
-    /** Visit every {@link Reference} held anywhere in a resource's element tree. */
-    private void forEachReference(Base base, Set<Base> seen, Consumer<Reference> visitor) {
-        if (base == null || !seen.add(base)) {
-            return;
-        }
-        if (base instanceof Reference ref) {
-            visitor.accept(ref);
-            return;   // a Reference's own children hold no further references
-        }
-        for (Property property : base.children()) {
-            for (Base child : property.getValues()) {
-                forEachReference(child, seen, visitor);
-            }
-        }
     }
 
     /**
      * Classify each entry: the requested type is a {@code match}, an {@link OperationOutcome} is an
      * {@code outcome}, and anything else is left for later marking or removal.
      *
-     * <p>One resource type is included without being asked for. A Z42 response ("Return Evaluated
-     * History and Forecast") carries the patient's evaluated history alongside the forecast, and
-     * v2tofhir splits it by RXA-5: {@code 998^No Vaccine Administered} becomes a
-     * {@code recommendation} component, any real CVX code becomes an {@link Immunization}. Those
-     * Immunizations carry evaluation data that exists nowhere else reachable —
+     * <p>Nothing is retained here that the caller did not ask for. A resource of another type
+     * survives only if an {@code _include} or {@code _revinclude} parameter reaches it, so the shape
+     * of a response is predictable from the query alone.</p>
+     *
+     * <p>That includes the evaluated history on a recommendation query. A Z42 response ("Return
+     * Evaluated History and Forecast") carries the patient's evaluated history alongside the
+     * forecast, and v2tofhir splits it by RXA-5: {@code 998^No Vaccine Administered} becomes a
+     * {@code recommendation} component, any real CVX code becomes an Immunization. Those
+     * Immunizations carry evaluation data reachable through no other call —
      * {@code protocolApplied.doseNumber} / {@code seriesDoses} (OBX 30973-2 / 59782-3),
-     * {@code protocolApplied.authority} (OBX 59779-9) and {@code programEligibility} (OBX 64994-7).
-     * The {@code /Immunization} path does not compensate: it sends Z34 and receives Z32, which
-     * carries none of those OBX codes. So on the recommendation query they are returned as
-     * {@code include} rather than dropped — {@code include}, not {@code match}, so a client can
-     * still isolate the forecast it asked for by filtering on {@code mode = 'match'}.</p>
+     * {@code protocolApplied.authority} (OBX 59779-9) and {@code programEligibility} (OBX 64994-7),
+     * none of which the Z32 behind {@code /Immunization} returns — but wanting them is the caller's
+     * call to make. They are reached with
+     * {@code _include=ImmunizationRecommendation:patient&_revinclude=Immunization:patient}: the
+     * Immunizations reference the Patient rather than the recommendation, so the reverse hit is
+     * found on a retained Patient.</p>
      */
     private void preFilter(Bundle bundle, List<Include> includes, String requested, List<Resource> resources) {
         for (BundleEntryComponent entry : bundle.getEntry()) {
@@ -1146,8 +1090,6 @@ public class FhirController {
                 markEntry(entry, resources, SearchEntryMode.MATCH);
             } else if (r instanceof OperationOutcome) {
                 markEntry(entry, resources, SearchEntryMode.OUTCOME);
-            } else if (r instanceof Immunization && IMMUNIZATION_RECOMMENDATION.equals(requested)) {
-                markEntry(entry, resources, SearchEntryMode.INCLUDE);
             } else {
                 whitelistInfrastructureCreatedResources(resources, includes, r);
             }
@@ -1212,36 +1154,6 @@ public class FhirController {
             @SuppressWarnings("unchecked")
             Set<Reference> revs = (Set<Reference>) r.getUserData("Reverses");
             checkReferences(revIncludes, resources, r, revs, true);
-            retainReferencedResources(resources, refs);
-        }
-    }
-
-    /**
-     * Retain everything a kept resource points at, so the searchset never ships a reference to a
-     * resource it does not contain. {@code ImmunizationRecommendation.patient} and
-     * {@code Immunization.patient} are 1..1 in R4, and a client resolving references locally
-     * rather than by a follow-up fetch cannot resolve an id no endpoint here serves. R4 allows
-     * this without the caller asking: "the server has the prerogative to return additional search
-     * results if it believes them to be relevant."
-     *
-     * <p>Forward references only. The reverse direction is deliberately not walked: the forecast
-     * Observations reach their subject through {@code Reverses}, and pulling them in would ship
-     * dozens of resources whose content the recommendation component already carries.</p>
-     *
-     * <p>The caller's loop grows {@code resources} as it iterates, so this is transitive — a
-     * retained Patient's own references are resolved on a later pass.</p>
-     */
-    private void retainReferencedResources(List<Resource> resources, Set<Reference> refs) {
-        if (refs == null) {
-            return;
-        }
-        for (Reference ref : refs) {
-            // Null for any reference not built through ParserUtils.toReference, which has no
-            // target resource to retain.
-            if (ref.getUserData(RESOURCE_KEY) instanceof Resource target && !resources.contains(target)) {
-                target.setUserData(SearchEntryMode.class.getName(), SearchEntryMode.INCLUDE);
-                resources.add(target);
-            }
         }
     }
 
