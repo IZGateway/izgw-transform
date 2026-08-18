@@ -217,12 +217,14 @@ records, so it cannot be taken after the deletions in groups 1 and 2.
 - [x] 6.2 Add a case asserting that a plain FHIR `Immunization` query returns no `Patient` entry.
 - [x] 6.3 Add a case sending `_include=Immunization:patient` and asserting the `Patient` is present
       with `entry.search.mode == "include"`.
-- [x] 6.4 Add a case sending `_include=*:*&_revinclude=Immunization` against
-      `ImmunizationRecommendation` and asserting `Patient`, `Organization`, and `Immunization` are all
-      present as `include` with the recommendation the only `match` — the recovery recipe documented
-      in task 5.4, exercised against a live IIS rather than a fixture.
-- [x] 6.5 Mirror the three new cases into the JWT Okta folder, matching how the existing FHIR cases
-      are duplicated there.
+- [x] 6.4 Deferred, not delivered. A case sending `_include=*:*&_revinclude=Immunization` against
+      `ImmunizationRecommendation` was added and then removed: IZ Gateway Hub does not currently
+      respond with Z42, so no dev fixture produces a forecast and the case failed with no
+      `ImmunizationRecommendation` in the bundle. The recovery recipe stays covered by the unit test
+      `recoveryParametersReproduceThePreChangePayload`, which runs against the Z42 fixture directly.
+      Re-add the integration case once the Hub returns Z42 (separate work, tracked by the team).
+- [x] 6.5 Mirror the new cases into the JWT Okta folder, matching how the existing FHIR cases are
+      duplicated there. Two delivered (`TS_TC_07d`, `TS_TC_07e`); the third is deferred per task 6.4.
 
 ## 7. Build gates and review
 
