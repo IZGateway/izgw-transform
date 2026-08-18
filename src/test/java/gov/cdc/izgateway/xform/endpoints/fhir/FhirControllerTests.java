@@ -380,7 +380,7 @@ class FhirControllerTests {
     }
 
     // Observations only ever arrive because the caller asked for them. The default recommendation
-    // query returns none (see plainRecommendationQueryIsSelfContainedWithoutObservations), because
+    // query returns none (see plainRecommendationQueryReturnsNoObservations), because
     // the filter never walks the Reverses direction on its own. When the caller does ask with
     // _revinclude=Observation, the forecast Observations arrive too - reaching them is the caller's
     // choice, and they are never labelled match.

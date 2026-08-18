@@ -70,6 +70,10 @@ records, so it cannot be taken after the deletions in groups 1 and 2.
 
 - [x] 3.1 In `FhirControllerTests.java`, delete the `assertNoDanglingReferences` and
       `collectReferences` helpers and the `org.hl7.fhir.r4.model.Base` import they need.
+
+      Corrected in delivery: `assertNoDanglingReferences` was deleted, but `collectReferences` and
+      the `Base` import were kept and repurposed under the `referencesOf` helper — the new
+      no-stripping tests (3.6, 4.5) need to walk a resource's reference tree.
 - [x] 3.2 Replace `recommendationQueryRetainsPatientAndAuthorityOrganization` with a test asserting
       that a plain `GET .../ImmunizationRecommendation` returns neither the `Patient` nor the
       schedule `Organization`, and a second test asserting both arrive with

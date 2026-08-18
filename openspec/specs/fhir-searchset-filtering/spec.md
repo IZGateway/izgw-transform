@@ -4,9 +4,8 @@
 
 This capability defines how the IZ Gateway Transformation Service turns a converted HL7 v2 response
 into a FHIR R4 searchset for a FHIR query caller: which entries the response bundle retains, what
-`Bundle.entry.search.mode` each retained entry carries, how `_include` and `_revinclude` are
-resolved, and the integrity guarantee that no retained entry references a resource the bundle does
-not contain. It applies to every FHIR query endpoint the service exposes and is independent of the
+`Bundle.entry.search.mode` each retained entry carries, and how `_include` and `_revinclude` are
+resolved. It applies to every FHIR query endpoint the service exposes and is independent of the
 transformation pipeline, which does not participate in searchset assembly.
 
 ## Requirements
@@ -67,6 +66,71 @@ The service SHALL retain every `OperationOutcome` in the converted bundle and SH
 - **WHEN** the searchset is assembled
 - **THEN** each `OperationOutcome` entry SHALL be retained with `search.mode = "outcome"`
 
+### Requirement: A searchset contains only what the caller asked for
+
+The service SHALL return, in the response to a FHIR query, only entries the caller asked for:
+resources of the requested type, `OperationOutcome` resources, and resources retained because they
+satisfied an `_include` or `_revinclude` parameter the caller supplied. It SHALL NOT retain a
+resource on any other ground. In particular, the service SHALL NOT retain a resource merely because
+a retained entry references it, and SHALL NOT retain a resource merely because the HL7 v2 response
+happened to carry it.
+
+The shape of a response SHALL therefore be predictable from the query alone: the same query against
+the same HL7 v2 response SHALL yield the same set of resource types regardless of the destination it
+was routed to, because searchset assembly reads only the converted bundle and the query parameters
+and consults no organization, pipeline or solution.
+
+This requirement is **BREAKING** for a caller relying on unrequested resources arriving. It governs
+the FHIR REST inbound path only. The SOAP/HL7 v2 inbound message contract, the outbound query sent
+to the downstream Hub or IIS, and the transformation pipeline (organizations, pipelines, solutions,
+operations, and preconditions) SHALL be unchanged, and existing organization transformation
+configurations SHALL continue to work untouched.
+
+#### Scenario: a plain immunization query returns immunizations only
+- **GIVEN** a request to `GET /fhir/{destination}/Immunization` with no `_include` or `_revinclude`
+  parameter
+- **WHEN** the converted bundle contains `Immunization` resources and the `Patient` they reference
+- **THEN** the returned searchset SHALL contain the `Immunization` entries with
+  `search.mode = "match"`
+- **AND** it SHALL NOT contain the `Patient`
+
+#### Scenario: a plain recommendation query returns the forecast only
+- **GIVEN** a request to `GET /fhir/{destination}/ImmunizationRecommendation` with no `_include` or
+  `_revinclude` parameter
+- **WHEN** the converted bundle contains an `ImmunizationRecommendation`, the `Patient`, the
+  schedule `Organization` behind `authority`, `Immunization` resources from the evaluated history,
+  and forecast `Observation` resources
+- **THEN** the returned searchset SHALL contain only the `ImmunizationRecommendation` entries, with
+  `search.mode = "match"`
+
+#### Scenario: the caller asks for the subject patient
+- **GIVEN** the same immunization query
+- **WHEN** the caller supplies `_include=Immunization:patient`
+- **THEN** the `Patient` SHALL be retained with `search.mode = "include"`
+
+#### Scenario: the caller asks for everything the returned resources reference
+- **GIVEN** a request to `GET /fhir/{destination}/ImmunizationRecommendation`
+- **WHEN** the caller supplies `_include=*:*`
+- **THEN** every resource reachable by a reference from a retained entry SHALL be retained with
+  `search.mode = "include"`
+
+#### Scenario: the caller asks for the evaluated history and its evaluation data
+- **GIVEN** a Z42 response containing administered doses and forecasts for one patient
+- **WHEN** the caller issues `GET /fhir/{destination}/ImmunizationRecommendation` with
+  `_include=ImmunizationRecommendation:patient`, `_revinclude=Immunization:patient`, and
+  `_include=Immunization:authority`
+- **THEN** the `Patient` and one `Immunization` per administered dose SHALL be retained with
+  `search.mode = "include"`
+- **AND** the `Organization` behind `protocolApplied.authority` SHALL be retained, because the
+  authority is registered on the `Immunization` and not on the `ImmunizationRecommendation`
+- **AND** the `ImmunizationRecommendation` SHALL be the only entry labelled `match`
+
+#### Scenario: the routing destination does not change the returned types
+- **GIVEN** the same FHIR query issued against two different destinations
+- **WHEN** both produce the same HL7 v2 response
+- **THEN** the two returned searchsets SHALL contain the same resource types with the same
+  `search.mode` on each
+
 ### Requirement: `_include` and `_revinclude` results are labelled `include`
 
 The service SHALL set `search.mode = "include"` on every resource retained because it satisfied an
@@ -82,13 +146,18 @@ resource types and search names SHALL match any value.
 
 This is a **BREAKING** change to the labelling a client observes: a client that previously read
 `_include` and `_revinclude` results as `match` SHALL now read them as `include`.
+Reverse resolution depends on the referencing resource reaching a retained entry, per "A reverse
+include resolves only from a retained resource". On the immunization path the `Observation` reference
+the retained `Immunization` directly, so `_revinclude=Observation` resolves with no forward
+`_include`. On the recommendation path they reference the `Patient` rather than the
+`ImmunizationRecommendation`, so the same parameter alone retains nothing.
+
 
 #### Scenario: a reverse-included resource is labelled include
-- **GIVEN** a request to `GET /fhir/{destination}/ImmunizationRecommendation` with
-  `_revinclude=Observation`
-- **WHEN** the converted bundle contains one `ImmunizationRecommendation` and supporting
-  `Observation` resources that reference it
-- **THEN** the `ImmunizationRecommendation` entry SHALL have `search.mode = "match"`
+- **GIVEN** a request to `GET /fhir/{destination}/Immunization` with `_revinclude=Observation`
+- **WHEN** the converted bundle contains `Immunization` resources and dose-level `Observation`
+  resources that reference them through `partOf`
+- **THEN** the `Immunization` entries SHALL have `search.mode = "match"`
 - **AND** every retained `Observation` entry SHALL have `search.mode = "include"`
 - **AND** the caller SHALL be able to obtain exactly the requested resources by selecting entries
   with `search.mode = "match"`
@@ -106,113 +175,112 @@ This is a **BREAKING** change to the labelling a client observes: a client that 
 - **THEN** the request SHALL succeed
 - **AND** no additional entry SHALL be retained on account of that parameter
 
-### Requirement: A returned searchset contains no dangling references
+### Requirement: A reverse include resolves only from a retained resource
 
-No entry retained in a returned searchset SHALL carry a `Reference.reference` element pointing at a
-resource that the searchset does not contain. When a resource would otherwise be removed but is
-still referenced by a retained entry, the service SHALL retain it with `search.mode = "include"`.
-Where the referenced resource cannot be retained because the searchset never held it, the service
-SHALL instead clear the `reference` element, preserving `Reference.identifier` and
-`Reference.display` so the target remains readable as a logical reference. A reference reduced this
-way still satisfies a 1..1 cardinality, because the element itself remains present.
+The service SHALL resolve a `_revinclude` parameter against the reverse references of resources
+already retained in the searchset. A resource that references a retained entry SHALL therefore be
+reached by `_revinclude` only when the entry it references is itself retained, and a caller SHALL be
+able to retain that intermediate entry with `_include`.
 
-FHIR R4 permits this without the client asking for it: "the server has the prerogative to return
-additional search results if it believes them to be relevant." The defect this closes is that
-mandatory 1..1 references — `Immunization.patient`, `ImmunizationRecommendation.patient` — and the
-populated `ImmunizationRecommendation.authority` resolved to nothing in the delivered bundle and to
-no endpoint this service serves, so a client performing local reference resolution rather than a
-follow-up fetch could not resolve them.
+This follows from how the HL7 v2 to FHIR conversion bookkeeps references: a reverse reference is
+recorded on the resource being pointed at, so it is discoverable only by traversing that resource.
+The consequence is observable and callers depend on it — the evaluated-history `Immunization` and the
+forecast `Observation` both reference the `Patient` rather than the `ImmunizationRecommendation`, so
+neither is reachable on a recommendation query until the `Patient` is retained.
 
-This requirement SHALL take precedence over "Conversion-created resources are retained only when
-white-listed": a conversion-created resource that a retained entry references SHALL be retained.
+Any retained resource that the sought resource references SHALL serve as the anchor; the anchor need
+not be the one whose search name the parameter names. The conversion keeps a single canonical
+`Reference` per resource and accumulates every reverse search name onto it, so a qualified
+`_revinclude` matches when the named search name is among the accumulated names, regardless of which
+retained resource the reverse reference was found on. A search name the conversion never registered
+SHALL match nothing.
 
-#### Scenario: the subject Patient is retained for an immunization query
+A `_revinclude` naming a resource type SHALL match on the resource type carried by the reverse
+reference. A `_revinclude=*` SHALL match any type. Where the conversion produces a resource whose id
+carries no resource type, a type-qualified `_revinclude` cannot identify it and matches nothing while
+the wildcard form still reaches it. `Provenance` is the only resource type the HL7 v2 to FHIR
+conversion currently gives such an id, so `_revinclude=Provenance` matches nothing while
+`_revinclude=*` and `_include=Resource:source:Provenance` both reach it. That is a defect in the
+conversion rather than intended behavior, and this capability does not require it to stay that way.
+
+#### Scenario: a reverse include finds nothing when the referenced entry is absent
+- **GIVEN** a request to `GET /fhir/{destination}/ImmunizationRecommendation` with
+  `_revinclude=Observation` and no `_include`
+- **WHEN** the forecast `Observation` resources reference the `Patient`, which is not retained
+- **THEN** no `Observation` entry SHALL be retained
+- **AND** the request SHALL succeed
+
+#### Scenario: retaining the intermediate entry makes the reverse include resolve
+- **GIVEN** the same request with `_include=ImmunizationRecommendation:patient` added
+- **WHEN** the searchset is assembled
+- **THEN** the `Patient` SHALL be retained with `search.mode = "include"`
+- **AND** every `Observation` referencing it SHALL be retained with `search.mode = "include"`
+
+#### Scenario: another retained resource serves as the anchor
+- **GIVEN** a request to `GET /fhir/{destination}/ImmunizationRecommendation` with
+  `_include=ImmunizationRecommendation:authority` and `_revinclude=Immunization:patient`, and no
+  `_include` naming `patient`
+- **WHEN** the evaluated-history `Immunization` reference both the `Patient`, which is not retained,
+  and the schedule `Organization`, which is
+- **THEN** those `Immunization` entries SHALL be retained with `search.mode = "include"`
+- **AND** the `Patient` SHALL NOT be retained
+
+#### Scenario: an unregistered reverse search name matches nothing
+- **GIVEN** the same request with `_revinclude=Immunization:nosuchsearchname`
+- **WHEN** the searchset is assembled
+- **THEN** no `Immunization` entry SHALL be retained
+- **AND** the request SHALL succeed
+
+#### Scenario: the evaluated history is reached through the subject patient
+- **GIVEN** a Z42 response and a request to `GET /fhir/{destination}/ImmunizationRecommendation`
+- **WHEN** the caller supplies `_include=ImmunizationRecommendation:patient` and
+  `_revinclude=Immunization:patient`
+- **THEN** one `Immunization` per administered dose SHALL be retained with `search.mode = "include"`
+
+### Requirement: A reference to a resource outside the searchset is left intact
+
+The service SHALL leave every `Reference` on a retained entry as the HL7 v2 to FHIR conversion
+produced it. Where the referenced resource is not present in the returned searchset, the service
+SHALL NOT remove, rewrite, or reduce the `reference` element, and SHALL NOT alter the reference's
+`identifier` or `display`. Resolving such a reference is the caller's decision: the literal value,
+the identifier, and the display text are all delivered, and the caller may resolve the reference
+against its own source of truth, request the target with `_include`, or ignore it.
+
+This restores the reference handling callers saw before this capability existed, and it applies to
+mandatory 1..1 references — `Immunization.patient`, `ImmunizationRecommendation.patient` — as much
+as to optional ones.
+
+The service makes no guarantee that every delivered reference is readable. Where the HL7 v2 to FHIR
+conversion produces a `Reference` carrying no `reference`, no `identifier`, and no `display`, the
+service SHALL deliver it as produced. Populating such a reference is the conversion's concern, not
+the searchset's.
+
+#### Scenario: a mandatory reference keeps its literal value
 - **GIVEN** a request to `GET /fhir/{destination}/Immunization` with no `_include` parameter
-- **WHEN** the retained `Immunization` entries carry a `patient` reference to a `Patient` in the
-  converted bundle
-- **THEN** that `Patient` SHALL be retained with `search.mode = "include"`
-- **AND** every `Immunization.patient` reference in the searchset SHALL resolve to it
+- **WHEN** the returned `Immunization` entries carry a `patient` reference to a `Patient` that the
+  searchset does not contain
+- **THEN** each `patient` reference SHALL retain the `reference` value the conversion produced
+- **AND** its `identifier` and `display` SHALL be unchanged
 
-#### Scenario: the subject Patient is retained for a recommendation query
-- **GIVEN** a request to `GET /fhir/{destination}/ImmunizationRecommendation` with no `_include`
-  parameter
-- **WHEN** the retained `ImmunizationRecommendation` carries a `patient` reference to a `Patient` in
-  the converted bundle
-- **THEN** that `Patient` SHALL be retained with `search.mode = "include"`
-
-#### Scenario: the schedule Organization behind authority is retained
-- **GIVEN** a request to `GET /fhir/{destination}/ImmunizationRecommendation` with no `_include`
-  parameter
+#### Scenario: an optional reference to an omitted resource is left alone
+- **GIVEN** a returned recommendation searchset
 - **WHEN** the retained `ImmunizationRecommendation` carries an `authority` reference to an
-  `Organization` created by the conversion from the immunization schedule used
-- **THEN** that `Organization` SHALL be retained with `search.mode = "include"`, notwithstanding
-  that it is a conversion-created resource
+  `Organization` the searchset does not contain
+- **THEN** that reference SHALL be delivered unchanged
 
-#### Scenario: no reference in a returned searchset dangles
-- **GIVEN** any returned searchset
-- **WHEN** every `Reference.reference` element on every retained entry is resolved against the
-  entries of that same searchset
-- **THEN** every such reference SHALL resolve to an entry present in the searchset
-
-#### Scenario: an unretainable target is reduced to a logical reference
-- **GIVEN** a retained entry carrying a reference to a resource the converted bundle never held —
-  for example a reference the HL7 v2 to FHIR conversion did not register in its reference
-  bookkeeping, so no target resource is available to retain
+#### Scenario: a reference the conversion left empty is delivered as produced
+- **GIVEN** a converted bundle in which a retained entry holds a `Reference` with no `reference`, no
+  `identifier`, and no `display`
 - **WHEN** the searchset is assembled
-- **THEN** that reference SHALL have no `reference` element
-- **AND** its `identifier` and `display` SHALL be preserved
-- **AND** the searchset SHALL still satisfy "no reference in a returned searchset dangles"
+- **THEN** that reference SHALL be delivered unchanged
+- **AND** the searchset SHALL NOT be rejected on that account
 
-#### Scenario: retaining a referenced resource does not promote it to a match
-- **GIVEN** a request to `GET /fhir/{destination}/ImmunizationRecommendation`
-- **WHEN** a `Patient` and an `Organization` are retained solely to satisfy reference integrity
-- **THEN** neither SHALL be labelled `match`
-- **AND** selecting entries with `search.mode = "match"` SHALL yield only the
-  `ImmunizationRecommendation` resources
-
-### Requirement: A recommendation query returns the evaluated history it was sent with
-
-On a query for `ImmunizationRecommendation`, the service SHALL retain the `Immunization` resources
-converted from the same response, with `search.mode = "include"`. It SHALL NOT label them `match`,
-so a client can still isolate the forecast it asked for by selecting `search.mode = "match"`.
-
-A Z42 response ("Return Evaluated History and Forecast") carries the patient's evaluated history
-alongside the forecast, split by RXA-5: `998^No Vaccine Administered` becomes a `recommendation`
-component, any other CVX code becomes an `Immunization`. Those `Immunization` resources carry
-evaluation data reachable through no other call — `protocolApplied.doseNumber` and `seriesDoses`
-(OBX `30973-2` / `59782-3`), `protocolApplied.authority` (OBX `59779-9`), and `programEligibility`
-(OBX `64994-7`). The `/Immunization` path does not compensate, because it sends Z34 and receives
-Z32, which carries none of those OBX codes.
-
-This applies only to the recommendation query path. On an `/Immunization` query the same resources
-are the matches, and their labelling SHALL be unchanged.
-
-#### Scenario: evaluated history accompanies the forecast
-- **GIVEN** a Z42 response containing administered doses and forecasts for one patient
-- **WHEN** the client issues `GET /fhir/{destination}/ImmunizationRecommendation` with no
-  `_include` parameter
-- **THEN** one `Immunization` per administered dose SHALL be retained with
-  `search.mode = "include"`
-- **AND** the single `ImmunizationRecommendation` SHALL be the only entry labelled `match`
-
-#### Scenario: included history carries the evaluation data
-- **GIVEN** a returned recommendation searchset containing evaluated history
-- **WHEN** the client reads an included `Immunization`
-- **THEN** the `protocolApplied.doseNumber`, `protocolApplied.seriesDoses`,
-  `protocolApplied.authority` and `programEligibility` values present in the source response SHALL
-  be populated
-- **AND** `protocolApplied.authority` SHALL resolve to an `Organization` in the same searchset
-
-#### Scenario: each included dose keeps its own identifier
-- **GIVEN** a Z42 response with more than one administered dose
-- **WHEN** the searchset is assembled
-- **THEN** each included `Immunization` SHALL carry the filler order number of its own ORC-3
-- **AND** no two entries in the searchset SHALL collide on resource type and id
-
-#### Scenario: an immunization query is unaffected
-- **GIVEN** a client issuing `GET /fhir/{destination}/Immunization`
-- **WHEN** the searchset is assembled
-- **THEN** the `Immunization` resources SHALL be labelled `match`, not `include`
+#### Scenario: asking for the target changes nothing about the reference
+- **GIVEN** the same immunization query
+- **WHEN** the caller supplies `_include=Immunization:patient` so the `Patient` is retained
+- **THEN** the `patient` reference SHALL carry the same value it carries when the `Patient` is
+  omitted
+- **AND** it SHALL resolve to the retained `Patient`
 
 ### Requirement: Conversion-created resources are retained only when white-listed
 
@@ -223,8 +291,14 @@ already carries an identifier and display text sufficient for production use.
 
 The caller SHALL be able to white-list them with the `_include=Resource:source:<type>` parameter,
 where `<type>` is a resource type or `*` for all such resources; a white-listed resource SHALL be
-retained with `search.mode = "include"`. Resources referenced by a retained entry SHALL be retained
-regardless of this requirement, per "A returned searchset contains no dangling references".
+retained with `search.mode = "include"`. Such a resource SHALL also be retained when a forward
+`_include` reaches it as the target of a reference on a retained entry, on the same terms as any
+other resource — so `_include=Immunization:location` retains the conversion-created `Location`
+without the `Resource:source` form.
+
+A white-listed resource SHALL participate in `_include` and `_revinclude` traversal on the same terms
+as any other retained resource. Being retained by the white-list rather than by a caller's join does
+not exempt it from being traversed, so a `_revinclude` MAY reach a further resource through it.
 
 #### Scenario: conversion-created resources are removed by default
 - **GIVEN** a query whose converted bundle contains conversion-created `Practitioner` and `Location`
@@ -243,10 +317,32 @@ regardless of this requirement, per "A returned searchset contains no dangling r
 - **WHEN** the caller supplies `_include=Resource:source:*`
 - **THEN** every conversion-created resource SHALL be retained with `search.mode = "include"`
 
+#### Scenario: a forward include reaches a conversion-created resource
+- **GIVEN** a query whose converted bundle contains a conversion-created `Location` that a retained
+  `Immunization` references
+- **WHEN** the caller supplies `_include=Immunization:location` and no `Resource:source` parameter
+- **THEN** that `Location` SHALL be retained with `search.mode = "include"`
+
+#### Scenario: a white-listed resource is traversed like any other
+- **GIVEN** a query whose converted bundle contains conversion-created `Provenance` resources, which
+  reference a conversion-created `DocumentReference` rather than a resource of the requested type
+- **WHEN** the caller supplies `_include=Resource:source:DocumentReference` and `_revinclude=*:*`
+- **THEN** the `DocumentReference` SHALL be retained by the white-list
+- **AND** the `Provenance` resources referencing it SHALL be retained with `search.mode = "include"`,
+  reached by traversing the white-listed `DocumentReference`
+
+#### Scenario: a reverse include reaching nothing is not an error
+- **GIVEN** the same query
+- **WHEN** a `_revinclude` names a resource type that no reverse reference on any retained resource
+  resolves to
+- **THEN** no additional entry SHALL be retained
+- **AND** the request SHALL succeed
+
 ### Requirement: Unclassified entries are removed
 
 The service SHALL remove from the returned searchset every entry that no requirement in this
-capability retains. A caller SHALL therefore never receive an entry whose `search.mode` is absent.
+capability retains, whether or not a retained entry references it. A caller SHALL therefore never
+receive an entry whose `search.mode` is absent.
 
 #### Scenario: an unreferenced, unrequested resource is removed
 - **GIVEN** a converted bundle containing a resource that is not of the requested type, is not an
@@ -255,10 +351,16 @@ capability retains. A caller SHALL therefore never receive an entry whose `searc
 - **WHEN** the searchset is assembled
 - **THEN** that entry SHALL NOT appear in the returned searchset
 
+#### Scenario: being referenced does not save an entry from removal
+- **GIVEN** a converted bundle containing a resource that satisfies no `_include` or `_revinclude`
+  parameter but is referenced by a retained entry
+- **WHEN** the searchset is assembled
+- **THEN** that entry SHALL NOT appear in the returned searchset
+- **AND** the reference to it SHALL be delivered unchanged, per "A reference to a resource outside
+  the searchset is left intact"
+
 #### Scenario: forecast observations are removed from a plain recommendation query
 - **GIVEN** a request to `GET /fhir/{destination}/ImmunizationRecommendation` with no `_include` or
   `_revinclude` parameter
 - **WHEN** the converted bundle contains `Observation` resources carrying the forecast detail
 - **THEN** those `Observation` entries SHALL NOT appear in the returned searchset
-- **AND** the returned `ImmunizationRecommendation` SHALL remain self-contained — it SHALL NOT
-  reference any of the removed `Observation` resources
