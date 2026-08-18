@@ -100,7 +100,7 @@ GET /fhir/{destinationId}/Immunization?family=Smith&given=John&birthdate=2000-01
 `_include=*:*` follows all references from all returned resources, transitively. It reaches only
 resources a returned entry points **at**; add `_include=Resource:source:*` for the conversion-created
 resources that nothing references (see
-[Conversion-created resources](rsp-to-fhir.md#searchset-entries)).
+[Conversion-created resources](rsp-to-fhir.md#conversion-created-resources)).
 
 **Use case: I want the forecast plus the evaluated history it was computed from**
 
@@ -149,7 +149,10 @@ in reverse, which is why the `_revinclude` is there.
 #### Search parameter names
 
 An `_include` or `_revinclude` naming a search path the conversion never registered matches nothing
-and is not an error, so a typo fails silently. The registered names are:
+and is not an error, so a typo fails silently. The names below are the ones useful for immunization
+queries. They are not the whole set — the conversion registers a name per reference it builds, and
+also registers `subject`, `practitioner`, `organization`, `encounter`, `device`, `focus`, `target`,
+`information` and others on the resources that carry those references.
 
 | Parameter | Reaches |
 |---|---|
@@ -160,14 +163,25 @@ and is not an error, so a typo fails silently. The registered names are:
 | `_include=Immunization:location` | the administering `Location` |
 | `_include=Immunization:performer` | the administering `Practitioner` / `PractitionerRole` |
 | `_include=Immunization:manufacturer` | the vaccine manufacturer `Organization` |
-| `_revinclude=Observation` | the dose and forecast `Observation` |
-| `_revinclude=Observation:part-of` | only the `Observation` linked to a dose |
-| `_revinclude=Immunization` | the evaluated-history doses |
+| `_revinclude=Observation` | the dose and forecast `Observation` (needs an anchor, see below) |
+| `_revinclude=Observation:part-of` | only the `Observation` linked to a dose (needs an anchor) |
+| `_revinclude=Immunization` | the evaluated-history doses (needs an anchor) |
 | `_include=Resource:source:<type>` | conversion-created resources of that type, or `*` for all |
 
 `_include` follows references forward; `_revinclude` finds resources pointing **at** something already
 in the Bundle, so it needs a forward `_include` first unless the requested type is itself the target.
-`_revinclude` never reaches a resource retained only by `_include=Resource:source:...`.
+Any resource already in the Bundle can serve as that anchor, including one retained by
+`_include=Resource:source:...` — a white-listed resource is walked like any other.
+
+One known gap: a **type-qualified** `_revinclude` matches on the resource type carried by the
+reference, and the conversion gives `Provenance` an id with no type on it, so `_revinclude=Provenance`
+matches nothing. The wildcard form and the white-list both reach it:
+
+```
+_include=Resource:source:DocumentReference&_revinclude=*:*   returns the Provenance
+_include=Resource:source:Provenance                          returns the Provenance
+_revinclude=Provenance                                       returns nothing
+```
 
 
 #### Response

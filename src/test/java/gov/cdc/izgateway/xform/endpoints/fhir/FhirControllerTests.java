@@ -40,6 +40,7 @@ import org.hl7.fhir.r4.model.Enumerations;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Immunization;
 import org.hl7.fhir.r4.model.Immunization.ImmunizationProtocolAppliedComponent;
+import org.hl7.fhir.r4.model.ImmunizationRecommendation;
 import org.hl7.fhir.r4.model.Observation;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.OperationOutcome.IssueSeverity;
@@ -449,6 +450,20 @@ class FhirControllerTests {
                 .allMatch(e -> "ImmunizationRecommendation".equals(e.getResource().fhirType())
                     || e.getResource() instanceof OperationOutcome),
             () -> "only the requested type and outcomes should survive, got: " + typeModeCounts(b));
+
+        // The references to both omitted resources are delivered exactly as the conversion produced
+        // them. This is the case the removed no-dangling-references rule used to paper over.
+        ImmunizationRecommendation forecast =
+            (ImmunizationRecommendation) resourcesOfType(b, "ImmunizationRecommendation").get(0);
+        Reference patient = forecast.getPatient();
+        assertTrue(patient.hasReference(), "the mandatory patient reference keeps its literal value");
+        assertTrue(patient.getReference().startsWith("Patient/"),
+            () -> "unexpected patient reference: " + patient.getReference());
+        Reference authority = forecast.getAuthority();
+        assertTrue(authority.hasReference(),
+            "the optional authority reference keeps its literal value even with the target omitted");
+        assertTrue(authority.getReference().startsWith("Organization/"),
+            () -> "unexpected authority reference: " + authority.getReference());
     }
 
     @Test
@@ -772,23 +787,37 @@ class FhirControllerTests {
     }
 
     @Test
-    void revincludeDoesNotReachAWhitelistedResource() throws Exception {
-        // A white-listed resource is retained but never traversed, so no reverse reference is
-        // resolved from it. The Provenance points at the DocumentReference, so even white-listing
-        // the DocumentReference does not bring the Provenance along. Reaching it takes
-        // _include=Resource:source:Provenance - see namedTypeWhitelistRetainsOnlyThatType.
-        Bundle bare = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI,
-            queryParams("_revinclude", "Provenance"));
-        assertTrue(resourcesOfType(bare, "Provenance").isEmpty(),
-            "_revinclude=Provenance alone reaches nothing");
+    void aWhitelistedResourceIsTraversedLikeAnyOther() throws Exception {
+        // whitelistInfrastructureCreatedResources adds the resource to the retained list, so
+        // markIncludedResources visits it and walks its reverse references. The Provenance point at
+        // the DocumentReference, so white-listing the DocumentReference lets a _revinclude reach them.
+        Bundle b = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI, queryParams(
+            "_include", "Resource:source:DocumentReference",
+            "_revinclude", "*:*"));
 
-        Bundle withDoc = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI, queryParams(
+        assertFalse(resourcesOfType(b, "DocumentReference").isEmpty(),
+            "the white-list should retain the DocumentReference");
+        List<Resource> provenances = resourcesOfType(b, "Provenance");
+        assertFalse(provenances.isEmpty(),
+            "the Provenance should be reached by traversing the white-listed DocumentReference");
+        assertTrue(entriesWithMode(b, SearchEntryMode.INCLUDE).containsAll(provenances),
+            "a resource reached by a join is search.mode=include");
+    }
+
+    @Test
+    void typeQualifiedRevincludeCannotMatchProvenance() throws Exception {
+        // Known limitation, recorded in design.md and not introduced here: v2tofhir gives Provenance
+        // a bare id with no resource type, and includeMatches compares a type-qualified _revinclude
+        // against that type, so "Provenance".equals(null) fails. The wildcard form short-circuits the
+        // check - see aWhitelistedResourceIsTraversedLikeAnyOther. Change this test when that is fixed.
+        Bundle b = query(RSP_Z32_MESSAGE, IMMUNIZATION_URI, queryParams(
             "_include", "Resource:source:DocumentReference",
             "_revinclude", "Provenance"));
-        assertFalse(resourcesOfType(withDoc, "DocumentReference").isEmpty(),
-            "the white-list should retain the DocumentReference");
-        assertTrue(resourcesOfType(withDoc, "Provenance").isEmpty(),
-            "a white-listed resource is not traversed, so the reverse hit is still not found");
+
+        assertFalse(resourcesOfType(b, "DocumentReference").isEmpty(),
+            "the white-list still retains the DocumentReference");
+        assertTrue(resourcesOfType(b, "Provenance").isEmpty(),
+            "the type-qualified form cannot match a bare-id resource");
     }
 
     @Test
@@ -922,9 +951,11 @@ class FhirControllerTests {
     }
 
     @Test
-    void destinationDoesNotChangeTheReturnedTypes() throws Exception {
-        // Searchset assembly reads only the converted bundle and the query parameters, so the
-        // routing key - and therefore the organization's pipeline - cannot affect what is returned.
+    void theRoutingKeyDoesNotChangeTheReturnedTypes() throws Exception {
+        // Searchset assembly reads only the converted bundle and the query parameters. It consults no
+        // organization, pipeline or solution, so the destination that selected them cannot affect what
+        // comes back. Asserted on the routing key rather than on two pipeline configurations, because
+        // there is no config input to assembly for a pipeline fixture to vary.
         initRequestContext();
         Bundle first = controller(hubReturning(RSP_Z42_MESSAGE))
             .iisQuery("dev", fhirRequest(RECOMMENDATION_URI, null, HISTORY_PARAMS)).getBody();

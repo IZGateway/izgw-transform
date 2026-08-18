@@ -97,27 +97,53 @@ The branch's `whitelistInfrastructureCreatedResources` removes nothing; it only 
 removal happens once in `cleanupBundleOfUnmarkedResources` after include marking. Keep the branch's
 version: one removal point is easier to reason about than removal split across two passes.
 
-The carve-out is dropped, and **not** because the restructuring makes `_revinclude=Provenance` work.
-It does not work, and it did not work on `develop` either. Two facts establish this, both verified
-against the Z32 fixture:
+The carve-out is dropped because it was dead code: `develop` only skipped the `it.remove()` without
+setting a `search.mode`, so `cleanupBundleOfUnmarkedResources` deleted the `Provenance` on the next
+pass regardless. `_revinclude=Provenance` returned nothing on `develop` and returns nothing now —
+measured on the Z32 fixture at matched v2tofhir versions — so removing the carve-out changes no
+observable behavior.
 
-- `whitelistInfrastructureCreatedResources` sets the `SearchEntryMode` user data but never adds the
-  resource to the `resources` list, so `markIncludedResources` never visits a white-listed resource
-  and never walks its reverse references.
-- `develop`'s carve-out only skipped `it.remove()`; it set no mode, so
-  `cleanupBundleOfUnmarkedResources` deleted the `Provenance` on the next pass regardless. The
-  carve-out was dead code.
+A white-listed resource **is** traversed. `whitelistInfrastructureCreatedResources` adds it to the
+`resources` list, so `markIncludedResources` visits it and walks its reverse references like any
+other retained resource. The reason `_revinclude=Provenance` fails is unrelated to white-listing —
+see the known limitation below.
 
-Measured: `_revinclude=Provenance` returns 4 entries and no `Provenance`, and
-`_include=Resource:source:DocumentReference&_revinclude=Provenance` returns 5 entries — the
-`DocumentReference` arrives, the `Provenance` still does not, because the white-listed
-`DocumentReference` is never traversed. Conversion-created resources are reachable by a forward
-`_include` (`_include=Immunization:location` retains the `Location`) or by the `Resource:source`
-white-list, and not by `_revinclude`. The delta spec states this rather than the reverse.
+### Known limitation: a type-qualified `_revinclude` cannot match `Provenance`
 
-Making `_revinclude` work from a white-listed resource is a one-line change — add it to `resources` —
-but it is a behavior addition, not part of restoring the strict contract, so it belongs in its own
-change with its own proposal.
+`_revinclude=Provenance:target` is the standard FHIR way to ask for the provenance of search results,
+and it returns nothing here. This is a pre-existing defect, unchanged by this work, and it is not in
+`FhirController`.
+
+Measured on the Z32 fixture, with the `DocumentReference` that the `Provenance` resources reference
+white-listed so it is retained and traversed:
+
+```
+_include=Resource:source:DocumentReference & _revinclude=*:*         -> Provenance x23 retained
+_include=Resource:source:DocumentReference & _revinclude=Provenance  -> none retained
+```
+
+Same retained resources, same traversal, different only in the type check. `includeMatches` compares
+the parameter's type against `ref.getReferenceElement().getResourceType()`, and for `Provenance` that
+is `null`, so `"Provenance".equals(null)` fails. `*` short-circuits the check, which is why the
+wildcard form works.
+
+The null comes from v2tofhir. `Parser.addResource` assigns every resource a type-qualified id with
+`new IdType(resource.fhirType(), id)`, but the auto-created `Provenance` is added straight to the
+bundle with `p.setId(getIdGenerator().get())`, bypassing that line. Probing the converted bundle,
+`Provenance` is the only one of fourteen resource types with a bare id; the other thirteen are all
+type-qualified, which is why `_revinclude=Immunization` and `_revinclude=Observation` do work.
+
+Two candidate fixes, neither in scope here:
+
+1. **v2tofhir** — give the auto-created `Provenance` a type-qualified id like every other resource.
+   Fixes it for every consumer, and removes the inconsistency at its source.
+2. **xform, defensively** — have `includeMatches` compare against the target resource's `fhirType()`,
+   which it already holds via `ref.getUserData(RESOURCE_KEY)`, instead of parsing the type out of the
+   reference string. Robust regardless of id shape, and works against older v2tofhir.
+
+Both are behavior additions rather than part of restoring the strict contract, so they belong in their
+own change. The delta spec therefore states the general rule and records this as a limitation rather
+than specifying the current behavior as intended.
 
 ### A reverse include resolves only from a retained resource
 
@@ -151,6 +177,14 @@ keeps the one in `checkReferences`.
 `Property` and `java.util.function.Consumer` are used only by `forEachReference`, and
 `java.util.HashSet` only by `clearUnresolvableReferences`. All three imports must go with the
 deletions or Checkstyle's `UnusedImports` module fails the build at the `validate` phase.
+
+One constant is added rather than retained. `matchesSource` compared the `_include=Resource:source:…`
+parameter's type against the literal `"Resource"`, which SonarQube flagged as duplicating
+`RESOURCE_KEY`. They spell the same by coincidence and must not be merged: `RESOURCE_KEY` is an
+internal v2tofhir user-data key that v2tofhir may rename, while the literal in `matchesSource` is a
+token in the caller's URL, documented in `docs/fhir/rsp-to-fhir.md`. Sharing one constant would let a
+rename of either silently change the other with no compile error, so the URL token gets its own
+`SOURCE_INCLUDE_TYPE`.
 
 ### No pipeline, transport, or persistence involvement
 
@@ -211,16 +245,21 @@ this change touches.
 
 ## Risks / Trade-offs
 
-- **The eHealth Exchange pilot breaks on deploy if it has already been built against the branch
-  behavior** → The branch has not merged, so the behavior it depends on is whatever `develop`
-  serves today, plus the `match`-to-`include` labelling change. Confirm with the pilot contact
-  before merge that they read `Patient` from an `_include` they send, not from an unrequested entry,
-  and give them the parameter list from the proposal's What Changes section.
+- **The eHealth Exchange pilot is already exposed to the strict behavior** → The branch has not
+  merged to `develop`, but CI deploys it to the dev ECS cluster, and the Newman case `TS_TC_07e`
+  passes there. That case asserts `search.mode = "include"` on an `_include` hit, which pre-change
+  code labelled `match`, so `dev.xform.izgateway.org` is demonstrably serving this branch. The
+  notification is therefore overdue rather than pre-emptive: give the pilot contact the parameter list
+  from the proposal's What Changes section, and confirm they read `Patient` from an `_include` they
+  send rather than from an unrequested entry.
 - **Z42 evaluation data becomes hard to discover** → It is reachable through no other call, and the
-  two-parameter combination that reaches it (`_include=ImmunizationRecommendation:patient` plus
-  `_revinclude=Immunization:patient`) is not something a caller would guess. Mitigation is
-  documentation, not code: `docs/fhir/rsp-to-fhir.md` gets a worked example showing the parameter
-  pair, the resulting entry modes, and which OBX codes the included `Immunization` carry.
+  three-parameter combination that reaches it in full is not something a caller would guess:
+  `_include=ImmunizationRecommendation:patient` to anchor the reverse lookup,
+  `_revinclude=Immunization:patient` for the doses, and `_include=Immunization:authority` so
+  `protocolApplied.authority` resolves inside the searchset — that `Organization` is registered on the
+  `Immunization`, not on the recommendation, as recorded above. Mitigation is documentation, not code:
+  `docs/fhir/rsp-to-fhir.md` carries a worked example showing all three parameters, the resulting
+  entry modes, and which OBX codes the included `Immunization` carry.
 - **A caller doing local reference resolution inside the bundle now fails to resolve
   `Immunization.patient`** → This is the defect the branch set out to fix, and this change
   reinstates it deliberately: the reference is delivered with its `identifier` and `display`, and a
@@ -241,7 +280,9 @@ this change touches.
    so `develop` never carries the auto-retain behavior.
 2. Update `docs/fhir/fhir-api.md` and `docs/fhir/rsp-to-fhir.md` in the same commit range as the
    code, since both currently document the auto-retain and the reference stripping as the contract.
-3. Notify the eHealth Exchange pilot with the `_include` / `_revinclude` parameter list before the
-   dev deployment, since the CI pipeline force-deploys `develop` to the dev ECS cluster on merge.
+3. Notify the eHealth Exchange pilot with the `_include` / `_revinclude` parameter list. This is
+   overdue rather than pending: CI has already deployed the branch to the dev ECS cluster, so the
+   pilot is seeing the strict behavior on `dev.xform.izgateway.org` now. Do it before the merge to
+   `develop` promotes it further.
 4. Rollback: revert the change commits. There is no data migration, no persisted state, and no
    configuration to undo, so rollback is a redeploy of the previous image.

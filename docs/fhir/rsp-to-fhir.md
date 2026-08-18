@@ -83,10 +83,18 @@ _include=Resource:source:*              all conversion-created resources
 _include=Resource:source:Organization   just the named type
 ```
 
-A white-listed resource is returned but is not itself walked, so a `_revinclude` never reaches
-anything through it. `_revinclude=Provenance` returns no `Provenance`, even alongside
-`_include=Resource:source:DocumentReference` — the `Provenance` points at the `DocumentReference`, and
-a white-listed `DocumentReference` anchors nothing. Use `_include=Resource:source:Provenance`.
+A white-listed resource is walked like any other returned resource, so a `_revinclude` can reach
+further resources through it.
+
+One known gap: `_revinclude=Provenance` returns nothing, because the conversion gives `Provenance` a
+bare id with no resource type on it, and a type-qualified `_revinclude` matches on that type. The
+wildcard form works, and so does the white-list:
+
+```
+_include=Resource:source:DocumentReference&_revinclude=*:*   returns the Provenance
+_include=Resource:source:Provenance                          returns the Provenance
+_revinclude=Provenance                                       returns nothing
+```
 
 #### Getting the Z42 evaluated history
 

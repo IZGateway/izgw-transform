@@ -10,8 +10,9 @@ a retained entry references it, and SHALL NOT retain a resource merely because t
 happened to carry it.
 
 The shape of a response SHALL therefore be predictable from the query alone: the same query against
-the same HL7 v2 response SHALL yield the same set of resource types regardless of which
-organization sent it, because no organization configuration participates in searchset assembly.
+the same HL7 v2 response SHALL yield the same set of resource types regardless of the destination it
+was routed to, because searchset assembly reads only the converted bundle and the query parameters
+and consults no organization, pipeline or solution.
 
 This requirement is **BREAKING** for a caller relying on unrequested resources arriving. It governs
 the FHIR REST inbound path only. The SOAP/HL7 v2 inbound message contract, the outbound query sent
@@ -58,11 +59,11 @@ configurations SHALL continue to work untouched.
   authority is registered on the `Immunization` and not on the `ImmunizationRecommendation`
 - **AND** the `ImmunizationRecommendation` SHALL be the only entry labelled `match`
 
-#### Scenario: organization configuration does not change the returned types
-- **GIVEN** two organizations whose pipelines apply different transformations
-- **WHEN** each issues the same FHIR query and the HL7 v2 responses convert to bundles holding the
-  same resource types
-- **THEN** the two returned searchsets SHALL contain the same set of resource types
+#### Scenario: the routing destination does not change the returned types
+- **GIVEN** the same FHIR query issued against two different destinations
+- **WHEN** both produce the same HL7 v2 response
+- **THEN** the two returned searchsets SHALL contain the same resource types with the same
+  `search.mode` on each
 
 ### Requirement: A reverse include resolves only from a retained resource
 
@@ -83,6 +84,14 @@ not be the one whose search name the parameter names. The conversion keeps a sin
 `_revinclude` matches when the named search name is among the accumulated names, regardless of which
 retained resource the reverse reference was found on. A search name the conversion never registered
 SHALL match nothing.
+
+A `_revinclude` naming a resource type SHALL match on the resource type carried by the reverse
+reference. A `_revinclude=*` SHALL match any type. Where the conversion produces a resource whose id
+carries no resource type, a type-qualified `_revinclude` cannot identify it and matches nothing while
+the wildcard form still reaches it. `Provenance` is the only resource type the HL7 v2 to FHIR
+conversion currently gives such an id, so `_revinclude=Provenance` matches nothing while
+`_revinclude=*` and `_include=Resource:source:Provenance` both reach it. That is a defect in the
+conversion rather than intended behavior, and this capability does not require it to stay that way.
 
 #### Scenario: a reverse include finds nothing when the referenced entry is absent
 - **GIVEN** a request to `GET /fhir/{destination}/ImmunizationRecommendation` with
@@ -165,6 +174,50 @@ the searchset's.
 
 ## MODIFIED Requirements
 
+### Requirement: `_include` and `_revinclude` results are labelled `include`
+
+The service SHALL set `search.mode = "include"` on every resource retained because it satisfied an
+`_include` or `_revinclude` parameter. It SHALL NOT label such a resource `match`. In FHIR R4,
+`include` is the defined value for an entry "added to the results because of a join", and clients
+filter on `mode = "match"` to obtain the hits; labelling joined resources `match` makes the hits
+indistinguishable from their supporting resources.
+
+An `_include` or `_revinclude` parameter SHALL be resolved against the search-parameter names the
+HL7 v2 to FHIR conversion registered for each reference. A parameter naming a resource type or
+search name that is not registered SHALL match nothing and SHALL NOT be an error. Wildcard (`*`)
+resource types and search names SHALL match any value.
+
+This is a **BREAKING** change to the labelling a client observes: a client that previously read
+`_include` and `_revinclude` results as `match` SHALL now read them as `include`.
+Reverse resolution depends on the referencing resource reaching a retained entry, per "A reverse
+include resolves only from a retained resource". On the immunization path the `Observation` reference
+the retained `Immunization` directly, so `_revinclude=Observation` resolves with no forward
+`_include`. On the recommendation path they reference the `Patient` rather than the
+`ImmunizationRecommendation`, so the same parameter alone retains nothing.
+
+
+#### Scenario: a reverse-included resource is labelled include
+- **GIVEN** a request to `GET /fhir/{destination}/Immunization` with `_revinclude=Observation`
+- **WHEN** the converted bundle contains `Immunization` resources and dose-level `Observation`
+  resources that reference them through `partOf`
+- **THEN** the `Immunization` entries SHALL have `search.mode = "match"`
+- **AND** every retained `Observation` entry SHALL have `search.mode = "include"`
+- **AND** the caller SHALL be able to obtain exactly the requested resources by selecting entries
+  with `search.mode = "match"`
+
+#### Scenario: a forward-included resource is labelled include
+- **GIVEN** a request to a FHIR query endpoint with an `_include` parameter that matches a reference
+  on a resource of the requested type
+- **WHEN** the searchset is assembled
+- **THEN** the referenced resource SHALL be retained with `search.mode = "include"`
+
+#### Scenario: an unmatched include parameter is not an error
+- **GIVEN** a request with an `_include` or `_revinclude` parameter naming a search name that the
+  conversion does not register for any reference
+- **WHEN** the searchset is assembled
+- **THEN** the request SHALL succeed
+- **AND** no additional entry SHALL be retained on account of that parameter
+
 ### Requirement: Conversion-created resources are retained only when white-listed
 
 Resources that the HL7 v2 to FHIR conversion synthesises as a side effect of datatype and message
@@ -179,8 +232,9 @@ retained with `search.mode = "include"`. Such a resource SHALL also be retained 
 other resource — so `_include=Immunization:location` retains the conversion-created `Location`
 without the `Resource:source` form.
 
-A `_revinclude` SHALL NOT reach a resource retained only by this white-list. A white-listed resource
-is retained but is not itself traversed, so no reverse reference is resolved from it.
+A white-listed resource SHALL participate in `_include` and `_revinclude` traversal on the same terms
+as any other retained resource. Being retained by the white-list rather than by a caller's join does
+not exempt it from being traversed, so a `_revinclude` MAY reach a further resource through it.
 
 #### Scenario: conversion-created resources are removed by default
 - **GIVEN** a query whose converted bundle contains conversion-created `Practitioner` and `Location`
@@ -205,12 +259,19 @@ is retained but is not itself traversed, so no reverse reference is resolved fro
 - **WHEN** the caller supplies `_include=Immunization:location` and no `Resource:source` parameter
 - **THEN** that `Location` SHALL be retained with `search.mode = "include"`
 
-#### Scenario: a reverse include does not reach a white-listed resource
+#### Scenario: a white-listed resource is traversed like any other
 - **GIVEN** a query whose converted bundle contains conversion-created `Provenance` resources, which
   reference a conversion-created `DocumentReference` rather than a resource of the requested type
-- **WHEN** the caller supplies `_revinclude=Provenance`, with or without
-  `_include=Resource:source:DocumentReference`
-- **THEN** no `Provenance` entry SHALL be retained
+- **WHEN** the caller supplies `_include=Resource:source:DocumentReference` and `_revinclude=*:*`
+- **THEN** the `DocumentReference` SHALL be retained by the white-list
+- **AND** the `Provenance` resources referencing it SHALL be retained with `search.mode = "include"`,
+  reached by traversing the white-listed `DocumentReference`
+
+#### Scenario: a reverse include reaching nothing is not an error
+- **GIVEN** the same query
+- **WHEN** a `_revinclude` names a resource type that no reverse reference on any retained resource
+  resolves to
+- **THEN** no additional entry SHALL be retained
 - **AND** the request SHALL succeed
 
 ### Requirement: Unclassified entries are removed

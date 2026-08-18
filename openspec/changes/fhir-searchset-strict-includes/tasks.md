@@ -1,6 +1,6 @@
 ## 0. Capture the pre-change baseline
 
-This group runs first, while the auto-retain code is still in place. Task 4.3 asserts against what it
+This group runs first, while the auto-retain code is still in place. Task 4.2 asserts against what it
 records, so it cannot be taken after the deletions in groups 1 and 2.
 
 - [x] 0.1 Run the Z42 test message through `GET .../ImmunizationRecommendation` with no query
@@ -19,11 +19,15 @@ records, so it cannot be taken after the deletions in groups 1 and 2.
 
       Recorded, 10 entries: `OperationOutcome` x2 `outcome`, `Immunization` x2 `match`, `Patient` x1
       `include`, `PractitionerRole` x2 `include`, `Practitioner` x1 `include`, `Location` x2
-      `include`. Five references currently have their `reference` element cleared — four on the two
-      `PractitionerRole` resources and one on a `Location`. Only two of the five retain any readable
-      content (`display = "Carl Clinician"`); the other three carry neither `identifier` nor
-      `display`, so today they ship as empty `Reference` objects. That is a stronger argument for
-      this change than the proposal claims, and task 4.5 asserts against these numbers.
+      `include`. Five references arrive with no `reference` element — four on the two
+      `PractitionerRole` resources and one on a `Location`.
+
+      Corrected after the deletions landed: only **two** of those five were cleared by
+      `clearUnresolvableReferences`, the two carrying `display = "Carl Clinician"`. The other three
+      carry no `reference`, no `identifier` and no `display` as v2tofhir produces them, and they stay
+      empty afterwards. So this change restores two references, not five, and does not introduce the
+      three empty ones. Task 4.5 asserts the corrected numbers, and the delta spec records that the
+      searchset does not synthesise content for a reference the conversion left empty.
 
 ## 1. Remove the unrequested-retain behavior
 
@@ -54,13 +58,13 @@ records, so it cannot be taken after the deletions in groups 1 and 2.
 - [x] 2.5 Confirm `whitelistInfrastructureCreatedResources` still removes nothing and that all
       removal remains in the single `cleanupBundleOfUnmarkedResources` pass.
 
-      Verified, and one assumption corrected: a bare `_revinclude=Provenance` does **not** reach the
-      conversion-created `Provenance`, and did not on `develop` either.
-      `whitelistInfrastructureCreatedResources` marks the resource but never adds it to `resources`,
-      so `markIncludedResources` never traverses it, and `develop`'s carve-out set no mode so cleanup
-      deleted it anyway. Measured: `_revinclude=Provenance` gives 4 entries with no `Provenance`;
-      `_include=Resource:source:DocumentReference&_revinclude=Provenance` gives 5, the
-      `DocumentReference` arriving and the `Provenance` still not. Recorded in design.md.
+      Verified. A white-listed resource **is** added to `resources` and **is** traversed, so it can
+      anchor a `_revinclude` — `_include=Resource:source:DocumentReference&_revinclude=*:*` retains 23
+      `Provenance` on the Z32 fixture. The reason `_revinclude=Provenance` returns nothing is unrelated to white-listing:
+      v2tofhir gives `Provenance` a bare id, so the type check in `includeMatches` compares
+      `"Provenance"` against `null`. `develop`'s carve-out was dead code, since it set no
+      `search.mode` and cleanup deleted the resource anyway. Root cause and candidate fixes recorded
+      in design.md as a known limitation, out of scope here.
 
 ## 3. Invert the branch's unit tests
 
@@ -74,10 +78,15 @@ records, so it cannot be taken after the deletions in groups 1 and 2.
 - [x] 3.3 Replace `recommendationQueryIncludesTheEvaluatedHistory` with a test asserting no
       `Immunization` entry appears on a plain recommendation query.
 - [x] 3.4 Rework `includedHistoryCarriesTheZ42OnlyEvaluationData` and
-      `includedHistoryHasStableDistinctIdentifiers` to send
-      `_include=ImmunizationRecommendation:patient&_revinclude=Immunization:patient`, then keep their
+      `includedHistoryHasStableDistinctIdentifiers` to send the history parameters, then keep their
       existing assertions on `protocolApplied.doseNumber`, `seriesDoses`, `protocolApplied.authority`,
       `programEligibility`, and per-dose ORC-3 identifiers.
+
+      Delivered as the shared `HISTORY_PARAMS` constant, which needed a third parameter beyond the
+      `_include=ImmunizationRecommendation:patient&_revinclude=Immunization:patient` originally
+      written here: `_include=Immunization:authority`, without which the `protocolApplied.authority`
+      assertion fails because that `Organization` is registered on the `Immunization` rather than on
+      the recommendation.
 - [x] 3.5 Replace `immunizationQueryResolvesItsPatientReference` with a test asserting that on a
       plain `GET .../Immunization` the `Patient` is absent and every `Immunization.patient` keeps the
       literal `reference` value the conversion produced, with `identifier` and `display` unchanged.
@@ -151,15 +160,24 @@ records, so it cannot be taken after the deletions in groups 1 and 2.
       reverse, `Immunization` to `Location` forward) in a single pass. Add a second assertion running
       the same four parameters in reversed URL order and comparing the two searchsets, confirming
       parameter order does not matter.
-- [x] 4.10 Add a test that dropping `_include=ImmunizationRecommendation:patient` from the task 4.9
-      query returns no `Immunization`, since the reverse hit is found on the `Patient` and the
-      `Patient` must be retained first.
+- [x] 4.10 Add tests for what anchors a reverse include. Delivered as two:
+      `revincludeWithNoRetainedAnchorFindsNothing`, which drops **every** forward `_include` from the
+      task 4.9 query and gets no `Immunization`, and `anyRetainedReferencedResourceAnchorsTheReverseInclude`,
+      which keeps only `_include=ImmunizationRecommendation:authority` and still gets the doses.
+
+      Originally written as "dropping `_include=ImmunizationRecommendation:patient` returns no
+      `Immunization`". That is false: the 4.9 query also carries
+      `_include=ImmunizationRecommendation:authority`, and the retained `Organization` anchors the
+      reverse hit in the `Patient`'s place, because the doses reference it through
+      `protocolApplied.authority`. Split into the two tests above once measured.
 - [x] 4.11 Add a test that `Organization` and `Location` arrive under an ordinary `_include` without
       any `_include=Resource:source:...` parameter, even though both are conversion-created
       (`Parser.SOURCE`). This is the behavior the modified white-list requirement pins.
-- [x] 4.12 Add a test that organization configuration does not affect the returned resource types:
-      run the same query for two organizations whose pipelines apply different transformations and
-      assert the two searchsets hold the same set of resource types and search modes.
+- [x] 4.12 Add a test that the routing destination does not affect the returned resource types: issue
+      the same query against two destinations and assert the two searchsets hold the same resource
+      types and search modes. Originally written as "two organizations whose pipelines apply different
+      transformations"; narrowed because searchset assembly takes no organization, pipeline or solution
+      input, so a pipeline fixture would be testing the absence of a wire that never existed.
 - [x] 4.13 Remove the temporary `zzzTemporaryBaselineDump` test and its `dumpBaseline` helper, added
       only to capture the group 0 baseline.
 - [x] 4.14 Run the full class via Maven so the surefire env vars and `target/` BCFKS keystores are in
@@ -187,8 +205,10 @@ records, so it cannot be taken after the deletions in groups 1 and 2.
       `ImmunizationRecommendation`.
 - [x] 5.3a Document the general rule in `docs/fhir/rsp-to-fhir.md`: a `_revinclude` resolves only
       from a resource already in the searchset, so reaching a resource that references another
-      non-requested resource takes a forward `_include` first. Note that `_revinclude` never reaches
-      a resource retained only by the `Resource:source` white-list.
+      non-requested resource takes a forward `_include` first. Note that any retained resource can
+      serve as that anchor, including one retained by the `Resource:source` white-list — a white-listed
+      resource is traversed like any other — and that a type-qualified `_revinclude` matches nothing
+      for a resource whose id carries no resource type, which today is only `Provenance`.
 - [x] 5.4 Add a migration note to `docs/fhir/fhir-api.md` for callers upgrading from the pre-change
       behavior: `_include=*:*&_revinclude=Immunization` on an `ImmunizationRecommendation` query
       returns the same entry set the service returned before, with the one difference that a
@@ -241,12 +261,3 @@ records, so it cannot be taken after the deletions in groups 1 and 2.
 - [x] 7.5 Delete the untracked scratch file
       `src/test/java/gov/cdc/izgateway/xform/endpoints/fhir/AkZ42Scratch.java` before the branch
       merges.
-- [ ] 7.6 Notify the eHealth Exchange pilot contact of the `_include` / `_revinclude` parameters they
-      must add, before the merge to `develop` triggers the dev ECS force-new-deployment.
-
-## 8. Close out the change
-
-- [x] 8.1 Run `openspec validate fhir-searchset-strict-includes --strict` and confirm it passes.
-- [ ] 8.2 Run `/opsx:verify` to confirm the implementation matches the delta spec, then archive with
-      `/opsx:archive` so `openspec/specs/fhir-searchset-filtering/spec.md` absorbs the two added
-      requirements, the two modified ones, and the two removals.
