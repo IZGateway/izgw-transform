@@ -68,29 +68,18 @@ in the QBP message.
 
 #### Including additional resources
 
-By default the Bundle contains only the requested resource type (e.g., `Immunization`
-records) and any warnings. Use `_include` to add related resources.
+**You get only what you ask for.** By default the Bundle contains the requested resource type
+(e.g. `Immunization` records) and any warnings, and nothing else. The subject `Patient`, the
+administering `Practitioner` and `Location`, the `Organization` behind
+`ImmunizationRecommendation.authority`, and the evaluated-history `Immunization` on a recommendation
+query are all **absent** unless you ask for them with `_include` or `_revinclude`.
 
-**Use case: I want everything — immunization records and all referenced resources**
+A reference to a resource you did not ask for is still delivered in full — the `reference` value the
+conversion produced, plus `identifier` and `display` where it has them. This service serves no read
+endpoint for a reference target, so resolve it either by asking for the target with `_include`, or
+against your own data using the `identifier` and `display`.
 
-```
-GET /fhir/{destinationId}/Immunization?family=Smith&given=John&birthdate=2000-01-01
-    &_include=*:*
-    &_revinclude=Provenance:target
-```
-
-`_include=*:*` follows all references from all returned resources. Adding
-`_revinclude=Provenance:target` also includes a `Provenance` record for each result
-identifying the IIS as the data source.
-
-**Use case: I want immunization records and the patient only**
-
-```
-GET /fhir/{destinationId}/Immunization?family=Smith&given=John&birthdate=2000-01-01
-    &_include=Immunization:patient
-```
-
-**Use case: I want immunization records and the administering provider or organization**
+**Use case: I want immunization records, the patient, and the administering provider**
 
 ```
 GET /fhir/{destinationId}/Immunization?family=Smith&given=John&birthdate=2000-01-01
@@ -98,8 +87,101 @@ GET /fhir/{destinationId}/Immunization?family=Smith&given=John&birthdate=2000-01
     &_include=Immunization:performer
 ```
 
+Each `_include` is required. Without them you get the `Immunization` records alone.
+
+**Use case: I want everything — immunization records and all referenced resources**
+
+```
+GET /fhir/{destinationId}/Immunization?family=Smith&given=John&birthdate=2000-01-01
+    &_include=*:*
+    &_include=Resource:source:*
+```
+
+`_include=*:*` follows all references from all returned resources, transitively. It reaches only
+resources a returned entry points **at**; add `_include=Resource:source:*` for the conversion-created
+resources that nothing references (see
+[Conversion-created resources](rsp-to-fhir.md#conversion-created-resources)).
+
+**Use case: I want the forecast plus the evaluated history it was computed from**
+
+```
+GET /fhir/{destinationId}/ImmunizationRecommendation?...
+    &_include=ImmunizationRecommendation:patient
+    &_revinclude=Immunization:patient
+    &_include=Immunization:authority
+```
+
+The evaluated-history `Immunization` carry `protocolApplied.doseNumber`,
+`protocolApplied.seriesDoses`, `protocolApplied.authority` and `programEligibility`, which the
+`/Immunization` query cannot return because the Z32 response behind it does not carry the source OBX
+segments. All three parameters matter:
+
+- `_include=ImmunizationRecommendation:patient` is **not optional**. The `Immunization` reference the
+  `Patient`, not the recommendation, so a `_revinclude` has nothing to resolve from until the
+  `Patient` is in the Bundle.
+- `_include=Immunization:authority` is what brings in the schedule `Organization` that
+  `protocolApplied.authority` points at — it is registered on the `Immunization`, not on the
+  `ImmunizationRecommendation`.
+
+Filter on `search.mode = match` for the forecast alone.
+
+#### Migrating from the previous behavior
+
+Earlier builds returned referenced resources, and the evaluated history on a recommendation query,
+without being asked. To get that Bundle back:
+
+```
+GET /fhir/{destinationId}/ImmunizationRecommendation?...&_include=*:*&_revinclude=Immunization
+```
+
+That returns the same entries, with one difference: a reference the conversion built without a
+resource behind it — a `PractitionerRole` pointing at a `Practitioner`, for example — now keeps its
+literal `reference` value instead of being reduced to `identifier` and `display`. No `_include`
+recovers such a target, because there is no resource to return.
+
+`_include=*:*` alone is not enough on a recommendation query: the evaluated history is reachable only
+in reverse, which is why the `_revinclude` is there.
+
 > In the response Bundle, directly matched resources have `search.mode = match`;
 > included resources have `search.mode = include`; warnings have `search.mode = outcome`.
+> Select `search.mode = match` to get just the resources you queried for.
+
+#### Search parameter names
+
+An `_include` or `_revinclude` naming a search path the conversion never registered matches nothing
+and is not an error, so a typo fails silently. The names below are the ones useful for immunization
+queries. They are not the whole set — the conversion registers a name per reference it builds, and
+also registers `subject`, `practitioner`, `organization`, `encounter`, `device`, `focus`, `target`,
+`information` and others on the resources that carry those references.
+
+| Parameter | Reaches |
+|---|---|
+| `_include=ImmunizationRecommendation:patient` | the subject `Patient` |
+| `_include=ImmunizationRecommendation:authority` | the `Organization` the forecast cites |
+| `_include=Immunization:patient` | the subject `Patient` |
+| `_include=Immunization:authority` | the `Organization` behind `protocolApplied.authority` |
+| `_include=Immunization:location` | the administering `Location` |
+| `_include=Immunization:performer` | the administering `Practitioner` / `PractitionerRole` |
+| `_include=Immunization:manufacturer` | the vaccine manufacturer `Organization` |
+| `_revinclude=Observation` | the dose and forecast `Observation` (needs an anchor, see below) |
+| `_revinclude=Observation:part-of` | only the `Observation` linked to a dose (needs an anchor) |
+| `_revinclude=Immunization` | the evaluated-history doses (needs an anchor) |
+| `_include=Resource:source:<type>` | conversion-created resources of that type, or `*` for all |
+
+`_include` follows references forward; `_revinclude` finds resources pointing **at** something already
+in the Bundle, so it needs a forward `_include` first unless the requested type is itself the target.
+Any resource already in the Bundle can serve as that anchor, including one retained by
+`_include=Resource:source:...` — a white-listed resource is walked like any other.
+
+One known gap: a **type-qualified** `_revinclude` matches on the resource type carried by the
+reference, and the conversion gives `Provenance` an id with no type on it, so `_revinclude=Provenance`
+matches nothing. The wildcard form and the white-list both reach it:
+
+```
+_include=Resource:source:DocumentReference&_revinclude=*:*   returns the Provenance
+_include=Resource:source:Provenance                          returns the Provenance
+_revinclude=Provenance                                       returns nothing
+```
 
 
 #### Response

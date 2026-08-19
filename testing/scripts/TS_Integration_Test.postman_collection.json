@@ -1795,6 +1795,148 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "TS_TC_07d FHIR Query Returns No Patient By Default",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "let response = pm.response.json();",
+                      "pm.test(\"Verify Immunization is present\", function() {",
+                      "    pm.expect(response.entry.find(e => e.resource && e.resource.resourceType === \"Immunization\")).to.not.be.undefined;",
+                      "});",
+                      "pm.test(\"Verify no Patient is returned without _include\", function() {",
+                      "    pm.expect(response.entry.find(e => e.resource && e.resource.resourceType === \"Patient\")).to.be.undefined;",
+                      "});",
+                      "pm.test(\"Every entry carries a search mode\", function() {",
+                      "    response.entry.forEach(e => pm.expect(e.search && e.search.mode).to.not.be.undefined);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization?patient.given={{fhirPatientGiven}}&patient.family={{fhirPatientFamily}}&patient.birthdate={{fhirPatientDOB}}",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization"
+                  ],
+                  "query": [
+                    {
+                      "key": "patient.given",
+                      "value": "{{fhirPatientGiven}}"
+                    },
+                    {
+                      "key": "patient.family",
+                      "value": "{{fhirPatientFamily}}"
+                    },
+                    {
+                      "key": "patient.birthdate",
+                      "value": "{{fhirPatientDOB}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_07e FHIR Query With _include Returns Patient",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "let response = pm.response.json();",
+                      "let patient = response.entry.find(e => e.resource && e.resource.resourceType === \"Patient\");",
+                      "pm.test(\"Verify Patient is present when included\", function() {",
+                      "    pm.expect(patient).to.not.be.undefined;",
+                      "});",
+                      "pm.test(\"Verify the included Patient is search.mode=include\", function() {",
+                      "    pm.expect(patient.search.mode).to.equal(\"include\");",
+                      "});",
+                      "pm.test(\"Verify only Immunization is a match\", function() {",
+                      "    response.entry.filter(e => e.search.mode === \"match\")",
+                      "        .forEach(e => pm.expect(e.resource.resourceType).to.equal(\"Immunization\"));",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "",
+                    "value": "",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "url": {
+                  "raw": "{{protocol}}://{{host}}:{{port}}/fhir/dev/Immunization?patient.given={{fhirPatientGiven}}&patient.family={{fhirPatientFamily}}&patient.birthdate={{fhirPatientDOB}}&_include=Immunization:patient",
+                  "protocol": "{{protocol}}",
+                  "host": [
+                    "{{host}}"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization"
+                  ],
+                  "query": [
+                    {
+                      "key": "patient.given",
+                      "value": "{{fhirPatientGiven}}"
+                    },
+                    {
+                      "key": "patient.family",
+                      "value": "{{fhirPatientFamily}}"
+                    },
+                    {
+                      "key": "patient.birthdate",
+                      "value": "{{fhirPatientDOB}}"
+                    },
+                    {
+                      "key": "_include",
+                      "value": "Immunization:patient"
+                    }
+                  ]
+                }
+              },
+              "response": []
             }
           ],
           "auth": {
@@ -16347,6 +16489,140 @@
                     "fhir",
                     "dev",
                     "Immunization"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_07d FHIR Query Returns No Patient By Default with JWT",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "let response = pm.response.json();",
+                      "pm.test(\"Verify Immunization is present\", function() {",
+                      "    pm.expect(response.entry.find(e => e.resource && e.resource.resourceType === \"Immunization\")).to.not.be.undefined;",
+                      "});",
+                      "pm.test(\"Verify no Patient is returned without _include\", function() {",
+                      "    pm.expect(response.entry.find(e => e.resource && e.resource.resourceType === \"Patient\")).to.be.undefined;",
+                      "});",
+                      "pm.test(\"Every entry carries a search mode\", function() {",
+                      "    response.entry.forEach(e => pm.expect(e.search && e.search.mode).to.not.be.undefined);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-xform-organization",
+                    "value": "0d15449b-fb08-4013-8985-20c148b353fe",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization?patient.given={{fhirPatientGiven}}&patient.family={{fhirPatientFamily}}&patient.birthdate={{fhirPatientDOB}}",
+                  "protocol": "{{no_cert_protocol}}",
+                  "host": [
+                    "{{no_cert_host}}"
+                  ],
+                  "port": "{{no_cert_port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization"
+                  ],
+                  "query": [
+                    {
+                      "key": "patient.given",
+                      "value": "{{fhirPatientGiven}}"
+                    },
+                    {
+                      "key": "patient.family",
+                      "value": "{{fhirPatientFamily}}"
+                    },
+                    {
+                      "key": "patient.birthdate",
+                      "value": "{{fhirPatientDOB}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "TS_TC_07e FHIR Query With _include Returns Patient with JWT",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "let response = pm.response.json();",
+                      "let patient = response.entry.find(e => e.resource && e.resource.resourceType === \"Patient\");",
+                      "pm.test(\"Verify Patient is present when included\", function() {",
+                      "    pm.expect(patient).to.not.be.undefined;",
+                      "});",
+                      "pm.test(\"Verify the included Patient is search.mode=include\", function() {",
+                      "    pm.expect(patient.search.mode).to.equal(\"include\");",
+                      "});",
+                      "pm.test(\"Verify only Immunization is a match\", function() {",
+                      "    response.entry.filter(e => e.search.mode === \"match\")",
+                      "        .forEach(e => pm.expect(e.resource.resourceType).to.equal(\"Immunization\"));",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "x-xform-organization",
+                    "value": "0d15449b-fb08-4013-8985-20c148b353fe",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{no_cert_protocol}}://{{no_cert_host}}:{{no_cert_port}}/fhir/dev/Immunization?patient.given={{fhirPatientGiven}}&patient.family={{fhirPatientFamily}}&patient.birthdate={{fhirPatientDOB}}&_include=Immunization:patient",
+                  "protocol": "{{no_cert_protocol}}",
+                  "host": [
+                    "{{no_cert_host}}"
+                  ],
+                  "port": "{{no_cert_port}}",
+                  "path": [
+                    "fhir",
+                    "dev",
+                    "Immunization"
+                  ],
+                  "query": [
+                    {
+                      "key": "patient.given",
+                      "value": "{{fhirPatientGiven}}"
+                    },
+                    {
+                      "key": "patient.family",
+                      "value": "{{fhirPatientFamily}}"
+                    },
+                    {
+                      "key": "patient.birthdate",
+                      "value": "{{fhirPatientDOB}}"
+                    },
+                    {
+                      "key": "_include",
+                      "value": "Immunization:patient"
+                    }
                   ]
                 }
               },
