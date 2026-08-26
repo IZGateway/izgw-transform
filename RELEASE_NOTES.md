@@ -1,3 +1,11 @@
+# IZ Gateway Transformation Service 0.22.0
+
+Released 2026-08-26.
+
+- chore: bump izgw-bom, izgw-core, and v2tofhir to latest releases ([#285](https://github.com/IZGateway/izgw-transform/pull/285))
+- IGDD-3285 - FHIR searchset: label joins as include, return only what the caller asked for ([#283](https://github.com/IZGateway/izgw-transform/pull/283))
+- chore: Update OpenSpec skills to 1.8.0 ([#282](https://github.com/IZGateway/izgw-transform/pull/282))
+
 # IZ Gateway Transformation Service 0.21.0
 
 Released 2026-08-04.

@@ -152,6 +152,20 @@ public class FhirController {
     private static final String IMMUNIZATION_RECOMMENDATION = "ImmunizationRecommendation";
     /** Name of the Patient {@code $match} operation advertised in the CapabilityStatement. */
     private static final String MATCH_OPERATION = "match";
+
+    /** User-data key under which v2tofhir stores a Reference's target resource. */
+    private static final String RESOURCE_KEY = "Resource";
+    /**
+     * The resource-type token in the {@code _include=Resource:source:<type>} white-list parameter,
+     * used as a pseudo-type meaning "any resource the conversion created".
+     *
+     * <p>This spells the same as {@link #RESOURCE_KEY} by coincidence and must not be merged with
+     * it. This one is part of the URL syntax callers type, documented in
+     * {@code docs/fhir/rsp-to-fhir.md}; {@code RESOURCE_KEY} is an internal v2tofhir user-data key
+     * that v2tofhir is free to rename. Sharing one constant would let a rename of either silently
+     * change the other.</p>
+     */
+    private static final String SOURCE_INCLUDE_TYPE = "Resource";
     /** Canonical OperationDefinition URL for the Patient {@code $match} operation. */
     private static final String PATIENT_MATCH_DEFINITION =
         "http://hl7.org/fhir/OperationDefinition/Patient-match";
@@ -1051,7 +1065,7 @@ public class FhirController {
         }
 
         List<Resource> resources = new ArrayList<>();
-        preFilter(bundle, includes, revIncludes, requested, resources);
+        preFilter(bundle, includes, requested, resources);
         
         markIncludedResources(includes, revIncludes, resources);
         
@@ -1059,71 +1073,74 @@ public class FhirController {
         return bundle;
     }
 
-    private void preFilter(Bundle bundle, List<Include> includes, List<Include> revIncludes, String requested,
-            List<Resource> resources) {
-        Iterator<BundleEntryComponent> it = bundle.getEntry().iterator();
-        while (it.hasNext()) {
-            BundleEntryComponent entry = it.next();
+    /**
+     * Classify each entry: the requested type is a {@code match}, an {@link OperationOutcome} is an
+     * {@code outcome}, and anything else is left for later marking or removal.
+     *
+     * <p>Nothing is retained here that the caller did not ask for. A resource of another type
+     * survives only if an {@code _include} or {@code _revinclude} parameter reaches it, so the shape
+     * of a response is predictable from the query alone.</p>
+     *
+     * <p>That includes the evaluated history on a recommendation query. A Z42 response ("Return
+     * Evaluated History and Forecast") carries the patient's evaluated history alongside the
+     * forecast, and v2tofhir splits it by RXA-5: {@code 998^No Vaccine Administered} becomes a
+     * {@code recommendation} component, any real CVX code becomes an Immunization. Those
+     * Immunizations carry evaluation data reachable through no other call —
+     * {@code protocolApplied.doseNumber} / {@code seriesDoses} (OBX 30973-2 / 59782-3),
+     * {@code protocolApplied.authority} (OBX 59779-9) and {@code programEligibility} (OBX 64994-7),
+     * none of which the Z32 behind {@code /Immunization} returns — but wanting them is the caller's
+     * call to make. They are reached with
+     * {@code _include=ImmunizationRecommendation:patient&_revinclude=Immunization:patient}: the
+     * Immunizations reference the Patient rather than the recommendation, so the reverse hit is
+     * found on a retained Patient.</p>
+     */
+    private void preFilter(Bundle bundle, List<Include> includes, String requested, List<Resource> resources) {
+        for (BundleEntryComponent entry : bundle.getEntry()) {
             Resource r = entry.getResource();
             if (r != null && r.fhirType().equals(requested)) {
-                entry.getSearch().setMode(SearchEntryMode.MATCH);
-                if (!resources.contains(r)) {
-                    resources.add(r);
-                }
+                markEntry(entry, resources, SearchEntryMode.MATCH);
             } else if (r instanceof OperationOutcome) {
-                entry.getSearch().setMode(SearchEntryMode.OUTCOME);
-                if (!resources.contains(r)) {
-                    resources.add(r);
-                }
+                markEntry(entry, resources, SearchEntryMode.OUTCOME);
             } else {
-                removeInfrastructureCreatedResources(resources, includes, revIncludes, it, r);
+                whitelistInfrastructureCreatedResources(resources, includes, r);
             }
         }
     }
-    
-    private void removeInfrastructureCreatedResources(List<Resource> resources, List<Include> includes, List<Include> revIncludes,
-            Iterator<BundleEntryComponent> it, Resource r) {
-        if (r != null && r.getUserData(Parser.SOURCE) != null) {
-            // Some DatatypeConverter and MessageParser created resources have limited utility.  
-            // What we should we do with those depends on what resources the
-            // user asks to include.  These infrastructure crafted resources can be white-listed
-            // using the include or revinclude parameters.
-            
-            // Users can white-list these resources with the following _include parameters:
-            // All:
-            // _include=Resource:source:*
-            // DatatypeConverter created Organization/Practitioner/RelatedPerson/Location
-            // _include=Resource:source:Organization
-            // MessageParser created DocumentReference/Provenance
-            // _include=Resource:source:DocumentReference
-            String source = r.getUserData(Parser.SOURCE).toString();
-            if (
-                // ANY Source requested
-                // DatatypeConverter created resources including Organization, Practitioner, RelatedPerson, and Location
-                // MessageParser created resources including DocumentReference and Provenance
-                matchesSource(includes, r.fhirType())
-            ) {
-                // Explicitly mark these as included resources.
-                r.setUserData(SearchEntryMode.class.getName(), SearchEntryMode.INCLUDE);
-                resources.add(r);
-                return;
-            }
-            
-            // If users reverse include provenance, don't delete the MessageParser crafted Provenance resources.
-            if (source.equals(MessageParser.class.getName()) 
-            	&& revIncludes.stream().anyMatch(rinc -> "Provenance".equals(rinc.getParamType()))) {
-                // Let normal include handling mark Provenance reverse includes.
-                return;
-            }
-            // Remove classes crafted by the infrastructure as being generally not useful because
-            // the enriched reference (name and identifier) is enough for production use.
-            it.remove();
+
+    private void markEntry(BundleEntryComponent entry, List<Resource> resources, SearchEntryMode mode) {
+        entry.getSearch().setMode(mode);
+        if (!resources.contains(entry.getResource())) {
+            resources.add(entry.getResource());
+        }
+    }
+
+    /**
+     * Mark the infrastructure-created resources the caller explicitly white-listed.
+     *
+     * <p>Some DatatypeConverter and MessageParser created resources have limited utility, because
+     * the enriched reference (name and identifier) is generally enough for production use. They are
+     * therefore not retained by default. A caller can white-list them with:</p>
+     * <pre>
+     * _include=Resource:source:*                  all of them
+     * _include=Resource:source:Organization       DatatypeConverter created Organization/Practitioner/RelatedPerson/Location
+     * _include=Resource:source:DocumentReference  MessageParser created DocumentReference/Provenance
+     * </pre>
+     *
+     * <p>Nothing is removed here. Anything left unmarked once include marking has finished is
+     * removed by {@link #cleanupBundleOfUnmarkedResources}, which is the single removal point —
+     * that is what lets {@link #markIncludedResources} rescue a resource that a retained entry
+     * still references, whether or not the caller white-listed it.</p>
+     */
+    private void whitelistInfrastructureCreatedResources(List<Resource> resources, List<Include> includes, Resource r) {
+        if (r != null && r.getUserData(Parser.SOURCE) != null && matchesSource(includes, r.fhirType())) {
+            r.setUserData(SearchEntryMode.class.getName(), SearchEntryMode.INCLUDE);
+            resources.add(r);
         }
     }
 
     private boolean matchesSource(List<Include> includes, String target) {
         for (Include include: includes) {
-            if ("Resource".equals(include.getParamType()) 
+            if (SOURCE_INCLUDE_TYPE.equals(include.getParamType())
             	&& Parser.SOURCE.equals(include.getParamName())
             	&& Arrays.asList("*", target, null).contains(include.getParamTargetType())
             ) {
@@ -1175,11 +1192,14 @@ public class FhirController {
                 // For each forward include, e.g., _include=Immunization:patient:Patient
                 for (Include include: includes) {
                     if (includeMatches(include, r, ref, reverse)) {
-                        Resource target = (Resource) ref.getUserData("Resource");
+                        Resource target = (Resource) ref.getUserData(RESOURCE_KEY);
                         if (!resources.contains(target)) {
                             resources.add(target);
                         }
-                        target.setUserData(SearchEntryMode.class.getName(), SearchEntryMode.MATCH);
+                        // An _include/_revinclude hit is a join, which R4 labels "include".
+                        // Labelling it "match" makes the hits indistinguishable from the
+                        // resources joined in to support them.
+                        target.setUserData(SearchEntryMode.class.getName(), SearchEntryMode.INCLUDE);
                     }
                 }
             }

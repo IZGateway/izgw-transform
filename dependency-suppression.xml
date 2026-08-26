@@ -114,4 +114,44 @@
         <filePath regex="true">.*kotlin-stdlib-.*\.jar</filePath>
         <cve>CVE-2026-53914</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+        tomcat-embed-core: CVE-2026-66299 is a false positive for embedded Tomcat usage.
+        The vulnerability is an unbounded buffer for undelivered messages in the WebSocket
+        chat example web application bundled with the full Apache Tomcat distribution,
+        allowing a slow client to exhaust memory. Apache's own advisory states users who
+        removed the examples web application are not affected. Our use of tomcat-embed does
+        not include the examples web application - this is Spring Boot's embedded Tomcat
+        (tomcat-embed-core/-el/-websocket only, pulled in via izgw-bom's tomcat.version
+        property), which never bundles the examples webapp in the first place. Confirmed as
+        a known false-positive pattern on the Apache Tomcat security mailing list thread for
+        this CVE.
+
+        MATCH NOTE: this CI job's dependency-check GitHub Action scans the assembled fat jar
+        (--scan target/xform-*.jar) directly, which does not derive a resolvable Maven
+        packageUrl for nested jars - the same root cause already documented in this file's
+        kotlin-stdlib suppression below. A packageUrl-regex suppression therefore has zero
+        matches here (confirmed in CI); matching by <sha1> of the exact jar works instead.
+        SHA1 below is identical to the one already used in izgw-bom's own suppression file
+        for this same CVE (same jar bytes, version-specific).
+
+        Fixed versions (11.0.25 / 10.1.58 / 9.0.121) had not been released as of this
+        writing - confirmed tomcat-embed-core 10.1.58 does not yet exist on Maven Central
+        (still under development). This entry is version-pinned (unlike the packageUrl
+        approach) so it will need a new SHA1 once the tomcat.version property is bumped
+        past 10.1.57 for any other reason - revisit once 10.1.58 ships either way.
+        Added: 2026-08-08 (IGDD-3254)
+        ]]></notes>
+        <sha1>bc0e4f83f9a841f68ebcc18186914f0a9bbacb1b</sha1>
+        <cve>CVE-2026-66299</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+        tomcat-embed-websocket: see note on tomcat-embed-core CVE-2026-66299 above - same
+        false positive, same fat-jar-scan packageUrl limitation, same fix.
+        Added: 2026-08-08 (IGDD-3254)
+        ]]></notes>
+        <sha1>cdf7daa908a6601377172e09385eb43425fa9660</sha1>
+        <cve>CVE-2026-66299</cve>
+    </suppress>
 </suppressions>
