@@ -123,7 +123,7 @@ xform,gov.cdc.izgateway.xform.solutions,Solution,129,0,8,0,25,0,9,0,5,0
 xform,gov.cdc.izgateway.xform.solutions,SolutionOperation,50,99,9,7,12,24,7,6,0,5
 xform,gov.cdc.izgateway.xform.endpoints.fhir,IDIMatch,625,452,154,54,145,77,106,25,10,17
 xform,gov.cdc.izgateway.xform.endpoints.fhir,UnexpectedException,6,0,0,0,2,0,1,0,1,0
-xform,gov.cdc.izgateway.xform.endpoints.fhir,FhirController,868,1191,132,105,169,289,101,70,12,40
+xform,gov.cdc.izgateway.xform.endpoints.fhir,FhirController,622,1410,80,151,124,324,65,103,8,44
 xform,gov.cdc.izgateway.xform.endpoints.fhir,RequestWithModifiableParameters,74,86,6,6,14,17,7,11,3,9
 xform,gov.cdc.izgateway.xform.endpoints.fhir,FaultException,68,0,6,0,18,0,8,0,5,0
 xform,gov.cdc.izgateway.xform.configuration,XformConfig,28,12,0,0,4,5,4,1,4,1
@@ -148,8 +148,8 @@ xform,gov.cdc.izgateway.xform,Application.new UserDetailsService() {...},11,0,0,
 xform,gov.cdc.izgateway.xform,Application,281,50,14,0,77,10,22,4,15,4
 xform,gov.cdc.izgateway.xform,XformApplicationController,20,11,2,0,6,4,4,2,3,2
 xform,gov.cdc.izgateway.xform.model,GroupRoleMapping,42,0,2,0,9,0,3,0,2,0
-xform,gov.cdc.izgateway.xform.model,Code,10,19,4,4,2,4,4,1,0,1
 xform,gov.cdc.izgateway.xform.model,Solution,98,0,8,0,30,0,12,0,8,0
+xform,gov.cdc.izgateway.xform.model,Code,10,19,4,4,2,4,4,1,0,1
 xform,gov.cdc.izgateway.xform.model,AccessControl,3,0,0,0,2,0,1,0,1,0
 xform,gov.cdc.izgateway.xform.model,SolutionOperation,0,3,0,0,0,1,0,1,0,1
 xform,gov.cdc.izgateway.xform.model,User,3,6,0,0,2,3,1,1,1,1
