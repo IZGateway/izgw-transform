@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Solution.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.model</a> &gt; <span class="el_source">Solution.java</span></div><h1>Solution.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
+import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbIgnore;
+
+import java.util.List;
+import java.util.UUID;
+
+@Getter
+@Setter
+@DynamoDbBean
+<span class="nc" id="L22">public class Solution extends BaseModel {</span>
+
+    private UUID id;
+
+    @NotBlank(message = &quot;Solution name is required&quot;)
+    private String solutionName;
+
+    private String description;
+
+    @NotBlank(message = &quot;Solution version is required&quot;)
+    private String version;
+
+    /**
+     * FYI - Jackson will do things like the number 1 sets to true.
+     * The number 0 sets to false.
+     * But also any non-zero number sets to true.
+     */
+    @NotNull(message = &quot;Solution active status is required&quot;)
+    private Boolean active;
+
+    @NotNull(message = &quot;Request Operations List is required (can be empty)&quot;)
+    @Valid
+    private List&lt;SolutionOperation&gt; requestOperations;
+
+    @NotNull(message = &quot;Response Operations List is required (can be empty)&quot;)
+    @Valid
+    private List&lt;SolutionOperation&gt; responseOperations;
+
+    /*
+     * DynamoDB only has built-in conversion for primitives (String, Integer, etc...)
+     * and simple collections (List&lt;String&gt; for example).
+     * Needed to create the getter/setter to work
+     */
+
+<span class="nc" id="L56">    private static final ObjectMapper objectMapper = new ObjectMapper();</span>
+
+    @JsonIgnore
+    @DynamoDbAttribute(&quot;requestOperations&quot;)
+    public String getRequestOperationsJson() {
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (requestOperations == null) {</span>
+<span class="nc" id="L62">            return null;</span>
+        }
+        try {
+<span class="nc" id="L65">            return objectMapper.writeValueAsString(requestOperations);</span>
+<span class="nc" id="L66">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L67">            throw new RuntimeException(&quot;Error serializing requestOperations&quot;, e);</span>
+        }
+    }
+
+    public void setRequestOperationsJson(String requestOperationsJson) {
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (requestOperationsJson == null) {</span>
+<span class="nc" id="L73">            this.requestOperations = null;</span>
+<span class="nc" id="L74">            return;</span>
+        }
+        try {
+<span class="nc" id="L77">            this.requestOperations = objectMapper.readValue(requestOperationsJson, new TypeReference&lt;List&lt;SolutionOperation&gt;&gt;() {});</span>
+<span class="nc" id="L78">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L79">            throw new RuntimeException(&quot;Error deserializing requestOperations&quot;, e);</span>
+<span class="nc" id="L80">        }</span>
+<span class="nc" id="L81">    }</span>
+
+    @DynamoDbIgnore
+    public List&lt;SolutionOperation&gt; getRequestOperations() {
+<span class="nc" id="L85">        return requestOperations;</span>
+    }
+
+    @JsonIgnore
+    @DynamoDbAttribute(&quot;responseOperations&quot;)
+    public String getResponseOperationsJson() {
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (responseOperations == null) {</span>
+<span class="nc" id="L92">            return null;</span>
+        }
+        try {
+<span class="nc" id="L95">            return objectMapper.writeValueAsString(responseOperations);</span>
+<span class="nc" id="L96">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L97">            throw new RuntimeException(&quot;Error serializing responseOperations&quot;, e);</span>
+        }
+    }
+
+    public void setResponseOperationsJson(String responseOperationsJson) {
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (responseOperationsJson == null) {</span>
+<span class="nc" id="L103">            this.responseOperations = null;</span>
+<span class="nc" id="L104">            return;</span>
+        }
+        try {
+<span class="nc" id="L107">            this.responseOperations = objectMapper.readValue(responseOperationsJson, new TypeReference&lt;List&lt;SolutionOperation&gt;&gt;() {});</span>
+<span class="nc" id="L108">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L109">            throw new RuntimeException(&quot;Error deserializing responseOperations&quot;, e);</span>
+<span class="nc" id="L110">        }</span>
+<span class="nc" id="L111">    }</span>
+
+    @DynamoDbIgnore
+    public List&lt;SolutionOperation&gt; getResponseOperations() {
+<span class="nc" id="L115">        return responseOperations;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
