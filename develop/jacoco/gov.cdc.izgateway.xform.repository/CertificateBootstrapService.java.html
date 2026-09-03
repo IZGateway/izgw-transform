@@ -196,13 +196,13 @@ import java.util.Date;
         try {
 <span class="fc" id="L197">            KeyStore trustStore = loadOrCreateKeyStore(trustStorePath, password);</span>
 
-<span class="pc bpc" id="L199" title="1 of 2 branches missed.">            if (trustStore.containsAlias(CERTIFICATE_ALIAS)) {</span>
-<span class="nc" id="L200">                Certificate existingCert = trustStore.getCertificate(CERTIFICATE_ALIAS);</span>
-<span class="nc bnc" id="L201" title="All 2 branches missed.">                if (existingCert.equals(certificate)) {</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">            if (trustStore.containsAlias(CERTIFICATE_ALIAS)) {</span>
+<span class="fc" id="L200">                Certificate existingCert = trustStore.getCertificate(CERTIFICATE_ALIAS);</span>
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">                if (existingCert.equals(certificate)) {</span>
 <span class="nc" id="L202">                    return;</span>
                 } else {
                     // Remove existing certificate if different
-<span class="nc" id="L205">                    trustStore.deleteEntry(CERTIFICATE_ALIAS);</span>
+<span class="fc" id="L205">                    trustStore.deleteEntry(CERTIFICATE_ALIAS);</span>
                 }
             }
 
