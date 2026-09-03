@@ -154,4 +154,80 @@
         <sha1>cdf7daa908a6601377172e09385eb43425fa9660</sha1>
         <cve>CVE-2026-66299</cve>
     </suppress>
+    <suppress until="2027-02-28Z">
+        <notes><![CDATA[
+        CVE-2026-66908 is in the Apache Camel Platform HTTP Main component: the camel-main
+        embedded HTTP server built JWTAuth from the keystore alone when neither jwtIssuer nor
+        jwtAudience was set, so inbound tokens were checked only for signature and expiry
+        (JWTAuthenticationConfigurer.buildJwtOptions, Vert.x JWTAuth). See CAMEL-24281.
+
+        That code is not on the classpath here. Verified on camel 4.18.4, in both the BOM
+        validation tree and izgw-transform:
+          - camel-platform-http-main  : not resolved in either tree
+          - io.vertx                  : not resolved in either tree
+          - camel-main-4.18.4.jar     : contains no JWT, platform-http or Vert.x classes
+        izgw-transform is a Spring Boot application using camel-spring-boot-starter. It never
+        starts camel-main's standalone HTTP server, and could not without Vert.x present.
+        Dependency-Check matches on version alone: cpe:2.3:a:apache:camel:* covers
+        "from 4.8.0 up to excluding 4.22.0" for every camel artifact, whatever the module.
+
+        There is no upgrade that clears this on our line. Per the advisory: "This behaviour is
+        fixed only on 4.22.0 ... The fail-closed guard could not be backported. The jwtIssuer
+        and jwtAudience options were themselves only introduced in 4.21.0 by CAMEL-23525, so on
+        camel-4.18.x and camel-4.14.x there was nothing an operator could set to satisfy the
+        requirement." 4.18.4 is the newest 4.18.x release, and camel 4.22.0 requires Spring
+        Boot 4.1 / Spring Framework 7 while this BOM pins spring-boot.version on 3.5.x. The real
+        remediation is the Spring Boot 4 plus Camel 4.22 upgrade. See versions-rules.xml for the
+        cap that keeps automation on 4.18.x until then.
+
+        Matched on <cve> alone, with no dependency selector, so it applies wherever this one CVE
+        is raised. Do not add <cpe>cpe:/a:apache:camel</cpe>: per the suppression XSD <cpe> is a
+        suppress-what element, not a dependency selector, so it would hide every Camel finding
+        including future ones.
+
+        WARNING - read before changing the date. This CVE is CVSS 7.5, at or above the
+        --failOnCVSS 7 gate used by both dependency-updates.yml and publish.yml. When this
+        suppression expires the scan fails hard: the nightly exits 1 with no PR, and publish.yml
+        exits 1 so develop stops deploying to GitHub Packages. Recovery needs an edit to this
+        file. The expiry is deliberate, to force the upgrade decision rather than let it drift,
+        but it must be tracked so it does not land unattended.
+        Expires 2027-02-28. Added: 2026-08-31
+        ]]></notes>
+        <cve>CVE-2026-66908</cve>
+    </suppress>
+    <suppress until="2027-02-28Z">
+        <notes><![CDATA[
+        CVE-2026-59283 (SpEL SimpleEvaluationContext safety-guard bypass) and CVE-2026-59313
+        (functional-web SSE stream corruption): verified not exploitable in izgw-hub,
+        izgw-transform, izgw-core, or v2tofhir — none use SimpleEvaluationContext for SpEL,
+        and none use Spring's functional RouterFunction/HandlerFunction web framework for SSE.
+        No fix exists on the Spring Framework 6.2.x line; the real fix ships only in 7.0.9,
+        which requires Spring Boot 4.x. Should clear once the Boot 4 upgrade lands.
+        Expires 2027-02-28. Added: 2026-09-02
+        ]]></notes>
+        <sha1>691459d4644894dae8e5c2d9550a4cfb8302f62f</sha1>
+        <cve>CVE-2026-59283</cve>
+        <cve>CVE-2026-59313</cve>
+    </suppress>
+    <suppress until="2027-02-28Z">
+        <notes><![CDATA[
+        CVE-2026-47892 (WebFlux.fn functional-endpoint header-predicate bypass) and CVE-2026-47893
+        (WebFlux HandshakeWebSocketService header leak): both require spring-webflux, which does not
+        resolve on the classpath of izgw-hub, izgw-transform, izgw-core, or v2tofhir — verified
+        independently in all four.
+
+        Flags on spring-core-6.2.19.jar despite webflux being absent because NVD tracks Spring
+        Framework as one CPE product across all modules, not per-artifact — any module-specific
+        CVE at this version matches every Spring jar we have, including spring-core. A Maven
+        <exclusion> can't fix this: it's a version-string match, not a real transitive dependency,
+        and spring-core itself is required by the framework regardless.
+
+        No fix exists on the Spring Framework 6.2.x line; the real fix ships only in 7.0.9, which
+        requires Spring Boot 4.x. Should clear once the Boot 4 upgrade lands.
+        Expires 2027-02-28. Added: 2026-09-02
+        ]]></notes>
+        <sha1>691459d4644894dae8e5c2d9550a4cfb8302f62f</sha1>
+        <cve>CVE-2026-47892</cve>
+        <cve>CVE-2026-47893</cve>
+    </suppress>
 </suppressions>
