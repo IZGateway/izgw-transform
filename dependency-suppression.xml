@@ -230,4 +230,43 @@
         <cve>CVE-2026-47892</cve>
         <cve>CVE-2026-47893</cve>
     </suppress>
+    <suppress until="2027-02-28Z">
+        <notes><![CDATA[
+        CVE-2026-47890 (SSE + view-fragment CRLF injection), CVE-2026-47891 (WebFlux + Aalto XML
+        unbounded allocation), and CVE-2026-59282 (data-binding property-path DoS): verified not
+        reachable in izgw-hub, izgw-transform, izgw-core, or v2tofhir. 47890 — no SSE response is
+        produced anywhere. 47891 — neither spring-webflux nor any aalto artifact resolves. 59282 —
+        all 112 request-mapped handlers across the four repos were enumerated (54 transform, 43 hub,
+        15 core, 0 v2tofhir); none takes @ModelAttribute or a bare POJO command object, so no
+        user-controlled property path reaches the binder.
+
+        NOTE: 59282 is a weaker guarantee than the other two — it rests on current handler shape, not
+        on a missing module. No @InitBinder / setAllowedFields allowlisting exists anywhere, so any new
+        handler taking @ModelAttribute or a bare POJO parameter re-opens it while we stay on 6.2.19.
+        Re-verify before extending this expiry.
+
+        Same spring-core CPE-matching caveat as the block above. No fix on the Spring Framework 6.2.x
+        line; the fix ships only in 7.0.9, which requires Spring Boot 4.x.
+        Expires 2027-02-28. Added: 2026-09-04
+        ]]></notes>
+        <sha1>691459d4644894dae8e5c2d9550a4cfb8302f62f</sha1>
+        <cve>CVE-2026-47890</cve>
+        <cve>CVE-2026-47891</cve>
+        <cve>CVE-2026-59282</cve>
+    </suppress>
+    <suppress until="2027-02-28Z">
+        <notes><![CDATA[
+        CVE-2026-59281 (Errors.getFieldErrors XSS), CVE-2026-59280 (FreeMarker path traversal), and
+        CVE-2026-47888 (RSocket DoS): same Spring 6.2.19 disclosure batch, currently scored below our
+        --failOnCVSS 7 gate. Suppressed pre-emptively because this scanner has rescored batch CVEs well
+        above Spring's own advisory (47892 was 4.8 upstream, 9.8 here). Verified not reachable in all
+        four repos: no server-side HTML views or escaped Errors rendering, and no freemarker, no
+        io.rsocket, no spring-webflux in any resolved tree.
+        Expires 2027-02-28. Added: 2026-09-04
+        ]]></notes>
+        <sha1>691459d4644894dae8e5c2d9550a4cfb8302f62f</sha1>
+        <cve>CVE-2026-59281</cve>
+        <cve>CVE-2026-59280</cve>
+        <cve>CVE-2026-47888</cve>
+    </suppress>
 </suppressions>
