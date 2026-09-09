@@ -1,3 +1,12 @@
+# IZ Gateway Transformation Service 0.22.1
+
+Released 2026-09-09.
+
+- chore: Bump izgw-core, izgw-bom, and v2tofhir dependencies for release ([#289](https://github.com/IZGateway/izgw-transform/pull/289))
+- Postman - add organization override for FHIR tests ([#288](https://github.com/IZGateway/izgw-transform/pull/288))
+- chore(deps): bump actions/setup-java from 5 to 6 ([#286](https://github.com/IZGateway/izgw-transform/pull/286))
+- Add tests for ImmunizationRecommendation ([#284](https://github.com/IZGateway/izgw-transform/pull/284))
+
 # IZ Gateway Transformation Service 0.22.0
 
 Released 2026-08-26.

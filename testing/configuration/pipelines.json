@@ -161,25 +161,6 @@
     "preconditions" : [ ]
   } ]
 }, {
-  "pipelineName" : "Pipeline for Milky Way Wellness Center",
-  "id" : "c78e886f-eb1f-4d09-9f91-a822de531b16",
-  "organizationId" : "55dbc8c9-ca16-402d-b16b-e56cc805de90",
-  "description" : "Milky Way Wellness Center pipeline description",
-  "inboundEndpoint" : "izgts:IISHubService",
-  "outboundEndpoint" : "izghub:IISHubService",
-  "active" : true,
-  "pipes" : [ {
-    "id" : "0b19484b-d645-4e2e-ba23-0cc14868474b",
-    "solutionId" : "7e9ab0bf-e174-4073-a63f-75e2fabdb3a3",
-    "solutionVersion" : "1.0",
-    "preconditions" : [ ]
-  }, {
-    "id" : "1771a176-4a4d-4169-a1b2-0add9d9ad68c",
-    "solutionId" : "afcabc17-8377-4752-a0a4-f4fa0e4d6854",
-    "solutionVersion" : "1.0",
-    "preconditions" : [ ]
-  } ]
-}, {
   "pipelineName" : "Pipeline for Black Hole Data Storage Systems",
   "id" : "56dccf8b-158f-49e5-9cdb-0114327ed544",
   "organizationId" : "6388c0c6-8c58-4c8c-aa31-4ccbb81068c6",
@@ -251,5 +232,14 @@
   "inboundEndpoint" : "izgts:IISHubService",
   "outboundEndpoint" : "izghub:IISHubService",
   "active" : true,
+  "pipes" : [ ]
+}, {
+  "pipelineName" : "Pipeline for Milky Way Wellness Center",
+  "id" : "c78e886f-eb1f-4d09-9f91-a822de531b16",
+  "organizationId" : "55dbc8c9-ca16-402d-b16b-e56cc805de90",
+  "description" : "FHIR org override - DO NOT EDIT",
+  "inboundEndpoint" : "izgts:IISHubService",
+  "outboundEndpoint" : "izghub:IISHubService",
+  "active" : false,
   "pipes" : [ ]
 } ]
