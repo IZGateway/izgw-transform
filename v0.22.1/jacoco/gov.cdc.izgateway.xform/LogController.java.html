@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LogController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform</a> &gt; <span class="el_source">LogController.java</span></div><h1>LogController.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform;
+
+import gov.cdc.izgateway.logging.event.LogEvent;
+import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.security.Roles;
+import gov.cdc.izgateway.LogControllerBase;
+import gov.cdc.izgateway.soap.fault.SecurityFault;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+/**
+ * The LogController provides access to in memory logging data on a server.
+ * This is used for integration testing to verify log content is as expected
+ * when sending messages.
+ */
+
+@RestController
+@CrossOrigin
+// TODO: Presently, blacklisted users are allowed to access the logs request, b/c blacklisting only
+// applies to the SOAP Stack.  Once we apply it to the full HTTP stack, we will have to provide
+// SECURE mechanism for clearing the blacklisted state of the testing user.  It cannot be said
+// to have been applied to the full stack until this loophole is resolved.
+@RolesAllowed({ Roles.ADMIN, Roles.OPERATIONS, Roles.BLACKLIST })
+@RequestMapping({&quot;/rest&quot;})
+@Lazy(false)
+public class LogController extends LogControllerBase {
+
+    @Autowired
+<span class="fc" id="L41">    public LogController(AccessControlRegistry registry) {</span>
+<span class="fc" id="L42">        registry.register(this);</span>
+<span class="fc" id="L43">    }</span>
+
+    @Operation(summary = &quot;Get the most recent log records&quot;,
+            description = &quot;Search for the log records matching the search parameter or all records if there is no search value&quot;)
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Success&quot;,
+            content = {
+                    @Content(mediaType = &quot;application/json&quot;, array = @ArraySchema(schema = @Schema(implementation = LogEvent.class)))
+            }
+    )
+    @GetMapping(&quot;/logs&quot;)
+    @Override
+    public List&lt;LogEvent&gt; getLogs(
+            @Parameter(description = &quot;The search string&quot;)
+            @RequestParam(required = false) String search) {
+<span class="nc" id="L57">        return super.getLogs(search);</span>
+    }
+
+    @Operation(summary = &quot;Clear log records&quot;)
+    @ApiResponse(responseCode = &quot;204&quot;, description = &quot;Reset the logs&quot;, content = @Content)
+    @DeleteMapping(&quot;/logs&quot;)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RolesAllowed({ Roles.ADMIN, Roles.OPERATIONS, Roles.BLACKLIST })
+    @Override
+    public void deleteLogs(HttpServletRequest servletReq,
+                           @Parameter(description=&quot;If true, reset the specified endpoint, clearing maintenance&quot;)
+                           @RequestParam(required = false) String clear) throws SecurityFault {
+<span class="nc" id="L69">        super.deleteLogs(servletReq, clear);</span>
+<span class="nc" id="L70">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

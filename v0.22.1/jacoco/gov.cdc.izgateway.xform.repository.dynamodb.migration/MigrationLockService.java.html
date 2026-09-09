@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MigrationLockService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.repository.dynamodb.migration</a> &gt; <span class="el_source">MigrationLockService.java</span></div><h1>MigrationLockService.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.repository.dynamodb.migration;
+
+import gov.cdc.izgateway.xform.model.Event;
+import gov.cdc.izgateway.xform.repository.XformRepository;
+import gov.cdc.izgateway.xform.repository.dynamodb.DynamoDbRepositoryFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.time.Instant;
+
+/**
+ * Service for managing a migration lock using DynamoDB events.
+ * Ensures that only one migration process can run at a time across distributed nodes.
+ */
+@Service
+<span class="nc" id="L16">@Slf4j</span>
+public class MigrationLockService {
+
+    private final XformRepository&lt;Event&gt; eventRepository;
+
+    @Autowired
+<span class="nc" id="L22">    public MigrationLockService(DynamoDbRepositoryFactory repositoryFactory) {</span>
+<span class="nc" id="L23">        this.eventRepository = repositoryFactory.eventRepository();</span>
+<span class="nc" id="L24">    }</span>
+
+    /**
+     * Attempts to acquire the migration lock.
+     * @return true if the lock was acquired, false if another migration is in progress.
+     */
+    public boolean acquireLock() {
+        try {
+<span class="nc bnc" id="L32" title="All 2 branches missed.">            if (isMigrationInProgress()) {</span>
+<span class="nc" id="L33">                log.warn(&quot;Migration is already in progress by another node.&quot;);</span>
+<span class="nc" id="L34">                return false;</span>
+            }
+
+<span class="nc" id="L37">            Event event = new Event();</span>
+<span class="nc" id="L38">            event.setName(Event.MIGRATION);</span>
+<span class="nc" id="L39">            event.setStarted(Instant.now());</span>
+<span class="nc" id="L40">            eventRepository.createEntity(event);</span>
+<span class="nc" id="L41">            log.info(&quot;Migration lock acquired by node: {}&quot;, event.getReportedBy());</span>
+
+<span class="nc" id="L43">            return true;</span>
+<span class="nc" id="L44">        } catch (Exception e) {</span>
+<span class="nc" id="L45">            log.warn(&quot;Failed to acquire migration lock, another migration may be in progress: {}&quot;, e.getMessage());</span>
+<span class="nc" id="L46">            return false;</span>
+        }
+    }
+
+    /**
+     * Releases the migration lock by marking the active event as completed.
+     */
+    public void releaseLock() {
+        try {
+<span class="nc" id="L55">            Event event = getActiveEvent();</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">            if (event == null) {</span>
+<span class="nc" id="L57">                log.warn(&quot;No active migration event found to release lock.&quot;);</span>
+<span class="nc" id="L58">                return;</span>
+            }
+<span class="nc" id="L60">            event.setCompleted(Instant.now());</span>
+<span class="nc" id="L61">            eventRepository.updateEntity(event);</span>
+<span class="nc" id="L62">            log.info(&quot;Migration lock released by node: {}&quot;, event.getReportedBy());</span>
+<span class="nc" id="L63">        } catch (Exception e) {</span>
+<span class="nc" id="L64">            log.error(&quot;Failed to release migration lock: {}&quot;, e.getMessage(), e);</span>
+<span class="nc" id="L65">        }</span>
+<span class="nc" id="L66">    }</span>
+
+    /**
+     * Checks if a migration is currently in progress.
+     * @return true if a migration event is active and not completed, false otherwise.
+     */
+    public boolean isMigrationInProgress() {
+        // Loop through all events in the entity set to see if there is an event that is in progress
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        for (Event event : eventRepository.getEntitySet()) {</span>
+            // If event.completed is null then return true
+<span class="nc bnc" id="L76" title="All 2 branches missed.">            if (event.getCompleted() == null) {</span>
+<span class="nc" id="L77">                return true;</span>
+            }
+<span class="nc" id="L79">        }</span>
+
+<span class="nc" id="L81">        return false;</span>
+    }
+
+    /**
+     * Retrieves the currently active migration event, if any.
+     * @return the active Event, or null if none is active.
+     */
+    private Event getActiveEvent() {
+<span class="nc bnc" id="L89" title="All 2 branches missed.">        for (Event event : eventRepository.getEntitySet()) {</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">            if (event.getCompleted() == null) {</span>
+<span class="nc" id="L91">                return event;</span>
+            }
+<span class="nc" id="L93">        }</span>
+<span class="nc" id="L94">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

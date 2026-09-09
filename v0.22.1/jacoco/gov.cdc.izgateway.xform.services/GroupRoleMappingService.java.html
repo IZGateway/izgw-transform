@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GroupRoleMappingService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.services</a> &gt; <span class="el_source">GroupRoleMappingService.java</span></div><h1>GroupRoleMappingService.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.services;
+
+import gov.cdc.izgateway.security.principal.GroupToRoleMapper;
+import gov.cdc.izgateway.xform.model.GroupRoleMapping;
+import gov.cdc.izgateway.xform.repository.RepositoryFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+
+<span class="fc" id="L12">@Slf4j</span>
+@Service
+public class GroupRoleMappingService extends GenericService&lt;GroupRoleMapping&gt; implements GroupToRoleMapper {
+
+    @Autowired
+    public GroupRoleMappingService(RepositoryFactory repositoryFactory) {
+<span class="fc" id="L18">        super(repositoryFactory.groupRoleMappingRepository());</span>
+<span class="fc" id="L19">    }</span>
+
+    public List&lt;String&gt; getRolesByGroup(String group) {
+<span class="nc" id="L22">        return repo.getEntitySet().stream()</span>
+<span class="nc" id="L23">                .filter(m -&gt; m.getGroupName().equals(group))</span>
+<span class="nc" id="L24">                .findFirst()</span>
+<span class="nc" id="L25">                .map(GroupRoleMapping::getRoles)</span>
+<span class="nc" id="L26">                .orElse(Collections.emptyList());</span>
+    }
+
+    /**
+     * For the given groups, it returns the roles that are mapped to the groups.
+     * @param groups The groups to map to roles
+     * @return The roles that are mapped from the groups
+     */
+    @Override
+    public Set&lt;String&gt; mapGroupsToRoles(Set&lt;String&gt; groups) {
+<span class="nc" id="L36">        Set&lt;String&gt; roles = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        for (String group : groups) {</span>
+<span class="nc" id="L38">            roles.addAll(getRolesByGroup(group));</span>
+<span class="nc" id="L39">        }</span>
+<span class="nc" id="L40">        return roles;</span>
+    }
+
+    @Override
+    protected boolean isDuplicate(GroupRoleMapping groupRoleMapping) {
+<span class="nc" id="L45">        return repo.getEntitySet().stream()</span>
+<span class="nc" id="L46">                .anyMatch(grp -&gt;</span>
+<span class="nc" id="L47">                        grp.getGroupName().equalsIgnoreCase(groupRoleMapping.getGroupName())</span>
+                );
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>XformPrincipalService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.services</a> &gt; <span class="el_source">XformPrincipalService.java</span></div><h1>XformPrincipalService.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.services;
+
+import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.logging.info.HostInfo;
+import gov.cdc.izgateway.principal.provider.CertificatePrincipalProvider;
+import gov.cdc.izgateway.principal.provider.JwtPrincipalProvider;
+import gov.cdc.izgateway.security.IzgPrincipal;
+import gov.cdc.izgateway.security.UnauthenticatedPrincipal;
+import gov.cdc.izgateway.security.service.PrincipalService;
+import gov.cdc.izgateway.xform.model.User;
+import gov.cdc.izgateway.xform.security.Roles;
+import gov.cdc.izgateway.xform.security.XformPrincipal;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+
+@Service
+<span class="nc" id="L22">@Slf4j</span>
+public class XformPrincipalService implements PrincipalService {
+
+    private final CertificatePrincipalProvider certificatePrincipalProvider;
+    private final JwtPrincipalProvider jwtPrincipalProvider;
+    private final AccessControlService accessControlService;
+    private final UserService userService;
+<span class="nc" id="L29">    private final List&lt;String&gt; localHostIps = Arrays.asList(HostInfo.LOCALHOST_IP4, &quot;0:0:0:0:0:0:0:1&quot;, HostInfo.LOCALHOST_IP6);</span>
+    private final GroupRoleMappingService groupRoleMappingService;
+
+    @Autowired
+    public XformPrincipalService(AccessControlService accessControlService,
+                                 CertificatePrincipalProvider certificatePrincipalProvider,
+                                 JwtPrincipalProvider jwtPrincipalProvider,
+                                 UserService userService,
+<span class="nc" id="L37">                                 GroupRoleMappingService groupRoleMappingService) {</span>
+<span class="nc" id="L38">        this.certificatePrincipalProvider = certificatePrincipalProvider;</span>
+<span class="nc" id="L39">        this.jwtPrincipalProvider = jwtPrincipalProvider;</span>
+<span class="nc" id="L40">        this.accessControlService = accessControlService;</span>
+<span class="nc" id="L41">        this.userService = userService;</span>
+<span class="nc" id="L42">        this.groupRoleMappingService = groupRoleMappingService;</span>
+<span class="nc" id="L43">    }</span>
+
+    /**
+     * Gets the principal from the request. This will first try to get the principal from a JWT,
+     * if that fails, it will get the principal from the client certificate,
+     * if that fails, it will return an UnauthenticatedPrincipal.
+     * @param request The request to get the principal from
+     * @return The principal from the request.  If no principal is found, an UnauthenticatedPrincipal is returned.
+     */
+    @Override
+    public IzgPrincipal getPrincipal(HttpServletRequest request) {
+<span class="nc" id="L54">        IzgPrincipal izgPrincipal = jwtPrincipalProvider.createPrincipalFromJwt(request);</span>
+
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (izgPrincipal == null) {</span>
+<span class="nc" id="L57">            izgPrincipal = getPrincipalFromCertificate(request);</span>
+        }
+
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (izgPrincipal == null) {</span>
+<span class="nc" id="L61">            izgPrincipal = new UnauthenticatedPrincipal();</span>
+            // Add admin role for localhost requests, but only for the UnauthenticatedPrincipal
+<span class="nc" id="L63">            addRolesIfFromLocalhost(izgPrincipal, request);</span>
+        }
+
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if ( izgPrincipal instanceof UnauthenticatedPrincipal ) {</span>
+<span class="nc" id="L67">            return izgPrincipal;</span>
+        } else {
+<span class="nc" id="L69">            XformPrincipal xformPrincipal = new XformPrincipal(izgPrincipal);</span>
+<span class="nc" id="L70">            User user = userService.getUserByUserName(xformPrincipal.getName());</span>
+<span class="nc" id="L71">            xformPrincipal.setAllowedOrganizationIds(user.getOrganizationIds());</span>
+
+            // Remove admin role if X-Remove-Admin-Role header is present (used for testing)
+<span class="nc bnc" id="L74" title="All 2 branches missed.">            if (!StringUtils.isEmpty(request.getHeader(Roles.REMOVE_ADMIN_ROLE_HEADER))) {</span>
+<span class="nc" id="L75">                xformPrincipal.getRoles().remove(Roles.ADMIN);</span>
+            }
+
+<span class="nc" id="L78">            return xformPrincipal;</span>
+        }
+    }
+
+    /**
+     * Gets the principal from the client certificate in the request.
+     * @param request The request to get the principal from
+     * @return The principal from the client certificate in the request, null if no principal found
+     */
+    private IzgPrincipal getPrincipalFromCertificate(HttpServletRequest request) {
+<span class="nc" id="L88">        IzgPrincipal izgPrincipal = certificatePrincipalProvider.createPrincipalFromCertificate(request);</span>
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (izgPrincipal == null) {</span>
+<span class="nc" id="L91">            log.warn(&quot;No principal found via certificate in the request.&quot;);</span>
+<span class="nc" id="L92">            return null;</span>
+        }
+
+<span class="nc" id="L95">        User user = userService.getUserByUserName(izgPrincipal.getName());</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (user == null) {</span>
+<span class="nc" id="L97">            log.warn(&quot;User not found for common name: {} - no roles will be assigned based on certificate&quot;, izgPrincipal.getName());</span>
+<span class="nc" id="L98">            return izgPrincipal;</span>
+        }
+
+        // Add roles for the user as specified in the access control configuration
+<span class="nc" id="L102">        Map&lt;String, TreeSet&lt;String&gt;&gt; usersAndRoles = accessControlService.getUserRoles();</span>
+<span class="nc" id="L103">        TreeSet&lt;String&gt; roles = usersAndRoles.get(user.getId().toString());</span>
+<span class="nc bnc" id="L104" title="All 4 branches missed.">        if (roles == null || roles.isEmpty()) {</span>
+<span class="nc" id="L105">            log.warn(&quot;No roles found for user: {}&quot;, user.getUserName());</span>
+<span class="nc" id="L106">            return izgPrincipal;</span>
+        }
+
+<span class="nc" id="L109">        izgPrincipal.setRoles(roles);</span>
+<span class="nc" id="L110">        log.debug(&quot;Added roles {} for user: {}&quot;, roles, user.getUserName());</span>
+
+<span class="nc" id="L112">        return izgPrincipal;</span>
+    }
+
+    private void addRolesIfFromLocalhost(IzgPrincipal izgPrincipal, HttpServletRequest request) {
+<span class="nc bnc" id="L116" title="All 4 branches missed.">        if (isLocalHost(request.getRemoteHost()) &amp;&amp; StringUtils.isEmpty(request.getHeader(Roles.NOT_ADMIN_HEADER))) {</span>
+<span class="nc" id="L117">            log.debug(&quot;Adding ADMIN role for localhost request&quot;);</span>
+<span class="nc" id="L118">            izgPrincipal.getRoles().add(Roles.ADMIN);</span>
+        }
+<span class="nc" id="L120">    }</span>
+
+    private boolean isLocalHost(String remoteHost) {
+<span class="nc" id="L123">        return localHostIps.contains(remoteHost);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

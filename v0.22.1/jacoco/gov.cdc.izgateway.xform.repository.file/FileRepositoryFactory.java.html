@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileRepositoryFactory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.repository.file</a> &gt; <span class="el_source">FileRepositoryFactory.java</span></div><h1>FileRepositoryFactory.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.repository.file;
+
+import gov.cdc.izgateway.common.HealthService;
+import gov.cdc.izgateway.xform.model.*;
+import gov.cdc.izgateway.xform.repository.RepositoryFactory;
+import gov.cdc.izgateway.xform.repository.XformRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.stereotype.Component;
+
+@Component
+//Allow operation of hub and xform service in same configuration
+@ConditionalOnExpression(&quot;'${spring.database:}'.equalsIgnoreCase('jpa') || '${spring.database:file}'.equalsIgnoreCase('file')&quot;)
+public class FileRepositoryFactory implements RepositoryFactory {
+
+    private final String accessControlFilePath;
+    private final String groupRoleMappingFilePath;
+    private final String mappingFilePath;
+    private final String operationPreconditionFieldFilePath;
+    private final String organizationFilePath;
+    private final String pipelineFilePath;
+    private final String solutionFilePath;
+    private final String userFilePath;
+
+    // Lazy-initialized repositories
+    private AccessControlRepository acr;
+    private GroupRoleMappingRepository grmr;
+    private MappingRepository mr;
+    private OperationPreconditionFieldRepository opfr;
+    private OrganizationRepository or;
+    private PipelineRepository pr;
+    private SolutionRepository sr;
+    private UserRepository ur;
+
+    public FileRepositoryFactory(
+            @Value(&quot;${xform.configurations.access-control}&quot;) String accessControlFilePath,
+            @Value(&quot;${xform.configurations.group-role-mapping}&quot;) String groupRoleMappingFilePath,
+            @Value(&quot;${xform.configurations.mappings}&quot;) String mappingFilePath,
+            @Value(&quot;${xform.configurations.operation-precondition-fields}&quot;) String operationPreconditionFieldFilePath,
+            @Value(&quot;${xform.configurations.organizations}&quot;) String organizationFilePath,
+            @Value(&quot;${xform.configurations.pipelines}&quot;) String pipelineFilePath,
+            @Value(&quot;${xform.configurations.solutions}&quot;) String solutionFilePath,
+<span class="fc" id="L43">            @Value(&quot;${xform.configurations.users}&quot;) String userFilePath) {</span>
+<span class="fc" id="L44">        this.accessControlFilePath = accessControlFilePath;</span>
+<span class="fc" id="L45">        this.groupRoleMappingFilePath = groupRoleMappingFilePath;</span>
+<span class="fc" id="L46">        this.mappingFilePath = mappingFilePath;</span>
+<span class="fc" id="L47">        this.operationPreconditionFieldFilePath = operationPreconditionFieldFilePath;</span>
+<span class="fc" id="L48">        this.organizationFilePath = organizationFilePath;</span>
+<span class="fc" id="L49">        this.pipelineFilePath = pipelineFilePath;</span>
+<span class="fc" id="L50">        this.solutionFilePath = solutionFilePath;</span>
+<span class="fc" id="L51">        this.userFilePath = userFilePath;</span>
+
+<span class="fc" id="L53">        HealthService.setDatabase(&quot;files&quot;);</span>
+<span class="fc" id="L54">    }</span>
+
+    @Override
+    public XformRepository&lt;AccessControl&gt; accessControlRepository() {
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        if (acr == null) {</span>
+<span class="fc" id="L59">            acr = new AccessControlRepository();</span>
+<span class="fc" id="L60">            acr.setFilePath(accessControlFilePath);</span>
+        }
+<span class="fc" id="L62">        return acr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;GroupRoleMapping&gt; groupRoleMappingRepository() {
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if (grmr == null) {</span>
+<span class="fc" id="L68">            grmr = new GroupRoleMappingRepository();</span>
+<span class="fc" id="L69">            grmr.setFilePath(groupRoleMappingFilePath);</span>
+        }
+<span class="fc" id="L71">        return grmr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;Mapping&gt; mappingRepository() {
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        if (mr == null) {</span>
+<span class="fc" id="L77">            mr = new MappingRepository();</span>
+<span class="fc" id="L78">            mr.setFilePath(mappingFilePath);</span>
+        }
+<span class="fc" id="L80">        return mr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;OperationPreconditionField&gt; operationPreconditionFieldRepository() {
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if (opfr == null) {</span>
+<span class="fc" id="L86">            opfr = new OperationPreconditionFieldRepository();</span>
+<span class="fc" id="L87">            opfr.setFilePath(operationPreconditionFieldFilePath);</span>
+        }
+<span class="fc" id="L89">        return opfr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;Organization&gt; organizationRepository() {
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">        if (or == null) {</span>
+<span class="fc" id="L95">            or = new OrganizationRepository();</span>
+<span class="fc" id="L96">            or.setFilePath(organizationFilePath);</span>
+        }
+<span class="fc" id="L98">        return or;</span>
+    }
+
+    @Override
+    public XformRepository&lt;Pipeline&gt; pipelineRepository() {
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if (pr == null) {</span>
+<span class="fc" id="L104">            pr = new PipelineRepository();</span>
+<span class="fc" id="L105">            pr.setFilePath(pipelineFilePath);</span>
+        }
+<span class="fc" id="L107">        return pr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;Solution&gt; solutionRepository() {
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">        if (sr == null) {</span>
+<span class="fc" id="L113">            sr = new SolutionRepository();</span>
+<span class="fc" id="L114">            sr.setFilePath(solutionFilePath);</span>
+        }
+<span class="fc" id="L116">        return sr;</span>
+    }
+
+    @Override
+    public XformRepository&lt;User&gt; userRepository() {
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        if (ur == null) {</span>
+<span class="fc" id="L122">            ur = new UserRepository();</span>
+<span class="fc" id="L123">            ur.setFilePath(userFilePath);</span>
+        }
+<span class="fc" id="L125">        return ur;</span>
+    }
+
+    @Override
+    public XformRepository&lt;Event&gt; eventRepository() {
+        // File-based event repository is not needed, it is only applicable for DynamoDB
+<span class="nc" id="L131">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

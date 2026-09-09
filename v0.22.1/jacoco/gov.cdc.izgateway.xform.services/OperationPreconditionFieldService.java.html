@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OperationPreconditionFieldService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.services</a> &gt; <span class="el_source">OperationPreconditionFieldService.java</span></div><h1>OperationPreconditionFieldService.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.services;
+
+import gov.cdc.izgateway.xform.model.OperationPreconditionField;
+import gov.cdc.izgateway.xform.repository.RepositoryFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class OperationPreconditionFieldService extends GenericService&lt;OperationPreconditionField&gt; {
+    @Autowired
+    protected OperationPreconditionFieldService(RepositoryFactory repositoryFactory) {
+<span class="fc" id="L15">        super(repositoryFactory.operationPreconditionFieldRepository());</span>
+<span class="fc" id="L16">    }</span>
+
+    public List&lt;OperationPreconditionField&gt; getOperationList() {
+<span class="nc" id="L19">        List&lt;OperationPreconditionField&gt; allFields = super.getList();</span>
+<span class="nc" id="L20">        List&lt;OperationPreconditionField&gt; operationFields = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L21" title="All 2 branches missed.">        for (OperationPreconditionField field : allFields) {</span>
+<span class="nc bnc" id="L22" title="All 2 branches missed.">            if (Boolean.TRUE.equals(field.getForOperation())) {</span>
+<span class="nc" id="L23">                operationFields.add(field);</span>
+            }
+<span class="nc" id="L25">        }</span>
+<span class="nc" id="L26">        return operationFields;</span>
+    }
+
+    public List&lt;OperationPreconditionField&gt; getPreconditionList() {
+<span class="nc" id="L30">        List&lt;OperationPreconditionField&gt; allFields = super.getList();</span>
+<span class="nc" id="L31">        List&lt;OperationPreconditionField&gt; preconditionFields = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L32" title="All 2 branches missed.">        for (OperationPreconditionField field : allFields) {</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">            if (Boolean.TRUE.equals(field.getForPrecondition())) {</span>
+<span class="nc" id="L34">                preconditionFields.add(field);</span>
+            }
+<span class="nc" id="L36">        }</span>
+<span class="nc" id="L37">        return preconditionFields;</span>
+    }
+
+    @Override
+    protected boolean isDuplicate(OperationPreconditionField operationPreconditionField) {
+<span class="nc" id="L42">        return repo.getEntitySet().stream().anyMatch(</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">                opf -&gt; opf.getDataPath().equalsIgnoreCase(operationPreconditionField.getDataPath()) &amp;&amp;</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">                        opf.getFieldName().equalsIgnoreCase(operationPreconditionField.getFieldName())</span>
+        );
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

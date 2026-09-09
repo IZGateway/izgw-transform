@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HubConverters.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.camel.converters</a> &gt; <span class="el_source">HubConverters.java</span></div><h1>HubConverters.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.camel.converters;
+import gov.cdc.izgateway.logging.RequestContext;
+import gov.cdc.izgateway.logging.event.TransactionData;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.xform.context.IZGXformContext;
+import gov.cdc.izgateway.xform.context.ServiceContext;
+import gov.cdc.izgateway.xform.enums.DataType;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.Converter;
+import org.apache.camel.TypeConverters;
+import org.apache.camel.component.file.GenericFile;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.UUID;
+
+@Component
+<span class="fc" id="L21">@Slf4j</span>
+<span class="fc" id="L22">public class HubConverters implements TypeConverters {</span>
+    @Converter
+    public InputStream contextToStream(IZGXformContext context) {
+<span class="nc" id="L25">        String hl7Message = context.getSubmitSingleMessageResponse().getHl7Message();</span>
+<span class="nc" id="L26">        return new ByteArrayInputStream(hl7Message.getBytes());</span>
+    }
+
+    @Converter
+    public String contextToString(IZGXformContext context) {
+<span class="nc" id="L31">        return context.getSubmitSingleMessageResponse().getHl7Message();</span>
+    }
+
+    @Converter
+    public IZGXformContext fileToContext(GenericFile&lt;File&gt; file) {
+<span class="nc" id="L36">        File thebody = (File) file.getBody();</span>
+
+<span class="nc" id="L38">        UUID organization = UUID.fromString(&quot;0d15449b-fb08-4013-8985-20c148b353fe&quot;);</span>
+<span class="nc" id="L39">        ServiceContext serviceContext = null;</span>
+        String body;
+        try {
+<span class="nc" id="L42">            body = new String(Files.readAllBytes(thebody.toPath()));</span>
+<span class="nc" id="L43">            serviceContext = new ServiceContext(organization,</span>
+                    &quot;izgts:IISHubService&quot;,
+                    &quot;izghub:IISHubService&quot;,
+                    DataType.HL7V2,
+                    &quot;&quot;, // This isn't used so blanking FacilityID for now
+                    body);
+<span class="nc" id="L49">        } catch (Exception e) {</span>
+<span class="nc" id="L50">            log.error(&quot;Error creating ServiceContext: &quot; + e.getMessage());</span>
+<span class="nc" id="L51">            throw new RuntimeException(&quot;Error creating ServiceContext: &quot; + e.getMessage());</span>
+<span class="nc" id="L52">        }</span>
+
+<span class="nc" id="L54">        SubmitSingleMessageRequest request = new SubmitSingleMessageRequest();</span>
+<span class="nc" id="L55">        request.getHubHeader().setDestinationId(&quot;dev&quot;);</span>
+
+        // TODO this needs to be addressed
+<span class="nc" id="L58">        TransactionData t = new TransactionData(&quot;TODO: A Real EVENTID&quot;);</span>
+<span class="nc" id="L59">        RequestContext.setTransactionData(t);</span>
+
+<span class="nc" id="L61">        return new IZGXformContext(serviceContext, request, null);</span>
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
