@@ -87,7 +87,7 @@ then
 fi
 
 # Start Java application
-java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.22.jar -javaagent:lib/spring-instrument-5.3.8.jar \
+java $JAVA_OPTS $JAVA_TOOL_OPTS -javaagent:lib/aspectjweaver-1.9.25.1.jar -javaagent:lib/spring-instrument-7.0.9.jar \
    -XX:+CreateCoredumpOnCrash -cp "./lib/bcfips/*" \
    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
    --add-opens=java.base/java.net=ALL-UNNAMED \
