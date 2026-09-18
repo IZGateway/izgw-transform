@@ -87,6 +87,12 @@ server:
   protocol: https
   port: ${XFORM_SERVER_PORT:444}
   local-port: 9082
+  # Keep getRemoteAddr() returning the load balancer's address rather than the
+  # X-Forwarded-For client. izgw-core's IpAddressFilter allowlists only internal
+  # CIDRs, so resolving the real client IP denies every request. Set explicitly
+  # so the behavior no longer depends on the Boot default or platform detection.
+  # (IGDD-2353)
+  forward-headers-strategy: none
   ssl:
     enabled: true
     client-auth: want
