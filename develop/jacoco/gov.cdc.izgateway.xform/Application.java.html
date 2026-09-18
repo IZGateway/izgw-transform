@@ -20,7 +20,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.coyote.ProtocolHandler;
-import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.bouncycastle.crypto.CryptoServicesRegistrar;
 import org.bouncycastle.crypto.EntropySourceProvider;
 import org.bouncycastle.crypto.fips.FipsDRBG;
@@ -32,10 +32,10 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
-import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
-import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.tomcat.TomcatContextCustomizer;
+import org.springframework.boot.tomcat.TomcatProtocolHandlerCustomizer;
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.ApplicationContextException;
@@ -86,7 +86,7 @@ import lombok.extern.slf4j.Slf4j;
 
     private static SecureRandom secureRandom;
 
-    private static AbstractHttp11JsseProtocol&lt;?&gt; protocol;
+    private static AbstractHttp11Protocol&lt;?&gt; protocol;
     public static void reloadSsl() {
 <span class="nc bnc" id="L91" title="All 2 branches missed.">        if (protocol != null) {</span>
 <span class="nc" id="L92">            protocol.reloadSslHostConfigs();</span>
@@ -245,14 +245,14 @@ import lombok.extern.slf4j.Slf4j;
     }
 
     public static void customizeConnector(Connector connector) {
-<span class="nc bnc" id="L248" title="All 2 branches missed.">        if (&quot;https&quot;.equals(connector.getScheme())) {</span>
-<span class="nc" id="L249">            ProtocolHandler p = connector.getProtocolHandler();</span>
-<span class="nc bnc" id="L250" title="All 2 branches missed.">            if (p instanceof AbstractHttp11JsseProtocol&lt;?&gt; jsse) {</span>
-<span class="nc" id="L251">                Application.protocol = jsse;</span>
-<span class="nc" id="L252">                jsse.setSslImplementationName(SSLImplementation.class.getName());</span>
+<span class="fc bfc" id="L248" title="All 2 branches covered.">        if (&quot;https&quot;.equals(connector.getScheme())) {</span>
+<span class="fc" id="L249">            ProtocolHandler p = connector.getProtocolHandler();</span>
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">            if (p instanceof AbstractHttp11Protocol&lt;?&gt; jsse) {</span>
+<span class="fc" id="L251">                Application.protocol = jsse;</span>
+<span class="fc" id="L252">                jsse.setSslImplementationName(SSLImplementation.class.getName());</span>
             }
         }
-<span class="nc" id="L255">    }</span>
+<span class="fc" id="L255">    }</span>
 
     @Bean
     TomcatServletWebServerFactory tomcatServletWebServerFactory(
@@ -270,9 +270,9 @@ import lombok.extern.slf4j.Slf4j;
                 }
             }
         };
-<span class="nc" id="L273">        factory.getTomcatConnectorCustomizers().addAll(connectorCustomizers.orderedStream().toList());</span>
-<span class="nc" id="L274">        factory.getTomcatContextCustomizers().addAll(contextCustomizers.orderedStream().toList());</span>
-<span class="nc" id="L275">        factory.getTomcatProtocolHandlerCustomizers().addAll(protocolHandlerCustomizers.orderedStream().toList());</span>
+<span class="nc" id="L273">        factory.getConnectorCustomizers().addAll(connectorCustomizers.orderedStream().toList());</span>
+<span class="nc" id="L274">        factory.getContextCustomizers().addAll(contextCustomizers.orderedStream().toList());</span>
+<span class="nc" id="L275">        factory.getProtocolHandlerCustomizers().addAll(protocolHandlerCustomizers.orderedStream().toList());</span>
 <span class="nc bnc" id="L276" title="All 2 branches missed.">        if (additionalPort &lt; 1) {</span>
 <span class="nc" id="L277">            return factory;</span>
         }
@@ -280,7 +280,7 @@ import lombok.extern.slf4j.Slf4j;
 <span class="nc" id="L280">        connector.setScheme(&quot;http&quot;);</span>
 <span class="nc" id="L281">        connector.setPort(additionalPort);</span>
 <span class="nc" id="L282">        connector.setProperty(&quot;minSpareThreads&quot;, &quot;3&quot;);  // This is for local administration, we don't need many.</span>
-<span class="nc" id="L283">        factory.addAdditionalTomcatConnectors(connector);</span>
+<span class="nc" id="L283">        factory.addAdditionalConnectors(connector);</span>
 <span class="nc" id="L284">        return factory;</span>
     }
 }

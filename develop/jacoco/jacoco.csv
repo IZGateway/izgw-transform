@@ -143,7 +143,7 @@ xform,gov.cdc.izgateway.xform,LogController,9,6,0,0,3,3,2,1,2,1
 xform,gov.cdc.izgateway.xform,Application.new TomcatServletWebServerFactory() {...},15,0,0,0,4,0,2,0,2,0
 xform,gov.cdc.izgateway.xform,Application.new Thread() {...},5,0,0,0,3,0,2,0,2,0
 xform,gov.cdc.izgateway.xform,Application.new UserDetailsService() {...},11,0,0,0,2,0,2,0,2,0
-xform,gov.cdc.izgateway.xform,Application,281,50,14,0,77,10,22,4,15,4
+xform,gov.cdc.izgateway.xform,Application,260,71,11,3,71,16,20,6,14,5
 xform,gov.cdc.izgateway.xform,XformApplicationController,20,11,2,0,6,4,4,2,3,2
 xform,gov.cdc.izgateway.xform.model,GroupRoleMapping,42,0,2,0,9,0,3,0,2,0
 xform,gov.cdc.izgateway.xform.model,Solution,98,0,8,0,30,0,12,0,8,0
