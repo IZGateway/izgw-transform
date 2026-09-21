@@ -42,6 +42,12 @@ spring:
       enabled: true
       max-file-size: 15GB
       max-request-size: 15GB
+  web:
+    error:
+      # Boot 4 renamed server.error.* to spring.web.error.*; the old key is
+      # deprecation level=error since 4.0.0 and is silently ignored, which drops
+      # the `message` field from error bodies entirely. (IGDD-2353)
+      include-message: always
 
 elastic:
   api-key: ${ELASTIC_API_KEY:}
@@ -81,12 +87,16 @@ springdoc:
   paths-to-match: /api/**
 
 server:
-  error:
-    include-message: always
   hostname: ${XFORM_SERVER_HOSTNAME:dev.izgateway.org}
   protocol: https
   port: ${XFORM_SERVER_PORT:444}
   local-port: 9082
+  # Keep getRemoteAddr() returning the load balancer's address rather than the
+  # X-Forwarded-For client. izgw-core's IpAddressFilter allowlists only internal
+  # CIDRs, so resolving the real client IP denies every request. Set explicitly
+  # so the behavior no longer depends on the Boot default or platform detection.
+  # (IGDD-2353)
+  forward-headers-strategy: none
   ssl:
     enabled: true
     client-auth: want
