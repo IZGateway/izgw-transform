@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SoapMessageWriter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.soap.net</a> &gt; <span class="el_source">SoapMessageWriter.java</span></div><h1>SoapMessageWriter.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.soap.net;
+
+import gov.cdc.izgateway.logging.event.EventId;
+import gov.cdc.izgateway.soap.message.*;
+import gov.cdc.izgateway.soap.message.SoapMessage.Response;
+import gov.cdc.izgateway.utils.HL7Utils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.MDC;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import java.util.List;
+import java.util.function.Function;
+
+// TODO: Refactor this with IZG Core
+
+public class SoapMessageWriter {
+	public static final String HIDDEN = &quot;[Hidden]&quot;;
+<span class="nc" id="L20">	private static boolean fixNewlines = true;</span>
+	private final SoapMessage m;
+	private final XMLStreamWriter w;
+	private final boolean filtering;
+	
+<span class="nc" id="L25">	public SoapMessageWriter(SoapMessage m, XMLStreamWriter w, boolean filtering) {</span>
+<span class="nc" id="L26">		this.m = m;</span>
+<span class="nc" id="L27">		this.w = w;</span>
+<span class="nc" id="L28">		this.filtering = filtering;</span>
+<span class="nc" id="L29">	}</span>
+	
+	public SoapMessageWriter(SoapMessage m, XMLStreamWriter w) {
+<span class="nc" id="L32">		this(m, w, false);</span>
+<span class="nc" id="L33">	}</span>
+	
+	public static void setFixNewLines(boolean fixNewlines) {
+<span class="nc" id="L36">		SoapMessageWriter.fixNewlines = fixNewlines;</span>
+<span class="nc" id="L37">	}</span>
+	
+	public static boolean getFixNewLines() {
+<span class="nc" id="L40">		return SoapMessageWriter.fixNewlines;</span>
+	}
+	
+	public boolean isFiltering() {
+<span class="nc" id="L44">		return filtering;</span>
+	}
+
+	/**
+	 * Adjust IIS schema based on message schema 
+	 * @param m
+	 * @return The correct schema to use for iis: prefix.
+	 */
+	public static String getIisSchema(SoapMessage m) {
+<span class="nc bnc" id="L53" title="All 2 branches missed.">		if (m.getSchema().contains(&quot;2011&quot;)) {</span>
+<span class="nc" id="L54">			return SoapMessage.IIS2011_NS;</span>
+		}
+<span class="nc" id="L56">		return SoapMessage.IIS2014_NS;</span>
+	}
+
+	public void writeOptionalTextElement(String name, String value) throws XMLStreamException {
+<span class="nc bnc" id="L60" title="All 2 branches missed.">		if (!StringUtils.isEmpty(value)) {</span>
+<span class="nc" id="L61">			w.writeStartElement(SoapMessage.IIS_PREFIX, m.elementName(name), getIisSchema(m));</span>
+<span class="nc" id="L62">				w.writeCharacters(value);</span>
+<span class="nc" id="L63">			w.writeEndElement();</span>
+		}
+<span class="nc" id="L65">	}</span>
+	public void writeRequiredTextElement(String name, String value) throws XMLStreamException {
+<span class="nc" id="L67">		w.writeStartElement(SoapMessage.IIS_PREFIX, m.elementName(name), getIisSchema(m));</span>
+<span class="nc bnc" id="L68" title="All 2 branches missed.">		if (!StringUtils.isEmpty(value)) {</span>
+<span class="nc" id="L69">			w.writeCharacters(value);</span>
+		}
+<span class="nc" id="L71">		w.writeEndElement();</span>
+<span class="nc" id="L72">	}</span>
+	
+	private void writeSoapValueElement(String value) throws XMLStreamException {
+<span class="nc" id="L75">		w.writeStartElement(SoapMessage.SOAP_PREFIX, &quot;Value&quot;, SoapMessage.SOAP_NS);</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">		if (!StringUtils.isEmpty(value)) {</span>
+<span class="nc" id="L77">			w.writeCharacters(value);</span>
+		}
+<span class="nc" id="L79">		w.writeEndElement();</span>
+<span class="nc" id="L80">	}</span>
+	private void writeSoapTextElement(String text) throws XMLStreamException {
+<span class="nc" id="L82">		w.writeStartElement(SoapMessage.SOAP_PREFIX, &quot;Text&quot;, SoapMessage.SOAP_NS);</span>
+<span class="nc" id="L83">		w.writeAttribute(&quot;xml&quot;, &quot;http://www.w3.org/XML/1998/namespace&quot;, &quot;lang&quot;, &quot;en&quot;);</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">		if (!StringUtils.isEmpty(text)) {</span>
+<span class="nc" id="L85">			w.writeCharacters(text);</span>
+		}
+<span class="nc" id="L87">		w.writeEndElement();</span>
+<span class="nc" id="L88">	}</span>
+
+	public void write() throws XMLStreamException {
+<span class="nc" id="L91">		w.writeStartElement(SoapMessage.SOAP_PREFIX, &quot;Envelope&quot;, SoapMessage.SOAP_NS);</span>
+<span class="nc" id="L92">		w.writeNamespace(SoapMessage.SOAP_PREFIX, SoapMessage.SOAP_NS);</span>
+<span class="nc" id="L93">		w.writeNamespace(SoapMessage.IIS_PREFIX, getIisSchema(m));</span>
+		
+<span class="nc bnc" id="L95" title="All 6 branches missed.">		if (!m.getWsaHeaders().isEmpty() || !m.getHubHeader().isEmpty() || !m.getXformHeader().isEmpty()) {</span>
+<span class="nc" id="L96">			w.writeStartElement(SoapMessage.SOAP_PREFIX, &quot;Header&quot;, SoapMessage.SOAP_NS);</span>
+<span class="nc" id="L97">			w.writeNamespace(WsaHeaders.WSA_PREFIX, WsaHeaders.WSA_NS);</span>
+<span class="nc" id="L98">				writeWsaHeaders();</span>
+<span class="nc" id="L99">				writeHubHeaders(m instanceof Response);</span>
+<span class="nc" id="L100">            writeXformHeaders(m instanceof Response);</span>
+<span class="nc" id="L101">			w.writeEndElement();</span>
+		}
+
+<span class="nc" id="L104">			w.writeStartElement(SoapMessage.SOAP_PREFIX, &quot;Body&quot;, SoapMessage.SOAP_NS);</span>
+<span class="nc" id="L105">				startIisElement();</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">					if (m instanceof FaultMessage) {</span>
+<span class="nc" id="L107">						writeFaultContent();</span>
+					} else {
+<span class="nc" id="L109">						writeBodyContent();</span>
+					}
+<span class="nc" id="L111">				w.writeEndElement();</span>
+			
+<span class="nc" id="L113">			w.writeEndElement();</span>
+
+<span class="nc" id="L115">		w.writeEndElement();</span>
+<span class="nc" id="L116">		w.flush();</span>
+<span class="nc" id="L117">	}</span>
+    private void writeHubHeaders(boolean isResponse) throws XMLStreamException {
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        if (m.getHubHeader().isEmpty()) {</span>
+<span class="nc" id="L120">            return;</span>
+        }
+<span class="nc" id="L122">        w.writeStartElement(</span>
+                SoapMessage.HUB_PREFIX,
+<span class="nc bnc" id="L124" title="All 2 branches missed.">                isResponse ? &quot;HubResponseHeader&quot; : &quot;HubRequestHeader&quot;,</span>
+                SoapMessage.HUB_NS
+        );
+        // Force write of namespace prefix for hub header in case it isn't otherwise written.
+<span class="nc" id="L128">        w.writeNamespace(SoapMessage.HUB_PREFIX, SoapMessage.HUB_NS);</span>
+<span class="nc" id="L129">        writeKeyValueSuppliers(HubHeader.getKeyValueSuppliers(), SoapMessage.HUB_PREFIX, SoapMessage.HUB_NS);</span>
+<span class="nc" id="L130">        w.writeEndElement();</span>
+<span class="nc" id="L131">    }</span>
+
+	private void writeXformHeaders(boolean isResponse) throws XMLStreamException {
+<span class="nc bnc" id="L134" title="All 4 branches missed.">		if (!isResponse || m.getXformHeader().isEmpty()) {</span>
+<span class="nc" id="L135">			return;</span>
+		}
+
+<span class="nc" id="L138">		w.writeStartElement(</span>
+			SoapMessage.XFORM_PREFIX,
+			&quot;XformResponseHeader&quot;,
+			SoapMessage.XFORM_NS
+		);
+		// Force write of namespace prefix for hub header in case it isn't otherwise written.
+<span class="nc" id="L144">		w.writeNamespace(SoapMessage.XFORM_PREFIX, SoapMessage.XFORM_NS);</span>
+
+		// Xform headers always have HL7 content that needs to be protected if isFiltering is true
+<span class="nc" id="L147">		writeKeyValueSuppliers(XformHeader.getKeyValueSuppliers(), SoapMessage.XFORM_PREFIX, SoapMessage.XFORM_NS, true);</span>
+<span class="nc" id="L148">		w.writeEndElement();</span>
+<span class="nc" id="L149">	}</span>
+	
+	public void writeWsaHeaders() throws XMLStreamException {
+<span class="nc bnc" id="L152" title="All 2 branches missed.">		if (m.getWsaHeaders().isEmpty()) {</span>
+<span class="nc" id="L153">			return;</span>
+		}
+<span class="nc" id="L155">		writeKeyValueSuppliers(WsaHeaders.getKeyValueSuppliers(), WsaHeaders.WSA_PREFIX, WsaHeaders.WSA_NS);</span>
+<span class="nc" id="L156">	}</span>
+	
+	private void writeKeyValueSuppliers(List&lt;Pair&lt;String, Function&lt;SoapMessage, String&gt;&gt;&gt; pairs, String prefix, String ns) throws XMLStreamException {
+<span class="nc" id="L159">        writeKeyValueSuppliers(pairs, prefix, ns, false);</span>
+<span class="nc" id="L160">	}</span>
+
+    private void writeKeyValueSuppliers(List&lt;Pair&lt;String, Function&lt;SoapMessage, String&gt;&gt;&gt; pairs, String prefix, String ns, boolean hasHl7Content) throws XMLStreamException {
+<span class="nc bnc" id="L163" title="All 2 branches missed.">        for (Pair&lt;String, Function&lt;SoapMessage, String&gt;&gt; pair: pairs) {</span>
+<span class="nc" id="L164">            String value = pair.getValue().apply(m);</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">            if (!StringUtils.isEmpty(value)) {</span>
+<span class="nc" id="L166">                w.writeStartElement(prefix, pair.getKey(), ns);</span>
+<span class="nc bnc" id="L167" title="All 4 branches missed.">                if ( hasHl7Content &amp;&amp; isFiltering() ) {</span>
+<span class="nc" id="L168">                    w.writeCharacters(HL7Utils.protectHL7Message(value));</span>
+                } else {
+<span class="nc" id="L170">                    w.writeCharacters(value);</span>
+                }
+<span class="nc" id="L172">                w.writeEndElement();</span>
+            }
+<span class="nc" id="L174">        }</span>
+<span class="nc" id="L175">    }</span>
+
+	public void startIisElement(String name) throws XMLStreamException {
+<span class="nc" id="L178">		w.writeStartElement(SoapMessage.IIS_PREFIX, m.elementName(name), getIisSchema(m));</span>
+<span class="nc" id="L179">	}</span>
+	
+	private void startIisElement() throws XMLStreamException {
+<span class="nc bnc" id="L182" title="All 2 branches missed.">		if (m instanceof FaultMessage) {</span>
+<span class="nc" id="L183">			w.writeStartElement(SoapMessage.SOAP_PREFIX, &quot;Fault&quot;, SoapMessage.SOAP_NS);</span>
+		} else {
+<span class="nc" id="L185">			startIisElement(getMessageName());</span>
+		}
+<span class="nc" id="L187">	}</span>
+	
+	private String getMessageName() {
+<span class="nc" id="L190">		Class&lt;?&gt; clazz = m.getClass();</span>
+<span class="nc bnc" id="L191" title="All 4 branches missed.">		while (clazz != Object.class &amp;&amp; clazz.getPackage() != SoapMessage.class.getPackage()) {</span>
+<span class="nc" id="L192">			clazz = clazz.getSuperclass();</span>
+		}
+<span class="nc" id="L194">		return clazz.getSimpleName();</span>
+	}
+	
+	public void writeFaultContent() throws XMLStreamException {
+<span class="nc" id="L198">		FaultMessage f = (FaultMessage) m;</span>
+<span class="nc" id="L199">		w.writeStartElement(SoapMessage.SOAP_PREFIX, &quot;Code&quot;, SoapMessage.SOAP_NS);</span>
+<span class="nc" id="L200">			writeSoapValueElement(&quot;soap:Receiver&quot;);</span>
+<span class="nc" id="L201">		w.writeEndElement();</span>
+<span class="nc" id="L202">		w.writeStartElement(SoapMessage.SOAP_PREFIX, &quot;Reason&quot;, SoapMessage.SOAP_NS);</span>
+<span class="nc" id="L203">			writeSoapTextElement(f.getReason());</span>
+<span class="nc" id="L204">		w.writeEndElement();</span>
+<span class="nc" id="L205">		w.writeStartElement(SoapMessage.SOAP_PREFIX, &quot;Detail&quot;, SoapMessage.SOAP_NS);</span>
+<span class="nc" id="L206">		w.writeNamespace(&quot;&quot;, &quot;&quot;);</span>
+			// depending on the fault, we may need to add the Hub prefix and namespace
+<span class="nc" id="L208">			startFaultName(f);</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">			if (f.isHubFault()) {</span>
+<span class="nc" id="L210">				w.writeStartElement(SoapMessage.HUB_PREFIX, &quot;DestinationId&quot;, SoapMessage.HUB_NS);</span>
+<span class="nc" id="L211">				{	String destId = f.getDestinationId();</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">					if (!StringUtils.isEmpty(destId)) {</span>
+<span class="nc" id="L213">						w.writeCharacters(destId);</span>
+					}
+				}
+<span class="nc" id="L216">				w.writeEndElement();</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">				if (!(&quot;UnknownDestinationFault&quot;.equals(f.getFaultName()))) {</span>
+<span class="nc" id="L218">					w.writeStartElement(SoapMessage.HUB_PREFIX, &quot;DestinationUri&quot;, SoapMessage.HUB_NS);</span>
+<span class="nc" id="L219">					{	String destUri = f.getDestinationUri();</span>
+<span class="nc bnc" id="L220" title="All 2 branches missed.">						if (!StringUtils.isEmpty(destUri)) {</span>
+<span class="nc" id="L221">							w.writeCharacters(destUri);</span>
+						}
+					}
+<span class="nc" id="L224">					w.writeEndElement();</span>
+				}
+<span class="nc bnc" id="L226" title="All 2 branches missed.">			} else if (&quot;MessageTooLargeFault&quot;.equals(f.getFaultName())) {</span>
+<span class="nc" id="L227">				w.writeStartElement(SoapMessage.IIS_PREFIX, &quot;Size&quot;, getIisSchema(m));</span>
+<span class="nc" id="L228">					w.writeCharacters(f.getSize());</span>
+<span class="nc" id="L229">				w.writeEndElement();</span>
+<span class="nc" id="L230">				w.writeStartElement(SoapMessage.IIS_PREFIX, &quot;MaxSize&quot;, getIisSchema(m));</span>
+<span class="nc" id="L231">				w.writeCharacters(f.getMaxSize());</span>
+<span class="nc" id="L232">				w.writeEndElement();</span>
+			}
+<span class="nc" id="L234">			w.writeEndElement();</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">			if (SoapMessage.IIS2011_NS.equals(m.getSchema())) {</span>
+<span class="nc" id="L236">				writeOptionalTextElement(&quot;Code&quot;, f.getCode());</span>
+<span class="nc" id="L237">				writeOptionalTextElement(&quot;Reason&quot;, f.getReason());</span>
+<span class="nc" id="L238">				writeOptionalTextElement(&quot;Detail&quot;, f.getDetail());</span>
+			}
+<span class="nc" id="L240">			writeNoNamespaceElement(&quot;EventID&quot;, MDC.get(EventId.EVENTID_KEY));</span>
+<span class="nc" id="L241">			writeNoNamespaceElement(&quot;Summary&quot;, StringUtils.join(f.getSummary().split(&quot;\\s+&quot;)));</span>
+<span class="nc" id="L242">			writeNoNamespaceElement(&quot;Detail&quot;, f.getDetail());</span>
+<span class="nc" id="L243">			writeNoNamespaceElement(&quot;Diagnostics&quot;, f.getDiagnostics());</span>
+<span class="nc" id="L244">			writeNoNamespaceElement(&quot;Retry&quot;, f.getRetry());</span>
+<span class="nc bnc" id="L245" title="All 2 branches missed.">			if (&quot;HubClientFault&quot;.equals(f.getFaultName())) {</span>
+<span class="nc" id="L246">				writeNoNamespaceElement(&quot;Original&quot;, f.getOriginal());</span>
+			}
+<span class="nc" id="L248">		w.writeEndElement();</span>
+<span class="nc" id="L249">	}</span>
+	
+	private void writeNoNamespaceElement(String name, String value) throws XMLStreamException {
+<span class="nc bnc" id="L252" title="All 2 branches missed.">		if (!StringUtils.isEmpty(value)) {</span>
+<span class="nc" id="L253">			w.writeStartElement(&quot;&quot;, name, &quot;&quot;);</span>
+<span class="nc" id="L254">				w.writeCharacters(value);</span>
+<span class="nc" id="L255">			w.writeEndElement();</span>
+		}
+<span class="nc" id="L257">	}</span>
+	private void startFaultName(FaultMessage f) throws XMLStreamException {
+<span class="nc bnc" id="L259" title="All 2 branches missed.">		if (f.isHubFault()) {</span>
+<span class="nc" id="L260">			w.writeStartElement(SoapMessage.HUB_PREFIX, f.getFaultName(), SoapMessage.HUB_NS);</span>
+<span class="nc" id="L261">			w.writeNamespace(SoapMessage.HUB_PREFIX, SoapMessage.HUB_NS);</span>
+		} else {
+<span class="nc" id="L263">			w.writeStartElement(SoapMessage.IIS_PREFIX, f.getFaultName(), getIisSchema(m));</span>
+<span class="nc" id="L264">			w.writeNamespace(SoapMessage.IIS_PREFIX, getIisSchema(m));</span>
+		}
+<span class="nc" id="L266">	}</span>
+	public void writeBodyContent() throws XMLStreamException {
+<span class="nc bnc" id="L268" title="All 2 branches missed.">		if (m instanceof HasCredentials credentialed) {</span>
+<span class="nc" id="L269">			writeOptionalTextElement(&quot;Username&quot;, hidden(credentialed.getUsername()));</span>
+<span class="nc" id="L270">			writeOptionalTextElement(&quot;Password&quot;, hidden(credentialed.getPassword()));</span>
+<span class="nc bnc" id="L271" title="All 2 branches missed.">			if (m instanceof HasFacilityID hfid) {</span>
+<span class="nc" id="L272">				writeOptionalTextElement(&quot;FacilityID&quot;, hfid.getFacilityID());</span>
+			}
+		}
+<span class="nc bnc" id="L275" title="All 2 branches missed.">		if (m instanceof HasHL7Message hl7m) {</span>
+<span class="nc" id="L276">			writeHl7Message(hl7m.getHl7Message(), hl7m.isCdataWrapped());</span>
+		}
+<span class="nc bnc" id="L278" title="All 2 branches missed.">		if (m instanceof HasEchoBack heb) {</span>
+<span class="nc" id="L279">			writeRequiredTextElement(&quot;EchoBack&quot;, heb.getEchoBack());</span>
+		}
+<span class="nc" id="L281">	}</span>
+	
+	private String hidden(String value) {
+<span class="nc bnc" id="L284" title="All 2 branches missed.">		if (StringUtils.isEmpty(value)) {</span>
+<span class="nc" id="L285">			return value;</span>
+		}
+<span class="nc bnc" id="L287" title="All 2 branches missed.">		return filtering ? HIDDEN : value;</span>
+	}
+
+	/**
+	 * Write out an HL7 message properly escaped for representation in XML.
+	 * @param w
+	 * @param hl7Message
+	 * @param b 
+	 * @throws XMLStreamException
+	 */
+	private void writeHl7Message(String hl7Message, boolean isCdataWrapped) throws XMLStreamException {
+<span class="nc" id="L298">		w.writeStartElement(SoapMessage.IIS_PREFIX, m.elementName(&quot;Hl7Message&quot;), m.getSchema());</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">		if (filtering) {</span>
+<span class="nc" id="L300">			hl7Message = HL7Utils.protectHL7Message(hl7Message);</span>
+		}
+		
+<span class="nc bnc" id="L303" title="All 2 branches missed.">		if (!StringUtils.isEmpty(hl7Message)) {</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">			if (isCdataWrapped) {</span>
+<span class="nc" id="L305">				w.writeCData(hl7Message);</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">			} else if (fixNewlines) {</span>
+<span class="nc" id="L307">				String[] data = hl7Message.split(&quot;\r&quot;);</span>
+<span class="nc" id="L308">				w.writeCharacters(data[0]);</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">				for (int i = 1; i &lt; data.length; i++) {</span>
+<span class="nc" id="L310">					w.writeEntityRef(&quot;#xD&quot;);</span>
+<span class="nc" id="L311">					w.writeCharacters(data[i]);</span>
+				}
+<span class="nc" id="L313">			} else {</span>
+<span class="nc" id="L314">				w.writeCharacters(hl7Message);</span>
+			}
+		}
+<span class="nc" id="L317">		w.writeEndElement();</span>
+<span class="nc" id="L318">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

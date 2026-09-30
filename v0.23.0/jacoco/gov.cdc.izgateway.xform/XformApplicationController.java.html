@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>XformApplicationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform</a> &gt; <span class="el_source">XformApplicationController.java</span></div><h1>XformApplicationController.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform;
+
+import gov.cdc.izgateway.common.HealthService;
+import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.xform.security.Roles;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.annotation.security.RolesAllowed;
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+<span class="fc" id="L16">@Log</span>
+@RestController
+@Lazy(false)
+public class XformApplicationController {
+
+    @Autowired
+    public XformApplicationController(
+            AccessControlRegistry registry
+<span class="fc" id="L24">    ) {</span>
+<span class="fc" id="L25">        registry.register(this);</span>
+<span class="fc" id="L26">    }</span>
+
+    @RolesAllowed({Roles.PUBLIC_ACCESS})
+    @GetMapping(&quot;/healthy&quot;)
+    public ResponseEntity&lt;Boolean&gt; isHealthy() {
+<span class="nc" id="L31">        boolean healthy = HealthService.getHealth().isHealthy();</span>
+<span class="nc bnc" id="L32" title="All 2 branches missed.">        if (!healthy) {</span>
+<span class="nc" id="L33">            return ResponseEntity.status(503).body(false);</span>
+        }
+<span class="nc" id="L35">        return ResponseEntity.ok(true);</span>
+    }
+
+    @RolesAllowed({Roles.ADMIN})
+    @GetMapping(&quot;/health&quot;)
+    public gov.cdc.izgateway.logging.event.Health getHealth() {
+<span class="nc" id="L41">        return HealthService.getHealth();</span>
+    }
+
+    @Operation(summary = &quot;Get build information about the application&quot;,
+            description = &quot;Returns the build number, build machine and build date.&quot;)
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Success&quot;,
+            content = @Content(mediaType = &quot;text/plain&quot;)
+    )
+    @RolesAllowed({Roles.ADMIN})
+    @GetMapping({&quot;/build&quot;, &quot;/build.txt&quot;})
+    public String getBuild() {
+<span class="nc" id="L52">        return Application.getPage(Application.BUILD);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

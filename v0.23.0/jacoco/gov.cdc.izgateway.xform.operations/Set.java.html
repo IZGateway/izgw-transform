@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Set.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.operations</a> &gt; <span class="el_source">Set.java</span></div><h1>Set.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.operations;
+
+import gov.cdc.izgateway.xform.context.ServiceContext;
+import gov.cdc.izgateway.xform.enums.DataType;
+import gov.cdc.izgateway.xform.exceptions.OperationException;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class Set extends BaseOperation implements Operation {
+
+    @NotBlank(message = &quot;required and cannot be empty&quot;)
+    private String destinationField;
+    @NotBlank(message = &quot;required and cannot be empty&quot;)
+    private String setValue;
+
+<span class="fc" id="L19">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Set.class);</span>
+
+<span class="fc" id="L21">    public Set() {}</span>
+
+    protected Set(Set set) {
+<span class="fc" id="L24">        super(set.getId(), set.getOrder());</span>
+<span class="fc" id="L25">        this.destinationField = set.destinationField;</span>
+<span class="fc" id="L26">        this.setValue = set.setValue;</span>
+<span class="fc" id="L27">    }</span>
+
+
+    @Override
+    public void execute(ServiceContext context) throws OperationException {
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
+<span class="nc" id="L33">            log.trace(&quot;SET Operation: {} / SET {} TO {}&quot;, this.getClass().getSimpleName(), this.destinationField, this.setValue);</span>
+        }
+
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
+<span class="fc" id="L37">            Hl7v2Set hl7Set = new Hl7v2Set(this);</span>
+<span class="fc" id="L38">            hl7Set.execute(context);</span>
+        }
+<span class="fc" id="L40">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

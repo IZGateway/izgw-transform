@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataMigrationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.repository.dynamodb.migration</a> &gt; <span class="el_source">DataMigrationService.java</span></div><h1>DataMigrationService.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.repository.dynamodb.migration;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Service to migrate entity types from file storage to DynamoDB.
+ */
+<span class="nc" id="L12">@Slf4j</span>
+@Service
+public class DataMigrationService {
+
+    private final List&lt;EntityMigrator&lt;?&gt;&gt; migrators;
+
+    @Autowired
+<span class="nc" id="L19">    public DataMigrationService(List&lt;EntityMigrator&lt;?&gt;&gt; migrators) {</span>
+<span class="nc" id="L20">        this.migrators = migrators;</span>
+<span class="nc" id="L21">    }</span>
+
+    /**
+     * Run migration for all existing entity migrators.
+     *
+     * @return Migration success status
+     */
+    public boolean migrateAll() {
+
+<span class="nc" id="L30">        log.info(&quot;Starting data migration for {} entity types&quot;, migrators.size());</span>
+
+<span class="nc" id="L32">        boolean overallSuccess = true;</span>
+<span class="nc" id="L33">        int totalEntities = 0;</span>
+<span class="nc" id="L34">        int totalMigrated = 0;</span>
+<span class="nc" id="L35">        int totalSkipped = 0;</span>
+
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        for (EntityMigrator&lt;?&gt; migrator : migrators) {</span>
+<span class="nc" id="L38">            log.info(&quot;Migrating {}...&quot;, migrator.getEntityName());</span>
+
+            try {
+<span class="nc" id="L41">                MigrationCounts counts = migrator.migrate();</span>
+<span class="nc" id="L42">                totalEntities += counts.total();</span>
+<span class="nc" id="L43">                totalMigrated += counts.migrated();</span>
+<span class="nc" id="L44">                totalSkipped += counts.skipped();</span>
+<span class="nc" id="L45">            } catch (Exception e) {</span>
+<span class="nc" id="L46">                log.error(&quot;Failed to migrate {}: {}&quot;, migrator.getEntityName(), e.getMessage(), e);</span>
+<span class="nc" id="L47">                overallSuccess = false;</span>
+<span class="nc" id="L48">            }</span>
+<span class="nc" id="L49">        }</span>
+
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (overallSuccess) {</span>
+<span class="nc" id="L52">            log.info(&quot;Migration completed successfully: {}/{} entities migrated ({} skipped)&quot;,</span>
+<span class="nc" id="L53">                    totalMigrated, totalEntities, totalSkipped);</span>
+        } else {
+<span class="nc" id="L55">            log.error(&quot;Migration completed with errors&quot;);</span>
+        }
+
+<span class="nc" id="L58">        return overallSuccess;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
