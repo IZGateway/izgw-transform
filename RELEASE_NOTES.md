@@ -1,3 +1,9 @@
+# IZ Gateway Transformation Service 0.23.0
+
+Released 2026-09-30.
+
+- IGDD-2353: Migrate izgw-transform to Spring Boot 4 / Framework 7 / Tomcat 11 ([#290](https://github.com/IZGateway/izgw-transform/pull/290))
+
 # IZ Gateway Transformation Service 0.22.1
 
 Released 2026-09-09.
