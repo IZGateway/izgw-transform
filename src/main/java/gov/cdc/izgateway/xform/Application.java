@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.Security;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -20,7 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.coyote.ProtocolHandler;
-import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.bouncycastle.crypto.CryptoServicesRegistrar;
 import org.bouncycastle.crypto.EntropySourceProvider;
 import org.bouncycastle.crypto.fips.FipsDRBG;
@@ -32,17 +31,17 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
-import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
-import org.springframework.boot.web.embedded.tomcat.TomcatProtocolHandlerCustomizer;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.tomcat.TomcatContextCustomizer;
+import org.springframework.boot.tomcat.TomcatProtocolHandlerCustomizer;
+import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -86,7 +85,7 @@ public class Application implements WebMvcConfigurer {
 
     private static SecureRandom secureRandom;
 
-    private static AbstractHttp11JsseProtocol<?> protocol;
+    private static AbstractHttp11Protocol<?> protocol;
     public static void reloadSsl() {
         if (protocol != null) {
             protocol.reloadSslHostConfigs();
@@ -211,16 +210,28 @@ public class Application implements WebMvcConfigurer {
         return http.build();
     }
 
+    // Boot 4 / Framework 7: use the ServerBuilder hook, not the legacy
+    // configureMessageConverters(List). createMessageConverters() calls
+    // registerDefaults() before this hook, so the defaults (Jackson included) are
+    // always present and we only add to them. The legacy list path still has the trap
+    // that getMessageConverters() only adds defaults when the list is left empty, so
+    // populating configureMessageConverters(List) silently dropped every default
+    // converter app-wide -- Boot 4's WebMvcAutoConfigurationAdapter no longer
+    // contributes to that list, leaving our two converters as the only entries.
+    //
+    // addCustomConverter places these ahead of the defaults, which preserves the
+    // original add(0, new FhirConverter()) intent: FhirConverter still beats the
+    // Jackson converters to application/json FHIR content, because we prefer the
+    // HAPI based FHIR parsers over the jackson ones for FHIR content.
+    // SoapMessageConverter ahead of the defaults is safe because its
+    // canRead/canWrite both require SoapMessage.class.isAssignableFrom(clazz), so it
+    // can never claim a String or JSON payload regardless of its position.
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> messageConverters) {
+    public void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
         SoapMessageConverter smc = new SoapMessageConverter(SoapMessageConverter.INBOUND);
         smc.setHub(true);
-        messageConverters.add(smc);
-        // FhirConverter should go before jackson converters
-        // because they also handle application/json and we'd
-        // prefer to use the HAPI based FHIR parsers rather
-        // than the jackson ones for FHIR content.
-        messageConverters.add(0, new FhirConverter());
+        builder.addCustomConverter(smc);
+        builder.addCustomConverter(new FhirConverter());
     }
     
     @Bean
@@ -247,7 +258,7 @@ public class Application implements WebMvcConfigurer {
     public static void customizeConnector(Connector connector) {
         if ("https".equals(connector.getScheme())) {
             ProtocolHandler p = connector.getProtocolHandler();
-            if (p instanceof AbstractHttp11JsseProtocol<?> jsse) {
+            if (p instanceof AbstractHttp11Protocol<?> jsse) {
                 Application.protocol = jsse;
                 jsse.setSslImplementationName(SSLImplementation.class.getName());
             }
@@ -270,9 +281,9 @@ public class Application implements WebMvcConfigurer {
                 }
             }
         };
-        factory.getTomcatConnectorCustomizers().addAll(connectorCustomizers.orderedStream().toList());
-        factory.getTomcatContextCustomizers().addAll(contextCustomizers.orderedStream().toList());
-        factory.getTomcatProtocolHandlerCustomizers().addAll(protocolHandlerCustomizers.orderedStream().toList());
+        factory.getConnectorCustomizers().addAll(connectorCustomizers.orderedStream().toList());
+        factory.getContextCustomizers().addAll(contextCustomizers.orderedStream().toList());
+        factory.getProtocolHandlerCustomizers().addAll(protocolHandlerCustomizers.orderedStream().toList());
         if (additionalPort < 1) {
             return factory;
         }
@@ -280,7 +291,7 @@ public class Application implements WebMvcConfigurer {
         connector.setScheme("http");
         connector.setPort(additionalPort);
         connector.setProperty("minSpareThreads", "3");  // This is for local administration, we don't need many.
-        factory.addAdditionalTomcatConnectors(connector);
+        factory.addAdditionalConnectors(connector);
         return factory;
     }
 }

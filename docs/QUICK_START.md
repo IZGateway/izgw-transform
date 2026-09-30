@@ -38,12 +38,12 @@ mvn clean package
 ### 3. Run Transformation Service
 
 ```shell
-java -javaagent:docker/data/lib/aspectjweaver-1.9.22.jar \
-     -javaagent:docker/data/lib/spring-instrument-5.3.8.jar \
+java -javaagent:docker/data/lib/aspectjweaver-1.9.25.1.jar \
+     -javaagent:docker/data/lib/spring-instrument-7.0.9.jar \
      -DSSL_SHARE=./target \
      -DXFORM_CONFIGURATIONS_DIRECTORY=./docs/quickstart/configuration \
      -DCOMMON_PASS=XFORM_TESTING_COMMON_PASS \
-     -jar target/xform-0.8.0.jar
+     -jar target/xform-*.jar
 ```
 
 The Transformation Service is up and ready when you see log entries on the console:
