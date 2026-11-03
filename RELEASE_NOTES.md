@@ -1,3 +1,10 @@
+# IZ Gateway Transformation Service 0.24.0
+
+Released 2026-11-03.
+
+- IGDD-3562 Suppress marker names in JSON logs ([#292](https://github.com/IZGateway/izgw-transform/pull/292))
+- fix: Add AIRA too patient given name for FHIR  test because of C&K ([#291](https://github.com/IZGateway/izgw-transform/pull/291))
+
 # IZ Gateway Transformation Service 0.23.0
 
 Released 2026-09-30.
