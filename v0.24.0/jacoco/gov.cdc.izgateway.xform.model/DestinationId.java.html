@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DestinationId.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.model</a> &gt; <span class="el_source">DestinationId.java</span></div><h1>DestinationId.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.model;
+
+import gov.cdc.izgateway.model.IDestinationId;
+
+<span class="nc" id="L5">public class DestinationId implements IDestinationId {</span>
+    private String destId;
+    private int destType;
+
+    @Override
+    public String getDestId() {
+<span class="nc" id="L11">        return destId;</span>
+    }
+
+    @Override
+    public int getDestType() {
+<span class="nc" id="L16">        return destType;</span>
+    }
+
+    @Override
+    public void setDestId(String destId) {
+<span class="nc" id="L21">        this.destId = destId;</span>
+<span class="nc" id="L22">    }</span>
+
+    @Override
+    public IDestinationId copy() {
+<span class="nc" id="L26">        DestinationId copy = new DestinationId();</span>
+<span class="nc" id="L27">        copy.setDestId(this.destId);</span>
+<span class="nc" id="L28">        copy.setDestType(this.destType);</span>
+<span class="nc" id="L29">        return copy;</span>
+    }
+
+    @Override
+    public void setDestType(String destType) {
+<span class="nc" id="L34">        this.destType = Integer.parseInt(destType);</span>
+<span class="nc" id="L35">    }</span>
+
+    @Override
+    public void setDestType(int destType) {
+<span class="nc" id="L39">        this.destType = destType;</span>
+<span class="nc" id="L40">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Hl7v2Exists.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.preconditions</a> &gt; <span class="el_source">Hl7v2Exists.java</span></div><h1>Hl7v2Exists.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.preconditions;
+
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.util.Terser;
+import gov.cdc.izgateway.xform.context.ServiceContext;
+import lombok.extern.slf4j.Slf4j;
+
+<span class="fc" id="L9">@Slf4j</span>
+public class Hl7v2Exists extends Exists implements Precondition {
+
+    public Hl7v2Exists() {
+<span class="fc" id="L13">        super();</span>
+<span class="fc" id="L14">    }</span>
+
+    public Hl7v2Exists(Exists exists) {
+<span class="fc" id="L17">        super(exists);</span>
+<span class="fc" id="L18">    }</span>
+
+    public Hl7v2Exists(String fieldName) {
+<span class="nc" id="L21">        super(fieldName);</span>
+<span class="nc" id="L22">    }</span>
+
+    @Override
+    public boolean evaluate(ServiceContext context) {
+
+<span class="fc" id="L27">        Message message = context.getCurrentMessage();</span>
+<span class="fc" id="L28">        Terser terser = new Terser(message);</span>
+
+        String pathValue;
+        try {
+<span class="fc" id="L32">            pathValue = terser.get(this.getDataPath());</span>
+<span class="fc" id="L33">        } catch (HL7Exception e) {</span>
+            // HL7Exception will happen if Terser.get references Segment that does not exist in the message
+            // In this case just returning false.  Entirely possible that Analyst/Engineer has a precondition
+            // set for a segment that just simply won't exist in every message submitted.
+<span class="fc" id="L37">            return false;</span>
+<span class="fc" id="L38">        }</span>
+
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        return pathValue != null;</span>
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

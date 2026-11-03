@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>IISController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.endpoints.hub</a> &gt; <span class="el_source">IISController.java</span></div><h1>IISController.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.endpoints.hub;
+
+import ca.uhn.hl7v2.HL7Exception;
+import gov.cdc.izgateway.security.AccessControlRegistry;
+import gov.cdc.izgateway.service.IMessageHeaderService;
+import gov.cdc.izgateway.soap.fault.Fault;
+import gov.cdc.izgateway.soap.fault.SecurityFault;
+import gov.cdc.izgateway.soap.message.SoapMessage;
+import gov.cdc.izgateway.soap.message.SubmitSingleMessageRequest;
+import gov.cdc.izgateway.xform.camel.constants.EndpointUris;
+import gov.cdc.izgateway.xform.context.ServiceContext;
+import gov.cdc.izgateway.xform.enums.DataType;
+import gov.cdc.izgateway.xform.security.Roles;
+import gov.cdc.izgateway.xform.services.AccessControlService;
+import gov.cdc.izgateway.xform.services.OrganizationService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.annotation.security.RolesAllowed;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.camel.ProducerTemplate;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.UUID;
+
+@RestController
+@RolesAllowed({Roles.XFORM_SENDING_SYSTEM, Roles.ADMIN})
+@RequestMapping(&quot;/IISService&quot;)
+@Lazy(false)
+<span class="fc" id="L35">@Slf4j</span>
+public class IISController extends BaseController {
+    public IISController(
+            IMessageHeaderService mshService,
+            AccessControlRegistry registry,
+            ProducerTemplate producerTemplate,
+            OrganizationService organizationService,
+            AccessControlService accessControlService
+    ) {
+<span class="fc" id="L44">        super(mshService, SoapMessage.IIS2014_NS, &quot;cdc-iis.wsdl&quot;, Arrays.asList(SoapMessage.IIS2014_NS), producerTemplate, organizationService, accessControlService);</span>
+<span class="fc" id="L45">        registry.register(this);</span>
+<span class="fc" id="L46">    }</span>
+
+    @Override
+    protected ResponseEntity&lt;?&gt; submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
+
+<span class="nc" id="L51">        return super.submitSingleMessage(submitSingleMessage, EndpointUris.DIRECT_IIS_PIPELINE);</span>
+    }
+
+    @Override
+    protected boolean isHubWsdl() {
+        // IIS Controller is never to be considered Hub
+<span class="nc" id="L57">        return false;</span>
+    }
+
+    @Operation(
+            summary = &quot;Post a message to the SOAP Interface&quot;,
+            description = &quot;Send a request to the SOAP Interface for IZ Gateway&quot;
+    )
+    @ApiResponse(
+            responseCode = &quot;200&quot;,
+            description = &quot;The request completed normally&quot;,
+            content = {
+                    @Content(mediaType = &quot;application/xml&quot;)
+            }
+    )
+    @ApiResponse(
+            responseCode = &quot;500&quot;,
+            description = &quot;A fault occured while processing the request&quot;,
+            content = {@Content}
+    )
+    @PostMapping(
+            produces = {&quot;application/soap+xml&quot;, &quot;application/soap&quot;, &quot;application/xml&quot;, &quot;text/xml&quot;, &quot;text/plain&quot;, &quot;text/html&quot;}
+    )
+    @Override
+    public ResponseEntity&lt;?&gt; submitSoapRequest(@RequestBody SoapMessage soapMessage, @Schema(description = &quot;Throws the fault specified in the header parameter&quot;) @RequestHeader(value = &quot;X-IIS-Hub-Dev-Action&quot;,required = false) String devAction) throws SecurityFault {
+<span class="nc" id="L81">        return super.submitSoapRequest(soapMessage, devAction);</span>
+    }
+
+    protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
+        try {
+<span class="nc" id="L86">            return new ServiceContext(organization,</span>
+                    EndpointUris.IZGTS_IISService,
+                    EndpointUris.IIS_IISService,
+                    DataType.HL7V2,
+<span class="nc" id="L90">                    submitSingleMessage.getFacilityID(),</span>
+<span class="nc" id="L91">                    submitSingleMessage.getHl7Message());</span>
+<span class="nc" id="L92">        } catch (HL7Exception e) {</span>
+<span class="nc" id="L93">            throw new HubControllerFault(e);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang=""><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NotEquals.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">xform</a> &gt; <a href="index.source.html" class="el_package">gov.cdc.izgateway.xform.preconditions</a> &gt; <span class="el_source">NotEquals.java</span></div><h1>NotEquals.java</h1><pre class="source lang-java linenums">package gov.cdc.izgateway.xform.preconditions;
+
+import gov.cdc.izgateway.xform.annotations.CaptureXformAdvice;
+import gov.cdc.izgateway.xform.context.ServiceContext;
+import gov.cdc.izgateway.xform.enums.DataType;
+import lombok.Getter;
+import lombok.Setter;
+import gov.cdc.izgateway.xform.constants.XformConstants;
+
+import java.util.Objects;
+
+@Getter
+@Setter
+public class NotEquals extends Equals implements Precondition {
+
+<span class="fc" id="L16">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotEquals.class);</span>
+
+    protected NotEquals() {
+<span class="fc" id="L19">        super();</span>
+<span class="fc" id="L20">    }</span>
+
+    protected NotEquals(NotEquals notEquals) {
+<span class="nc" id="L23">        super(notEquals);</span>
+<span class="nc" id="L24">    }</span>
+
+    @Override
+    @CaptureXformAdvice
+    public boolean evaluate(ServiceContext context) {
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
+<span class="nc" id="L30">            log.trace(&quot;Precondition: {} / dataPath: '{}' / comparisonValue: '{}'&quot;,</span>
+<span class="nc" id="L31">                    this.getClass().getSimpleName(),</span>
+<span class="nc" id="L32">                    this.getDataPath(),</span>
+<span class="nc" id="L33">                    this.getComparisonValue());</span>
+        }
+
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (this.getDataPath().startsWith(&quot;state.&quot;)) {</span>
+<span class="fc" id="L37">            String stateKey = this.getDataPath().split(&quot;\\.&quot;)[1];</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">            return !Objects.equals(this.getComparisonValue(), context.getState().get(stateKey));</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        } else if (getDataPath().equals(XformConstants.CONTEXT_FACILITY_ID_PATH)) {</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">            return !context.getFacilityId().equals(getComparisonValue());</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        } else if (context.getDataType().equals(DataType.HL7V2)) {</span>
+<span class="nc" id="L42">            return new Hl7v2NotEquals(this).evaluate(context);</span>
+        }
+
+<span class="nc" id="L45">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
