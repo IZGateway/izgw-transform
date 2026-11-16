@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  versions-rules.xml
+  Rules for versions-maven-plugin, used by the Security Updates workflow
+  (.github/workflows/security-updates.yml). izgw-bom configures the plugin's rulesUri
+  to point at this file in the project root, so it must exist here.
+
+  Only stable releases are considered. Combined with allowMinorUpdates=false (set in
+  pom.xml), only patch releases are applied.
+
+  See: https://www.mojohaus.org/versions/versions-maven-plugin/version-rules.html
+-->
+<ruleset comparisonMethod="maven"
+         xmlns="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0
+                             https://www.mojohaus.org/versions-maven-plugin/xsd/rule-2.0.0.xsd">
+    <rules>
+        <!-- Global: ignore pre-release versions (RC, alpha, beta, milestone, CR, SNAPSHOT). -->
+        <rule>
+            <ignoreVersions>
+                <ignoreVersion type="regex">(?i).*[-.]RC\d*$</ignoreVersion>
+                <ignoreVersion type="regex">(?i).*[-.]alpha\d*$</ignoreVersion>
+                <ignoreVersion type="regex">(?i).*[-.]beta\d*$</ignoreVersion>
+                <ignoreVersion type="regex">(?i).*[-.]M\d+$</ignoreVersion>
+                <ignoreVersion type="regex">(?i).*[-.]cr\d*$</ignoreVersion>
+                <ignoreVersion type="regex">(?i).*-SNAPSHOT$</ignoreVersion>
+            </ignoreVersions>
+        </rule>
+        <!-- Guava publishes -jre and -android flavours of every release; stay on -jre. -->
+        <rule groupId="com.google.guava" artifactId="guava">
+            <ignoreVersions>
+                <ignoreVersion type="regex">.*-android$</ignoreVersion>
+            </ignoreVersions>
+        </rule>
+    </rules>
+</ruleset>
