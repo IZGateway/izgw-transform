@@ -14,8 +14,6 @@ name: Security Updates
 #   - pom.xml versions-maven-plugin config (allowMinorUpdates=false => patch releases only)
 
 on:
-  push:
-    branches: [IGDD-2766]   # TEMP-TEST: revert before merge
   schedule:
     # Mon-Fri 08:00 UTC: after izgw-bom's nightly update (07:00 UTC) and the
     # develop build (06:00 UTC), so upstream changes land first.
@@ -42,8 +40,6 @@ concurrency:
 jobs:
   security-updates:
     runs-on: ubuntu-latest
-    env:
-      BASE_BRANCH: IGDD-2766   # TEMP-TEST: revert before merge (normally develop)
     steps:
       - name: Generate Dependency Bot App Token
         id: app-token
@@ -55,7 +51,7 @@ jobs:
       - name: Checkout develop
         uses: actions/checkout@v7
         with:
-          ref: ${{ env.BASE_BRANCH }}   # TEMP-TEST
+          ref: develop
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up JDK 21
@@ -150,7 +146,7 @@ jobs:
               print("| `%s` | `%s` | `%s` |" % (k, old.get(k, "?"), new[k]))
           ')
 
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.auto_merge }}" = "true" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.auto_merge }}" = "true" ]; then
             MERGE_NOTE="**Auto-merge:** yes. This PR came from the nightly schedule (or a manual run with auto_merge=true), so it is approved and merged automatically once the \`Java CI with Maven\` build (build, dependency-check, dev deploy, integration tests) passes."
           else
             MERGE_NOTE="**Auto-merge:** no. This PR came from a manual run, so it needs a human review."
@@ -192,7 +188,7 @@ jobs:
         run: |
           # The branch prefix tells maven.yml's auto-merge job whether this PR may be
           # merged automatically: security-updates/nightly-* (yes) or security-updates/manual-* (no).
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.auto_merge }}" = "true" ]; then KIND=nightly; else KIND=manual; fi
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.auto_merge }}" = "true" ]; then KIND=nightly; else KIND=manual; fi
           BRANCH="security-updates/${KIND}-$(date -u +'%Y%m%d-%H%M')"
 
           git config user.name "izg-dependency-bot[bot]"
@@ -204,7 +200,7 @@ jobs:
           git push origin "$BRANCH"
 
           PR_URL=$(gh pr create \
-            --base "$BASE_BRANCH" \
+            --base develop \
             --head "$BRANCH" \
             --title "chore(deps): security patch updates $(date -u +'%Y-%m-%d')" \
             --body-file pr-body.md \
@@ -213,7 +209,7 @@ jobs:
           echo "PR_URL=$PR_URL" >> "$GITHUB_ENV"
 
           # Close earlier open security-update PRs; this one supersedes them.
-          gh pr list --state open --base "$BASE_BRANCH"--json number,headRefName \
+          gh pr list --state open --base develop --json number,headRefName \
             --jq ".[] | select(.headRefName | startswith(\"security-updates/\")) | select(.headRefName != \"$BRANCH\") | .number" \
           | while read -r OLD; do
               echo "Closing superseded PR #$OLD"
