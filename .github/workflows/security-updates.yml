@@ -2,7 +2,7 @@ name: Security Updates
 
 # Applies PATCH releases to the dependencies and plugins this project owns (everything
 # outside izgw-bom / izgw-core / v2tofhir, which are bumped by their own release process),
-# then opens a PR against the branch it ran on (develop for the nightly schedule).
+# then opens a PR against develop.
 #
 # The PR is built, deployed to dev and integration-tested by maven.yml like any other PR.
 # PRs from the NIGHTLY schedule are approved and merged automatically by the auto-merge
@@ -40,10 +40,6 @@ concurrency:
 jobs:
   security-updates:
     runs-on: ubuntu-latest
-    env:
-      # Branch to update and target with the PR: develop for the nightly schedule,
-      # or whichever branch a manual run is started from.
-      BASE_BRANCH: ${{ github.ref_name }}
     steps:
       - name: Generate Dependency Bot App Token
         id: app-token
@@ -52,10 +48,10 @@ jobs:
           app-id: ${{ secrets.DEPENDENCY_BOT_APP_ID }}
           private-key: ${{ secrets.DEPENDENCY_BOT_APP_KEY }}
 
-      - name: Checkout branch under update
+      - name: Checkout develop
         uses: actions/checkout@v7
         with:
-          ref: ${{ env.BASE_BRANCH }}
+          ref: develop
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up JDK 21
@@ -204,7 +200,7 @@ jobs:
           git push origin "$BRANCH"
 
           PR_URL=$(gh pr create \
-            --base "$BASE_BRANCH" \
+            --base develop \
             --head "$BRANCH" \
             --title "chore(deps): security patch updates $(date -u +'%Y-%m-%d')" \
             --body-file pr-body.md \
@@ -213,7 +209,7 @@ jobs:
           echo "PR_URL=$PR_URL" >> "$GITHUB_ENV"
 
           # Close earlier open security-update PRs; this one supersedes them.
-          gh pr list --state open --base "$BASE_BRANCH"--json number,headRefName \
+          gh pr list --state open --base develop --json number,headRefName \
             --jq ".[] | select(.headRefName | startswith(\"security-updates/\")) | select(.headRefName != \"$BRANCH\") | .number" \
           | while read -r OLD; do
               echo "Closing superseded PR #$OLD"
