@@ -40,6 +40,9 @@ concurrency:
 jobs:
   security-updates:
     runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.open-pr.outputs.branch }}
+      head_sha: ${{ steps.open-pr.outputs.head_sha }}
     steps:
       - name: Generate Dependency Bot App Token
         id: app-token
@@ -135,7 +138,10 @@ jobs:
         if: env.HAS_CHANGES == 'true'
         run: |
           # Table of changed <x.version> properties: old -> new
-          TABLE=$(diff pom.xml.before pom.xml | python3 -c '
+          # diff exits 1 when the files differ, which is the expected case here. Only treat
+          # status >= 2 (a real error, such as a missing file) as fatal, so this stays
+          # correct if the step is ever run with pipefail.
+          TABLE=$( { diff pom.xml.before pom.xml || [ $? -eq 1 ]; } | python3 -c '
           import re, sys
           old, new = {}, {}
           for line in sys.stdin:
@@ -182,22 +188,39 @@ jobs:
           cat pr-body.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Open pull request
+        id: open-pr
         if: env.HAS_CHANGES == 'true'
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
+          set -euo pipefail
           # The branch prefix tells maven.yml's auto-merge job whether this PR may be
           # merged automatically: security-updates/nightly-* (yes) or security-updates/manual-* (no).
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.auto_merge }}" = "true" ]; then KIND=nightly; else KIND=manual; fi
-          BRANCH="security-updates/${KIND}-$(date -u +'%Y%m%d-%H%M')"
+          # run_id (+ run_attempt, for re-runs) makes the name unique even when two runs
+          # start in the same minute, e.g. a queued manual run and the scheduled one.
+          BRANCH="security-updates/${KIND}-$(date -u +'%Y%m%d-%H%M')-${{ github.run_id }}-${{ github.run_attempt }}"
 
-          git config user.name "izg-dependency-bot[bot]"
-          # 321530222 is the bot USER id (gh api '/users/izg-dependency-bot[bot]'), not the App id.
-          git config user.email "321530222+izg-dependency-bot[bot]@users.noreply.github.com"
-          git checkout -b "$BRANCH"
-          git add pom.xml
-          git commit -m "chore(deps): apply patch dependency updates $(date -u +'%Y-%m-%d')"
-          git push origin "$BRANCH"
+          # Create the commit through the Git Data API instead of `git commit && git push`.
+          # A commit the App creates this way is signed by GitHub and shows as verified, with
+          # izg-dependency-bot[bot] as author and committer. maven.yml's auto-merge job
+          # requires that. A commit made locally with `git commit --author=...` cannot meet
+          # it, so the author metadata cannot be faked to get a PR auto-merged.
+          # No author/committer is passed, so GitHub uses the App identity and signs the commit.
+          BASE_SHA=$(git rev-parse HEAD)
+          BASE_TREE=$(git rev-parse 'HEAD^{tree}')
+          BLOB_SHA=$(jq -n --rawfile c <(base64 -w0 pom.xml) '{content: $c, encoding: "base64"}' \
+            | gh api "repos/$GH_REPO/git/blobs" --input - --jq .sha)
+          TREE_SHA=$(jq -n --arg base "$BASE_TREE" --arg blob "$BLOB_SHA" \
+              '{base_tree: $base, tree: [{path: "pom.xml", mode: "100644", type: "blob", sha: $blob}]}' \
+            | gh api "repos/$GH_REPO/git/trees" --input - --jq .sha)
+          COMMIT_SHA=$(jq -n --arg msg "chore(deps): apply patch dependency updates $(date -u +'%Y-%m-%d')" \
+              --arg tree "$TREE_SHA" --arg parent "$BASE_SHA" \
+              '{message: $msg, tree: $tree, parents: [$parent]}' \
+            | gh api "repos/$GH_REPO/git/commits" --input - --jq .sha)
+          gh api "repos/$GH_REPO/git/refs" -f ref="refs/heads/$BRANCH" -f sha="$COMMIT_SHA" > /dev/null
+          echo "Created $BRANCH at $COMMIT_SHA"
 
           PR_URL=$(gh pr create \
             --base develop \
@@ -207,10 +230,13 @@ jobs:
             --label dependencies)
           echo "PR created: $PR_URL"
           echo "PR_URL=$PR_URL" >> "$GITHUB_ENV"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
 
-          # Close earlier open security-update PRs; this one supersedes them.
+          # Close earlier open NIGHTLY PRs; this one supersedes them. Manual-run PRs
+          # (security-updates/manual-*) are left alone because someone may be reviewing them.
           gh pr list --state open --base develop --json number,headRefName \
-            --jq ".[] | select(.headRefName | startswith(\"security-updates/\")) | select(.headRefName != \"$BRANCH\") | .number" \
+            --jq ".[] | select(.headRefName | startswith(\"security-updates/nightly-\")) | select(.headRefName != \"$BRANCH\") | .number" \
           | while read -r OLD; do
               echo "Closing superseded PR #$OLD"
               gh pr close "$OLD" --delete-branch --comment "Superseded by $PR_URL"
@@ -234,3 +260,66 @@ jobs:
             pom.xml.before
             apply-updates.log
             pr-body.md
+
+  # maven.yml uses `concurrency: dev`, and GitHub keeps only ONE pending run per concurrency
+  # group. If another PR or develop push queues behind this PR's build, GitHub cancels the
+  # pending build and its auto-merge job never runs. This job watches the PR's build and
+  # re-runs it if it was cancelled, so the nightly update is not dropped silently.
+  watch-pr-build:
+    needs: security-updates
+    if: needs.security-updates.outputs.branch != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      actions: write        # gh run rerun
+      pull-requests: read
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      BRANCH: ${{ needs.security-updates.outputs.branch }}
+      HEAD_SHA: ${{ needs.security-updates.outputs.head_sha }}
+      MAX_RERUNS: 3
+    steps:
+      - name: Re-run the PR build if it was cancelled while queued
+        run: |
+          set -euo pipefail
+          RERUNS=0
+          RUN_ID=""
+          while true; do
+            if [ -z "$RUN_ID" ]; then
+              RUN_ID=$(gh run list --workflow maven.yml --event pull_request --branch "$BRANCH" \
+                --commit "$HEAD_SHA" --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+              if [ -z "$RUN_ID" ]; then
+                echo "No maven.yml run registered for $BRANCH yet; waiting."
+                sleep 30
+                continue
+              fi
+              echo "Watching maven.yml run $RUN_ID"
+            fi
+
+            read -r STATUS CONCLUSION < <(gh run view "$RUN_ID" --json status,conclusion \
+              --jq '"\(.status) \(.conclusion // "none")"')
+            if [ "$STATUS" != "completed" ]; then
+              sleep 60
+              continue
+            fi
+
+            if [ "$CONCLUSION" != "cancelled" ]; then
+              echo "maven.yml run $RUN_ID finished: $CONCLUSION"
+              exit 0
+            fi
+
+            STATE=$(gh pr view "$BRANCH" --json state --jq .state)
+            if [ "$STATE" != "OPEN" ]; then
+              echo "PR for $BRANCH is $STATE; not re-running."
+              exit 0
+            fi
+            if [ "$RERUNS" -ge "$MAX_RERUNS" ]; then
+              echo "::error::maven.yml run $RUN_ID was cancelled $((RERUNS + 1)) times; giving up. Re-run it by hand."
+              exit 1
+            fi
+            RERUNS=$((RERUNS + 1))
+            echo "::warning::maven.yml run $RUN_ID was cancelled (likely displaced in the 'dev' concurrency queue). Re-run $RERUNS of $MAX_RERUNS."
+            gh run rerun "$RUN_ID"
+            sleep 30
+          done

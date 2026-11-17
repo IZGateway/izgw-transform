@@ -335,10 +335,50 @@ jobs:
     env:
       PR_NUMBER: ${{ github.event.pull_request.number }}
       HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
       GH_REPO: ${{ github.repository }}
     steps:
+      # Provenance check. Commit metadata (author, committer) is chosen by whoever creates
+      # the commit, but the repository activity log records the authenticated actor that
+      # actually created or updated the branch, and that cannot be faked. Every write to
+      # this branch must have been made by izg-dependency-bot[bot], and the last write
+      # must have produced exactly the head commit that was built and tested.
+      # Fails closed: no activity, any other actor, or a head mismatch refuses the merge.
+      - name: Verify only izg-dependency-bot wrote to the PR branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          ACTIVITY=$(gh api -X GET "repos/$GH_REPO/activity" --paginate \
+            -f ref="refs/heads/$HEAD_REF" -f direction=asc -f per_page=100 \
+            --jq '.[] | "\(.actor.login // "unknown") \(.activity_type) \(.after)"')
+          echo "Branch activity (actor type after):"
+          echo "${ACTIVITY:-<none>}"
+          if [ -z "$ACTIVITY" ]; then
+            echo "::error::Auto-merge refused: no activity recorded for $HEAD_REF, so its provenance cannot be verified."
+            exit 1
+          fi
+          ACTORS=$(printf '%s\n' "$ACTIVITY" | awk '{print $1}' | sort -u)
+          if [ "$ACTORS" != "izg-dependency-bot[bot]" ]; then
+            echo "::error::Auto-merge refused: $HEAD_REF was written by actor(s) other than izg-dependency-bot[bot]: $(echo $ACTORS)"
+            exit 1
+          fi
+          if printf '%s\n' "$ACTIVITY" | awk '{print $2}' | grep -qx force_push; then
+            echo "::error::Auto-merge refused: $HEAD_REF has been force-pushed."
+            exit 1
+          fi
+          LAST_AFTER=$(printf '%s\n' "$ACTIVITY" | tail -1 | awk '{print $3}')
+          if [ "$LAST_AFTER" != "$HEAD_SHA" ]; then
+            echo "::error::Auto-merge refused: last recorded write to $HEAD_REF is $LAST_AFTER, not the tested head $HEAD_SHA."
+            exit 1
+          fi
+          echo "Provenance OK: every write to $HEAD_REF was made by izg-dependency-bot[bot]."
+
       # Guard against anything other than the bot's own pom.xml bump, e.g. a human pushing
-      # extra commits to the bot's branch.
+      # extra commits to the bot's branch. Author metadata alone can be faked with
+      # `git commit --author=...`, so every commit must also have the bot as COMMITTER and
+      # carry a GitHub-verified signature. security-updates.yml creates its commit through
+      # the Git Data API with the App token, and GitHub signs commits made that way.
       - name: Verify PR only contains bot-authored pom.xml changes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -349,10 +389,13 @@ jobs:
             echo "::error::Auto-merge refused: PR changes files other than pom.xml."
             exit 1
           fi
-          AUTHORS=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER/commits" --paginate --jq '.[].author.login // "unknown"' | sort -u)
-          echo "Commit authors: $AUTHORS"
-          if [ "$AUTHORS" != "izg-dependency-bot[bot]" ]; then
-            echo "::error::Auto-merge refused: PR has commits not authored by izg-dependency-bot[bot]."
+          # One line per distinct "author committer verified" combination across all commits.
+          IDENTITIES=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER/commits" --paginate \
+            --jq '.[] | "\(.author.login // "unknown") \(.committer.login // "unknown") \(.commit.verification.verified)"' \
+            | sort -u)
+          echo "Commit author / committer / verified: $IDENTITIES"
+          if [ "$IDENTITIES" != "izg-dependency-bot[bot] izg-dependency-bot[bot] true" ]; then
+            echo "::error::Auto-merge refused: every commit must be authored and committed by izg-dependency-bot[bot] and carry a GitHub-verified signature."
             exit 1
           fi
 
