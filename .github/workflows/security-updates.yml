@@ -14,8 +14,6 @@ name: Security Updates
 #   - pom.xml versions-maven-plugin config (allowMinorUpdates=false => patch releases only)
 
 on:
-  push:
-    branches: [IGDD-2766]   # TEMP-TEST: revert before merge
   schedule:
     # Mon-Fri 08:00 UTC: after izgw-bom's nightly update (07:00 UTC) and the
     # develop build (06:00 UTC), so upstream changes land first.
@@ -56,7 +54,7 @@ jobs:
       - name: Checkout develop
         uses: actions/checkout@v7
         with:
-          ref: IGDD-2766   # TEMP-TEST: revert before merge (normally develop)
+          ref: develop
           token: ${{ steps.app-token.outputs.token }}
 
       - name: Set up JDK 21
@@ -199,8 +197,7 @@ jobs:
           set -euo pipefail
           # The branch prefix tells maven.yml's auto-merge job whether this PR may be
           # merged automatically: security-updates/nightly-* (yes) or security-updates/manual-* (no).
-          # TEMP-TEST: push counts as nightly
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.auto_merge }}" = "true" ]; then KIND=nightly; else KIND=manual; fi
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.auto_merge }}" = "true" ]; then KIND=nightly; else KIND=manual; fi
           # run_id (+ run_attempt, for re-runs) makes the name unique even when two runs
           # start in the same minute, e.g. a queued manual run and the scheduled one.
           BRANCH="security-updates/${KIND}-$(date -u +'%Y%m%d-%H%M')-${{ github.run_id }}-${{ github.run_attempt }}"
@@ -226,7 +223,7 @@ jobs:
           echo "Created $BRANCH at $COMMIT_SHA"
 
           PR_URL=$(gh pr create \
-            --base IGDD-2766 \
+            --base develop \
             --head "$BRANCH" \
             --title "chore(deps): security patch updates $(date -u +'%Y-%m-%d')" \
             --body-file pr-body.md \
@@ -238,8 +235,7 @@ jobs:
 
           # Close earlier open NIGHTLY PRs; this one supersedes them. Manual-run PRs
           # (security-updates/manual-*) are left alone because someone may be reviewing them.
-          # TEMP-TEST: --base and PR create --base above use IGDD-2766 (normally develop)
-          gh pr list --state open --base IGDD-2766 --json number,headRefName \
+          gh pr list --state open --base develop --json number,headRefName \
             --jq ".[] | select(.headRefName | startswith(\"security-updates/nightly-\")) | select(.headRefName != \"$BRANCH\") | .number" \
           | while read -r OLD; do
               echo "Closing superseded PR #$OLD"
