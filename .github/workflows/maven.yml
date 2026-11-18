@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - develop
+      - IGDD-2766   # TEMP-TEST: revert before merge
 
   push:
     branches:
@@ -324,7 +325,7 @@ jobs:
     needs: build
     if: >-
       github.event_name == 'pull_request' &&
-      github.event.pull_request.base.ref == 'develop' &&
+      contains(fromJSON('["develop","IGDD-2766"]'), github.event.pull_request.base.ref) &&
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.user.login == 'izg-dependency-bot[bot]' &&
       startsWith(github.event.pull_request.head.ref, 'security-updates/nightly-')
