@@ -1,0 +1,325 @@
+name: Security Updates
+
+# Applies PATCH releases to the dependencies and plugins this project owns (everything
+# outside izgw-bom / izgw-core / v2tofhir, which are bumped by their own release process),
+# then opens a PR against develop.
+#
+# The PR is built, deployed to dev and integration-tested by maven.yml like any other PR.
+# PRs from the NIGHTLY schedule are approved and merged automatically by the auto-merge
+# job in maven.yml once that build passes. PRs from a MANUAL run are left for human review.
+#
+# Scope is controlled by:
+#   - automation-exclusions.txt   artifacts never bumped (upstream IZG projects, FIPS jars)
+#   - versions-rules.xml          pre-release / flavour filters
+#   - pom.xml versions-maven-plugin config (allowMinorUpdates=false => patch releases only)
+
+on:
+  schedule:
+    # Mon-Fri 08:00 UTC: after izgw-bom's nightly update (07:00 UTC) and the
+    # develop build (06:00 UTC), so upstream changes land first.
+    - cron: "0 8 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      auto_merge:
+        description: "Auto-merge the PR like a nightly run (use to test the auto-merge path)"
+        type: boolean
+        default: false
+
+# All writes (branch push, PR create, closing superseded PRs) use the izg-dependency-bot
+# App token. GITHUB_TOKEN is only used read-only for Maven resolution from GitHub Packages.
+# An App token is required because events raised by GITHUB_TOKEN do not trigger workflows,
+# so a PR opened with it would never run maven.yml (build, deploy, integration tests).
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: security-updates
+  cancel-in-progress: false
+
+jobs:
+  security-updates:
+    runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.open-pr.outputs.branch }}
+      head_sha: ${{ steps.open-pr.outputs.head_sha }}
+    steps:
+      - name: Generate Dependency Bot App Token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.DEPENDENCY_BOT_APP_ID }}
+          private-key: ${{ secrets.DEPENDENCY_BOT_APP_KEY }}
+
+      - name: Checkout develop
+        uses: actions/checkout@v7
+        with:
+          ref: develop
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v5.1
+        with:
+          maven-version: 3.9.0
+
+      - name: Configure Maven authentication
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>github-bom</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+              <server>
+                <id>github-core</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+              <server>
+                <id>v2tofhir</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      - name: Read automation exclusions
+        run: |
+          EXCLUDES=$(grep -v '^\s*#' automation-exclusions.txt | grep -v '^\s*$' | paste -sd ',' -)
+          echo "EXCLUDES=$EXCLUDES" >> "$GITHUB_ENV"
+          echo "Excluding from automation: $EXCLUDES"
+
+      - name: Apply patch version updates
+        run: |
+          cp pom.xml pom.xml.before
+          # Patch-only behaviour comes from the versions-maven-plugin configuration in pom.xml.
+          # use-latest-versions: literal <version>s in dependencies / dependencyManagement.
+          # update-properties:   ${*.version} properties defined in this pom (incl. plugins).
+          mvn -B -ntp versions:use-latest-versions versions:update-properties \
+            -Dexcludes="$EXCLUDES" \
+            -DprocessDependencyManagementTransitive=false \
+            2>&1 | tee apply-updates.log
+
+          if git diff --quiet -- pom.xml; then
+            echo "HAS_CHANGES=false" >> "$GITHUB_ENV"
+            echo "No patch updates available."
+          else
+            echo "HAS_CHANGES=true" >> "$GITHUB_ENV"
+            git diff -- pom.xml
+          fi
+
+      - name: Report no updates
+        if: env.HAS_CHANGES == 'false'
+        run: |
+          {
+            echo "## No patch updates available"
+            echo ""
+            echo "All project-owned dependencies and plugins are on their latest patch release."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # Fail fast before opening a PR. The full build, OWASP dependency-check, dev deploy
+      # and integration tests run on the PR itself in maven.yml.
+      - name: Compile with updated versions
+        if: env.HAS_CHANGES == 'true'
+        run: mvn -B -ntp test-compile -DskipDependencyCheck=true
+
+      - name: Build PR body
+        if: env.HAS_CHANGES == 'true'
+        run: |
+          # Table of changed <x.version> properties: old -> new
+          # diff exits 1 when the files differ, which is the expected case here. Only treat
+          # status >= 2 (a real error, such as a missing file) as fatal, so this stays
+          # correct if the step is ever run with pipefail.
+          TABLE=$( { diff pom.xml.before pom.xml || [ $? -eq 1 ]; } | python3 -c '
+          import re, sys
+          old, new = {}, {}
+          for line in sys.stdin:
+              m = re.match(r"([<>])\s*<([\w.-]+)>([^<]+)</\2>", line)
+              if m:
+                  (old if m.group(1) == "<" else new)[m.group(2)] = m.group(3)
+          for k in new:
+              print("| `%s` | `%s` | `%s` |" % (k, old.get(k, "?"), new[k]))
+          ')
+
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.auto_merge }}" = "true" ]; then
+            MERGE_NOTE="**Auto-merge:** yes. This PR came from the nightly schedule (or a manual run with auto_merge=true), so it is approved and merged automatically once the \`Java CI with Maven\` build (build, dependency-check, dev deploy, integration tests) passes."
+          else
+            MERGE_NOTE="**Auto-merge:** no. This PR came from a manual run, so it needs a human review."
+          fi
+
+          {
+            echo "## Automated patch updates"
+            echo ""
+            echo "Created by the [Security Updates workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})."
+            echo "Only **patch** releases of dependencies and plugins owned by this project are applied."
+            echo ""
+            echo "$MERGE_NOTE"
+            echo ""
+            echo "### Version changes"
+            echo ""
+            echo "| Property | Old | New |"
+            echo "|----------|-----|-----|"
+            echo "$TABLE"
+            echo ""
+            echo "### Not updated by this workflow"
+            echo ""
+            echo "Artifacts listed in \`automation-exclusions.txt\`:"
+            echo ""
+            grep -v '^\s*#' automation-exclusions.txt | grep -v '^\s*$' | sed 's/.*/- `&`/'
+            echo ""
+            echo "<details><summary>pom.xml diff</summary>"
+            echo ""
+            echo '```diff'
+            git diff -- pom.xml
+            echo '```'
+            echo "</details>"
+          } > pr-body.md
+          cat pr-body.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open pull request
+        id: open-pr
+        if: env.HAS_CHANGES == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          # The branch prefix tells maven.yml's auto-merge job whether this PR may be
+          # merged automatically: security-updates/nightly-* (yes) or security-updates/manual-* (no).
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.auto_merge }}" = "true" ]; then KIND=nightly; else KIND=manual; fi
+          # run_id (+ run_attempt, for re-runs) makes the name unique even when two runs
+          # start in the same minute, e.g. a queued manual run and the scheduled one.
+          BRANCH="security-updates/${KIND}-$(date -u +'%Y%m%d-%H%M')-${{ github.run_id }}-${{ github.run_attempt }}"
+
+          # Create the commit through the Git Data API instead of `git commit && git push`.
+          # A commit the App creates this way is signed by GitHub and shows as verified, with
+          # izg-dependency-bot[bot] as author and GitHub's signing account (web-flow) as
+          # committer. maven.yml's auto-merge job requires exactly that. A commit made locally with `git commit --author=...` cannot meet
+          # it, so the author metadata cannot be faked to get a PR auto-merged.
+          # No author/committer is passed, so GitHub uses the App identity and signs the commit.
+          BASE_SHA=$(git rev-parse HEAD)
+          BASE_TREE=$(git rev-parse 'HEAD^{tree}')
+          BLOB_SHA=$(jq -n --rawfile c <(base64 -w0 pom.xml) '{content: $c, encoding: "base64"}' \
+            | gh api "repos/$GH_REPO/git/blobs" --input - --jq .sha)
+          TREE_SHA=$(jq -n --arg base "$BASE_TREE" --arg blob "$BLOB_SHA" \
+              '{base_tree: $base, tree: [{path: "pom.xml", mode: "100644", type: "blob", sha: $blob}]}' \
+            | gh api "repos/$GH_REPO/git/trees" --input - --jq .sha)
+          COMMIT_SHA=$(jq -n --arg msg "chore(deps): apply patch dependency updates $(date -u +'%Y-%m-%d')" \
+              --arg tree "$TREE_SHA" --arg parent "$BASE_SHA" \
+              '{message: $msg, tree: $tree, parents: [$parent]}' \
+            | gh api "repos/$GH_REPO/git/commits" --input - --jq .sha)
+          gh api "repos/$GH_REPO/git/refs" -f ref="refs/heads/$BRANCH" -f sha="$COMMIT_SHA" > /dev/null
+          echo "Created $BRANCH at $COMMIT_SHA"
+
+          PR_URL=$(gh pr create \
+            --base develop \
+            --head "$BRANCH" \
+            --title "chore(deps): security patch updates $(date -u +'%Y-%m-%d')" \
+            --body-file pr-body.md \
+            --label dependencies)
+          echo "PR created: $PR_URL"
+          echo "PR_URL=$PR_URL" >> "$GITHUB_ENV"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$COMMIT_SHA" >> "$GITHUB_OUTPUT"
+
+          # Close earlier open NIGHTLY PRs; this one supersedes them. Manual-run PRs
+          # (security-updates/manual-*) are left alone because someone may be reviewing them.
+          gh pr list --state open --base develop --json number,headRefName \
+            --jq ".[] | select(.headRefName | startswith(\"security-updates/nightly-\")) | select(.headRefName != \"$BRANCH\") | .number" \
+          | while read -r OLD; do
+              echo "Closing superseded PR #$OLD"
+              gh pr close "$OLD" --delete-branch --comment "Superseded by $PR_URL"
+            done
+
+          {
+            echo ""
+            echo "## Pull request created"
+            echo ""
+            echo "$PR_URL"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: security-updates-logs
+          if-no-files-found: ignore
+          path: |
+            pom.xml
+            pom.xml.before
+            apply-updates.log
+            pr-body.md
+
+  # maven.yml uses `concurrency: dev`, and GitHub keeps only ONE pending run per concurrency
+  # group. If another PR or develop push queues behind this PR's build, GitHub cancels the
+  # pending build and its auto-merge job never runs. This job watches the PR's build and
+  # re-runs it if it was cancelled, so the nightly update is not dropped silently.
+  watch-pr-build:
+    needs: security-updates
+    if: needs.security-updates.outputs.branch != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      actions: write        # gh run rerun
+      pull-requests: read
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      BRANCH: ${{ needs.security-updates.outputs.branch }}
+      HEAD_SHA: ${{ needs.security-updates.outputs.head_sha }}
+      MAX_RERUNS: 3
+    steps:
+      - name: Re-run the PR build if it was cancelled while queued
+        run: |
+          set -euo pipefail
+          RERUNS=0
+          RUN_ID=""
+          while true; do
+            if [ -z "$RUN_ID" ]; then
+              RUN_ID=$(gh run list --workflow maven.yml --event pull_request --branch "$BRANCH" \
+                --commit "$HEAD_SHA" --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+              if [ -z "$RUN_ID" ]; then
+                echo "No maven.yml run registered for $BRANCH yet; waiting."
+                sleep 30
+                continue
+              fi
+              echo "Watching maven.yml run $RUN_ID"
+            fi
+
+            read -r STATUS CONCLUSION < <(gh run view "$RUN_ID" --json status,conclusion \
+              --jq '"\(.status) \(.conclusion // "none")"')
+            if [ "$STATUS" != "completed" ]; then
+              sleep 60
+              continue
+            fi
+
+            if [ "$CONCLUSION" != "cancelled" ]; then
+              echo "maven.yml run $RUN_ID finished: $CONCLUSION"
+              exit 0
+            fi
+
+            STATE=$(gh pr view "$BRANCH" --json state --jq .state)
+            if [ "$STATE" != "OPEN" ]; then
+              echo "PR for $BRANCH is $STATE; not re-running."
+              exit 0
+            fi
+            if [ "$RERUNS" -ge "$MAX_RERUNS" ]; then
+              echo "::error::maven.yml run $RUN_ID was cancelled $((RERUNS + 1)) times; giving up. Re-run it by hand."
+              exit 1
+            fi
+            RERUNS=$((RERUNS + 1))
+            echo "::warning::maven.yml run $RUN_ID was cancelled (likely displaced in the 'dev' concurrency queue). Re-run $RERUNS of $MAX_RERUNS."
+            gh run rerun "$RUN_ID"
+            sleep 30
+          done

@@ -315,3 +315,115 @@ jobs:
         with:
           name: build-failure
           path: .                   
+
+  # Auto-approve and merge PRs opened by the NIGHTLY Security Updates workflow
+  # (.github/workflows/security-updates.yml) once the build job above has built the PR,
+  # passed OWASP dependency-check, deployed to dev and passed the integration tests.
+  # Manual-run PRs (security-updates/manual-*) and any other PR are never auto-merged.
+  auto-merge-security-updates:
+    needs: build
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.base.ref == 'develop' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login == 'izg-dependency-bot[bot]' &&
+      startsWith(github.event.pull_request.head.ref, 'security-updates/nightly-')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      # Provenance check. Commit metadata (author, committer) is chosen by whoever creates
+      # the commit, but the repository activity log records the authenticated actor that
+      # actually created or updated the branch, and that cannot be faked. Every write to
+      # this branch must have been made by izg-dependency-bot[bot], and the last write
+      # must have produced exactly the head commit that was built and tested.
+      # Fails closed: no activity, any other actor, or a head mismatch refuses the merge.
+      - name: Verify only izg-dependency-bot wrote to the PR branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          ACTIVITY=$(gh api -X GET "repos/$GH_REPO/activity" --paginate \
+            -f ref="refs/heads/$HEAD_REF" -f direction=asc -f per_page=100 \
+            --jq '.[] | "\(.actor.login // "unknown") \(.activity_type) \(.after)"')
+          echo "Branch activity (actor type after):"
+          echo "${ACTIVITY:-<none>}"
+          if [ -z "$ACTIVITY" ]; then
+            echo "::error::Auto-merge refused: no activity recorded for $HEAD_REF, so its provenance cannot be verified."
+            exit 1
+          fi
+          ACTORS=$(printf '%s\n' "$ACTIVITY" | awk '{print $1}' | sort -u)
+          if [ "$ACTORS" != "izg-dependency-bot[bot]" ]; then
+            echo "::error::Auto-merge refused: $HEAD_REF was written by actor(s) other than izg-dependency-bot[bot]: $(echo $ACTORS)"
+            exit 1
+          fi
+          if printf '%s\n' "$ACTIVITY" | awk '{print $2}' | grep -qx force_push; then
+            echo "::error::Auto-merge refused: $HEAD_REF has been force-pushed."
+            exit 1
+          fi
+          LAST_AFTER=$(printf '%s\n' "$ACTIVITY" | tail -1 | awk '{print $3}')
+          if [ "$LAST_AFTER" != "$HEAD_SHA" ]; then
+            echo "::error::Auto-merge refused: last recorded write to $HEAD_REF is $LAST_AFTER, not the tested head $HEAD_SHA."
+            exit 1
+          fi
+          echo "Provenance OK: every write to $HEAD_REF was made by izg-dependency-bot[bot]."
+
+      # Guard against anything other than the bot's own pom.xml bump, e.g. a human pushing
+      # extra commits to the bot's branch. Author metadata alone can be faked with
+      # `git commit --author=...`, so every commit must also carry a GitHub-verified
+      # signature. security-updates.yml creates its commit through the Git Data API with the
+      # App token, and GitHub signs commits made that way. GitHub records its own signing
+      # account, web-flow, as the COMMITTER of such commits, never the bot, so the expected
+      # identity is "izg-dependency-bot[bot] web-flow true". web-flow alone does not prove
+      # who made the commit; the activity-log check above does.
+      - name: Verify PR only contains bot-authored pom.xml changes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FILES=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename' | sort -u)
+          echo "Changed files: $FILES"
+          if [ "$FILES" != "pom.xml" ]; then
+            echo "::error::Auto-merge refused: PR changes files other than pom.xml."
+            exit 1
+          fi
+          # One line per distinct "author committer verified" combination across all commits.
+          IDENTITIES=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER/commits" --paginate \
+            --jq '.[] | "\(.author.login // "unknown") \(.committer.login // "unknown") \(.commit.verification.verified)"' \
+            | sort -u)
+          echo "Commit author / committer / verified: $IDENTITIES"
+          if [ "$IDENTITIES" != "izg-dependency-bot[bot] web-flow true" ]; then
+            echo "::error::Auto-merge refused: every commit must be authored by izg-dependency-bot[bot], committed and signed by GitHub (web-flow), and verified."
+            exit 1
+          fi
+
+      # develop requires one approving review. The PR is authored by izg-dependency-bot,
+      # so github-actions[bot] (GITHUB_TOKEN) can supply it. Requires the repo setting
+      # "Allow GitHub Actions to create and approve pull requests".
+      - name: Approve PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr review "$PR_NUMBER" --approve \
+            --body "Auto-approved: nightly security patch update passed build, dependency-check, dev deploy and integration tests in run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}."
+
+      # Merge with the App token, not GITHUB_TOKEN, so the push to develop triggers the
+      # develop build. --match-head-commit ensures only the commit tested above is merged.
+      - name: Generate Dependency Bot App Token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ secrets.DEPENDENCY_BOT_APP_ID }}
+          private-key: ${{ secrets.DEPENDENCY_BOT_APP_KEY }}
+
+      - name: Merge PR
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          gh pr merge "$PR_NUMBER" --merge --delete-branch --match-head-commit "$HEAD_SHA"
+          echo "Merged PR #$PR_NUMBER into develop." >> "$GITHUB_STEP_SUMMARY"

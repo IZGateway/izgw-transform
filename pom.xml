@@ -26,6 +26,19 @@
 
 		<!-- JaCoCo Configuration -->
 		<jacoco.version>0.8.13</jacoco.version>
+
+		<!-- Versions owned by this project (not managed by izgw-bom). Kept as properties so the
+		     Security Updates workflow (versions:update-properties) can apply patch releases. -->
+		<guava.version>33.7.2-jre</guava.version>
+		<maven-site-plugin.version>3.21.0</maven-site-plugin.version>
+		<maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
+		<dockerfile-maven-plugin.version>1.4.7</dockerfile-maven-plugin.version>
+		<jnr-unixsocket.version>0.38.14</jnr-unixsocket.version>
+		<dependency-check-maven.version>12.1.1</dependency-check-maven.version>
+		<dependency-check-maven-report.version>8.4.3</dependency-check-maven-report.version>
+		<maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+		<maven-project-info-reports-plugin.version>3.6.1</maven-project-info-reports-plugin.version>
+		<maven-surefire-report-plugin.version>3.5.3</maven-surefire-report-plugin.version>
 		<jacoco.jar>${user.home}/.m2/repository/org/jacoco/org.jacoco.agent/${jacoco.version}/org.jacoco.agent-${jacoco.version}.jar</jacoco.jar>
 		<surefire.argLine>
 			-Xmx2048m
@@ -86,7 +99,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>33.7.2-jre</version>
+				<version>${guava.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -153,10 +166,25 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<!-- Used by .github/workflows/security-updates.yml. izgw-bom configures this plugin
+				     with allowMinorUpdates=true; POM configuration wins over -D flags, so it is
+				     overridden here to apply patch releases only. -->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<configuration>
+						<allowMajorUpdates>false</allowMajorUpdates>
+						<allowMinorUpdates>false</allowMinorUpdates>
+						<allowIncrementalUpdates>true</allowIncrementalUpdates>
+						<allowSnapshots>false</allowSnapshots>
+						<generateBackupPoms>false</generateBackupPoms>
+						<rulesUri>${project.baseUri}versions-rules.xml</rulesUri>
+					</configuration>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.21.0</version>
+					<version>${maven-site-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.jacoco</groupId>
@@ -213,7 +241,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>3.4.0</version>
+				<version>${maven-checkstyle-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>validate</id>
@@ -280,12 +308,12 @@
 			<plugin>
 				<groupId>com.spotify</groupId>
 				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>1.4.7</version>
+				<version>${dockerfile-maven-plugin.version}</version>
 				<dependencies>
 					<dependency>
 						<groupId>com.github.jnr</groupId>
 						<artifactId>jnr-unixsocket</artifactId>
-						<version>0.38.14</version>
+						<version>${jnr-unixsocket.version}</version>
 					</dependency>
 				</dependencies>
 				<executions>
@@ -340,7 +368,7 @@
                          -->
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
-				<version>12.1.1</version>
+				<version>${dependency-check-maven.version}</version>
 				<configuration>
                     <!--nvdApiKey>${env.NVDAPIKEY}</nvdApiKey-->
 					<formats>
@@ -377,7 +405,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.12.0</version>
+				<version>${maven-javadoc-plugin.version}</version>
 				<configuration>
 					<failOnError>true</failOnError>
 				</configuration>
@@ -385,7 +413,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>3.6.1</version>
+				<version>${maven-project-info-reports-plugin.version}</version>
 				<reportSets>
 					<reportSet>
 						<reports>
@@ -404,12 +432,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.5.3</version>
+				<version>${maven-surefire-report-plugin.version}</version>
 			</plugin>
 			<plugin>
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
-				<version>8.4.3</version>
+				<version>${dependency-check-maven-report.version}</version>
 				<configuration>
 					<!--nvdApiKey>${env.NVDAPIKEY}</nvdApiKey-->
 					<formats>
@@ -438,7 +466,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.13</version>
+				<version>${jacoco.version}</version>
 				<reportSets>
 					<reportSet>
 						<reports>
