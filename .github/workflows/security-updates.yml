@@ -207,8 +207,8 @@ jobs:
 
           # Create the commit through the Git Data API instead of `git commit && git push`.
           # A commit the App creates this way is signed by GitHub and shows as verified, with
-          # izg-dependency-bot[bot] as author and committer. maven.yml's auto-merge job
-          # requires that. A commit made locally with `git commit --author=...` cannot meet
+          # izg-dependency-bot[bot] as author and GitHub's signing account (web-flow) as
+          # committer. maven.yml's auto-merge job requires exactly that. A commit made locally with `git commit --author=...` cannot meet
           # it, so the author metadata cannot be faked to get a PR auto-merged.
           # No author/committer is passed, so GitHub uses the App identity and signs the commit.
           BASE_SHA=$(git rev-parse HEAD)

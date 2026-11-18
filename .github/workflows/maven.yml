@@ -377,9 +377,12 @@ jobs:
 
       # Guard against anything other than the bot's own pom.xml bump, e.g. a human pushing
       # extra commits to the bot's branch. Author metadata alone can be faked with
-      # `git commit --author=...`, so every commit must also have the bot as COMMITTER and
-      # carry a GitHub-verified signature. security-updates.yml creates its commit through
-      # the Git Data API with the App token, and GitHub signs commits made that way.
+      # `git commit --author=...`, so every commit must also carry a GitHub-verified
+      # signature. security-updates.yml creates its commit through the Git Data API with the
+      # App token, and GitHub signs commits made that way. GitHub records its own signing
+      # account, web-flow, as the COMMITTER of such commits, never the bot, so the expected
+      # identity is "izg-dependency-bot[bot] web-flow true". web-flow alone does not prove
+      # who made the commit; the activity-log check above does.
       - name: Verify PR only contains bot-authored pom.xml changes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -395,8 +398,8 @@ jobs:
             --jq '.[] | "\(.author.login // "unknown") \(.committer.login // "unknown") \(.commit.verification.verified)"' \
             | sort -u)
           echo "Commit author / committer / verified: $IDENTITIES"
-          if [ "$IDENTITIES" != "izg-dependency-bot[bot] izg-dependency-bot[bot] true" ]; then
-            echo "::error::Auto-merge refused: every commit must be authored and committed by izg-dependency-bot[bot] and carry a GitHub-verified signature."
+          if [ "$IDENTITIES" != "izg-dependency-bot[bot] web-flow true" ]; then
+            echo "::error::Auto-merge refused: every commit must be authored by izg-dependency-bot[bot], committed and signed by GitHub (web-flow), and verified."
             exit 1
           fi
 
