@@ -8,8 +8,15 @@ import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.exceptions.OperationException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * HL7 v2 implementation of the {@link SaveState} operation.
+ */
 @Slf4j
 public class Hl7v2SaveState extends SaveState implements Operation {
+    /**
+     * Creates an HL7 v2 save state operation with the settings of another operation.
+     * @param saveState the operation to copy the settings from
+     */
     public Hl7v2SaveState(SaveState saveState) {
         super(saveState);
     }

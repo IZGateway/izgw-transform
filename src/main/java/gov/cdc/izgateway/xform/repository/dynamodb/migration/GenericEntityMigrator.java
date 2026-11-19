@@ -23,6 +23,14 @@ public class GenericEntityMigrator<T extends BaseModel> implements EntityMigrato
     private final GenericDynamoDBRepository<T> dynamoDbRepository;
     private final Class<T> entityClass;
 
+    /**
+     * Creates a migrator that copies entities from a JSON file to a DynamoDB table.
+     *
+     * @param entityClass the entity class
+     * @param filePath the path of the JSON file to read
+     * @param dynamoDbClient the DynamoDB enhanced client
+     * @param tableName the name of the DynamoDB table
+     */
     public GenericEntityMigrator(Class<T> entityClass,
                                  String filePath,
                                  DynamoDbEnhancedClient dynamoDbClient,

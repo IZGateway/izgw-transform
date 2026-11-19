@@ -13,11 +13,19 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST endpoints for the health and build information of the application.
+ */
 @Log
 @RestController
 @Lazy(false)
 public class XformApplicationController {
 
+    /**
+     * Creates the controller and registers it for access control.
+     *
+     * @param registry the access control registry
+     */
     @Autowired
     public XformApplicationController(
             AccessControlRegistry registry
@@ -25,6 +33,11 @@ public class XformApplicationController {
         registry.register(this);
     }
 
+    /**
+     * Returns the health status of the application.
+     *
+     * @return true with status 200 if healthy, false with status 503 if not
+     */
     @RolesAllowed({Roles.PUBLIC_ACCESS})
     @GetMapping("/healthy")
     public ResponseEntity<Boolean> isHealthy() {
@@ -35,12 +48,22 @@ public class XformApplicationController {
         return ResponseEntity.ok(true);
     }
 
+    /**
+     * Returns the health details of the application.
+     *
+     * @return the health details
+     */
     @RolesAllowed({Roles.ADMIN})
     @GetMapping("/health")
     public gov.cdc.izgateway.logging.event.Health getHealth() {
         return HealthService.getHealth();
     }
 
+    /**
+     * Returns the build information of the application.
+     *
+     * @return the build number, build machine and build date as text
+     */
     @Operation(summary = "Get build information about the application",
             description = "Returns the build number, build machine and build date.")
     @ApiResponse(responseCode = "200", description = "Success",

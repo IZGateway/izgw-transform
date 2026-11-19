@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
+/**
+ * REST API for the users.
+ */
 @Log
 @Lazy(false)
 @RestController
@@ -24,6 +27,12 @@ public class UserApiController extends BaseApiController {
 
     private final UserService userService;
 
+    /**
+     * Creates the controller and registers it with the access control registry.
+     *
+     * @param userService the service for the users
+     * @param registry the access control registry
+     */
     @Autowired
     public UserApiController(
             UserService userService,
@@ -34,6 +43,15 @@ public class UserApiController extends BaseApiController {
         registry.register(this);
     }
 
+    /**
+     * Gets one page of users.
+     *
+     * @param nextCursor the id of the user after which the page starts, or null
+     * @param prevCursor the id of the user before which the page ends, or null
+     * @param includeInactive if true, inactive users are included
+     * @param limit the maximum number of users in the page
+     * @return the page as JSON, or status 500 if the page cannot be serialized
+     */
     @RolesAllowed({Roles.ADMIN})
     @GetMapping("/api/v1/users")
     public ResponseEntity<String> getUsersList(
@@ -50,6 +68,12 @@ public class UserApiController extends BaseApiController {
         }
     }
 
+    /**
+     * Gets one user.
+     *
+     * @param uuid the id of the user
+     * @return the user, or status 404 if it is not found
+     */
     @RolesAllowed({Roles.ADMIN})
     @GetMapping("/api/v1/users/{uuid}")
     public ResponseEntity<User> getUserByUUID(@PathVariable UUID uuid) {
@@ -60,6 +84,13 @@ public class UserApiController extends BaseApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    /**
+     * Replaces a user.
+     *
+     * @param uuid the id of the user
+     * @param updatedUser the new user
+     * @return the updated user
+     */
     @RolesAllowed({Roles.ADMIN})
     @PutMapping("/api/v1/users/{uuid}")
     public ResponseEntity<User> updateUser(
@@ -71,6 +102,12 @@ public class UserApiController extends BaseApiController {
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
+    /**
+     * Creates a user with a new id.
+     *
+     * @param user the user to create
+     * @return the created user
+     */
     @RolesAllowed({Roles.ADMIN})
     @PostMapping("/api/v1/users")
     public ResponseEntity<User> createUser(

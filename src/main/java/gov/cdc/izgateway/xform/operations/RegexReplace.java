@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Replaces the text that matches a regular expression in a message field.
+ */
 @Getter
 @Setter
 public class RegexReplace extends BaseOperation implements Operation {
@@ -20,8 +23,15 @@ public class RegexReplace extends BaseOperation implements Operation {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RegexReplace.class);
 
+    /**
+     * Creates an empty operation.
+     */
     public RegexReplace() {}
 
+    /**
+     * Creates an operation with the settings of another operation.
+     * @param regexReplace the operation to copy the settings from
+     */
     protected RegexReplace(RegexReplace regexReplace) {
         super(regexReplace.getId(), regexReplace.getOrder());
         this.field = regexReplace.field;

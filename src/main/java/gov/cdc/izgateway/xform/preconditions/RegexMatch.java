@@ -16,6 +16,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 
+/**
+ * Precondition that passes when the value at the data path matches a regular expression.
+ */
 @Getter
 @Setter
 public class RegexMatch implements Precondition, Advisable, Transformable {
@@ -28,15 +31,28 @@ public class RegexMatch implements Precondition, Advisable, Transformable {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RegexMatch.class);
 
+    /**
+     * Creates an empty precondition.
+     */
     protected RegexMatch() {
     }
 
+    /**
+     * Creates a precondition with the settings of another precondition.
+     * @param regexMatch the precondition to copy the settings from
+     */
     protected RegexMatch(RegexMatch regexMatch) {
         this.id = regexMatch.id;
         this.dataPath = regexMatch.dataPath;
         this.regex = regexMatch.regex;
     }
 
+    /**
+     * Creates a precondition with the given settings.
+     * @param id the identifier of the precondition
+     * @param dataPath the path of the value to match
+     * @param regex the regular expression that the value must match
+     */
     protected RegexMatch(UUID id, String dataPath, String regex) {
         this.id = id;
         this.dataPath = dataPath;
@@ -67,6 +83,11 @@ public class RegexMatch implements Precondition, Advisable, Transformable {
         return false;
     }
 
+    /**
+     * Creates a matcher for the regular expression of this precondition.
+     * @param sourceValue the value to match; null is treated as an empty string
+     * @return the matcher for the value
+     */
     protected Matcher getMatcher(String sourceValue) {
         Pattern pattern = Pattern.compile(this.getRegex());
         return pattern.matcher(StringUtils.defaultString(sourceValue));

@@ -8,14 +8,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
 
+/**
+ * Service for the pipelines.
+ */
 @Service
 public class PipelineService extends GenericService<Pipeline>{
 
+    /**
+     * Creates the service.
+     *
+     * @param repositoryFactory the factory that supplies the pipeline repository
+     */
     @Autowired
     public PipelineService(RepositoryFactory repositoryFactory) {
         super(repositoryFactory.pipelineRepository());
     }
 
+    /**
+     * Finds the active pipeline for an organization and endpoint pair.
+     *
+     * @param organizationId the id of the organization
+     * @param inboundEndpoint the inbound endpoint
+     * @param outboundEndpoint the outbound endpoint
+     * @return the pipeline, or null if no active pipeline matches
+     */
     public Pipeline getPipelineByOrganizationAndEndpoints(UUID organizationId, String inboundEndpoint, String outboundEndpoint) {
         return getList()
                 .stream()
@@ -32,6 +48,12 @@ public class PipelineService extends GenericService<Pipeline>{
         return isPipelineNameDuplicate(pipeline) || isEndpointDuplicate(pipeline);
     }
 
+    /**
+     * Checks if the organization of a pipeline already has a pipeline with the same name, ignoring case.
+     *
+     * @param pipeline the pipeline to check
+     * @return true if the name is already in use
+     */
     protected boolean isPipelineNameDuplicate(Pipeline pipeline) {
         return repo.getEntitySet().stream().anyMatch(p ->
                 p.getOrganizationId().equals(pipeline.getOrganizationId()) &&
@@ -39,6 +61,12 @@ public class PipelineService extends GenericService<Pipeline>{
         );
     }
 
+    /**
+     * Checks if the organization of a pipeline already has a pipeline with the same endpoints, ignoring case.
+     *
+     * @param pipeline the pipeline to check
+     * @return true if the endpoints are already in use
+     */
     protected boolean isEndpointDuplicate(Pipeline pipeline) {
         return repo.getEntitySet().stream().anyMatch(p ->
                 p.getOrganizationId().equals(pipeline.getOrganizationId()) &&

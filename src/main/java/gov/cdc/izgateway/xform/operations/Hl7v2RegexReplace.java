@@ -8,9 +8,16 @@ import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.exceptions.OperationException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * HL7 v2 implementation of the {@link RegexReplace} operation.
+ */
 @Slf4j
 public class Hl7v2RegexReplace extends RegexReplace implements Operation {
 
+    /**
+     * Creates an HL7 v2 regex replace operation with the settings of another operation.
+     * @param regexReplace the operation to copy the settings from
+     */
     public Hl7v2RegexReplace(RegexReplace regexReplace) {
         super(regexReplace);
     }

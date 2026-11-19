@@ -7,8 +7,15 @@ import gov.cdc.izgateway.xform.context.ServiceContext;
 
 import java.util.regex.Matcher;
 
+/**
+ * HL7 v2 implementation of the {@link RegexMatch} precondition.
+ */
 public class Hl7v2RegexMatch extends RegexMatch implements Precondition {
 
+    /**
+     * Creates an HL7 v2 precondition with the settings of another precondition.
+     * @param regexMatch the precondition to copy the settings from
+     */
     public Hl7v2RegexMatch(RegexMatch regexMatch) {
         super(regexMatch);
     }

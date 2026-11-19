@@ -1183,7 +1183,7 @@ class FhirControllerTests {
 
         ResponseEntity<Resource> res = controller.iisPatientMatch("dev", matchParameters(), req);
 
-        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, res.getStatusCode());
+        assertEquals(HttpStatus.UNPROCESSABLE_CONTENT, res.getStatusCode());
         assertEquals(ContentUtils.FHIR_PLUS_JSON_VALUE, res.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
         assertTrue(res.getBody() instanceof OperationOutcome, "top-level resource must be an OperationOutcome, not a Bundle");
         OperationOutcome oo = (OperationOutcome) res.getBody();

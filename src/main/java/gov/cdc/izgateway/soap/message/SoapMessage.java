@@ -15,21 +15,35 @@ import java.util.Map;
 
 // TODO: Refactor this with IZG Core
 
+/**
+ * Base class for SOAP messages that IZ Gateway sends and receives.
+ */
 @Schema(description="A generic SOAP Request message for IZ Gateway")
 @Data
 @NoArgsConstructor
 public class SoapMessage implements Serializable {
 	private static final long serialVersionUID = 1L;
+	/** The SOAP 1.2 envelope namespace URI. */
 	public static final String SOAP_NS = "http://www.w3.org/2003/05/soap-envelope";
+	/** The namespace prefix for SOAP envelope elements. */
 	public static final String SOAP_PREFIX = "soap";
+	/** The IZ Gateway Hub namespace URI. */
 	public static final String HUB_NS = "urn:cdc:iisb:hub:2014";
+	/** The namespace prefix for Hub elements. */
 	public static final String HUB_PREFIX = "hub";
+    /** The transformation service namespace URI. */
     public static final String XFORM_NS = "urn:cdc:iisb:hub:xform";
+    /** The namespace prefix for transformation service elements. */
     public static final String XFORM_PREFIX = "xform";
+	/** The CDC 2011 IIS WSDL namespace URI. */
 	public static final String IIS2011_NS = "urn:cdc:iisb:2011";
+	/** The namespace prefix for IIS elements. */
 	public static final String IIS_PREFIX = "iis";
+	/** The CDC 2014 IIS WSDL namespace URI. */
 	public static final String IIS2014_NS = "urn:cdc:iisb:2014";
+	/** A map of schema names. Not used in this repository. */
 	protected static final Map<String, String> schemaNameMap = new HashMap<>();
+	/** The media types accepted for SOAP messages. */
 	protected static final String[] SOAP_MEDIA_TYPES = {
 			MediaType.TEXT_PLAIN_VALUE,
 			MediaType.TEXT_HTML_VALUE,	// Postel's law, be forgiving
@@ -38,6 +52,7 @@ public class SoapMessage implements Serializable {
 			"application/soap",
 			"application/soap+xml"
 	};
+	/** The media types accepted for WSDL documents. */
 	protected static final String[] WSDL_MEDIA_TYPES = {
 			MediaType.TEXT_PLAIN_VALUE,
 			MediaType.TEXT_HTML_VALUE,	// Postel's law, be forgiving
@@ -52,13 +67,17 @@ public class SoapMessage implements Serializable {
 	public static interface Request {}
 	/** Marker interface for response messages */
 	public static interface Response {}
+	/** The XML schema namespace of this message. */
 	@Schema(description="The XML Schema this message comes from")
 	private String schema = IIS2014_NS;
 
+	/** The Hub header values from the soap:Header element. */
 	@Schema(description="The Hub Request header values found in the soap:Header element if any")
 	private HubHeader hubHeader = new HubHeader();
+	/** The WS-Addressing header values from the soap:Header element. */
 	@Schema(description="The Web Services Addressing (WSA) values found in the soap:Header element if any")
 	private WsaHeaders wsaHeaders = new WsaHeaders();
+    /** The transformation service header values from the soap:Header element. */
     @Schema(description="The Xform Request header values found in the soap:Header element if any")
     private XformHeader xformHeader = new XformHeader();
 	/**
@@ -70,6 +89,7 @@ public class SoapMessage implements Serializable {
 	 * 
 	 * @param that	The message to copy from.
 	 * @param schema	The schema to use.
+	 * @param isUpgradeOrSchemaChange true if this is an upgrade or schema change; false to make this message a response to {@code that}
 	 */
 	public SoapMessage(SoapMessage that, String schema, boolean isUpgradeOrSchemaChange) {
 		// Always copy the HubHeader
@@ -83,16 +103,30 @@ public class SoapMessage implements Serializable {
 		setSchema(schema == null ? that.schema : schema);
 	}
 
+	/**
+	 * Set the XML schema namespace of this message.
+	 * @param schema The schema namespace URI.
+	 */
 	public void setSchema(String schema) {
 		this.schema = schema;
 	}
 
+	/**
+	 * Set the WS-Addressing Action header to the action for this message.
+	 * @param isHub true to use the Hub WSDL action, false to use the IIS WSDL action.
+	 * @return This message.
+	 */
 	public SoapMessage updateAction(boolean isHub) {
 		String action = getAction(isHub);
 		this.getWsaHeaders().setAction(action);
 		return this;
 	}
 	
+	/**
+	 * Get the WS-Addressing action URI for this message, based on its type and schema.
+	 * @param isHub true to use the Hub WSDL action, false to use the IIS WSDL action.
+	 * @return The action URI.
+	 */
 	public String getAction(boolean isHub) {
 		String simpleName = this.getClass().getSimpleName();
 				
@@ -140,6 +174,11 @@ public class SoapMessage implements Serializable {
 		return "urn:cdc:iisb:2014:IISPortType:" + simpleName;
 	}
 	
+	/**
+	 * Mark this message as a response to a request, if this is a response and that is a request.
+	 * @param that The request message.
+	 * @return This message.
+	 */
 	public SoapMessage respondingTo(SoapMessage that) {
 		if (this instanceof Response && that instanceof Request) {
 			wsaHeaders.respondingTo(that.getWsaHeaders());
@@ -187,18 +226,34 @@ public class SoapMessage implements Serializable {
 		return newName;
 	}
 	
+	/**
+	 * Check whether the Hub header has a destination identifier.
+	 * @return true if the destination identifier is present and not empty.
+	 */
 	public boolean hasDestinationId() {
 		return hubHeader != null && !StringUtils.isEmpty(hubHeader.getDestinationId());
 	}
 
+	/**
+	 * Check whether this message has a schema.
+	 * @return true if the schema is not null.
+	 */
 	public boolean hasSchema() {
 		return schema != null;
 	}
 
+	/**
+	 * Check whether this message uses the 2011 IIS WSDL schema.
+	 * @return true if the schema is the 2011 IIS namespace.
+	 */
 	@JsonIgnore
 	public boolean is2011Message() {
 		return IIS2011_NS.equals(schema);
 	}
+	/**
+	 * Check whether this message uses the 2014 IIS WSDL schema.
+	 * @return true if this is a 2014 IIS message, false if it is a 2011 or Hub message.
+	 */
 	@JsonIgnore
 	public boolean is2014Message() {
 		if (IIS2011_NS.equals(schema)) {
@@ -209,6 +264,10 @@ public class SoapMessage implements Serializable {
 		}
 		return hubHeader.isEmpty() || IIS2014_NS.equals(schema);
 	}
+	/**
+	 * Check whether this message uses the Hub WSDL schema.
+	 * @return true if this is neither a 2011 nor a 2014 IIS message.
+	 */
 	@JsonIgnore
 	public boolean isHubMessage() {
 		return !is2011Message() && !is2014Message();
@@ -240,11 +299,11 @@ public class SoapMessage implements Serializable {
         return "";
 	}
 
-	@JsonIgnore
 	/**
 	 * Return the length of the message payload.
 	 * @return Return the length of the payload.
 	 */
+	@JsonIgnore
 	public int length() {
 		if (this instanceof HasEchoBack echo) {
 			return echo.getEchoBack().length();

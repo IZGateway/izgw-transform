@@ -16,6 +16,9 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbIgnor
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * A versioned set of request and response operations.
+ */
 @Getter
 @Setter
 @DynamoDbBean
@@ -55,6 +58,18 @@ public class Solution extends BaseModel {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Creates an empty solution.
+     */
+    public Solution() {
+        // Jackson and the DynamoDB Enhanced Client set the fields.
+    }
+
+    /**
+     * Returns the request operations as JSON for storage in DynamoDB.
+     *
+     * @return the request operations as JSON, or null if there are no request operations
+     */
     @JsonIgnore
     @DynamoDbAttribute("requestOperations")
     public String getRequestOperationsJson() {
@@ -68,6 +83,11 @@ public class Solution extends BaseModel {
         }
     }
 
+    /**
+     * Sets the request operations from the JSON stored in DynamoDB.
+     *
+     * @param requestOperationsJson the request operations as JSON, or null
+     */
     public void setRequestOperationsJson(String requestOperationsJson) {
         if (requestOperationsJson == null) {
             this.requestOperations = null;
@@ -80,11 +100,21 @@ public class Solution extends BaseModel {
         }
     }
 
+    /**
+     * Returns the request operations of the solution. DynamoDB stores them as JSON through {@link #getRequestOperationsJson()}.
+     *
+     * @return the request operations
+     */
     @DynamoDbIgnore
     public List<SolutionOperation> getRequestOperations() {
         return requestOperations;
     }
 
+    /**
+     * Returns the response operations as JSON for storage in DynamoDB.
+     *
+     * @return the response operations as JSON, or null if there are no response operations
+     */
     @JsonIgnore
     @DynamoDbAttribute("responseOperations")
     public String getResponseOperationsJson() {
@@ -98,6 +128,11 @@ public class Solution extends BaseModel {
         }
     }
 
+    /**
+     * Sets the response operations from the JSON stored in DynamoDB.
+     *
+     * @param responseOperationsJson the response operations as JSON, or null
+     */
     public void setResponseOperationsJson(String responseOperationsJson) {
         if (responseOperationsJson == null) {
             this.responseOperations = null;
@@ -110,6 +145,11 @@ public class Solution extends BaseModel {
         }
     }
 
+    /**
+     * Returns the response operations of the solution. DynamoDB stores them as JSON through {@link #getResponseOperationsJson()}.
+     *
+     * @return the response operations
+     */
     @DynamoDbIgnore
     public List<SolutionOperation> getResponseOperations() {
         return responseOperations;

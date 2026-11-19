@@ -26,12 +26,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Base class for the SOAP controllers. It sends inbound messages through a Camel pipeline route.
+ */
 @Slf4j
 public abstract class BaseController extends SoapControllerBase {
+    /** Sends the message context to the Camel pipeline route. */
     protected final ProducerTemplate producerTemplate;
+    /** Finds the organization of the sender. */
     protected final OrganizationService organizationService;
+    /** The service that checks access to request paths. */
     protected final AccessControlService accessControlService;
 
+    /**
+     * Creates the controller.
+     *
+     * @param mshService the message header service
+     * @param namespace the SOAP namespace of the service
+     * @param wsdl the WSDL of the service
+     * @param additionalNamespaces other namespaces that the service accepts
+     * @param producerTemplate sends the message context to the Camel pipeline route
+     * @param organizationService finds the organization of the sender
+     * @param accessControlService the service that checks access to request paths
+     */
     protected BaseController(
             IMessageHeaderService mshService,
             String namespace,
@@ -72,6 +89,14 @@ public abstract class BaseController extends SoapControllerBase {
         return checkResponseEntitySize(new ResponseEntity<>(context.getSubmitSingleMessageResponse(), HttpStatus.OK));
     }
 
+    /**
+     * Returns the organization for a certificate common name, or the override organization from the
+     * x-xform-organization header if the user is an administrator.
+     *
+     * @param commonName the common name of the client certificate
+     * @return the organization
+     * @throws Fault if no organization is found
+     */
     protected Organization getOrganization(String commonName) throws Fault {
         Organization organization = checkOrganizationOverride(organizationService.getOrganizationByCommonName(commonName));
         if (organization == null) {
@@ -81,6 +106,14 @@ public abstract class BaseController extends SoapControllerBase {
         return organization;
     }
 
+    /**
+     * Returns the organization from the x-xform-organization header if the user has the ADMIN role
+     * and the header is present; otherwise returns the given organization.
+     *
+     * @param organization the organization found for the sender
+     * @return the organization to use
+     * @throws Fault if the organization in the header is not found
+     */
     protected Organization checkOrganizationOverride(Organization organization) throws Fault {
         if (RequestContext.getHttpHeaders() != null
                 && RequestContext.getPrincipal().getRoles().contains(Roles.ADMIN)
@@ -98,6 +131,14 @@ public abstract class BaseController extends SoapControllerBase {
         return organization;
     }
 
+    /**
+     * Creates the transformation context for a request, with the direction set to REQUEST.
+     *
+     * @param organization the organization identifier
+     * @param submitSingleMessage the inbound request
+     * @return the transformation context
+     * @throws Fault if the service context cannot be created
+     */
     protected IZGXformContext createXformContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage);
         serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);
@@ -105,6 +146,14 @@ public abstract class BaseController extends SoapControllerBase {
         return new IZGXformContext(serviceContext, submitSingleMessage);
     }
 
+    /**
+     * Creates the service context for a request.
+     *
+     * @param organization the organization identifier
+     * @param submitSingleMessage the inbound request
+     * @return the service context
+     * @throws Fault if the service context cannot be created
+     */
     abstract protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault;
 
     @Override

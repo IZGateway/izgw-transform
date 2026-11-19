@@ -37,6 +37,11 @@ import java.util.List;
 @Lazy(false)
 public class LogController extends LogControllerBase {
 
+    /**
+     * Creates the controller and registers it for access control.
+     *
+     * @param registry the access control registry
+     */
     @Autowired
     public LogController(AccessControlRegistry registry) {
         registry.register(this);

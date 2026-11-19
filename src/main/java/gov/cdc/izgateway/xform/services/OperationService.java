@@ -13,8 +13,18 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+/**
+ * Service that lists the operation types and their properties from the {@code @JsonSubTypes} annotation on {@link Operation}.
+ */
 @Service
 public class OperationService implements XformService<OperationInfo> {
+    /**
+     * Creates the service.
+     */
+    public OperationService() {
+        // No state to initialize.
+    }
+
     @Override
     public OperationInfo getObject(UUID id) {
         return null;

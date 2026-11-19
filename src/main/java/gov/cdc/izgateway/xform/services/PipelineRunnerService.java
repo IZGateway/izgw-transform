@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Finds the pipeline for a message and runs its pipes. Pipes run in reverse order for a response.
+ */
 @Service
 @Slf4j
 @Getter
@@ -29,11 +32,22 @@ public class PipelineRunnerService implements Advisable, Transformable {
     private Pipeline pipeline;
     private UUID id;
 
+    /**
+     * Creates the service.
+     *
+     * @param xformConfig the configuration that supplies the pipelines and solutions
+     */
     @Autowired
     public PipelineRunnerService(XformConfig xformConfig) {
         this.xformConfig = xformConfig;
     }
 
+    /**
+     * Runs the pipeline that matches the context. Each pipe runs its solution only if all pipe preconditions pass.
+     *
+     * @param context the message context to transform
+     * @throws Exception if a solution fails
+     */
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws Exception {
         pipeline = xformConfig.findPipelineByContext(context);

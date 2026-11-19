@@ -14,4 +14,11 @@ import java.util.Map;
 public class PreconditionInfo {
     private String method;
     private Map<String, PreconditionInfoProperty> properties;
+
+    /**
+     * Creates an empty precondition information.
+     */
+    public PreconditionInfo() {
+        // The service sets the fields.
+    }
 }

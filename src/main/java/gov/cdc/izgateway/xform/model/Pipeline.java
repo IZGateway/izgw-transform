@@ -17,6 +17,9 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbIgnor
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * An ordered list of pipes that runs for an organization on an inbound and outbound endpoint pair.
+ */
 @Getter
 @Setter
 @DynamoDbBean
@@ -54,6 +57,18 @@ public class Pipeline extends BaseModel implements OrganizationAware {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Creates an empty pipeline.
+     */
+    public Pipeline() {
+        // Jackson and the DynamoDB Enhanced Client set the fields.
+    }
+
+    /**
+     * Returns the pipes as JSON for storage in DynamoDB.
+     *
+     * @return the pipes as JSON, or null if there are no pipes
+     */
     @JsonIgnore
     @DynamoDbAttribute("pipes")
     public String getPipesJson() {
@@ -67,6 +82,11 @@ public class Pipeline extends BaseModel implements OrganizationAware {
         }
     }
 
+    /**
+     * Sets the pipes from the JSON stored in DynamoDB.
+     *
+     * @param pipesJson the pipes as JSON, or null
+     */
     public void setPipesJson(String pipesJson) {
         if (pipesJson == null) {
             this.pipes = null;
@@ -79,6 +99,11 @@ public class Pipeline extends BaseModel implements OrganizationAware {
         }
     }
 
+    /**
+     * Returns the pipes of the pipeline. DynamoDB stores them as JSON through {@link #getPipesJson()}.
+     *
+     * @return the pipes
+     */
     @DynamoDbIgnore
     public List<Pipe> getPipes() {
         return pipes;

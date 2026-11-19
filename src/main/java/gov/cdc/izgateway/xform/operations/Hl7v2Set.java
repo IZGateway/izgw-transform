@@ -9,9 +9,16 @@ import gov.cdc.izgateway.xform.exceptions.OperationException;
 import lombok.extern.slf4j.Slf4j;
 
 
+/**
+ * HL7 v2 implementation of the {@link Set} operation.
+ */
 @Slf4j
 public class Hl7v2Set extends Set implements Operation {
 
+    /**
+     * Creates an HL7 v2 set operation with the settings of another operation.
+     * @param set the operation to copy the settings from
+     */
     public Hl7v2Set(Set set) {
         super(set);
     }

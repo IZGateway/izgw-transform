@@ -19,12 +19,25 @@ public class IZGXformContext {
     private SubmitSingleMessageResponse submitSingleMessageResponse;
     private FaultMessage faultMessage;
     
+    /**
+     * Creates a context for a request that has no response yet.
+     *
+     * @param serviceContext the service context of the message
+     * @param submitSingleMessageRequest the inbound SOAP request
+     */
     public IZGXformContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest) {
         this.serviceContext = serviceContext;
         this.submitSingleMessageRequest = submitSingleMessageRequest;
         this.submitSingleMessageResponse = null;
     }
 
+    /**
+     * Creates a context for a request and its response.
+     *
+     * @param serviceContext the service context of the message
+     * @param submitSingleMessageRequest the inbound SOAP request
+     * @param submitSingleMessageResponse the SOAP response
+     */
     public IZGXformContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest, SubmitSingleMessageResponse submitSingleMessageResponse) {
         this.serviceContext = serviceContext;
         this.submitSingleMessageRequest = submitSingleMessageRequest;

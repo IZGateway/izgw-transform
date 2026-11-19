@@ -13,8 +13,18 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+/**
+ * Service that lists the precondition types and their properties from the {@code @JsonSubTypes} annotation on {@link Precondition}.
+ */
 @Service
 public class PreconditionService implements XformService<PreconditionInfo> {
+    /**
+     * Creates the service.
+     */
+    public PreconditionService() {
+        // No state to initialize.
+    }
+
     @Override
     public PreconditionInfo getObject(UUID id) {
         return null;

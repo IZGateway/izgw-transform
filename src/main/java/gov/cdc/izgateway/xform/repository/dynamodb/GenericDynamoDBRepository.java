@@ -16,12 +16,22 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Generic DynamoDB-backed repository that stores entities with the entity name as the partition key and the identifier as the sort key.
+ *
+ * @param <T> the entity type
+ */
 public abstract class GenericDynamoDBRepository<T extends BaseModel> implements XformRepository<T> {
 
+    /** The DynamoDB enhanced client. */
     protected final DynamoDbEnhancedClient dynamoDbClient;
+    /** The name of the DynamoDB table. */
     protected final String tableName;
+    /** The entity class. */
     protected final Class<T> entityClass;
+    /** The table schema of the entity class. */
     protected final TableSchema<T> tableSchema;
+    /** The DynamoDB table for the entity class. */
     protected DynamoDbTable<T> table;
 
     /**
@@ -33,6 +43,14 @@ public abstract class GenericDynamoDBRepository<T extends BaseModel> implements 
         return entityClass.getSimpleName();
     }
 
+    /**
+     * Creates the repository and opens the table.
+     *
+     * @param dynamoDbClient the DynamoDB enhanced client
+     * @param tableName the name of the DynamoDB table
+     * @param entityClass the entity class
+     * @param tableSchema the table schema of the entity class
+     */
     protected GenericDynamoDBRepository(DynamoDbEnhancedClient dynamoDbClient, String tableName, Class<T> entityClass, TableSchema<T> tableSchema) {
         this.dynamoDbClient = dynamoDbClient;
         this.tableName = tableName;

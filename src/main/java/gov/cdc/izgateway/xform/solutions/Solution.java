@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Runtime form of a configured solution that runs its request or response operations on a message.
+ */
 public class Solution implements Advisable, Transformable {
 
     private final gov.cdc.izgateway.xform.model.Solution configuration;
@@ -19,6 +22,10 @@ public class Solution implements Advisable, Transformable {
     private final List<SolutionOperation> responseOperations;
     private boolean hasTransformed = false;
 
+    /**
+     * Creates a runtime solution from its configuration.
+     * @param configuration the solution configuration
+     */
     public Solution(gov.cdc.izgateway.xform.model.Solution configuration) {
         this.configuration = configuration;
         requestOperations = new ArrayList<>();
@@ -35,6 +42,11 @@ public class Solution implements Advisable, Transformable {
         }
     }
 
+    /**
+     * Runs the request or response operations, as selected by the current direction of the context.
+     * @param context the context of the message to transform
+     * @throws SolutionException if an operation fails
+     */
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws SolutionException {
     	List<SolutionOperation> source = context.getCurrentDirection().equals(DataFlowDirection.REQUEST) ? requestOperations : responseOperations;

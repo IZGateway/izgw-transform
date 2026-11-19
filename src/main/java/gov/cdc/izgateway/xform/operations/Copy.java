@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * An operation that copies the value of a source field to a destination field.
+ */
 @Getter
 @Setter
 public class Copy extends BaseOperation implements Operation {
@@ -18,9 +21,17 @@ public class Copy extends BaseOperation implements Operation {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Copy.class);
 
+    /**
+     * Creates an empty copy operation.
+     */
     public Copy() {
     }
 
+    /**
+     * Creates a copy operation with the same id, order and fields as another one.
+     *
+     * @param copy the operation to copy
+     */
     protected Copy(Copy copy) {
         super(copy.getId(), copy.getOrder());
         this.sourceField = copy.sourceField;

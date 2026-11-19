@@ -17,20 +17,45 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.UUID;
 
+/**
+ * Camel type converters between {@link IZGXformContext}, HL7 v2 message content, and files.
+ */
 @Component
 @Slf4j
 public class HubConverters implements TypeConverters {
+    /**
+     * Creates the converters.
+     */
+    public HubConverters() {
+        // No initialization needed.
+    }
+
+    /**
+     * Converts a context to a stream of its response HL7 v2 message.
+     * @param context the transformation context
+     * @return the response HL7 v2 message as an input stream
+     */
     @Converter
     public InputStream contextToStream(IZGXformContext context) {
         String hl7Message = context.getSubmitSingleMessageResponse().getHl7Message();
         return new ByteArrayInputStream(hl7Message.getBytes());
     }
 
+    /**
+     * Converts a context to its response HL7 v2 message.
+     * @param context the transformation context
+     * @return the response HL7 v2 message
+     */
     @Converter
     public String contextToString(IZGXformContext context) {
         return context.getSubmitSingleMessageResponse().getHl7Message();
     }
 
+    /**
+     * Creates a hub-to-hub HL7 v2 context from a file that contains an HL7 v2 message.
+     * @param file the file that contains the HL7 v2 request message
+     * @return a new context for the message
+     */
     @Converter
     public IZGXformContext fileToContext(GenericFile<File> file) {
         File thebody = (File) file.getBody();

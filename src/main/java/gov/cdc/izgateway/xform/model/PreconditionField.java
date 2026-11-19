@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.util.UUID;
 
+/**
+ * A named message data path that preconditions can use as a field.
+ */
 @Getter
 @Setter
 public class PreconditionField extends BaseModel {
@@ -22,4 +25,11 @@ public class PreconditionField extends BaseModel {
 
     @NotNull(message = "Precondition Field active status is required")
     private Boolean active;
+
+    /**
+     * Creates an empty precondition field.
+     */
+    public PreconditionField() {
+        // Jackson sets the fields.
+    }
 }

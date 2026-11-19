@@ -15,9 +15,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 
+/**
+ * Camel producer that sends the transformed request to the IZ Gateway Hub destination and stores the response in the context.
+ */
 @Slf4j
 public class IZGHubProducer extends ProducerBase {
 
+    /**
+     * Creates the producer.
+     * @param endpoint the endpoint that owns the producer
+     */
     public IZGHubProducer(Endpoint endpoint) {
         super(endpoint);
     }

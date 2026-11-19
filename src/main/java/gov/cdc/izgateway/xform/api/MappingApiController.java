@@ -18,12 +18,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
+/**
+ * REST API for the code mappings.
+ */
 @Log
 @Lazy(false)
 @RestController
 public class MappingApiController extends BaseApiController {
     private final MappingService mappingService;
 
+    /**
+     * Creates the controller and registers it with the access control registry.
+     *
+     * @param mappingService the service for the code mappings
+     * @param registry the access control registry
+     */
     @Autowired
     public MappingApiController(
             MappingService mappingService,
@@ -33,6 +42,15 @@ public class MappingApiController extends BaseApiController {
         registry.register(this);
     }
 
+    /**
+     * Gets one page of code mappings.
+     *
+     * @param nextCursor the id of the mapping after which the page starts, or null
+     * @param prevCursor the id of the mapping before which the page ends, or null
+     * @param includeInactive if true, inactive mappings are included
+     * @param limit the maximum number of mappings in the page
+     * @return the page as JSON, or status 500 if the page cannot be serialized
+     */
     @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/mappings")
     public ResponseEntity<String> getMappingsList(
@@ -49,6 +67,12 @@ public class MappingApiController extends BaseApiController {
         }
     }
 
+    /**
+     * Gets one code mapping.
+     *
+     * @param uuid the id of the mapping
+     * @return the mapping, or status 404 if it is not found
+     */
     @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/mappings/{uuid}")
     public ResponseEntity<Mapping> getMappingByUUID(@PathVariable UUID uuid) {
@@ -59,6 +83,12 @@ public class MappingApiController extends BaseApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    /**
+     * Creates a code mapping with a new id.
+     *
+     * @param mapping the mapping to create
+     * @return the created mapping
+     */
     @RolesAllowed({Roles.PIPELINE_WRITER})
     @PostMapping("/api/v1/mappings")
     public ResponseEntity<Mapping> createMapping(
@@ -68,6 +98,13 @@ public class MappingApiController extends BaseApiController {
         return new ResponseEntity<>(mapping, HttpStatus.OK);
     }
 
+    /**
+     * Replaces a code mapping.
+     *
+     * @param uuid the id of the mapping
+     * @param updatedMapping the new mapping
+     * @return the updated mapping
+     */
     @RolesAllowed({Roles.PIPELINE_WRITER})
     @PutMapping("/api/v1/mappings/{uuid}")
     public ResponseEntity<Mapping> updateMapping(
@@ -79,6 +116,12 @@ public class MappingApiController extends BaseApiController {
         return new ResponseEntity<>(updatedMapping, HttpStatus.OK);
     }
 
+    /**
+     * Deletes a code mapping.
+     *
+     * @param uuid the id of the mapping
+     * @return status 204
+     */
     @RolesAllowed({Roles.PIPELINE_DELETER})
     @DeleteMapping("/api/v1/mappings/{uuid}")
     public ResponseEntity<Mapping> deleteMapping(

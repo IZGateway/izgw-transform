@@ -18,6 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * Gets the principal of a request from a JWT or a client certificate, and adds the roles and organizations of the user.
+ */
 @Service
 @Slf4j
 public class XformPrincipalService implements PrincipalService {
@@ -29,6 +32,15 @@ public class XformPrincipalService implements PrincipalService {
     private final List<String> localHostIps = Arrays.asList(HostInfo.LOCALHOST_IP4, "0:0:0:0:0:0:0:1", HostInfo.LOCALHOST_IP6);
     private final GroupRoleMappingService groupRoleMappingService;
 
+    /**
+     * Creates the service.
+     *
+     * @param accessControlService the service that supplies the roles of the users
+     * @param certificatePrincipalProvider the provider that creates a principal from a client certificate
+     * @param jwtPrincipalProvider the provider that creates a principal from a JWT
+     * @param userService the service for the users
+     * @param groupRoleMappingService the service for the group to role mappings
+     */
     @Autowired
     public XformPrincipalService(AccessControlService accessControlService,
                                  CertificatePrincipalProvider certificatePrincipalProvider,

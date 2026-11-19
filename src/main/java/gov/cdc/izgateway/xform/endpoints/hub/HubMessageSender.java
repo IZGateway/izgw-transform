@@ -10,10 +10,22 @@ import gov.cdc.izgateway.soap.net.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Message sender that sends SOAP messages to the IZ Gateway Hub or IIS destinations.
+ */
 @Component
 public class HubMessageSender extends MessageSender {
     private EndpointStatusService statusService;
 
+    /**
+     * Creates the message sender.
+     * @param serverConfig the server configuration
+     * @param senderConfig the sender configuration
+     * @param clientConfig the client configuration
+     * @param tlsSupport the client TLS support
+     * @param statusService the endpoint status service
+     * @param app the application properties
+     */
     @Autowired
     public HubMessageSender(final ServerConfiguration serverConfig, final SenderConfig senderConfig, final ClientConfiguration clientConfig, final ClientTlsSupport tlsSupport, final EndpointStatusService statusService, final AppProperties app
     ) {

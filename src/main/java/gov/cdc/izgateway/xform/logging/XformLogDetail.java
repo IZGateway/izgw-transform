@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.UUID;
 
+/**
+ * Details of a transformed transaction for one pipeline that {@link XformTransactionData} writes to the log.
+ */
 @Data
 public class XformLogDetail {
     private String eventId;
@@ -21,4 +24,11 @@ public class XformLogDetail {
     private String responseSendingFacility;
     private String responseReceivingApplication;
     private String responseReceivingFacility;
+
+    /**
+     * Creates an empty log detail.
+     */
+    public XformLogDetail() {
+        // Lombok generates the accessors.
+    }
 }

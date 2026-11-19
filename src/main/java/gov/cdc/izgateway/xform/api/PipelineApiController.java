@@ -18,12 +18,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
+/**
+ * REST API for the pipelines.
+ */
 @Log
 @Lazy(false)
 @RestController
 public class PipelineApiController extends BaseApiController {
     private final PipelineService pipelineService;
 
+    /**
+     * Creates the controller and registers it with the access control registry.
+     *
+     * @param pipelineService the service for the pipelines
+     * @param registry the access control registry
+     */
     @Autowired
     public PipelineApiController(
             PipelineService pipelineService,
@@ -33,6 +42,12 @@ public class PipelineApiController extends BaseApiController {
         registry.register(this);
     }
 
+    /**
+     * Gets one pipeline.
+     *
+     * @param uuid the id of the pipeline
+     * @return the pipeline, or status 404 if it is not found
+     */
     @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/pipelines/{uuid}")
     public ResponseEntity<Pipeline> getPipelineByUUID(@PathVariable UUID uuid) {
@@ -43,6 +58,13 @@ public class PipelineApiController extends BaseApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    /**
+     * Replaces a pipeline.
+     *
+     * @param uuid the id of the pipeline
+     * @param updatedPipeline the new pipeline
+     * @return the updated pipeline
+     */
     @RolesAllowed({Roles.PIPELINE_WRITER})
     @PutMapping("/api/v1/pipelines/{uuid}")
     public ResponseEntity<Pipeline> updatePipeline(@PathVariable UUID uuid, @Valid @RequestBody Pipeline updatedPipeline) {
@@ -52,6 +74,15 @@ public class PipelineApiController extends BaseApiController {
     }
 
     // TODO - Paul to look at AccessControl as it works with groups too.
+    /**
+     * Gets one page of pipelines.
+     *
+     * @param nextCursor the id of the pipeline after which the page starts, or null
+     * @param prevCursor the id of the pipeline before which the page ends, or null
+     * @param includeInactive if true, inactive pipelines are included
+     * @param limit the maximum number of pipelines in the page
+     * @return the page as JSON, or status 500 if the page cannot be serialized
+     */
     @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/pipelines")
     public ResponseEntity<String> getPipelinesList(
@@ -68,6 +99,12 @@ public class PipelineApiController extends BaseApiController {
         }
     }
 
+    /**
+     * Creates a pipeline with a new id.
+     *
+     * @param pipeline the pipeline to create
+     * @return the created pipeline
+     */
     @RolesAllowed({Roles.PIPELINE_WRITER})
     @PostMapping("/api/v1/pipelines")
     public ResponseEntity<Pipeline> createPipeline(
@@ -77,6 +114,12 @@ public class PipelineApiController extends BaseApiController {
         return new ResponseEntity<>(pipeline, HttpStatus.OK);
     }
 
+    /**
+     * Deletes a pipeline.
+     *
+     * @param uuid the id of the pipeline
+     * @return status 204
+     */
     @RolesAllowed({Roles.PIPELINE_DELETER})
     @DeleteMapping("/api/v1/pipelines/{uuid}")
     public ResponseEntity<Pipeline> deletePipeline(

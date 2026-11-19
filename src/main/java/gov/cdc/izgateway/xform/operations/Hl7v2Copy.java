@@ -8,8 +8,15 @@ import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.exceptions.OperationException;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * HL7 v2 implementation of the {@link Copy} operation.
+ */
 @Slf4j
 public class Hl7v2Copy extends Copy implements Operation {
+    /**
+     * Creates an HL7 v2 copy operation with the settings of another operation.
+     * @param copy the operation to copy the settings from
+     */
     public Hl7v2Copy(Copy copy) {
         super(copy);
     }

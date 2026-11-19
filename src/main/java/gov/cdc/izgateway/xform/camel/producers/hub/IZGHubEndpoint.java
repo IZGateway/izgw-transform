@@ -5,7 +5,15 @@ import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.support.DefaultEndpoint;
 
+/**
+ * Camel endpoint that creates producers for the IZ Gateway Hub destination.
+ */
 public class IZGHubEndpoint extends DefaultEndpoint {
+    /**
+     * Creates the endpoint.
+     * @param endpointUri the URI of the endpoint
+     * @param component the component that owns the endpoint
+     */
     public IZGHubEndpoint(String endpointUri, IZGHubComponent component) {
         super(endpointUri, component);
     }

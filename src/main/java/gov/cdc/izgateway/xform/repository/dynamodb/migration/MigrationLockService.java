@@ -18,6 +18,11 @@ public class MigrationLockService {
 
     private final XformRepository<Event> eventRepository;
 
+    /**
+     * Creates the service.
+     *
+     * @param repositoryFactory the factory that supplies the event repository
+     */
     @Autowired
     public MigrationLockService(DynamoDbRepositoryFactory repositoryFactory) {
         this.eventRepository = repositoryFactory.eventRepository();

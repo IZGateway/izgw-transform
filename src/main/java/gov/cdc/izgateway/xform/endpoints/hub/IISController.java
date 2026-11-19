@@ -28,12 +28,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.UUID;
 
+/**
+ * SOAP endpoint for {@code /IISService} that transforms messages and sends them to the IIS destination.
+ */
 @RestController
 @RolesAllowed({Roles.XFORM_SENDING_SYSTEM, Roles.ADMIN})
 @RequestMapping("/IISService")
 @Lazy(false)
 @Slf4j
 public class IISController extends BaseController {
+    /**
+     * Creates the controller and registers it with the access control registry.
+     * @param mshService the service that processes MSH segments
+     * @param registry the access control registry
+     * @param producerTemplate the template used to send messages to Camel routes
+     * @param organizationService the service used to find the sending organization
+     * @param accessControlService the access control service
+     */
     public IISController(
             IMessageHeaderService mshService,
             AccessControlRegistry registry,

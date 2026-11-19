@@ -48,6 +48,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * SOAP endpoint for {@code /IISHubService} that transforms messages and sends them to the IZ Gateway Hub.
+ */
 @RestController
 @RolesAllowed({Roles.ADMIN, Roles.XFORM_SENDING_SYSTEM})
 @RequestMapping("/IISHubService")
@@ -59,6 +62,14 @@ public class HubController extends BaseController /*SoapControllerBase*/ {
     @Value("${xform.destination.hub.uri:}")
     private String destinationUri;
 
+    /**
+     * Creates the controller and registers it with the access control registry.
+     * @param mshService the service that processes MSH segments
+     * @param registry the access control registry
+     * @param producerTemplate the template used to send messages to Camel routes
+     * @param organizationService the service used to find the sending organization
+     * @param accessControlService the access control service
+     */
     @Autowired
     public HubController(
             IMessageHeaderService mshService,

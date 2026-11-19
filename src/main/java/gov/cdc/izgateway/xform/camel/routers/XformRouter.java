@@ -23,11 +23,21 @@ import org.apache.camel.builder.RouteBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Defines the Camel routes that transform messages and send them to the hub or IIS destination.
+ */
 @Component
 public class XformRouter extends RouteBuilder {
 
   @Autowired
   DataXformService dataXformService;
+
+  /**
+   * Creates the router.
+   */
+  public XformRouter() {
+      // No initialization needed.
+  }
 
   @Override
   public void configure() throws Exception {

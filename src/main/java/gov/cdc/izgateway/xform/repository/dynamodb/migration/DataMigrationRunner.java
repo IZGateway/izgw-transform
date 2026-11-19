@@ -24,6 +24,12 @@ public class DataMigrationRunner implements ApplicationRunner {
     private final DataMigrationService migrationService;
     private final MigrationLockService lockService;
 
+    /**
+     * Creates the runner.
+     *
+     * @param migrationService the service that migrates the entities
+     * @param lockService the service that makes sure that only one node runs the migration
+     */
     @Autowired
     public DataMigrationRunner(DataMigrationService migrationService, MigrationLockService lockService) {
         this.migrationService = migrationService;

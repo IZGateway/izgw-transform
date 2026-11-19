@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Sets a message field to a fixed value.
+ */
 @Getter
 @Setter
 public class Set extends BaseOperation implements Operation {
@@ -18,8 +21,15 @@ public class Set extends BaseOperation implements Operation {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Set.class);
 
+    /**
+     * Creates an empty operation.
+     */
     public Set() {}
 
+    /**
+     * Creates an operation with the settings of another operation.
+     * @param set the operation to copy the settings from
+     */
     protected Set(Set set) {
         super(set.getId(), set.getOrder());
         this.destinationField = set.destinationField;

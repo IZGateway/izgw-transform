@@ -18,12 +18,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
+/**
+ * REST API for the operation and precondition field definitions.
+ */
 @Log
 @Lazy(false)
 @RestController
 public class FieldApiController extends BaseApiController {
     private final OperationPreconditionFieldService operationPreconditionFieldService;
 
+    /**
+     * Creates the controller and registers it with the access control registry.
+     *
+     * @param operationPreconditionFieldService the service for the field definitions
+     * @param registry the access control registry
+     */
     @Autowired
     public FieldApiController(
             OperationPreconditionFieldService operationPreconditionFieldService,
@@ -33,6 +42,16 @@ public class FieldApiController extends BaseApiController {
         registry.register(this);
     }
 
+    /**
+     * Gets one page of field definitions.
+     *
+     * @param fieldType "operations" or "preconditions" to get only the fields for that type, or null to get all fields
+     * @param nextCursor the id of the field after which the page starts, or null
+     * @param prevCursor the id of the field before which the page ends, or null
+     * @param includeInactive if true, inactive fields are included
+     * @param limit the maximum number of fields in the page
+     * @return the page as JSON, or status 500 if the page cannot be serialized
+     */
     @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping(
             {
@@ -63,6 +82,12 @@ public class FieldApiController extends BaseApiController {
         }
     }
 
+    /**
+     * Gets one field definition.
+     *
+     * @param uuid the id of the field
+     * @return the field, or status 404 if it is not found
+     */
     @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping("/api/v1/fields/{uuid}")
     public ResponseEntity<Object> getFieldByUUID(
@@ -77,6 +102,13 @@ public class FieldApiController extends BaseApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    /**
+     * Replaces a field definition.
+     *
+     * @param uuid the id of the field
+     * @param updatedPreconditionField the new field definition
+     * @return the updated field
+     */
     @RolesAllowed({Roles.SOLUTION_WRITER})
     @PutMapping("/api/v1/fields/{uuid}")
     public ResponseEntity<Object> updateField(
@@ -88,6 +120,12 @@ public class FieldApiController extends BaseApiController {
         return new ResponseEntity<>(updatedPreconditionField, HttpStatus.OK);
     }
 
+    /**
+     * Creates a field definition with a new id.
+     *
+     * @param operationPreconditionField the field definition to create
+     * @return the created field
+     */
     @RolesAllowed({Roles.SOLUTION_WRITER})
     @PostMapping("/api/v1/fields")
     public ResponseEntity<OperationPreconditionField> createField(
@@ -97,6 +135,12 @@ public class FieldApiController extends BaseApiController {
         return new ResponseEntity<>(operationPreconditionField, HttpStatus.OK);
     }
 
+    /**
+     * Deletes a field definition.
+     *
+     * @param uuid the id of the field
+     * @return status 204
+     */
     @RolesAllowed({Roles.SOLUTION_DELETER})
     @DeleteMapping("/api/v1/fields/{uuid}")
     public ResponseEntity<OperationPreconditionField> deleteFieldByUUID(

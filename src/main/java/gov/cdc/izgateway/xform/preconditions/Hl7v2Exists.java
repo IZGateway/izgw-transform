@@ -6,17 +6,31 @@ import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.xform.context.ServiceContext;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * HL7 v2 implementation of the {@link Exists} precondition.
+ */
 @Slf4j
 public class Hl7v2Exists extends Exists implements Precondition {
 
+    /**
+     * Creates an empty precondition.
+     */
     public Hl7v2Exists() {
         super();
     }
 
+    /**
+     * Creates an HL7 v2 precondition with the settings of another precondition.
+     * @param exists the precondition to copy the settings from
+     */
     public Hl7v2Exists(Exists exists) {
         super(exists);
     }
 
+    /**
+     * Creates a precondition that checks if a message field has a value.
+     * @param fieldName the HL7 v2 Terser path of the field
+     */
     public Hl7v2Exists(String fieldName) {
         super(fieldName);
     }

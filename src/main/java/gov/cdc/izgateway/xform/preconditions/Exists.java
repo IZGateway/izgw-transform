@@ -12,6 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 
+/**
+ * A precondition that is true if a value exists at a data path.
+ */
 @Slf4j
 @Getter
 @Setter
@@ -21,14 +24,27 @@ public class Exists implements Precondition, Advisable, Transformable {
     @NotNull(message = "required and cannot be empty")
     private String dataPath;
 
+    /**
+     * Creates an empty precondition.
+     */
     protected Exists() {
     }
 
+    /**
+     * Creates a precondition with the same id and data path as another one.
+     *
+     * @param exists the precondition to copy
+     */
     protected Exists(Exists exists) {
         this.id = exists.id;
         this.dataPath = exists.getDataPath();
     }
 
+    /**
+     * Creates a precondition for a data path.
+     *
+     * @param dataPath the path of the value to check
+     */
     protected Exists(String dataPath) {
         this.dataPath = dataPath;
     }

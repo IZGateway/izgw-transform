@@ -6,6 +6,9 @@ import gov.cdc.izgateway.security.IzgPrincipal;
 
 import java.util.Date;
 
+/**
+ * The outbound destination (IZ Gateway Hub or IIS) to which the Transformation Service sends a message.
+ */
 @lombok.Data
 public class Destination implements IDestination {
     private String facilityId;
@@ -37,6 +40,13 @@ public class Destination implements IDestination {
     private String destType;
     private String jurisdictionName;
     private String jurisdictionDesc;
+
+    /**
+     * Creates an empty destination. Callers set the fields with the setters.
+     */
+    public Destination() {
+        // Same as the constructor that Lombok @Data generates for a class without final fields.
+    }
 
     @Override
     public IDestination safeCopy() {

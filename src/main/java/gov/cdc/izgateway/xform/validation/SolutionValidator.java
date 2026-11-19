@@ -7,9 +7,16 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Validator for the {@link ValidSolution} annotation that checks that the solution and version of a pipe exist.
+ */
 public class SolutionValidator implements ConstraintValidator<ValidSolution, Pipe> {
     private final SolutionService solutionService;
 
+    /**
+     * Creates the validator.
+     * @param solutionService the service used to find solutions
+     */
     @Autowired
     public SolutionValidator(SolutionService solutionService) {
         this.solutionService = solutionService;

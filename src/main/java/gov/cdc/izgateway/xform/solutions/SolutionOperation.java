@@ -12,6 +12,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Runtime form of a solution operation: a list of operations that run only when all preconditions pass.
+ */
 @Slf4j
 public class SolutionOperation {
     private final List<Precondition> preconditions;
@@ -19,6 +22,12 @@ public class SolutionOperation {
     private final String solutionName;
     private final DataFlowDirection direction;
 
+    /**
+     * Creates a runtime solution operation from its configuration and sorts its operations by order.
+     * @param solutionOperation the solution operation configuration
+     * @param solutionName the name of the solution, used in log messages
+     * @param direction the direction of the messages that this solution operation transforms
+     */
     public SolutionOperation(gov.cdc.izgateway.xform.model.SolutionOperation solutionOperation, String solutionName, DataFlowDirection direction) {
         this.solutionName = solutionName;
         this.direction = direction;
@@ -53,6 +62,11 @@ public class SolutionOperation {
         return passed;
     }
 
+    /**
+     * Runs the operations in order if all preconditions pass.
+     * @param context the context of the message to transform
+     * @throws SolutionOperationException if an operation fails
+     */
     public void execute(ServiceContext context) throws SolutionOperationException {
 
         if (passedPreconditions(context)) {

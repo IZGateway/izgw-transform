@@ -9,15 +9,29 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+/**
+ * Service for the mappings from user groups to roles.
+ */
 @Slf4j
 @Service
 public class GroupRoleMappingService extends GenericService<GroupRoleMapping> implements GroupToRoleMapper {
 
+    /**
+     * Creates the service.
+     *
+     * @param repositoryFactory the factory that supplies the group to role mapping repository
+     */
     @Autowired
     public GroupRoleMappingService(RepositoryFactory repositoryFactory) {
         super(repositoryFactory.groupRoleMappingRepository());
     }
 
+    /**
+     * Gets the roles of the first mapping for a group.
+     *
+     * @param group the group name
+     * @return the roles, or an empty list if no mapping exists for the group
+     */
     public List<String> getRolesByGroup(String group) {
         return repo.getEntitySet().stream()
                 .filter(m -> m.getGroupName().equals(group))

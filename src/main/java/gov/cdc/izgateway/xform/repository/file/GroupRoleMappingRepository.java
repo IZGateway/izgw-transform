@@ -7,9 +7,24 @@ import org.springframework.stereotype.Repository;
 
 import java.util.LinkedHashSet;
 
+/**
+ * File-backed repository for {@link GroupRoleMapping} entities.
+ */
 @Repository
 public class GroupRoleMappingRepository extends GenericFileRepository<GroupRoleMapping> {
 
+    /**
+     * Creates the file-backed repository.
+     */
+    public GroupRoleMappingRepository() {
+        // The file path is set by setFilePath.
+    }
+
+    /**
+     * Sets the path of the group role mapping JSON file.
+     *
+     * @param filePath the path of the JSON file
+     */
     @Value("${xform.configurations.group-role-mapping}")
     protected void setFilePath(String filePath) {
         this.filePath = filePath;

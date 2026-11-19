@@ -16,12 +16,21 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.logging.Level;
 
+/**
+ * REST API that lists the available precondition types.
+ */
 @Log
 @Lazy(false)
 @RestController
 public class PreconditionApiController extends BaseApiController {
     private final PreconditionService preconditionService;
 
+    /**
+     * Creates the controller and registers it with the access control registry.
+     *
+     * @param preconditionService the service that lists the precondition types
+     * @param registry the access control registry
+     */
     @Autowired
     public PreconditionApiController(
             PreconditionService preconditionService,
@@ -31,6 +40,11 @@ public class PreconditionApiController extends BaseApiController {
         registry.register(this);
     }
 
+    /**
+     * Gets the precondition types and the properties that each type uses.
+     *
+     * @return the precondition types, or status 500 if an error occurs
+     */
     @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping("/api/v1/preconditions/available")
     public ResponseEntity<List<PreconditionInfo>> getAvailablePreconditionList() {

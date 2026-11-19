@@ -44,7 +44,8 @@ jobs:
         shell: bash
         run: |
           echo COMPUTERNAME=`hostname` >> $GITHUB_ENV
-          npm install -g newman-reporter-junitfull
+          # ubuntu-26.04 (ubuntu-latest since 2026-11-18) does not include newman, so install it here.
+          npm install -g newman newman-reporter-junitfull
           npm install -g xunit-viewer
           mkdir -p ~/.m2
           cat << EOF > ~/.m2/settings.xml
@@ -143,15 +144,33 @@ jobs:
           ELASTIC_API_KEY: ${{ secrets.ELASTIC_API_KEY }}
           SSL_SHARE: ${{ github.workspace }}/target
 
+        # Two things avoid "[WARNING] Overwriting artifact's file ... to target/classes" (IGDD-2974):
+        # 1. The first command lists only "install". "install" already runs test and package.
+        #    It must be "install", not "package": dockerfile-maven-plugin (pom.xml) builds the
+        #    izgw-transform image in the install phase, and later steps tag and push that image.
+        # 2. The site is built in a separate Maven run on purpose. "site" forks the lifecycle, and
+        #    in the same run as the build it sets the artifact file again. The site run reads the
+        #    test and JaCoCo results of the first run. Do not use "clean" in the site run.
+        # -U makes Maven check for a newer SNAPSHOT of the izgw-bom parent and other SNAPSHOT
+        # dependencies, because the Maven cache can hold an old one.
+        # The default shell of a run step uses "bash -e", so the site run does not start if the
+        # first run fails.
         run: |
-          env && mvn -B clean package install site -Dbuildno=${{github.run_number}} \
+          env && mvn -B -U clean install -Dbuildno=${{github.run_number}} \
               -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
               -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
               -Dimage.tag=$IMAGE_BRANCH_TAG
-                
+          mvn -B site -DskipTests -Dbuildno=${{github.run_number}} \
+              -DdoRevisionCheck=${{env.DO_REVISION_CHECK}} \
+              -DskipDependencyCheck=${{env.SKIP_DEPENDENCY_CHECK}} \
+              -Dimage.tag=$IMAGE_BRANCH_TAG
+
 #
 # Use GitHub Action to speed up and improve dependency checking
 # NOTE: Disable automatic dependency checking in the build, this replaces it
+# This scan does not use an NVD API key (IGDD-2974). The action runs the scanner with --noupdate.
+# The scanner uses the NVD database that is inside the Docker image of the action. The owners of
+# the action build this image every night with a new database.
       - name: Dependency Check
         env:
         # Per https://github.com/marketplace/actions/dependency-check, fix JAVA_HOME location for action
@@ -168,7 +187,6 @@ jobs:
             --disableOssIndex
             --failOnCVSS 7
             --suppression ./dependency-suppression.xml
-            --nvdApiKey ${{ secrets.NVDAPIKEY }}
             --disableNuspec
             --disableNugetconf
             --disableAssembly

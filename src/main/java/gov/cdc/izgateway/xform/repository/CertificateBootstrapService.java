@@ -11,7 +11,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.*;
@@ -62,6 +62,12 @@ public class CertificateBootstrapService implements ApplicationListener<Applicat
     private String clientKeyStorePassword;
 
     private volatile boolean initialized = false;
+
+    /**
+     * Creates the service. Spring creates it from the META-INF/spring.factories file.
+     */
+    public CertificateBootstrapService() {
+    }
 
     /**
      * Handles the ApplicationEnvironmentPreparedEvent to trigger certificate and keystore/truststore initialization.
