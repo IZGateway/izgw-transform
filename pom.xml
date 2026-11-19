@@ -347,8 +347,10 @@
 				<configuration>
 					<!-- @{argLine} keeps the JaCoCo agent. The Mockito agent is attached at JVM start,
 						 which avoids the JDK 21 dynamic agent warning (IGDD-2974). The surefire.argLine
-						 property above is not used here on purpose: it was never applied to the tests. -->
-					<argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar}</argLine>
+						 property above is not used here on purpose: it was never applied to the tests.
+						 -Xshare:off stops the JVM class data sharing warning. The agents add jars to the
+						 bootstrap classpath, so class data sharing works only in part. Tests only. -->
+					<argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar} -Xshare:off</argLine>
 					<environmentVariables>
 						<SSL_SHARE>${project.build.directory}</SSL_SHARE>
 						<COMMON_PASS>${xform.testing.common.pass}</COMMON_PASS>
