@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           echo COMPUTERNAME=`hostname` >> $GITHUB_ENV
-          npm install -g newman-reporter-junitfull
+          npm install -g newman newman-reporter-junitfull
           npm install -g xunit-viewer
           mkdir -p ~/.m2
           cat << EOF > ~/.m2/settings.xml
