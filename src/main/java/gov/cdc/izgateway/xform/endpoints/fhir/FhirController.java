@@ -207,6 +207,13 @@ public class FhirController {
         private String receivingFacility;
         /** The facility id value to use in the IZG Hub Message */
         private String facilityId;
+
+        /**
+         * Creates an empty configuration. Spring sets the fields from the v2tofhir properties.
+         */
+        public FhirConfiguration() {
+            // Same as the constructor that Lombok @Data generates for a class without final fields.
+        }
     }
     
     private final FhirConfiguration config;
@@ -706,7 +713,7 @@ public class FhirController {
         OperationOutcomeIssueComponent tooMany = findTooManyMatchesIssue(b);
         if (tooMany != null) {
             return new ResponseEntity<>(noCertainMatchOutcome(tooMany),
-                ContentUtils.getHeaders(req), HttpStatus.UNPROCESSABLE_ENTITY);
+                ContentUtils.getHeaders(req), HttpStatus.UNPROCESSABLE_CONTENT);
         }
 
         IDIMatch.score(b, match);

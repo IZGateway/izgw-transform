@@ -8,6 +8,9 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
 import java.util.UUID;
 
+/**
+ * Maps a code in a code system to a target code in a target code system for an organization.
+ */
 @Getter
 @Setter
 @DynamoDbBean
@@ -27,4 +30,11 @@ public class Mapping extends BaseModel implements OrganizationAware {
     private String targetCode;
     @Size(max = 2000, message = "Notes must not exceed 2000 characters")
     private String notes;
+
+    /**
+     * Creates an empty mapping.
+     */
+    public Mapping() {
+        // Jackson and the DynamoDB Enhanced Client set the fields.
+    }
 }

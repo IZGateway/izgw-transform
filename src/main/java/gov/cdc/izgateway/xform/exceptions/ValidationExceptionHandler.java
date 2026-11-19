@@ -27,6 +27,20 @@ import java.util.stream.Collectors;
  */
 @ControllerAdvice
 public class ValidationExceptionHandler {
+    /**
+     * Creates the handler.
+     */
+    public ValidationExceptionHandler() {
+        // No initialization needed.
+    }
+
+    /**
+     * Converts a validation failure into a bad request response that lists each field error.
+     *
+     * @param ex the validation exception
+     * @param request the HTTP request that failed validation
+     * @return a bad request response with the timestamp, status, error, path and field error message
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(
             MethodArgumentNotValidException ex,

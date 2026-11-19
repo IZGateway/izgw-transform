@@ -6,15 +6,25 @@ import gov.cdc.izgateway.xform.enums.DataType;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Precondition that passes when the data path has no value.
+ */
 @Getter
 @Setter
 public class NotExists extends Exists implements Precondition {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotExists.class);
 
+    /**
+     * Creates an empty precondition.
+     */
     protected NotExists() {
     }
 
+    /**
+     * Creates a precondition with the settings of another precondition.
+     * @param notExists the precondition to copy the settings from
+     */
     protected NotExists(NotExists notExists) {
         super(notExists);
     }

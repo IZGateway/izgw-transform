@@ -14,10 +14,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 
+/**
+ * HL7 v2 implementation of the {@link Mapper} operation.
+ */
 @Slf4j
 public class Hl7v2Mapper extends Mapper implements Operation {
 
     private final MappingService mappingService;
+    /**
+     * Creates an HL7 v2 mapper operation with the settings of another operation.
+     * @param mapper the operation to copy the settings from
+     */
     public Hl7v2Mapper(Mapper mapper) {
         super(mapper);
         this.mappingService = SpringContext.getBean(MappingService.class);

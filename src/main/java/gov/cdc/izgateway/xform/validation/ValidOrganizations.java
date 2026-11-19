@@ -15,7 +15,19 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = OrganizationsValidator.class)
 @Documented
 public @interface ValidOrganizations {
+    /**
+     * Message to display when validation fails.
+     * @return validation error message
+     */
     String message() default "Organization does not exist";
+    /**
+     * Validation groups that this constraint belongs to.
+     * @return the validation groups
+     */
     Class<?>[] groups() default {};
+    /**
+     * Payload that clients can attach to this constraint.
+     * @return the payload types
+     */
     Class<? extends Payload>[] payload() default {};
 }

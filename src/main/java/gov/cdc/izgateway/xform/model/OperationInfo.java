@@ -14,4 +14,11 @@ import java.util.Map;
 public class OperationInfo {
     private String method;
     private Map<String, OperationInfoProperty> properties;
+
+    /**
+     * Creates an empty operation information.
+     */
+    public OperationInfo() {
+        // The service sets the fields.
+    }
 }

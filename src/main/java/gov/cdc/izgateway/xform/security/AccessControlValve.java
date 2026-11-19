@@ -24,6 +24,11 @@ import java.io.IOException;
 public class AccessControlValve extends ValveBase {
     private final AccessControlService accessControlService;
 
+    /**
+     * Creates the valve.
+     *
+     * @param accessControlService the service that checks access to request paths
+     */
     @Autowired
     public AccessControlValve(AccessControlService accessControlService) {
         this.accessControlService = accessControlService;
@@ -36,6 +41,14 @@ public class AccessControlValve extends ValveBase {
         }
     }
 
+    /**
+     * Checks access to the request path. If access is not allowed, sets the response status to
+     * 404 (path does not exist) or 401 (access denied).
+     *
+     * @param req the request
+     * @param resp the response
+     * @return true if access is allowed
+     */
     public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
         String path = req.getRequestURI();
         Boolean accessAllowed = accessControlService.checkAccess(req.getMethod(), path);

@@ -5,14 +5,29 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.xform.context.ServiceContext;
 
+/**
+ * HL7 v2 implementation of the {@link Equals} precondition.
+ */
 public class Hl7v2Equals extends Equals implements Precondition {
 
+    /**
+     * Creates an empty precondition.
+     */
     public Hl7v2Equals() {}
 
+    /**
+     * Creates a precondition that compares a message field to a value.
+     * @param dataPath the HL7 v2 Terser path of the field
+     * @param comparisonValue the value to compare the field to
+     */
     public Hl7v2Equals(String dataPath, String comparisonValue) {
         super(dataPath, comparisonValue);
     }
 
+    /**
+     * Creates an HL7 v2 precondition with the settings of another precondition.
+     * @param equals the precondition to copy the settings from
+     */
     public Hl7v2Equals(Equals equals) {
         super(equals);
     }

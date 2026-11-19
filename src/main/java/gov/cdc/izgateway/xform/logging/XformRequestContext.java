@@ -1,5 +1,8 @@
 package gov.cdc.izgateway.xform.logging;
 
+/**
+ * Thread-local request state of the Xform Service.
+ */
 public class XformRequestContext {
     private XformRequestContext() {}
     private static ThreadLocal<Boolean> disableApiLogging = ThreadLocal.withInitial(() -> Boolean.FALSE);
@@ -15,10 +18,16 @@ public class XformRequestContext {
         return disableApiLogging.get();
     }
 
+    /**
+     * Disables API event logging for the current thread.
+     */
     public static void disableApiLogging() {
         disableApiLogging.set(Boolean.TRUE);
     }
 
+    /**
+     * Removes the request state of the current thread.
+     */
     public static void clear() {
         disableApiLogging.remove();
     }

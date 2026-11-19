@@ -27,4 +27,10 @@ public class EndpointUris {
 
     /** The URI for the IIS service endpoint */
     public static final String IIS_IISService = "iis:IISService";
+
+    /**
+     * Creates an instance. This class contains only constants.
+     */
+    public EndpointUris() {
+    }
 }

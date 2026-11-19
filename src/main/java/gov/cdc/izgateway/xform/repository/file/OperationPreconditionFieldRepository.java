@@ -7,9 +7,24 @@ import org.springframework.stereotype.Repository;
 
 import java.util.LinkedHashSet;
 
+/**
+ * File-backed repository for {@link OperationPreconditionField} entities.
+ */
 @Repository
 public class OperationPreconditionFieldRepository extends GenericFileRepository<OperationPreconditionField> {
 
+    /**
+     * Creates the file-backed repository.
+     */
+    public OperationPreconditionFieldRepository() {
+        // The file path is set by setFilePath.
+    }
+
+    /**
+     * Sets the path of the operation precondition field JSON file.
+     *
+     * @param filePath the path of the JSON file
+     */
     @Value("${xform.configurations.operation-precondition-fields}")
     protected void setFilePath(String filePath) {
         this.filePath = filePath;

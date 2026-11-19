@@ -23,6 +23,14 @@ public @interface ValidUser {
      */
     String message() default "User does not exist";
     
+    /**
+     * Validation groups that this constraint belongs to.
+     * @return the validation groups
+     */
     Class<?>[] groups() default {};
+    /**
+     * Payload that clients can attach to this constraint.
+     * @return the payload types
+     */
     Class<? extends Payload>[] payload() default {};
 }

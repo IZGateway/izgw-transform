@@ -19,12 +19,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
+/**
+ * REST API for the solutions.
+ */
 @Log
 @Lazy(false)
 @RestController
 public class SolutionApiController extends BaseApiController {
     private final SolutionService solutionService;
     private final PipelineService pipelineService;
+    /**
+     * Creates the controller and registers it with the access control registry.
+     *
+     * @param solutionService the service for the solutions
+     * @param pipelineService the service for the pipelines, used to find solutions that are in use
+     * @param registry the access control registry
+     */
     @Autowired
     public SolutionApiController(
             SolutionService solutionService,
@@ -36,6 +46,12 @@ public class SolutionApiController extends BaseApiController {
         registry.register(this);
     }
 
+    /**
+     * Gets one solution.
+     *
+     * @param uuid the id of the solution
+     * @return the solution, or status 404 if it is not found
+     */
     @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping("/api/v1/solutions/{uuid}")
     public ResponseEntity<Solution> getSolutionByUUID(@PathVariable UUID uuid) {
@@ -46,6 +62,13 @@ public class SolutionApiController extends BaseApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    /**
+     * Replaces a solution.
+     *
+     * @param uuid the id of the solution
+     * @param updatedSolution the new solution
+     * @return the updated solution
+     */
     @RolesAllowed({Roles.SOLUTION_WRITER})
     @PutMapping("/api/v1/solutions/{uuid}")
     public ResponseEntity<Solution> updateSolution(@PathVariable UUID uuid, @Valid @RequestBody Solution updatedSolution) {
@@ -54,6 +77,15 @@ public class SolutionApiController extends BaseApiController {
         return new ResponseEntity<>(updatedSolution, HttpStatus.OK);
     }
 
+    /**
+     * Gets one page of solutions.
+     *
+     * @param nextCursor the id of the solution after which the page starts, or null
+     * @param prevCursor the id of the solution before which the page ends, or null
+     * @param includeInactive if true, inactive solutions are included
+     * @param limit the maximum number of solutions in the page
+     * @return the page as JSON, or status 500 if the page cannot be serialized
+     */
     @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping("/api/v1/solutions")
     public ResponseEntity<String> getSolutionsList(
@@ -70,6 +102,12 @@ public class SolutionApiController extends BaseApiController {
         }
     }
 
+    /**
+     * Creates a solution with a new id.
+     *
+     * @param solution the solution to create
+     * @return the created solution
+     */
     @RolesAllowed({Roles.SOLUTION_WRITER})
     @PostMapping("/api/v1/solutions")
     public ResponseEntity<Solution> createSolution(
@@ -79,6 +117,12 @@ public class SolutionApiController extends BaseApiController {
         return new ResponseEntity<>(solution, HttpStatus.OK);
     }
 
+    /**
+     * Deletes a solution if no pipeline uses it.
+     *
+     * @param uuid the id of the solution
+     * @return status 204, or status 409 if a pipeline uses the solution
+     */
     @RolesAllowed({Roles.SOLUTION_DELETER})
     @DeleteMapping("/api/v1/solutions/{uuid}")
     public ResponseEntity<Solution> deleteSolution(

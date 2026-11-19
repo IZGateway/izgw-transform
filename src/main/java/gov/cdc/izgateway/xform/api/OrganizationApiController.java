@@ -18,12 +18,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
+/**
+ * REST API for the organizations.
+ */
 @Log
 @Lazy(false)
 @RestController
 public class OrganizationApiController extends BaseApiController {
     private final OrganizationService organizationService;
 
+    /**
+     * Creates the controller and registers it with the access control registry.
+     *
+     * @param organizationService the service for the organizations
+     * @param registry the access control registry
+     */
     @Autowired
     public OrganizationApiController(
             OrganizationService organizationService,
@@ -33,6 +42,12 @@ public class OrganizationApiController extends BaseApiController {
         registry.register(this);
     }
 
+    /**
+     * Gets one organization.
+     *
+     * @param uuid the id of the organization
+     * @return the organization, or status 404 if it is not found
+     */
     @RolesAllowed({Roles.ORGANIZATION_READER})
     @GetMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> getOrganizationByUUID(@PathVariable UUID uuid) {
@@ -43,6 +58,13 @@ public class OrganizationApiController extends BaseApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    /**
+     * Replaces an organization.
+     *
+     * @param uuid the id of the organization
+     * @param updatedOrganization the new organization
+     * @return the updated organization
+     */
     @RolesAllowed({Roles.ADMIN})
     @PutMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> updateOrganization(@PathVariable UUID uuid, @RequestBody Organization updatedOrganization) {
@@ -51,6 +73,15 @@ public class OrganizationApiController extends BaseApiController {
         return new ResponseEntity<>(updatedOrganization, HttpStatus.OK);
     }
 
+    /**
+     * Gets one page of organizations.
+     *
+     * @param nextCursor the id of the organization after which the page starts, or null
+     * @param prevCursor the id of the organization before which the page ends, or null
+     * @param includeInactive if true, inactive organizations are included
+     * @param limit the maximum number of organizations in the page
+     * @return the page as JSON, or status 500 if the page cannot be serialized
+     */
     @RolesAllowed({Roles.ORGANIZATION_READER})
     @GetMapping("/api/v1/organizations")
     public ResponseEntity<String> getOrganizationsList(
@@ -67,6 +98,12 @@ public class OrganizationApiController extends BaseApiController {
         }
     }
 
+    /**
+     * Creates an organization with a new id.
+     *
+     * @param organization the organization to create
+     * @return the created organization
+     */
     @RolesAllowed({Roles.ADMIN})
     @PostMapping("/api/v1/organizations")
     public ResponseEntity<Organization> createOrganization(
@@ -76,6 +113,12 @@ public class OrganizationApiController extends BaseApiController {
         return new ResponseEntity<>(organization, HttpStatus.OK);
     }
 
+    /**
+     * Deletes an organization.
+     *
+     * @param uuid the id of the organization
+     * @return status 204
+     */
     @RolesAllowed({Roles.ADMIN})
     @DeleteMapping("/api/v1/organizations/{uuid}")
     public ResponseEntity<Organization> deleteOrganization(

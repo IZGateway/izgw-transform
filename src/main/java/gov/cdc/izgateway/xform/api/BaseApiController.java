@@ -15,8 +15,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Base class for the configuration API controllers. It provides paged list responses.
+ */
 public abstract class BaseApiController {
 
+    /**
+     * Creates the controller.
+     */
+    public BaseApiController() {
+    }
+
+    /**
+     * Filters a list of entities and returns one page of it as a JSON response with "data" and "has_more" keys.
+     *
+     * @param <T> the entity type
+     * @param allEntityList all entities
+     * @param nextCursor the id of the entity after which the page starts, or null
+     * @param prevCursor the id of the entity before which the page ends, or null
+     * @param includeInactive if false, inactive entities are removed from the list
+     * @param limit the maximum number of entities in the page
+     * @return the JSON response
+     * @throws JsonProcessingException if the response cannot be serialized
+     */
     protected <T extends BaseModel> ResponseEntity<String> processList(List<T> allEntityList, String nextCursor, String prevCursor, Boolean includeInactive, int limit) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> returnMap = new HashMap<>();

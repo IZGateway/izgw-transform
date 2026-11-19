@@ -28,8 +28,16 @@ public class MigrationConfiguration {
     private String groupRoleMapping;
 
     /**
+     * Creates the configuration.
+     */
+    public MigrationConfiguration() {
+        // Spring binds the properties.
+    }
+
+    /**
      * Gets a map of entity classes to their configuration file paths.
      * Add new entity types here as they get DynamoDB support.
+     * @return a map of entity classes to their configuration file paths
      */
     public Map<Class<? extends BaseModel>, String> getEntityConfigurations() {
         return Map.of(

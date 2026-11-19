@@ -4,8 +4,17 @@ import gov.cdc.izgateway.xform.model.Organization;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
+/**
+ * DynamoDB repository for {@link Organization} entities.
+ */
 public class OrganizationRepository extends GenericDynamoDBRepository<Organization> {
 
+    /**
+     * Creates the repository.
+     *
+     * @param dynamoDbClient the DynamoDB enhanced client
+     * @param tableName the name of the DynamoDB table
+     */
     public OrganizationRepository(
             DynamoDbEnhancedClient dynamoDbClient,
             String tableName) {

@@ -21,6 +21,7 @@ import java.util.UUID;
 @Setter
 @DynamoDbBean
 public class Event extends BaseModel {
+	/** The name of the event that records a data migration. */
 	public static final String MIGRATION = "Migration";
 
     private String name;
@@ -30,6 +31,9 @@ public class Event extends BaseModel {
     private UUID id = UUID.randomUUID();
     private Boolean active =  true;
     
+    /**
+     * Creates an event that starts now and is reported by this host.
+     */
     public Event() {
     }
 }

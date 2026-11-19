@@ -12,6 +12,9 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * A user of the Xform Service and the organizations that the user can access.
+ */
 @Getter
 @Setter
 @DynamoDbBean
@@ -28,9 +31,17 @@ public class User extends BaseModel {
     @NotNull(message = "User - Active status is required")
     private Boolean active;
 
+    /**
+     * Creates an empty user.
+     */
     public User() {
     }
 
+    /**
+     * Creates a user with the user name.
+     *
+     * @param userName the user name
+     */
     public User(String userName) {
         this.userName = userName;
     }

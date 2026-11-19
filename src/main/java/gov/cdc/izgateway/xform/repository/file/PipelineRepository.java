@@ -7,9 +7,24 @@ import org.springframework.stereotype.Repository;
 
 import java.util.LinkedHashSet;
 
+/**
+ * File-backed repository for {@link Pipeline} entities.
+ */
 @Repository
 public class PipelineRepository extends GenericFileRepository<Pipeline> {
 
+    /**
+     * Creates the file-backed repository.
+     */
+    public PipelineRepository() {
+        // The file path is set by setFilePath.
+    }
+
+    /**
+     * Sets the path of the pipeline JSON file.
+     *
+     * @param filePath the path of the JSON file
+     */
     @Value("${xform.configurations.pipelines}")
     protected void setFilePath(String filePath) {
         this.filePath = filePath;

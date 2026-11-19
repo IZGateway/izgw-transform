@@ -20,11 +20,19 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * Tomcat valve that creates the {@link XformTransactionData} for each request and logs it.
+ */
 @Slf4j
 @Component("xformValveLogging")
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class XformLoggingValve extends LoggingValveBase {
 
+    /**
+     * Creates the valve.
+     *
+     * @param principalService the service that gets the principal of the request
+     */
     @Autowired
     public XformLoggingValve(PrincipalService principalService) {
         this.principalService = principalService;
@@ -56,6 +64,12 @@ public class XformLoggingValve extends LoggingValveBase {
                 requestURI.startsWith("/IISService");
     }
 
+    /**
+     * Returns true if API event logging is enabled for the request URI.
+     *
+     * @param requestURI the request URI
+     * @return true if the URI starts with /api
+     */
     protected boolean isLogEnabledForApi(String requestURI) {
         return requestURI.startsWith("/api");
     }

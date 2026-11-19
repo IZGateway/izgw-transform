@@ -2,9 +2,18 @@ package gov.cdc.izgateway.xform.model;
 
 import gov.cdc.izgateway.model.IDestinationId;
 
+/**
+ * The identifier of a destination: a destination id and a destination type.
+ */
 public class DestinationId implements IDestinationId {
     private String destId;
     private int destType;
+
+    /**
+     * Creates an empty destination identifier.
+     */
+    public DestinationId() {
+    }
 
     @Override
     public String getDestId() {

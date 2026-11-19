@@ -15,6 +15,11 @@ public class DataMigrationService {
 
     private final List<EntityMigrator<?>> migrators;
 
+    /**
+     * Creates the service.
+     *
+     * @param migrators the migrators for each entity type
+     */
     @Autowired
     public DataMigrationService(List<EntityMigrator<?>> migrators) {
         this.migrators = migrators;

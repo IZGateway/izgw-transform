@@ -10,6 +10,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.text.similarity.LevenshteinDetailedDistance;
 import org.apache.commons.text.similarity.LevenshteinResults;
 import org.hl7.fhir.r4.model.Address;
@@ -28,7 +29,7 @@ import org.hl7.fhir.r4.model.StringType;
 import com.google.common.base.Objects;
 
 import gov.cdc.izgw.v2tofhir.datatype.AddressParser;
-import gov.cdc.izgw.v2tofhir.utils.ISO3166;
+import gov.cdc.izgw.v2tofhir.terminology.ISO3166;
 import lombok.Data;
 
 /**
@@ -52,6 +53,13 @@ public class IDIMatch {
 	    private int count = 5;
 	    private boolean onlySingleMatch = false;
 	    private boolean onlyCertainMatches = false;
+
+	    /**
+	     * Creates parameters with the default values.
+	     */
+	    public PatientMatchParameters() {
+	        // Fields use their default values.
+	    }
 	}
 
     /** The best name match score     */
@@ -132,11 +140,11 @@ public class IDIMatch {
         if (id2 == null) {
             return 1;
         }
-        int comp = StringUtils.compareIgnoreCase(id1.getSystem(), id2.getSystem());
+        int comp = Strings.CI.compare(id1.getSystem(), id2.getSystem());
         if (comp != 0) {
             return comp;
         }
-        return StringUtils.compareIgnoreCase(id1.getValue(), id2.getValue());
+        return Strings.CI.compare(id1.getValue(), id2.getValue());
     }
     
     /**
@@ -155,7 +163,7 @@ public class IDIMatch {
         if (id2 == null) {
             return 1;
         }
-        return StringUtils.compareIgnoreCase(StringUtils.right(id1.getValue(), 4), StringUtils.right(id2.getValue(), 4));
+        return Strings.CI.compare(StringUtils.right(id1.getValue(), 4), StringUtils.right(id2.getValue(), 4));
     }
     
     
@@ -239,7 +247,7 @@ public class IDIMatch {
      * @return true if the two strings match.
      */
     public static boolean stringsMatch(String search, String found) {
-        if (StringUtils.equalsIgnoreCase(search, found)) {
+        if (Strings.CI.equals(search, found)) {
             return true;
         }
         search = StringUtils.upperCase(search);
@@ -272,14 +280,14 @@ public class IDIMatch {
             for (int i = 0; i < f.length() - 1; i++) {
                 // Swap i and i + 1
                 swap(s, i, i + 1);
-                if (StringUtils.equals(s,  f)) {
+                if (Strings.CS.equals(s,  f)) {
                     return true;
                 }
                 // Swap them back
                 swap(s, i, i + 1);
                 if (i + 2 < f.length()) {
                     swap(s, i, i + 2); // Swap around a single character.
-                    if (StringUtils.equals(s,  f)) {
+                    if (Strings.CS.equals(s,  f)) {
                         return true;
                     }
                     swap(s, i, i + 2); // Swap them back.
@@ -435,12 +443,12 @@ public class IDIMatch {
      */
     public static boolean zipsMatch(String search, String found) {
         // Normalize by removing hyphens (e.g., US) and spaces (e.g., Canada).
-        search = StringUtils.replace(search, "- ", "");
-        found = StringUtils.replace(found, "- ", "");
+        search = StringUtils.replaceChars(search, "- ", "");
+        found = StringUtils.replaceChars(found, "- ", "");
         if (StringUtils.isNumeric(search) && StringUtils.isNumeric(found)) {
-            return StringUtils.equals(StringUtils.left(search, 5), StringUtils.left(found, 5));
+            return Strings.CS.equals(StringUtils.left(search, 5), StringUtils.left(found, 5));
         }
-        return StringUtils.equalsIgnoreCase(search, found);
+        return Strings.CI.equals(search, found);
     }
 
     /**
@@ -482,10 +490,10 @@ public class IDIMatch {
                 
                 // remove any punctuation before testing phone numbers
                 if (ContactPointSystem.PHONE.equals(system)) {
-                    sValue = StringUtils.replace(sValue, ".-()[] ", "");
-                    fValue = StringUtils.replace(fValue, ".-()[] ", "");
+                    sValue = StringUtils.replaceChars(sValue, ".-()[] ", "");
+                    fValue = StringUtils.replaceChars(fValue, ".-()[] ", "");
                 }
-                if (StringUtils.equalsIgnoreCase(sValue, fValue)) {
+                if (Strings.CI.equals(sValue, fValue)) {
                     return true;
                 }
             }
@@ -504,23 +512,14 @@ public class IDIMatch {
             for (Address f: found) {
                 String sPostal = StringUtils.defaultString(s.getPostalCode());
                 String fPostal = StringUtils.defaultString(f.getPostalCode());
-                if (zipMatches(sPostal, fPostal)) {
+                // zipsMatch removes hyphens and spaces first, so ZIP+4 matches a five-digit ZIP.
+                if (zipsMatch(sPostal, fPostal)) {
                 	return true;
                 }
             }
         }
         return false;
     }
-
-	private static boolean zipMatches(String sPostal, String fPostal) {
-		if (StringUtils.isNumeric(sPostal) && StringUtils.isNumeric(fPostal) 
-			&& (StringUtils.equals(fPostal, sPostal) 
-	    	   || StringUtils.equals(StringUtils.left(fPostal, 5), StringUtils.left(sPostal, 5)))
-	    ) {
-	        return true;
-	    }
-		return StringUtils.equalsIgnoreCase(sPostal, fPostal);
-	}
 
     /**
      * Score the results in the bundle.

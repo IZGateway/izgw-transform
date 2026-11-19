@@ -8,16 +8,29 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Checks that an organization exists and is active, and adds a constraint violation if not.
+ */
 @Service
 public class OrganizationValidationService {
 
     private final OrganizationService organizationService;
 
+    /**
+     * Creates the service.
+     * @param organizationService the service used to find organizations
+     */
     @Autowired
     public OrganizationValidationService(OrganizationService organizationService) {
         this.organizationService = organizationService;
     }
 
+    /**
+     * Checks that an organization exists and is active.
+     * @param organizationId the identifier of the organization
+     * @param context the validator context, used to add a constraint violation message
+     * @return true if the organization exists and is active, false otherwise
+     */
     public boolean validateOrganization(UUID organizationId, ConstraintValidatorContext context) {
         if (organizationId == null) {
             return false;

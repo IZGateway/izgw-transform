@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 
+/**
+ * Repository factory that creates JSON file-backed repositories when the database is {@code file} or {@code jpa}.
+ */
 @Component
 //Allow operation of hub and xform service in same configuration
 @ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('jpa') || '${spring.database:file}'.equalsIgnoreCase('file')")
@@ -32,6 +35,18 @@ public class FileRepositoryFactory implements RepositoryFactory {
     private SolutionRepository sr;
     private UserRepository ur;
 
+    /**
+     * Creates the factory with the paths of the JSON files.
+     *
+     * @param accessControlFilePath the path of the access control file
+     * @param groupRoleMappingFilePath the path of the group role mapping file
+     * @param mappingFilePath the path of the mapping file
+     * @param operationPreconditionFieldFilePath the path of the operation precondition field file
+     * @param organizationFilePath the path of the organization file
+     * @param pipelineFilePath the path of the pipeline file
+     * @param solutionFilePath the path of the solution file
+     * @param userFilePath the path of the user file
+     */
     public FileRepositoryFactory(
             @Value("${xform.configurations.access-control}") String accessControlFilePath,
             @Value("${xform.configurations.group-role-mapping}") String groupRoleMappingFilePath,

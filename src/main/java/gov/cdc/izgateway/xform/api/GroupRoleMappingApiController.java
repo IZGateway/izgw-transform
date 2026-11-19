@@ -18,12 +18,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
+/**
+ * REST API for the mappings from user groups to roles.
+ */
 @Log
 @Lazy(false)
 @RestController
 public class GroupRoleMappingApiController extends BaseApiController {
     private final GroupRoleMappingService groupRoleMappingService;
 
+    /**
+     * Creates the controller and registers it with the access control registry.
+     *
+     * @param groupRoleMappingService the service for the group to role mappings
+     * @param registry the access control registry
+     */
     @Autowired
     public GroupRoleMappingApiController(
             GroupRoleMappingService groupRoleMappingService,
@@ -33,6 +42,15 @@ public class GroupRoleMappingApiController extends BaseApiController {
         registry.register(this);
     }
 
+    /**
+     * Gets one page of group to role mappings.
+     *
+     * @param nextCursor the id of the mapping after which the page starts, or null
+     * @param prevCursor the id of the mapping before which the page ends, or null
+     * @param includeInactive if true, inactive mappings are included
+     * @param limit the maximum number of mappings in the page
+     * @return the page as JSON, or status 500 if the page cannot be serialized
+     */
     @RolesAllowed({Roles.ADMIN})
     @GetMapping("/api/v1/group-role-mappings")
     public ResponseEntity<String> getGroupRoleMappingList(
@@ -49,6 +67,12 @@ public class GroupRoleMappingApiController extends BaseApiController {
         }
     }
 
+    /**
+     * Gets one group to role mapping.
+     *
+     * @param uuid the id of the mapping
+     * @return the mapping, or status 404 if it is not found
+     */
     @RolesAllowed({Roles.ADMIN})
     @GetMapping("/api/v1/group-role-mappings/{uuid}")
     public ResponseEntity<GroupRoleMapping> getGroupRoleMappingByUUID(@PathVariable UUID uuid) {
@@ -59,6 +83,13 @@ public class GroupRoleMappingApiController extends BaseApiController {
         return new ResponseEntity<>(entity, HttpStatus.OK);
     }
 
+    /**
+     * Replaces a group to role mapping.
+     *
+     * @param uuid the id of the mapping
+     * @param updatedGroupRoleMapping the new mapping
+     * @return the updated mapping
+     */
     @RolesAllowed({Roles.ADMIN})
     @PutMapping("/api/v1/group-role-mappings/{uuid}")
     public ResponseEntity<GroupRoleMapping> updateGroupRoleMapping(
@@ -70,6 +101,12 @@ public class GroupRoleMappingApiController extends BaseApiController {
         return new ResponseEntity<>(updatedGroupRoleMapping, HttpStatus.OK);
     }
 
+    /**
+     * Creates a group to role mapping with a new id.
+     *
+     * @param groupRoleMapping the mapping to create
+     * @return the created mapping
+     */
     @RolesAllowed({Roles.ADMIN})
     @PostMapping("/api/v1/group-role-mappings")
     public ResponseEntity<GroupRoleMapping> createGroupRoleMapping(
@@ -79,6 +116,12 @@ public class GroupRoleMappingApiController extends BaseApiController {
         return new ResponseEntity<>(groupRoleMapping, HttpStatus.OK);
     }
 
+    /**
+     * Deletes a group to role mapping.
+     *
+     * @param uuid the id of the mapping
+     * @return status 204
+     */
     @RolesAllowed({Roles.ADMIN})
     @DeleteMapping("/api/v1/group-role-mappings/{uuid}")
     public ResponseEntity<GroupRoleMapping> deleteGroupRoleMapping(

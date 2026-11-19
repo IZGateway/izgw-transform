@@ -10,6 +10,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Transaction data of the Xform Service, with the advice collected for the pipeline that ran.
+ */
 @Slf4j
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -24,14 +27,27 @@ public class XformTransactionData extends TransactionData {
     @JsonIgnore
     private SolutionAdvice currentSolutionAdvice = null;
 
+    /**
+     * Creates transaction data with a new event identifier.
+     */
     public XformTransactionData() {
         super();
     }
 
+    /**
+     * Creates transaction data for the event.
+     *
+     * @param eventId the event identifier
+     */
     public XformTransactionData(String eventId) {
         super(eventId);
     }
 
+    /**
+     * Adds advice to the collected advice for its type. Null advice is ignored.
+     *
+     * @param advice the advice to add
+     */
     public void addAdvice(XformAdviceDTO advice) {
         if ( advice == null )
             return;
@@ -46,6 +62,11 @@ public class XformTransactionData extends TransactionData {
             addAdvice(preAdvice);
     }
 
+    /**
+     * Creates the pipeline advice if necessary and updates it from the given advice.
+     *
+     * @param advice the pipeline advice
+     */
     public void addAdvice(PipelineAdviceDTO advice) {
 
         if ( pipelineAdvice == null ) {
@@ -64,6 +85,11 @@ public class XformTransactionData extends TransactionData {
             pipelineAdvice.setTransformedResponse(advice.getTransformedResponse());
     }
 
+    /**
+     * Makes the solution the current solution and records its errors and transformed messages.
+     *
+     * @param advice the solution advice
+     */
     public void addAdvice(SolutionAdviceDTO advice) {
 
         currentSolutionAdvice = pipelineAdvice.getSolutionAdvice(advice);
@@ -83,6 +109,11 @@ public class XformTransactionData extends TransactionData {
         }
     }
 
+    /**
+     * Adds operation advice to the current solution if the operation transformed the request or the response.
+     *
+     * @param advice the operation advice
+     */
     public void addAdvice(OperationAdviceDTO advice) {
         if (advice.getTransformedRequest() != null)
             currentSolutionAdvice.addRequestOperationAdvice(advice);
@@ -91,6 +122,11 @@ public class XformTransactionData extends TransactionData {
 
     }
 
+    /**
+     * Adds precondition advice to the pipeline if no solution has run, otherwise to the current solution.
+     *
+     * @param advice the precondition advice
+     */
     public void addAdvice(PreconditionAdviceDTO advice) {
         if (currentSolutionAdvice == null) {
             // There isn't a solution seen yet... so we are at the pipeline level

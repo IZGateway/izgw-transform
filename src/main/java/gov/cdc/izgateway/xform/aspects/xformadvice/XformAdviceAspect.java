@@ -13,9 +13,27 @@ import org.aspectj.lang.annotation.Aspect;
 
 import java.util.UUID;
 
+/**
+ * AspectJ aspect that records pipeline, solution, operation and precondition advice
+ * before and after each method annotated with {@code @CaptureXformAdvice}.
+ */
 @Aspect
 public class XformAdviceAspect {
 
+    /**
+     * Creates the aspect. AspectJ creates the instance.
+     */
+    public XformAdviceAspect() {
+        // No initialization is necessary.
+    }
+
+    /**
+     * Records advice before and after the advised method and marks the advice as errored if the method throws.
+     *
+     * @param joinPoint the advised method call
+     * @return the value returned by the advised method
+     * @throws Throwable the exception thrown by the advised method
+     */
     @Around("execution(* *(..)) && @annotation(gov.cdc.izgateway.xform.annotations.CaptureXformAdvice)")
     public Object processXformAdviceAspect(ProceedingJoinPoint joinPoint) throws Throwable {
         boolean hasErrored = false;

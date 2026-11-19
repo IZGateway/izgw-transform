@@ -22,8 +22,18 @@ import java.util.UUID;
 public abstract class GenericFileRepository<T extends BaseModel> implements XformRepository<T> {
 
 
+    /** The entities read from the file, or null if the file has not been read. */
     protected LinkedHashSet<T> entities;
+    /** The path of the JSON file. */
     protected String filePath;
+
+    /**
+     * Creates the repository.
+     */
+    public GenericFileRepository() {
+        // The file path is set by the subclass.
+    }
+
     /**
      * Provide the type reference used to deserialize the stored entities.
      *

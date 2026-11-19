@@ -18,6 +18,9 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbIgnor
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * A step of a pipeline that runs a version of a solution when its preconditions are met.
+ */
 @Getter
 @Setter
 @ValidSolution
@@ -36,6 +39,13 @@ public class Pipe {
     @Valid
     private List<Precondition> preconditions;
 
+    /**
+     * Creates an empty pipe.
+     */
+    public Pipe() {
+        // Jackson and the DynamoDB Enhanced Client set the fields.
+    }
+
     /*
      * DynamoDB only has built-in conversion for primitives (String, Integer, etc...)
      * and simple collections (List<String> for example).
@@ -43,6 +53,11 @@ public class Pipe {
      * understand Jackson's @JsonSubTypes we need to create these getter/setters.
      */
 
+    /**
+     * Returns the preconditions of the pipe. DynamoDB stores them as JSON through {@link #getPreconditionsJson()}.
+     *
+     * @return the preconditions
+     */
     @DynamoDbIgnore
     public List<Precondition> getPreconditions() {
         return preconditions;
@@ -50,6 +65,11 @@ public class Pipe {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Returns the preconditions as JSON for storage in DynamoDB.
+     *
+     * @return the preconditions as JSON, or null if there are no preconditions
+     */
     @JsonIgnore
     @DynamoDbAttribute("preconditions")
     public String getPreconditionsJson() {
@@ -63,6 +83,11 @@ public class Pipe {
         }
     }
 
+    /**
+     * Sets the preconditions from the JSON stored in DynamoDB.
+     *
+     * @param preconditionsJson the preconditions as JSON, or null
+     */
     public void setPreconditionsJson(String preconditionsJson) {
         if (preconditionsJson == null) {
             this.preconditions = null;

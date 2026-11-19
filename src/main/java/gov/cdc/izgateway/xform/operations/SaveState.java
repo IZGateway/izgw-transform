@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Saves the value of a message field in the context state under a key.
+ */
 @Getter
 @Setter
 public class SaveState extends BaseOperation implements Operation {
@@ -18,8 +21,15 @@ public class SaveState extends BaseOperation implements Operation {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SaveState.class);
 
+    /**
+     * Creates an empty operation.
+     */
     public SaveState() {}
 
+    /**
+     * Creates an operation with the settings of another operation.
+     * @param saveState the operation to copy the settings from
+     */
     protected SaveState(SaveState saveState) {
         super(saveState.getId(), saveState.getOrder());
         this.field = saveState.field;

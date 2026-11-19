@@ -15,11 +15,24 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
+/**
+ * Base service for configuration entities, with access checks by organization and audit logging.
+ *
+ * @param <T> the entity type
+ */
 @Slf4j
 public abstract class GenericService<T extends BaseModel> implements XformService<T> {
 
+    /**
+     * The repository that stores the entities.
+     */
     protected final XformRepository<T> repo;
 
+    /**
+     * Creates the service.
+     *
+     * @param repo the repository that stores the entities
+     */
     protected GenericService(XformRepository<T> repo){
         this.repo = repo;
     }

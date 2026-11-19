@@ -25,6 +25,13 @@ public class MigratorFactory {
     private final String tableName;
     private final MigrationConfiguration migrationConfig;
 
+    /**
+     * Creates the factory.
+     *
+     * @param dynamoDbClient the DynamoDB enhanced client
+     * @param dynamoDbConfig the DynamoDB configuration that supplies the table name
+     * @param migrationConfig the configuration of the entity file paths
+     */
     public MigratorFactory(DynamoDbEnhancedClient dynamoDbClient,
                            DynamoDbConfig dynamoDbConfig,
                            MigrationConfiguration migrationConfig) {
@@ -36,6 +43,7 @@ public class MigratorFactory {
     /**
      * Creates EntityMigrator instances for all configured entity types.
      * Spring will automatically inject this list into DataMigrationService.
+     * @return the migrators for all configured entity types
      */
     @Bean
     public List<EntityMigrator<?>> entityMigrators() {

@@ -10,6 +10,9 @@ import java.util.*;
 import gov.cdc.izgateway.xform.security.Roles;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
+/**
+ * Maps an identity provider group to the roles that its members get.
+ */
 @Getter
 @Setter
 @DynamoDbBean
@@ -21,6 +24,13 @@ public class GroupRoleMapping extends BaseModel {
     private Boolean active;
     @NotNull(message = "GroupRoleMapping - Roles are required")
     private List<String> roles;
+
+    /**
+     * Creates an empty group role mapping.
+     */
+    public GroupRoleMapping() {
+        // Jackson and the DynamoDB Enhanced Client set the fields.
+    }
 
     /**
      * Set the list of roles. This method validates the roles against

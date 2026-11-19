@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Maps a code and code system in a message to a different code with the organization's mappings.
+ */
 @Getter
 @Setter
 public class Mapper extends BaseOperation implements Operation {
@@ -20,8 +23,15 @@ public class Mapper extends BaseOperation implements Operation {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Mapper.class);
 
+    /**
+     * Creates an empty operation.
+     */
     protected Mapper() {}
 
+    /**
+     * Creates an operation with the settings of another operation.
+     * @param mapper the operation to copy the settings from
+     */
     protected Mapper(Mapper mapper) {
         super(mapper.getId(), mapper.getOrder());
         this.codeField = mapper.getCodeField();

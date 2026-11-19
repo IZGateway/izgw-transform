@@ -8,11 +8,18 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Validator for the {@link ValidOrganizations} annotation that checks that each organization in a set of identifiers exists and is active.
+ */
 @Component
 public class OrganizationsValidator implements ConstraintValidator<ValidOrganizations, Set<UUID>> {
 
     private final OrganizationValidationService validationService;
 
+    /**
+     * Creates the validator.
+     * @param validationService the service that validates organizations
+     */
     @Autowired
     public OrganizationsValidator(OrganizationValidationService validationService) {
         this.validationService = validationService;

@@ -61,6 +61,9 @@ import io.swagger.v3.oas.annotations.info.License;
 import io.swagger.v3.oas.annotations.info.Info;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Spring Boot entry point and web configuration for the IZ Gateway Transformation Service.
+ */
 @Slf4j
 @OpenAPIDefinition(
         info = @Info(
@@ -86,11 +89,26 @@ public class Application implements WebMvcConfigurer {
     private static SecureRandom secureRandom;
 
     private static AbstractHttp11Protocol<?> protocol;
+
+    /**
+     * Creates the application configuration; Spring calls this constructor.
+     */
+    public Application() {
+    }
+
+    /**
+     * Reloads the SSL host configurations of the HTTPS connector, so that changed keystores take effect.
+     */
     public static void reloadSsl() {
         if (protocol != null) {
             protocol.reloadSslHostConfigs();
         }
     }
+    /**
+     * Initializes the FIPS security providers and starts the Spring application.
+     *
+     * @param args the command line arguments
+     */
     public static void main(String[] args) {
         initialize();
 
@@ -151,15 +169,29 @@ public class Application implements WebMvcConfigurer {
         }
     }
 
+    /**
+     * Called by the JVM shutdown hook. It does nothing at this time.
+     */
     public static void shutdown() {
     }
 
+    /**
+     * Returns the build identifier from the "Build:" line of the build.txt resource.
+     *
+     * @return the build identifier
+     */
     public static String getBuild() {
         byte[] v = staticPages.get(BUILD);
         String version = v == null ? "" : new String(v);
         return StringUtils.substringBetween(version, "Build:", "\n").trim();
     }
 
+    /**
+     * Returns the content of a loaded static resource as a UTF-8 string.
+     *
+     * @param page the name of the static resource
+     * @return the content of the resource
+     */
     public static String getPage(String page) {
         return new String(staticPages.get(page), StandardCharsets.UTF_8);
     }
@@ -199,6 +231,14 @@ public class Application implements WebMvcConfigurer {
     @Value("${server.local-port:9081}")
     private int additionalPort;
 
+    /**
+     * Creates the security filter chain. It permits all requests, enables X.509 client certificate
+     * authentication, and disables CSRF protection unless security.enable-csrf is true.
+     *
+     * @param http the HTTP security builder
+     * @return the security filter chain
+     * @throws Exception if the filter chain cannot be built
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(a -> a.requestMatchers("/**").permitAll())
@@ -234,6 +274,11 @@ public class Application implements WebMvcConfigurer {
         builder.addCustomConverter(new FhirConverter());
     }
     
+    /**
+     * Creates a user details service that gives each user name the ROLE_USER authority.
+     *
+     * @return the user details service
+     */
     @Bean
     public UserDetailsService userDetailsService() {
         return new UserDetailsService() {
@@ -255,6 +300,11 @@ public class Application implements WebMvcConfigurer {
         return Application::customizeConnector;
     }
 
+    /**
+     * Sets the reloadable SSL implementation on an HTTPS connector and keeps its protocol for {@link #reloadSsl()}.
+     *
+     * @param connector the Tomcat connector to customize
+     */
     public static void customizeConnector(Connector connector) {
         if ("https".equals(connector.getScheme())) {
             ProtocolHandler p = connector.getProtocolHandler();

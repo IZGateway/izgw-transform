@@ -16,6 +16,9 @@ import java.util.UUID;
 import gov.cdc.izgateway.xform.constants.XformConstants;
 
 
+/**
+ * A precondition that is true if the value at a data path is equal to a comparison value.
+ */
 @Getter
 @Setter
 @Slf4j
@@ -27,16 +30,30 @@ public class Equals implements Precondition, Advisable, Transformable {
     @NotNull(message = "required and cannot be empty")
     private String comparisonValue;
 
+    /**
+     * Creates an empty precondition.
+     */
     protected Equals() {
 
     }
 
+    /**
+     * Creates a precondition with the same id, data path and comparison value as another one.
+     *
+     * @param equals the precondition to copy
+     */
     protected Equals(Equals equals) {
         this.id = equals.id;
         this.dataPath = equals.getDataPath();
         this.comparisonValue = equals.getComparisonValue();
     }
 
+    /**
+     * Creates a precondition for a data path and a comparison value.
+     *
+     * @param dataPath the path of the value to compare
+     * @param comparisonValue the value to compare with
+     */
     protected Equals(String dataPath, String comparisonValue) {
         this.dataPath = dataPath;
         this.comparisonValue = comparisonValue;

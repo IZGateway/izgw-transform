@@ -4,8 +4,17 @@ import gov.cdc.izgateway.xform.model.Solution;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
+/**
+ * DynamoDB repository for {@link Solution} entities.
+ */
 public class SolutionRepository extends GenericDynamoDBRepository<Solution> {
 
+    /**
+     * Creates the repository.
+     *
+     * @param dynamoDbClient the DynamoDB enhanced client
+     * @param tableName the name of the DynamoDB table
+     */
     public SolutionRepository(
             DynamoDbEnhancedClient dynamoDbClient,
             String tableName) {

@@ -8,6 +8,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 
+/**
+ * Creates the DynamoDB repositories when spring.database is dynamodb or migrate.
+ */
 @Component
 @ConditionalOnExpression("'${spring.database:}'.equalsIgnoreCase('dynamodb') || '${spring.database:}'.equalsIgnoreCase('migrate')")
 public class DynamoDbRepositoryFactory implements RepositoryFactory {
@@ -26,6 +29,12 @@ public class DynamoDbRepositoryFactory implements RepositoryFactory {
     private UserRepository ur;
     private EventRepository er;
 
+    /**
+     * Creates the factory.
+     *
+     * @param dynamoDbClient the DynamoDB enhanced client
+     * @param dynamoDbConfig the DynamoDB configuration that contains the table name
+     */
     public DynamoDbRepositoryFactory(
             DynamoDbEnhancedClient dynamoDbClient,
             DynamoDbConfig dynamoDbConfig) {

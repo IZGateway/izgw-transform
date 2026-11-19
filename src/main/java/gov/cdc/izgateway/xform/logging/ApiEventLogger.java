@@ -7,27 +7,61 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+/**
+ * Logs configuration API events (read, create, update, delete) with an "apiLog" marker, unless API logging is disabled.
+ */
 @Slf4j
 public class ApiEventLogger {
 
+    /**
+     * Logs a READ event for one entity.
+     *
+     * @param <T> the entity type
+     * @param data the entity that was read
+     */
     public static <T> void logReadEvent(T data) {
         logApiEvent("READ", getClassName(data), getId(data),  null, null);
     }
 
+    /**
+     * Logs a READ event for a list of entities. Nothing is logged if the list is null or empty.
+     *
+     * @param <T> the entity type
+     * @param data the entities that were read
+     */
     public static <T> void logReadEvent(List<T> data) {
         if (data != null && !data.isEmpty()) {
             logApiEvent("READ", getClassName(data.get(0)), null, null, null);
         }
     }
 
+    /**
+     * Logs a DELETE event, with the deleted entity as the old data.
+     *
+     * @param <T> the entity type
+     * @param dataToDelete the entity to delete
+     */
     public static <T> void logDeleteEvent(T dataToDelete) {
         logApiEvent("DELETE", getClassName(dataToDelete), getId(dataToDelete), null, dataToDelete);
     }
 
+    /**
+     * Logs a CREATE event, with the created entity as the new data.
+     *
+     * @param <T> the entity type
+     * @param newData the entity that was created
+     */
     public static <T> void logCreateEvent(T newData) {
         logApiEvent("CREATE", getClassName(newData), getId(newData), newData, null);
     }
 
+    /**
+     * Logs an UPDATE event with the new and the old data.
+     *
+     * @param <T> the entity type
+     * @param newData the entity after the update
+     * @param existingData the entity before the update
+     */
     public static <T> void logUpdateEvent(T newData, T existingData) {
         logApiEvent("UPDATE", getClassName(newData), getId(newData), newData, existingData);
     }

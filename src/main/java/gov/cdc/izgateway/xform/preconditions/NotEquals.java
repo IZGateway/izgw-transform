@@ -9,16 +9,26 @@ import gov.cdc.izgateway.xform.constants.XformConstants;
 
 import java.util.Objects;
 
+/**
+ * Precondition that passes when the value at the data path is not equal to the comparison value.
+ */
 @Getter
 @Setter
 public class NotEquals extends Equals implements Precondition {
 
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotEquals.class);
 
+    /**
+     * Creates an empty precondition.
+     */
     protected NotEquals() {
         super();
     }
 
+    /**
+     * Creates a precondition with the settings of another precondition.
+     * @param notEquals the precondition to copy the settings from
+     */
     protected NotEquals(NotEquals notEquals) {
         super(notEquals);
     }

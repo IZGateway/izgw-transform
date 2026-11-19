@@ -317,11 +317,26 @@ jobs:
           # dockerfile-maven-plugin (in pom.xml) builds the image during install phase as
           # izgw-transform:${image.tag}-${buildno}. With image.tag=$RELEASE_VERSION,
           # this yields izgw-transform:$RELEASE_VERSION-$BUILDNO locally.
-          mvn -B clean test package install site \
+          #
+          # Two things avoid "[WARNING] Overwriting artifact's file ... to target/classes" (IGDD-2974):
+          # 1. The first command lists only "install". "install" already runs test and package,
+          #    and it builds the Docker image.
+          # 2. The site is built in a separate Maven run on purpose. "site" forks the lifecycle, and
+          #    in the same run as the build it sets the artifact file again. The site run reads the
+          #    test and JaCoCo results of the first run. Do not use "clean" in the site run.
+          # "set -e" (above) stops the step if the first run fails.
+          mvn -B clean install \
+            -Dbuildno="$BUILDNO" \
+            -Dimage.tag="$RELEASE_VERSION" \
+            -DskipDependencyCheck=true
+          mvn -B site -DskipTests \
             -Dbuildno="$BUILDNO" \
             -Dimage.tag="$RELEASE_VERSION" \
             -DskipDependencyCheck=true
 
+      # This scan does not use an NVD API key (IGDD-2974). The action runs the scanner with --noupdate.
+      # The scanner uses the NVD database that is inside the Docker image of the action. The owners of
+      # the action build this image every night with a new database.
       - name: Run OWASP Dependency Check
         env:
           JAVA_HOME: /opt/jdk
@@ -337,7 +352,6 @@ jobs:
             --disableOssIndex
             --failOnCVSS 7
             --suppression ./dependency-suppression.xml
-            --nvdApiKey ${{ secrets.NVDAPIKEY }}
             --disableNuspec
             --disableNugetconf
             --disableAssembly

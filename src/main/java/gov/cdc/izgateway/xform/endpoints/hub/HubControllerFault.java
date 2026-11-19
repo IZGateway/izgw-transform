@@ -18,11 +18,17 @@ public class HubControllerFault extends Fault {
     	// For now, at least while in Pilot, a this Fault should indicate a CONTACT_SUPPORT RetryStrategy.
     	super(new MessageSupport("HubControllerFault", "500", getMessage(detail), getDetail(detail), null, RetryStrategy.CONTACT_SUPPORT), ex);
     }
-    /** Construct a new HubControllerFault with a message */
+    /**
+     * Construct a new HubControllerFault with a message.
+     * @param detail the fault message; text before the first colon is the summary and text after it is the detail
+     */
     public HubControllerFault(String detail) {
         this(detail, null);
     }
-    /** Construct a new HubControllerFault from an exception */
+    /**
+     * Construct a new HubControllerFault from an exception.
+     * @param ex the exception that caused the fault
+     */
     public HubControllerFault(Throwable ex) {
         this(ex.getMessage(), ex);
     }

@@ -15,38 +15,65 @@ import java.util.function.Function;
 
 // TODO: Refactor this with IZG Core
 
+/**
+ * Writes a {@link SoapMessage} as a SOAP envelope to an {@link XMLStreamWriter}.
+ */
 public class SoapMessageWriter {
+	/** The value written in place of credentials when filtering is on. */
 	public static final String HIDDEN = "[Hidden]";
 	private static boolean fixNewlines = true;
 	private final SoapMessage m;
 	private final XMLStreamWriter w;
 	private final boolean filtering;
 	
+	/**
+	 * Create a writer for a message.
+	 * @param m The message to write.
+	 * @param w The XML stream to write to.
+	 * @param filtering true to hide credentials and protect HL7 content in the output.
+	 */
 	public SoapMessageWriter(SoapMessage m, XMLStreamWriter w, boolean filtering) {
 		this.m = m;
 		this.w = w;
 		this.filtering = filtering;
 	}
 	
+	/**
+	 * Create a writer for a message, with filtering off.
+	 * @param m The message to write.
+	 * @param w The XML stream to write to.
+	 */
 	public SoapMessageWriter(SoapMessage m, XMLStreamWriter w) {
 		this(m, w, false);
 	}
 	
+	/**
+	 * Set whether carriage returns in HL7 messages are written as {@code &#xD;} character references.
+	 * @param fixNewlines true to write carriage returns as character references.
+	 */
 	public static void setFixNewLines(boolean fixNewlines) {
 		SoapMessageWriter.fixNewlines = fixNewlines;
 	}
 	
+	/**
+	 * Get whether carriage returns in HL7 messages are written as {@code &#xD;} character references.
+	 * @return true if carriage returns are written as character references.
+	 */
 	public static boolean getFixNewLines() {
 		return SoapMessageWriter.fixNewlines;
 	}
 	
+	/**
+	 * Get whether this writer hides credentials and protects HL7 content.
+	 * @return true if filtering is on.
+	 */
 	public boolean isFiltering() {
 		return filtering;
 	}
 
 	/**
 	 * Adjust IIS schema based on message schema 
-	 * @param m
+	 * @param m The message.
 	 * @return The correct schema to use for iis: prefix.
 	 */
 	public static String getIisSchema(SoapMessage m) {
@@ -56,6 +83,12 @@ public class SoapMessageWriter {
 		return SoapMessage.IIS2014_NS;
 	}
 
+	/**
+	 * Write an IIS element with a text value, only if the value is not empty.
+	 * @param name The 2014 WSDL name of the element.
+	 * @param value The text value.
+	 * @throws XMLStreamException If an error occurs while writing.
+	 */
 	public void writeOptionalTextElement(String name, String value) throws XMLStreamException {
 		if (!StringUtils.isEmpty(value)) {
 			w.writeStartElement(SoapMessage.IIS_PREFIX, m.elementName(name), getIisSchema(m));
@@ -63,6 +96,12 @@ public class SoapMessageWriter {
 			w.writeEndElement();
 		}
 	}
+	/**
+	 * Write an IIS element with a text value; the element is written even if the value is empty.
+	 * @param name The 2014 WSDL name of the element.
+	 * @param value The text value.
+	 * @throws XMLStreamException If an error occurs while writing.
+	 */
 	public void writeRequiredTextElement(String name, String value) throws XMLStreamException {
 		w.writeStartElement(SoapMessage.IIS_PREFIX, m.elementName(name), getIisSchema(m));
 		if (!StringUtils.isEmpty(value)) {
@@ -87,6 +126,10 @@ public class SoapMessageWriter {
 		w.writeEndElement();
 	}
 
+	/**
+	 * Write the complete SOAP envelope for the message, then flush the stream.
+	 * @throws XMLStreamException If an error occurs while writing.
+	 */
 	public void write() throws XMLStreamException {
 		w.writeStartElement(SoapMessage.SOAP_PREFIX, "Envelope", SoapMessage.SOAP_NS);
 		w.writeNamespace(SoapMessage.SOAP_PREFIX, SoapMessage.SOAP_NS);
@@ -148,6 +191,10 @@ public class SoapMessageWriter {
 		w.writeEndElement();
 	}
 	
+	/**
+	 * Write the WS-Addressing header elements, if the message has any.
+	 * @throws XMLStreamException If an error occurs while writing.
+	 */
 	public void writeWsaHeaders() throws XMLStreamException {
 		if (m.getWsaHeaders().isEmpty()) {
 			return;
@@ -174,6 +221,11 @@ public class SoapMessageWriter {
         }
     }
 
+	/**
+	 * Write the start tag of an IIS element.
+	 * @param name The 2014 WSDL name of the element.
+	 * @throws XMLStreamException If an error occurs while writing.
+	 */
 	public void startIisElement(String name) throws XMLStreamException {
 		w.writeStartElement(SoapMessage.IIS_PREFIX, m.elementName(name), getIisSchema(m));
 	}
@@ -194,6 +246,10 @@ public class SoapMessageWriter {
 		return clazz.getSimpleName();
 	}
 	
+	/**
+	 * Write the content of a soap:Fault element for a fault message.
+	 * @throws XMLStreamException If an error occurs while writing.
+	 */
 	public void writeFaultContent() throws XMLStreamException {
 		FaultMessage f = (FaultMessage) m;
 		w.writeStartElement(SoapMessage.SOAP_PREFIX, "Code", SoapMessage.SOAP_NS);
@@ -264,6 +320,10 @@ public class SoapMessageWriter {
 			w.writeNamespace(SoapMessage.IIS_PREFIX, getIisSchema(m));
 		}
 	}
+	/**
+	 * Write the body elements of the message: credentials, facility ID, HL7 message, and echo back, as present.
+	 * @throws XMLStreamException If an error occurs while writing.
+	 */
 	public void writeBodyContent() throws XMLStreamException {
 		if (m instanceof HasCredentials credentialed) {
 			writeOptionalTextElement("Username", hidden(credentialed.getUsername()));
