@@ -5,19 +5,34 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Runs the transformation pipeline for a message.
+ */
 @Service
-<span class="fc" id="L9">@Slf4j</span>
+<span class="fc" id="L12">@Slf4j</span>
 public class DataXformService {
     private final PipelineRunnerService pipelineRunnerService;
 
+    /**
+     * Creates the service.
+     *
+     * @param pipelineRunnerService the service that runs the pipeline
+     */
     @Autowired
-<span class="fc" id="L14">    public DataXformService(PipelineRunnerService pipelineRunnerService) {</span>
-<span class="fc" id="L15">        this.pipelineRunnerService = pipelineRunnerService;</span>
-<span class="fc" id="L16">    }</span>
+<span class="fc" id="L22">    public DataXformService(PipelineRunnerService pipelineRunnerService) {</span>
+<span class="fc" id="L23">        this.pipelineRunnerService = pipelineRunnerService;</span>
+<span class="fc" id="L24">    }</span>
 
+    /**
+     * Runs the pipeline on the service context of the message.
+     *
+     * @param context the transformation context
+     * @return the same context, after the pipeline ran
+     * @throws Exception if the pipeline fails
+     */
     public IZGXformContext transform(IZGXformContext context) throws Exception {
-<span class="nc" id="L19">        pipelineRunnerService.execute(context.getServiceContext());</span>
-<span class="nc" id="L20">        return context;</span>
+<span class="nc" id="L34">        pipelineRunnerService.execute(context.getServiceContext());</span>
+<span class="nc" id="L35">        return context;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -15,10 +15,15 @@ public class DataMigrationService {
 
     private final List&lt;EntityMigrator&lt;?&gt;&gt; migrators;
 
+    /**
+     * Creates the service.
+     *
+     * @param migrators the migrators for each entity type
+     */
     @Autowired
-<span class="nc" id="L19">    public DataMigrationService(List&lt;EntityMigrator&lt;?&gt;&gt; migrators) {</span>
-<span class="nc" id="L20">        this.migrators = migrators;</span>
-<span class="nc" id="L21">    }</span>
+<span class="nc" id="L24">    public DataMigrationService(List&lt;EntityMigrator&lt;?&gt;&gt; migrators) {</span>
+<span class="nc" id="L25">        this.migrators = migrators;</span>
+<span class="nc" id="L26">    }</span>
 
     /**
      * Run migration for all existing entity migrators.
@@ -27,35 +32,35 @@ public class DataMigrationService {
      */
     public boolean migrateAll() {
 
-<span class="nc" id="L30">        log.info(&quot;Starting data migration for {} entity types&quot;, migrators.size());</span>
+<span class="nc" id="L35">        log.info(&quot;Starting data migration for {} entity types&quot;, migrators.size());</span>
 
-<span class="nc" id="L32">        boolean overallSuccess = true;</span>
-<span class="nc" id="L33">        int totalEntities = 0;</span>
-<span class="nc" id="L34">        int totalMigrated = 0;</span>
-<span class="nc" id="L35">        int totalSkipped = 0;</span>
+<span class="nc" id="L37">        boolean overallSuccess = true;</span>
+<span class="nc" id="L38">        int totalEntities = 0;</span>
+<span class="nc" id="L39">        int totalMigrated = 0;</span>
+<span class="nc" id="L40">        int totalSkipped = 0;</span>
 
-<span class="nc bnc" id="L37" title="All 2 branches missed.">        for (EntityMigrator&lt;?&gt; migrator : migrators) {</span>
-<span class="nc" id="L38">            log.info(&quot;Migrating {}...&quot;, migrator.getEntityName());</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        for (EntityMigrator&lt;?&gt; migrator : migrators) {</span>
+<span class="nc" id="L43">            log.info(&quot;Migrating {}...&quot;, migrator.getEntityName());</span>
 
             try {
-<span class="nc" id="L41">                MigrationCounts counts = migrator.migrate();</span>
-<span class="nc" id="L42">                totalEntities += counts.total();</span>
-<span class="nc" id="L43">                totalMigrated += counts.migrated();</span>
-<span class="nc" id="L44">                totalSkipped += counts.skipped();</span>
-<span class="nc" id="L45">            } catch (Exception e) {</span>
-<span class="nc" id="L46">                log.error(&quot;Failed to migrate {}: {}&quot;, migrator.getEntityName(), e.getMessage(), e);</span>
-<span class="nc" id="L47">                overallSuccess = false;</span>
-<span class="nc" id="L48">            }</span>
-<span class="nc" id="L49">        }</span>
+<span class="nc" id="L46">                MigrationCounts counts = migrator.migrate();</span>
+<span class="nc" id="L47">                totalEntities += counts.total();</span>
+<span class="nc" id="L48">                totalMigrated += counts.migrated();</span>
+<span class="nc" id="L49">                totalSkipped += counts.skipped();</span>
+<span class="nc" id="L50">            } catch (Exception e) {</span>
+<span class="nc" id="L51">                log.error(&quot;Failed to migrate {}: {}&quot;, migrator.getEntityName(), e.getMessage(), e);</span>
+<span class="nc" id="L52">                overallSuccess = false;</span>
+<span class="nc" id="L53">            }</span>
+<span class="nc" id="L54">        }</span>
 
-<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (overallSuccess) {</span>
-<span class="nc" id="L52">            log.info(&quot;Migration completed successfully: {}/{} entities migrated ({} skipped)&quot;,</span>
-<span class="nc" id="L53">                    totalMigrated, totalEntities, totalSkipped);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (overallSuccess) {</span>
+<span class="nc" id="L57">            log.info(&quot;Migration completed successfully: {}/{} entities migrated ({} skipped)&quot;,</span>
+<span class="nc" id="L58">                    totalMigrated, totalEntities, totalSkipped);</span>
         } else {
-<span class="nc" id="L55">            log.error(&quot;Migration completed with errors&quot;);</span>
+<span class="nc" id="L60">            log.error(&quot;Migration completed with errors&quot;);</span>
         }
 
-<span class="nc" id="L58">        return overallSuccess;</span>
+<span class="nc" id="L63">        return overallSuccess;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

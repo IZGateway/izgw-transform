@@ -11,8 +11,15 @@ import java.util.Map;
  */
 @Getter
 @Setter
-<span class="nc" id="L14">public class PreconditionInfo {</span>
+public class PreconditionInfo {
     private String method;
     private Map&lt;String, PreconditionInfoProperty&gt; properties;
+
+    /**
+     * Creates an empty precondition information.
+     */
+<span class="nc" id="L21">    public PreconditionInfo() {</span>
+        // The service sets the fields.
+<span class="nc" id="L23">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

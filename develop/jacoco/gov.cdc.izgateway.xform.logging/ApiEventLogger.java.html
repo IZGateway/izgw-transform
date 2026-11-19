@@ -7,55 +7,89 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
-<span class="fc" id="L10">@Slf4j</span>
+/**
+ * Logs configuration API events (read, create, update, delete) with an &quot;apiLog&quot; marker, unless API logging is disabled.
+ */
+<span class="fc" id="L13">@Slf4j</span>
 public class ApiEventLogger {
 
+    /**
+     * Logs a READ event for one entity.
+     *
+     * @param &lt;T&gt; the entity type
+     * @param data the entity that was read
+     */
     public static &lt;T&gt; void logReadEvent(T data) {
-<span class="nc" id="L14">        logApiEvent(&quot;READ&quot;, getClassName(data), getId(data),  null, null);</span>
-<span class="nc" id="L15">    }</span>
+<span class="nc" id="L23">        logApiEvent(&quot;READ&quot;, getClassName(data), getId(data),  null, null);</span>
+<span class="nc" id="L24">    }</span>
 
+    /**
+     * Logs a READ event for a list of entities. Nothing is logged if the list is null or empty.
+     *
+     * @param &lt;T&gt; the entity type
+     * @param data the entities that were read
+     */
     public static &lt;T&gt; void logReadEvent(List&lt;T&gt; data) {
-<span class="pc bpc" id="L18" title="2 of 4 branches missed.">        if (data != null &amp;&amp; !data.isEmpty()) {</span>
-<span class="fc" id="L19">            logApiEvent(&quot;READ&quot;, getClassName(data.get(0)), null, null, null);</span>
+<span class="pc bpc" id="L33" title="2 of 4 branches missed.">        if (data != null &amp;&amp; !data.isEmpty()) {</span>
+<span class="fc" id="L34">            logApiEvent(&quot;READ&quot;, getClassName(data.get(0)), null, null, null);</span>
         }
-<span class="fc" id="L21">    }</span>
+<span class="fc" id="L36">    }</span>
 
+    /**
+     * Logs a DELETE event, with the deleted entity as the old data.
+     *
+     * @param &lt;T&gt; the entity type
+     * @param dataToDelete the entity to delete
+     */
     public static &lt;T&gt; void logDeleteEvent(T dataToDelete) {
-<span class="nc" id="L24">        logApiEvent(&quot;DELETE&quot;, getClassName(dataToDelete), getId(dataToDelete), null, dataToDelete);</span>
-<span class="nc" id="L25">    }</span>
+<span class="nc" id="L45">        logApiEvent(&quot;DELETE&quot;, getClassName(dataToDelete), getId(dataToDelete), null, dataToDelete);</span>
+<span class="nc" id="L46">    }</span>
 
+    /**
+     * Logs a CREATE event, with the created entity as the new data.
+     *
+     * @param &lt;T&gt; the entity type
+     * @param newData the entity that was created
+     */
     public static &lt;T&gt; void logCreateEvent(T newData) {
-<span class="nc" id="L28">        logApiEvent(&quot;CREATE&quot;, getClassName(newData), getId(newData), newData, null);</span>
-<span class="nc" id="L29">    }</span>
+<span class="nc" id="L55">        logApiEvent(&quot;CREATE&quot;, getClassName(newData), getId(newData), newData, null);</span>
+<span class="nc" id="L56">    }</span>
 
+    /**
+     * Logs an UPDATE event with the new and the old data.
+     *
+     * @param &lt;T&gt; the entity type
+     * @param newData the entity after the update
+     * @param existingData the entity before the update
+     */
     public static &lt;T&gt; void logUpdateEvent(T newData, T existingData) {
-<span class="nc" id="L32">        logApiEvent(&quot;UPDATE&quot;, getClassName(newData), getId(newData), newData, existingData);</span>
-<span class="nc" id="L33">    }</span>
+<span class="nc" id="L66">        logApiEvent(&quot;UPDATE&quot;, getClassName(newData), getId(newData), newData, existingData);</span>
+<span class="nc" id="L67">    }</span>
 
     private static &lt;T&gt; void logApiEvent(String eventDescription, String objectName, String objectId, T newData, T existingData) {
-<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        if ( XformRequestContext.isApiLoggingDisabled() ) {</span>
-<span class="fc" id="L37">            return;</span>
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if ( XformRequestContext.isApiLoggingDisabled() ) {</span>
+<span class="fc" id="L71">            return;</span>
         }
 
-<span class="nc" id="L40">        XformApiDetail data = new XformApiDetail();</span>
-<span class="nc" id="L41">        data.setEventId(RequestContext.getEventId());</span>
-<span class="nc" id="L42">        data.setOldData(existingData);</span>
-<span class="nc" id="L43">        data.setNewData(newData);</span>
-<span class="nc" id="L44">        data.setMethod(eventDescription);</span>
-<span class="nc" id="L45">        data.setUserName(RequestContext.getPrincipal().getName());</span>
-<span class="nc" id="L46">        data.setPrincipalType(RequestContext.getPrincipal().getClass().getSimpleName());</span>
-<span class="nc" id="L47">        data.setObject(objectName);</span>
-<span class="nc" id="L48">        data.setObjectId(objectId);</span>
+<span class="nc" id="L74">        XformApiDetail data = new XformApiDetail();</span>
+<span class="nc" id="L75">        data.setEventId(RequestContext.getEventId());</span>
+<span class="nc" id="L76">        data.setOldData(existingData);</span>
+<span class="nc" id="L77">        data.setNewData(newData);</span>
+<span class="nc" id="L78">        data.setMethod(eventDescription);</span>
+<span class="nc" id="L79">        data.setUserName(RequestContext.getPrincipal().getName());</span>
+<span class="nc" id="L80">        data.setPrincipalType(RequestContext.getPrincipal().getClass().getSimpleName());</span>
+<span class="nc" id="L81">        data.setObject(objectName);</span>
+<span class="nc" id="L82">        data.setObjectId(objectId);</span>
 
-<span class="nc" id="L50">        log.info(Markers2.append(&quot;apiLog&quot;, data), &quot;Log message for {} event on object: {}&quot;, eventDescription, objectName);</span>
-<span class="nc" id="L51">    }</span>
+<span class="nc" id="L84">        log.info(Markers2.append(&quot;apiLog&quot;, data), &quot;Log message for {} event on object: {}&quot;, eventDescription, objectName);</span>
+<span class="nc" id="L85">    }</span>
 
     private static &lt;T&gt; String getClassName(T data) {
-<span class="pc bpc" id="L54" title="1 of 2 branches missed.">        return data == null ? null : data.getClass().getSimpleName();</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        return data == null ? null : data.getClass().getSimpleName();</span>
     }
 
     private static &lt;T&gt; String getId(T data) {
-<span class="nc bnc" id="L58" title="All 2 branches missed.">        return data == null ? null: ((BaseModel)data).getId().toString();</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        return data == null ? null: ((BaseModel)data).getId().toString();</span>
     }
 
     private ApiEventLogger() {

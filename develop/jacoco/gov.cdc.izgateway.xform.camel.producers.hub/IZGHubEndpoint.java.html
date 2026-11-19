@@ -5,24 +5,32 @@ import org.apache.camel.Processor;
 import org.apache.camel.Producer;
 import org.apache.camel.support.DefaultEndpoint;
 
+/**
+ * Camel endpoint that creates producers for the IZ Gateway Hub destination.
+ */
 public class IZGHubEndpoint extends DefaultEndpoint {
+    /**
+     * Creates the endpoint.
+     * @param endpointUri the URI of the endpoint
+     * @param component the component that owns the endpoint
+     */
     public IZGHubEndpoint(String endpointUri, IZGHubComponent component) {
-<span class="fc" id="L10">        super(endpointUri, component);</span>
-<span class="fc" id="L11">    }</span>
+<span class="fc" id="L18">        super(endpointUri, component);</span>
+<span class="fc" id="L19">    }</span>
 
     @Override
     public Producer createProducer() throws Exception {
-<span class="fc" id="L15">        return new IZGHubProducer(this);</span>
+<span class="fc" id="L23">        return new IZGHubProducer(this);</span>
     }
 
     @Override
     public Consumer createConsumer(Processor processor) throws Exception {
-<span class="nc" id="L20">        return null;</span>
+<span class="nc" id="L28">        return null;</span>
     }
 
     @Override
     public boolean isSingleton() {
-<span class="fc" id="L25">        return true;</span>
+<span class="fc" id="L33">        return true;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

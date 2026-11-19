@@ -16,6 +16,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 
+/**
+ * Precondition that passes when the value at the data path matches a regular expression.
+ */
 @Getter
 @Setter
 public class RegexMatch implements Precondition, Advisable, Transformable {
@@ -26,60 +29,78 @@ public class RegexMatch implements Precondition, Advisable, Transformable {
     @NotNull(message = &quot;required and cannot be empty&quot;)
     private String regex;
 
-<span class="fc" id="L29">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RegexMatch.class);</span>
+<span class="fc" id="L32">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RegexMatch.class);</span>
 
-<span class="nc" id="L31">    protected RegexMatch() {</span>
-<span class="nc" id="L32">    }</span>
+    /**
+     * Creates an empty precondition.
+     */
+<span class="nc" id="L37">    protected RegexMatch() {</span>
+<span class="nc" id="L38">    }</span>
 
-<span class="fc" id="L34">    protected RegexMatch(RegexMatch regexMatch) {</span>
-<span class="fc" id="L35">        this.id = regexMatch.id;</span>
-<span class="fc" id="L36">        this.dataPath = regexMatch.dataPath;</span>
-<span class="fc" id="L37">        this.regex = regexMatch.regex;</span>
-<span class="fc" id="L38">    }</span>
+    /**
+     * Creates a precondition with the settings of another precondition.
+     * @param regexMatch the precondition to copy the settings from
+     */
+<span class="fc" id="L44">    protected RegexMatch(RegexMatch regexMatch) {</span>
+<span class="fc" id="L45">        this.id = regexMatch.id;</span>
+<span class="fc" id="L46">        this.dataPath = regexMatch.dataPath;</span>
+<span class="fc" id="L47">        this.regex = regexMatch.regex;</span>
+<span class="fc" id="L48">    }</span>
 
-<span class="fc" id="L40">    protected RegexMatch(UUID id, String dataPath, String regex) {</span>
-<span class="fc" id="L41">        this.id = id;</span>
-<span class="fc" id="L42">        this.dataPath = dataPath;</span>
-<span class="fc" id="L43">        this.regex = regex;</span>
-<span class="fc" id="L44">    }</span>
+    /**
+     * Creates a precondition with the given settings.
+     * @param id the identifier of the precondition
+     * @param dataPath the path of the value to match
+     * @param regex the regular expression that the value must match
+     */
+<span class="fc" id="L56">    protected RegexMatch(UUID id, String dataPath, String regex) {</span>
+<span class="fc" id="L57">        this.id = id;</span>
+<span class="fc" id="L58">        this.dataPath = dataPath;</span>
+<span class="fc" id="L59">        this.regex = regex;</span>
+<span class="fc" id="L60">    }</span>
 
     @Override
     @CaptureXformAdvice
     public boolean evaluate(ServiceContext context) {
 
-<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
-<span class="nc" id="L51">            log.trace(&quot;Precondition: {} / id: '{}' / dataPath: '{}' / regex: '{}'&quot;,</span>
-<span class="nc" id="L52">                    this.getClass().getSimpleName(),</span>
-<span class="nc" id="L53">                    this.getId().toString(),</span>
-<span class="nc" id="L54">                    this.getDataPath(),</span>
-<span class="nc" id="L55">                    this.getRegex());</span>
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
+<span class="nc" id="L67">            log.trace(&quot;Precondition: {} / id: '{}' / dataPath: '{}' / regex: '{}'&quot;,</span>
+<span class="nc" id="L68">                    this.getClass().getSimpleName(),</span>
+<span class="nc" id="L69">                    this.getId().toString(),</span>
+<span class="nc" id="L70">                    this.getDataPath(),</span>
+<span class="nc" id="L71">                    this.getRegex());</span>
         }
 
-<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (this.dataPath.startsWith(&quot;state.&quot;)) {</span>
-<span class="fc" id="L59">            String stateKey = this.dataPath.split(&quot;\\.&quot;)[1];</span>
-<span class="fc" id="L60">            String stateValue = context.getState().get(stateKey);</span>
-<span class="fc" id="L61">            Matcher matcher = getMatcher(StringUtils.defaultString(stateValue));</span>
-<span class="fc" id="L62">            return matcher.matches();</span>
-<span class="pc bpc" id="L63" title="1 of 2 branches missed.">        } else if (context.getDataType().equals(DataType.HL7V2)) {</span>
-<span class="fc" id="L64">            return new Hl7v2RegexMatch(this).evaluate(context);</span>
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        if (this.dataPath.startsWith(&quot;state.&quot;)) {</span>
+<span class="fc" id="L75">            String stateKey = this.dataPath.split(&quot;\\.&quot;)[1];</span>
+<span class="fc" id="L76">            String stateValue = context.getState().get(stateKey);</span>
+<span class="fc" id="L77">            Matcher matcher = getMatcher(StringUtils.defaultString(stateValue));</span>
+<span class="fc" id="L78">            return matcher.matches();</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        } else if (context.getDataType().equals(DataType.HL7V2)) {</span>
+<span class="fc" id="L80">            return new Hl7v2RegexMatch(this).evaluate(context);</span>
         }
 
-<span class="nc" id="L67">        return false;</span>
+<span class="nc" id="L83">        return false;</span>
     }
 
+    /**
+     * Creates a matcher for the regular expression of this precondition.
+     * @param sourceValue the value to match; null is treated as an empty string
+     * @return the matcher for the value
+     */
     protected Matcher getMatcher(String sourceValue) {
-<span class="fc" id="L71">        Pattern pattern = Pattern.compile(this.getRegex());</span>
-<span class="fc" id="L72">        return pattern.matcher(StringUtils.defaultString(sourceValue));</span>
+<span class="fc" id="L92">        Pattern pattern = Pattern.compile(this.getRegex());</span>
+<span class="fc" id="L93">        return pattern.matcher(StringUtils.defaultString(sourceValue));</span>
     }
 
     @Override
     public String getName() {
-<span class="nc" id="L77">        return this.getClass().getSimpleName();</span>
+<span class="nc" id="L98">        return this.getClass().getSimpleName();</span>
     }
 
     @Override
     public boolean hasTransformed() {
-<span class="nc" id="L82">        return true;</span>
+<span class="nc" id="L103">        return true;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

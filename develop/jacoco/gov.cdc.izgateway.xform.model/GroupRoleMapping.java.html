@@ -10,10 +10,13 @@ import java.util.*;
 import gov.cdc.izgateway.xform.security.Roles;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
+/**
+ * Maps an identity provider group to the roles that its members get.
+ */
 @Getter
 @Setter
 @DynamoDbBean
-<span class="nc" id="L16">public class GroupRoleMapping extends BaseModel {</span>
+public class GroupRoleMapping extends BaseModel {
     private UUID id;
     @NotBlank(message = &quot;GroupRoleMapping - Name is required&quot;)
     private String groupName;
@@ -21,6 +24,13 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
     private Boolean active;
     @NotNull(message = &quot;GroupRoleMapping - Roles are required&quot;)
     private List&lt;String&gt; roles;
+
+    /**
+     * Creates an empty group role mapping.
+     */
+<span class="nc" id="L31">    public GroupRoleMapping() {</span>
+        // Jackson and the DynamoDB Enhanced Client set the fields.
+<span class="nc" id="L33">    }</span>
 
     /**
      * Set the list of roles. This method validates the roles against
@@ -31,17 +41,17 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
      * @param roles	The list of roles to set.
      */
     public void setRoles(List&lt;String&gt; roles) {
-<span class="nc" id="L34">        Set&lt;String&gt; invalidRoleSet = new TreeSet&lt;&gt;(roles);</span>
+<span class="nc" id="L44">        Set&lt;String&gt; invalidRoleSet = new TreeSet&lt;&gt;(roles);</span>
         // Normalize the list to a set
-<span class="nc" id="L36">        roles = new ArrayList&lt;&gt;(invalidRoleSet);</span>
-<span class="nc" id="L37">        invalidRoleSet.removeAll(Roles.ALL_ROLES);</span>
-<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (!invalidRoleSet.isEmpty()) {</span>
-<span class="nc" id="L39">            String message = String.format(</span>
+<span class="nc" id="L46">        roles = new ArrayList&lt;&gt;(invalidRoleSet);</span>
+<span class="nc" id="L47">        invalidRoleSet.removeAll(Roles.ALL_ROLES);</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (!invalidRoleSet.isEmpty()) {</span>
+<span class="nc" id="L49">            String message = String.format(</span>
                     &quot;Roles %s do not come from the set %s&quot;,
                     invalidRoleSet, Roles.ALL_ROLES);
-<span class="nc" id="L42">            throw new IllegalArgumentException(message);</span>
+<span class="nc" id="L52">            throw new IllegalArgumentException(message);</span>
         }
-<span class="nc" id="L44">        this.roles = roles;</span>
-<span class="nc" id="L45">    }</span>
+<span class="nc" id="L54">        this.roles = roles;</span>
+<span class="nc" id="L55">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

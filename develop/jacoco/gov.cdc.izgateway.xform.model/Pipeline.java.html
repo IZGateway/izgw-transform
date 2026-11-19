@@ -17,10 +17,13 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbIgnor
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * An ordered list of pipes that runs for an organization on an inbound and outbound endpoint pair.
+ */
 @Getter
 @Setter
 @DynamoDbBean
-<span class="fc" id="L23">public class Pipeline extends BaseModel implements OrganizationAware {</span>
+public class Pipeline extends BaseModel implements OrganizationAware {
 
     @NotBlank(message = &quot;Pipeline name is required&quot;)
     private String pipelineName;
@@ -52,36 +55,58 @@ import java.util.UUID;
      * Needed to create the getter/setter to work
      */
 
-<span class="fc" id="L55">    private static final ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="fc" id="L58">    private static final ObjectMapper objectMapper = new ObjectMapper();</span>
 
+    /**
+     * Creates an empty pipeline.
+     */
+<span class="fc" id="L63">    public Pipeline() {</span>
+        // Jackson and the DynamoDB Enhanced Client set the fields.
+<span class="fc" id="L65">    }</span>
+
+    /**
+     * Returns the pipes as JSON for storage in DynamoDB.
+     *
+     * @return the pipes as JSON, or null if there are no pipes
+     */
     @JsonIgnore
     @DynamoDbAttribute(&quot;pipes&quot;)
     public String getPipesJson() {
-<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (pipes == null) {</span>
-<span class="nc" id="L61">            return null;</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (pipes == null) {</span>
+<span class="nc" id="L76">            return null;</span>
         }
         try {
-<span class="nc" id="L64">            return objectMapper.writeValueAsString(pipes);</span>
-<span class="nc" id="L65">        } catch (JsonProcessingException e) {</span>
-<span class="nc" id="L66">            throw new RuntimeException(&quot;Error serializing pipes&quot;, e);</span>
+<span class="nc" id="L79">            return objectMapper.writeValueAsString(pipes);</span>
+<span class="nc" id="L80">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L81">            throw new RuntimeException(&quot;Error serializing pipes&quot;, e);</span>
         }
     }
 
+    /**
+     * Sets the pipes from the JSON stored in DynamoDB.
+     *
+     * @param pipesJson the pipes as JSON, or null
+     */
     public void setPipesJson(String pipesJson) {
-<span class="nc bnc" id="L71" title="All 2 branches missed.">        if (pipesJson == null) {</span>
-<span class="nc" id="L72">            this.pipes = null;</span>
-<span class="nc" id="L73">            return;</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">        if (pipesJson == null) {</span>
+<span class="nc" id="L92">            this.pipes = null;</span>
+<span class="nc" id="L93">            return;</span>
         }
         try {
-<span class="nc" id="L76">            this.pipes = objectMapper.readValue(pipesJson, new TypeReference&lt;List&lt;Pipe&gt;&gt;() {});</span>
-<span class="nc" id="L77">        } catch (JsonProcessingException e) {</span>
-<span class="nc" id="L78">            throw new RuntimeException(&quot;Error deserializing pipes&quot;, e);</span>
-<span class="nc" id="L79">        }</span>
-<span class="nc" id="L80">    }</span>
+<span class="nc" id="L96">            this.pipes = objectMapper.readValue(pipesJson, new TypeReference&lt;List&lt;Pipe&gt;&gt;() {});</span>
+<span class="nc" id="L97">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L98">            throw new RuntimeException(&quot;Error deserializing pipes&quot;, e);</span>
+<span class="nc" id="L99">        }</span>
+<span class="nc" id="L100">    }</span>
 
+    /**
+     * Returns the pipes of the pipeline. DynamoDB stores them as JSON through {@link #getPipesJson()}.
+     *
+     * @return the pipes
+     */
     @DynamoDbIgnore
     public List&lt;Pipe&gt; getPipes() {
-<span class="nc" id="L84">        return pipes;</span>
+<span class="nc" id="L109">        return pipes;</span>
     }
 
 }

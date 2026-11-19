@@ -13,11 +13,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 
+/**
+ * Service that lists the operation types and their properties from the {@code @JsonSubTypes} annotation on {@link Operation}.
+ */
 @Service
-<span class="fc" id="L17">public class OperationService implements XformService&lt;OperationInfo&gt; {</span>
+public class OperationService implements XformService&lt;OperationInfo&gt; {
+    /**
+     * Creates the service.
+     */
+<span class="fc" id="L24">    public OperationService() {</span>
+        // No state to initialize.
+<span class="fc" id="L26">    }</span>
+
     @Override
     public OperationInfo getObject(UUID id) {
-<span class="nc" id="L20">        return null;</span>
+<span class="nc" id="L30">        return null;</span>
     }
 
     @Override
@@ -26,68 +36,68 @@ import java.util.*;
         // Start with pulling the annotation on the Operation interface
         // Then build up array of OperationInfo to show fields necessary
         // when configuring each operation.
-<span class="nc" id="L29">        Class&lt;?&gt; operationClass = Operation.class;</span>
-<span class="nc" id="L30">        JsonSubTypes subTypesAnnotation = operationClass.getAnnotation(JsonSubTypes.class);</span>
-<span class="nc" id="L31">        List&lt;OperationInfo&gt; operationInfoList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L39">        Class&lt;?&gt; operationClass = Operation.class;</span>
+<span class="nc" id="L40">        JsonSubTypes subTypesAnnotation = operationClass.getAnnotation(JsonSubTypes.class);</span>
+<span class="nc" id="L41">        List&lt;OperationInfo&gt; operationInfoList = new ArrayList&lt;&gt;();</span>
 
-<span class="nc bnc" id="L33" title="All 2 branches missed.">        if (subTypesAnnotation != null) {</span>
-<span class="nc" id="L34">            JsonSubTypes.Type[] types = subTypesAnnotation.value();</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (subTypesAnnotation != null) {</span>
+<span class="nc" id="L44">            JsonSubTypes.Type[] types = subTypesAnnotation.value();</span>
 
-<span class="nc bnc" id="L36" title="All 2 branches missed.">            for (JsonSubTypes.Type type : types) {</span>
-<span class="nc" id="L37">                Class&lt;?&gt; subClass = type.value();</span>
-<span class="nc" id="L38">                OperationInfo info = new OperationInfo();</span>
-<span class="nc" id="L39">                info.setMethod(type.name());</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">            for (JsonSubTypes.Type type : types) {</span>
+<span class="nc" id="L47">                Class&lt;?&gt; subClass = type.value();</span>
+<span class="nc" id="L48">                OperationInfo info = new OperationInfo();</span>
+<span class="nc" id="L49">                info.setMethod(type.name());</span>
 
-<span class="nc" id="L41">                Map&lt;String, OperationInfoProperty&gt; properties = new HashMap&lt;&gt;();</span>
-<span class="nc" id="L42">                getAllFields(subClass, properties);</span>
-<span class="nc" id="L43">                info.setProperties(properties);</span>
+<span class="nc" id="L51">                Map&lt;String, OperationInfoProperty&gt; properties = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L52">                getAllFields(subClass, properties);</span>
+<span class="nc" id="L53">                info.setProperties(properties);</span>
 
-<span class="nc" id="L45">                operationInfoList.add(info);</span>
+<span class="nc" id="L55">                operationInfoList.add(info);</span>
             }
         }
-<span class="nc" id="L48">        ApiEventLogger.logReadEvent(operationInfoList);</span>
-<span class="nc" id="L49">        return operationInfoList;</span>
+<span class="nc" id="L58">        ApiEventLogger.logReadEvent(operationInfoList);</span>
+<span class="nc" id="L59">        return operationInfoList;</span>
     }
 
     @Override
     public void update(OperationInfo obj) {
         // Operations are determined and listed via code reflection, not to be updated in code.
-<span class="nc" id="L55">    }</span>
+<span class="nc" id="L65">    }</span>
 
     @Override
     public void create(OperationInfo obj) {
         // Operations are determined and listed via code reflection, not to be created in code.
-<span class="nc" id="L60">    }</span>
+<span class="nc" id="L70">    }</span>
 
     @Override
     public void delete(UUID id) {
         // Operations are determined and listed via code reflection, not to be deleted in code.
-<span class="nc" id="L65">    }</span>
+<span class="nc" id="L75">    }</span>
 
     private void getAllFields(Class&lt;?&gt; clazz, Map&lt;String, OperationInfoProperty&gt; properties) {
-<span class="nc bnc" id="L68" title="All 4 branches missed.">        if (clazz == null || clazz == Object.class) {</span>
-<span class="nc" id="L69">            return;</span>
+<span class="nc bnc" id="L78" title="All 4 branches missed.">        if (clazz == null || clazz == Object.class) {</span>
+<span class="nc" id="L79">            return;</span>
         }
 
         // Process current class
-<span class="nc bnc" id="L73" title="All 2 branches missed.">        for (Field field : clazz.getDeclaredFields()) {</span>
-<span class="nc bnc" id="L74" title="All 2 branches missed.">            if (shouldIncludeField(field)) {</span>
-<span class="nc" id="L75">                OperationInfoProperty prop = new OperationInfoProperty();</span>
-<span class="nc" id="L76">                prop.setType(field.getType().getSimpleName());</span>
-<span class="nc bnc" id="L77" title="All 2 branches missed.">                prop.setRequired(!field.isAnnotationPresent(Nullable.class));</span>
-<span class="nc" id="L78">                properties.put(field.getName(), prop);</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        for (Field field : clazz.getDeclaredFields()) {</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (shouldIncludeField(field)) {</span>
+<span class="nc" id="L85">                OperationInfoProperty prop = new OperationInfoProperty();</span>
+<span class="nc" id="L86">                prop.setType(field.getType().getSimpleName());</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">                prop.setRequired(!field.isAnnotationPresent(Nullable.class));</span>
+<span class="nc" id="L88">                properties.put(field.getName(), prop);</span>
             }
         }
 
         // Process superclass
-<span class="nc" id="L83">        getAllFields(clazz.getSuperclass(), properties);</span>
-<span class="nc" id="L84">    }</span>
+<span class="nc" id="L93">        getAllFields(clazz.getSuperclass(), properties);</span>
+<span class="nc" id="L94">    }</span>
 
     private boolean shouldIncludeField(Field field) {
         // If a field is annotated with @JsonIgnore in an Operation do not include this in the output.
         // If a field is static do not include in the output.  Only non-static fields would be updated in
         // the state so this will exclude the AspectJ objects that may show up.
-<span class="nc bnc" id="L90" title="All 4 branches missed.">        return !field.isAnnotationPresent(JsonIgnore.class) &amp;&amp; !Modifier.isStatic(field.getModifiers());</span>
+<span class="nc bnc" id="L100" title="All 4 branches missed.">        return !field.isAnnotationPresent(JsonIgnore.class) &amp;&amp; !Modifier.isStatic(field.getModifiers());</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

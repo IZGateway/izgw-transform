@@ -18,39 +18,70 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
-<span class="fc" id="L21">@Log</span>
+/**
+ * REST API for the organizations.
+ */
+<span class="fc" id="L24">@Log</span>
 @Lazy(false)
 @RestController
 public class OrganizationApiController extends BaseApiController {
     private final OrganizationService organizationService;
 
+    /**
+     * Creates the controller and registers it with the access control registry.
+     *
+     * @param organizationService the service for the organizations
+     * @param registry the access control registry
+     */
     @Autowired
     public OrganizationApiController(
             OrganizationService organizationService,
             AccessControlRegistry registry
-<span class="fc" id="L31">    ) {</span>
-<span class="fc" id="L32">        this.organizationService = organizationService;</span>
-<span class="fc" id="L33">        registry.register(this);</span>
-<span class="fc" id="L34">    }</span>
+<span class="fc" id="L40">    ) {</span>
+<span class="fc" id="L41">        this.organizationService = organizationService;</span>
+<span class="fc" id="L42">        registry.register(this);</span>
+<span class="fc" id="L43">    }</span>
 
+    /**
+     * Gets one organization.
+     *
+     * @param uuid the id of the organization
+     * @return the organization, or status 404 if it is not found
+     */
     @RolesAllowed({Roles.ORGANIZATION_READER})
     @GetMapping(&quot;/api/v1/organizations/{uuid}&quot;)
     public ResponseEntity&lt;Organization&gt; getOrganizationByUUID(@PathVariable UUID uuid) {
-<span class="nc" id="L39">        Organization entity = organizationService.getObject(uuid);</span>
-<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (entity == null) {</span>
-<span class="nc" id="L41">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+<span class="nc" id="L54">        Organization entity = organizationService.getObject(uuid);</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (entity == null) {</span>
+<span class="nc" id="L56">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
         }
-<span class="nc" id="L43">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
+<span class="nc" id="L58">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
     }
 
+    /**
+     * Replaces an organization.
+     *
+     * @param uuid the id of the organization
+     * @param updatedOrganization the new organization
+     * @return the updated organization
+     */
     @RolesAllowed({Roles.ADMIN})
     @PutMapping(&quot;/api/v1/organizations/{uuid}&quot;)
     public ResponseEntity&lt;Organization&gt; updateOrganization(@PathVariable UUID uuid, @RequestBody Organization updatedOrganization) {
-<span class="nc" id="L49">        updatedOrganization.setId(uuid);</span>
-<span class="nc" id="L50">        organizationService.update(updatedOrganization);</span>
-<span class="nc" id="L51">        return new ResponseEntity&lt;&gt;(updatedOrganization, HttpStatus.OK);</span>
+<span class="nc" id="L71">        updatedOrganization.setId(uuid);</span>
+<span class="nc" id="L72">        organizationService.update(updatedOrganization);</span>
+<span class="nc" id="L73">        return new ResponseEntity&lt;&gt;(updatedOrganization, HttpStatus.OK);</span>
     }
 
+    /**
+     * Gets one page of organizations.
+     *
+     * @param nextCursor the id of the organization after which the page starts, or null
+     * @param prevCursor the id of the organization before which the page ends, or null
+     * @param includeInactive if true, inactive organizations are included
+     * @param limit the maximum number of organizations in the page
+     * @return the page as JSON, or status 500 if the page cannot be serialized
+     */
     @RolesAllowed({Roles.ORGANIZATION_READER})
     @GetMapping(&quot;/api/v1/organizations&quot;)
     public ResponseEntity&lt;String&gt; getOrganizationsList(
@@ -59,30 +90,42 @@ public class OrganizationApiController extends BaseApiController {
             @RequestParam(defaultValue = &quot;false&quot;) Boolean includeInactive,
             @RequestParam(defaultValue = &quot;10&quot;) int limit) {
         try {
-<span class="nc" id="L62">            return processList(organizationService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
+<span class="nc" id="L93">            return processList(organizationService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
 
-<span class="nc" id="L64">        } catch (JsonProcessingException e) { //need to keep this part of the logic because log.log is dependent on @Log</span>
-<span class="nc" id="L65">            log.log(Level.SEVERE, e.getMessage(), e);</span>
-<span class="nc" id="L66">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="nc" id="L95">        } catch (JsonProcessingException e) { //need to keep this part of the logic because log.log is dependent on @Log</span>
+<span class="nc" id="L96">            log.log(Level.SEVERE, e.getMessage(), e);</span>
+<span class="nc" id="L97">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
         }
     }
 
+    /**
+     * Creates an organization with a new id.
+     *
+     * @param organization the organization to create
+     * @return the created organization
+     */
     @RolesAllowed({Roles.ADMIN})
     @PostMapping(&quot;/api/v1/organizations&quot;)
     public ResponseEntity&lt;Organization&gt; createOrganization(
             @Valid @RequestBody() Organization organization
     ) {
-<span class="nc" id="L75">        organizationService.create(organization);</span>
-<span class="nc" id="L76">        return new ResponseEntity&lt;&gt;(organization, HttpStatus.OK);</span>
+<span class="nc" id="L112">        organizationService.create(organization);</span>
+<span class="nc" id="L113">        return new ResponseEntity&lt;&gt;(organization, HttpStatus.OK);</span>
     }
 
+    /**
+     * Deletes an organization.
+     *
+     * @param uuid the id of the organization
+     * @return status 204
+     */
     @RolesAllowed({Roles.ADMIN})
     @DeleteMapping(&quot;/api/v1/organizations/{uuid}&quot;)
     public ResponseEntity&lt;Organization&gt; deleteOrganization(
             @PathVariable UUID uuid
     ) {
-<span class="nc" id="L84">        organizationService.delete(uuid);</span>
-<span class="nc" id="L85">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+<span class="nc" id="L127">        organizationService.delete(uuid);</span>
+<span class="nc" id="L128">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

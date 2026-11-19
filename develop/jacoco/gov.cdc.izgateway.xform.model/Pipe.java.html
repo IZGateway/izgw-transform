@@ -18,11 +18,14 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbIgnor
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * A step of a pipeline that runs a version of a solution when its preconditions are met.
+ */
 @Getter
 @Setter
 @ValidSolution
 @DynamoDbBean
-<span class="nc" id="L25">public class Pipe {</span>
+public class Pipe {
     @NotNull(message = &quot;Pipe ID is required&quot;)
     private UUID id;
 
@@ -36,6 +39,13 @@ import java.util.UUID;
     @Valid
     private List&lt;Precondition&gt; preconditions;
 
+    /**
+     * Creates an empty pipe.
+     */
+<span class="nc" id="L45">    public Pipe() {</span>
+        // Jackson and the DynamoDB Enhanced Client set the fields.
+<span class="nc" id="L47">    }</span>
+
     /*
      * DynamoDB only has built-in conversion for primitives (String, Integer, etc...)
      * and simple collections (List&lt;String&gt; for example).
@@ -43,36 +53,51 @@ import java.util.UUID;
      * understand Jackson's @JsonSubTypes we need to create these getter/setters.
      */
 
+    /**
+     * Returns the preconditions of the pipe. DynamoDB stores them as JSON through {@link #getPreconditionsJson()}.
+     *
+     * @return the preconditions
+     */
     @DynamoDbIgnore
     public List&lt;Precondition&gt; getPreconditions() {
-<span class="nc" id="L48">        return preconditions;</span>
+<span class="nc" id="L63">        return preconditions;</span>
     }
 
-<span class="nc" id="L51">    private static final ObjectMapper objectMapper = new ObjectMapper();</span>
+<span class="nc" id="L66">    private static final ObjectMapper objectMapper = new ObjectMapper();</span>
 
+    /**
+     * Returns the preconditions as JSON for storage in DynamoDB.
+     *
+     * @return the preconditions as JSON, or null if there are no preconditions
+     */
     @JsonIgnore
     @DynamoDbAttribute(&quot;preconditions&quot;)
     public String getPreconditionsJson() {
-<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (preconditions == null) {</span>
-<span class="nc" id="L57">            return null;</span>
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (preconditions == null) {</span>
+<span class="nc" id="L77">            return null;</span>
         }
         try {
-<span class="nc" id="L60">            return objectMapper.writeValueAsString(preconditions);</span>
-<span class="nc" id="L61">        } catch (JsonProcessingException e) {</span>
-<span class="nc" id="L62">            throw new RuntimeException(&quot;Error serializing preconditions&quot;, e);</span>
+<span class="nc" id="L80">            return objectMapper.writeValueAsString(preconditions);</span>
+<span class="nc" id="L81">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L82">            throw new RuntimeException(&quot;Error serializing preconditions&quot;, e);</span>
         }
     }
 
+    /**
+     * Sets the preconditions from the JSON stored in DynamoDB.
+     *
+     * @param preconditionsJson the preconditions as JSON, or null
+     */
     public void setPreconditionsJson(String preconditionsJson) {
-<span class="nc bnc" id="L67" title="All 2 branches missed.">        if (preconditionsJson == null) {</span>
-<span class="nc" id="L68">            this.preconditions = null;</span>
-<span class="nc" id="L69">            return;</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        if (preconditionsJson == null) {</span>
+<span class="nc" id="L93">            this.preconditions = null;</span>
+<span class="nc" id="L94">            return;</span>
         }
         try {
-<span class="nc" id="L72">            this.preconditions = objectMapper.readValue(preconditionsJson, new TypeReference&lt;List&lt;Precondition&gt;&gt;() {});</span>
-<span class="nc" id="L73">        } catch (JsonProcessingException e) {</span>
-<span class="nc" id="L74">            throw new RuntimeException(&quot;Error deserializing preconditions&quot;, e);</span>
-<span class="nc" id="L75">        }</span>
-<span class="nc" id="L76">    }</span>
+<span class="nc" id="L97">            this.preconditions = objectMapper.readValue(preconditionsJson, new TypeReference&lt;List&lt;Precondition&gt;&gt;() {});</span>
+<span class="nc" id="L98">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L99">            throw new RuntimeException(&quot;Error deserializing preconditions&quot;, e);</span>
+<span class="nc" id="L100">        }</span>
+<span class="nc" id="L101">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

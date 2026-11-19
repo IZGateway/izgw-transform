@@ -21,16 +21,20 @@ import java.util.UUID;
 @Setter
 @DynamoDbBean
 public class Event extends BaseModel {
+	/** The name of the event that records a data migration. */
 	public static final String MIGRATION = &quot;Migration&quot;;
 
     private String name;
-<span class="nc" id="L27">    private Instant started = Instant.now();</span>
+<span class="nc" id="L28">    private Instant started = Instant.now();</span>
     private Instant completed;
-<span class="nc" id="L29">    private String reportedBy = SystemUtils.getHostname();</span>
-<span class="nc" id="L30">    private UUID id = UUID.randomUUID();</span>
-<span class="nc" id="L31">    private Boolean active =  true;</span>
+<span class="nc" id="L30">    private String reportedBy = SystemUtils.getHostname();</span>
+<span class="nc" id="L31">    private UUID id = UUID.randomUUID();</span>
+<span class="nc" id="L32">    private Boolean active =  true;</span>
     
-<span class="nc" id="L33">    public Event() {</span>
-<span class="nc" id="L34">    }</span>
+    /**
+     * Creates an event that starts now and is reported by this host.
+     */
+<span class="nc" id="L37">    public Event() {</span>
+<span class="nc" id="L38">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

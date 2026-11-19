@@ -11,7 +11,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
 
 import javax.security.auth.x500.X500Principal;
 import java.io.*;
@@ -36,7 +36,7 @@ import java.util.Date;
  * for the application.  This is done by specifying this class in the META-INF/spring.factories file.
  */
 <span class="fc" id="L38">@Slf4j</span>
-<span class="fc" id="L39">public class CertificateBootstrapService implements ApplicationListener&lt;ApplicationEnvironmentPreparedEvent&gt; {</span>
+public class CertificateBootstrapService implements ApplicationListener&lt;ApplicationEnvironmentPreparedEvent&gt; {
     private static final String XFORM_INIT = &quot;XFORM_INIT&quot;;
     private static final String XFORM_CRYPTO_CLIENT_CERT_FILE = &quot;XFORM_CRYPTO_CLIENT_CERT_FILE&quot;;
     private static final String XFORM_CRYPTO_CLIENT_KEY_FILE = &quot;XFORM_CRYPTO_CLIENT_KEY_FILE&quot;;
@@ -64,50 +64,56 @@ import java.util.Date;
 <span class="fc" id="L64">    private volatile boolean initialized = false;</span>
 
     /**
+     * Creates the service. Spring creates it from the META-INF/spring.factories file.
+     */
+<span class="fc" id="L69">    public CertificateBootstrapService() {</span>
+<span class="fc" id="L70">    }</span>
+
+    /**
      * Handles the ApplicationEnvironmentPreparedEvent to trigger certificate and keystore/truststore initialization.
      * @param event the Spring application environment prepared event
      */
     @Override
     public void onApplicationEvent(@Nullable ApplicationEnvironmentPreparedEvent event) {
-<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (!performInitialization()) return;</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if (!performInitialization()) return;</span>
 
-<span class="fc" id="L74">        log.info(&quot;CertificateBootstrapService is initializing...&quot;);</span>
+<span class="fc" id="L80">        log.info(&quot;CertificateBootstrapService is initializing...&quot;);</span>
 
         try {
-<span class="fc" id="L77">            createInitialClientCertificateAndTrust();</span>
-<span class="nc" id="L78">        } catch (CertificateBootstrapException e) {</span>
-<span class="nc" id="L79">            throw new RuntimeException(e);</span>
-<span class="fc" id="L80">        }</span>
+<span class="fc" id="L83">            createInitialClientCertificateAndTrust();</span>
+<span class="nc" id="L84">        } catch (CertificateBootstrapException e) {</span>
+<span class="nc" id="L85">            throw new RuntimeException(e);</span>
+<span class="fc" id="L86">        }</span>
 
-<span class="fc" id="L82">        log.info(&quot;CertificateBootstrapService has completed.&quot;);</span>
-<span class="fc" id="L83">    }</span>
+<span class="fc" id="L88">        log.info(&quot;CertificateBootstrapService has completed.&quot;);</span>
+<span class="fc" id="L89">    }</span>
 
     /**
      * Checks if initialization should be performed and loads required environment variables.
      * @return true if initialization should proceed, false otherwise
      */
     private boolean performInitialization() {
-<span class="pc bpc" id="L90" title="1 of 2 branches missed.">        if (initialized) {</span>
-<span class="nc" id="L91">            log.debug(&quot;CertificateBootstrapService already initialized, skipping...&quot;);</span>
-<span class="nc" id="L92">            return false;</span>
-        }
-
-<span class="fc" id="L95">        String initValue = getEnv(XFORM_INIT);</span>
-
-<span class="pc bpc" id="L97" title="2 of 4 branches missed.">        if (StringUtils.isEmpty(initValue) || !initValue.equalsIgnoreCase(&quot;true&quot;)) {</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">        if (initialized) {</span>
+<span class="nc" id="L97">            log.debug(&quot;CertificateBootstrapService already initialized, skipping...&quot;);</span>
 <span class="nc" id="L98">            return false;</span>
         }
 
-<span class="fc" id="L101">        certPath = getEnvStrict(XFORM_CRYPTO_CLIENT_CERT_FILE);</span>
-<span class="fc" id="L102">        privateKeyPath = getEnvStrict(XFORM_CRYPTO_CLIENT_KEY_FILE);</span>
-<span class="fc" id="L103">        trustStorePath = getEnvStrict(XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE);</span>
-<span class="fc" id="L104">        trustStorePassword = getEnvStrict(COMMON_PASS);</span>
-<span class="fc" id="L105">        clientTrustStorePath = getEnvStrict(XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE);</span>
-<span class="fc" id="L106">        clientTrustStorePassword = getEnvStrict(COMMON_PASS);</span>
-<span class="fc" id="L107">        clientKeyStorePath = getEnvStrict(XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE);</span>
-<span class="fc" id="L108">        clientKeyStorePassword = getEnvStrict(COMMON_PASS);</span>
+<span class="fc" id="L101">        String initValue = getEnv(XFORM_INIT);</span>
 
-<span class="fc" id="L110">        return true;</span>
+<span class="pc bpc" id="L103" title="2 of 4 branches missed.">        if (StringUtils.isEmpty(initValue) || !initValue.equalsIgnoreCase(&quot;true&quot;)) {</span>
+<span class="nc" id="L104">            return false;</span>
+        }
+
+<span class="fc" id="L107">        certPath = getEnvStrict(XFORM_CRYPTO_CLIENT_CERT_FILE);</span>
+<span class="fc" id="L108">        privateKeyPath = getEnvStrict(XFORM_CRYPTO_CLIENT_KEY_FILE);</span>
+<span class="fc" id="L109">        trustStorePath = getEnvStrict(XFORM_CRYPTO_STORE_TRUST_TOMCAT_SERVER_FILE);</span>
+<span class="fc" id="L110">        trustStorePassword = getEnvStrict(COMMON_PASS);</span>
+<span class="fc" id="L111">        clientTrustStorePath = getEnvStrict(XFORM_CRYPTO_STORE_TRUST_WS_CLIENT_FILE);</span>
+<span class="fc" id="L112">        clientTrustStorePassword = getEnvStrict(COMMON_PASS);</span>
+<span class="fc" id="L113">        clientKeyStorePath = getEnvStrict(XFORM_CRYPTO_STORE_KEY_WS_CLIENT_FILE);</span>
+<span class="fc" id="L114">        clientKeyStorePassword = getEnvStrict(COMMON_PASS);</span>
+
+<span class="fc" id="L116">        return true;</span>
     }
 
     /**
@@ -116,27 +122,27 @@ import java.util.Date;
      */
     private void createInitialClientCertificateAndTrust() throws CertificateBootstrapException {
         try {
-<span class="fc" id="L119">            Path certFile = Paths.get(certPath);</span>
-<span class="fc" id="L120">            Path keyFile = Paths.get(privateKeyPath);</span>
+<span class="fc" id="L125">            Path certFile = Paths.get(certPath);</span>
+<span class="fc" id="L126">            Path keyFile = Paths.get(privateKeyPath);</span>
 
             // Generate new certificate and key pair
-<span class="fc" id="L123">            KeyPair keyPair = generateKeyPair();</span>
-<span class="fc" id="L124">            X509Certificate certificate = generateSelfSignedCertificate(keyPair);</span>
+<span class="fc" id="L129">            KeyPair keyPair = generateKeyPair();</span>
+<span class="fc" id="L130">            X509Certificate certificate = generateSelfSignedCertificate(keyPair);</span>
 
             // Save certificate and private key
-<span class="fc" id="L127">            saveCertificate(certificate, certFile);</span>
-<span class="fc" id="L128">            savePrivateKey(keyPair.getPrivate(), keyFile);</span>
+<span class="fc" id="L133">            saveCertificate(certificate, certFile);</span>
+<span class="fc" id="L134">            savePrivateKey(keyPair.getPrivate(), keyFile);</span>
 
             // Update trust stores and create key store
-<span class="fc" id="L131">            addCertificateToTrustStore(certificate, trustStorePath, trustStorePassword);</span>
-<span class="fc" id="L132">            addCertificateToTrustStore(certificate, clientTrustStorePath, clientTrustStorePassword);</span>
-<span class="fc" id="L133">            addCertificateAndKeyToKeyStore(certificate, keyPair, clientKeyStorePath, clientKeyStorePassword);</span>
+<span class="fc" id="L137">            addCertificateToTrustStore(certificate, trustStorePath, trustStorePassword);</span>
+<span class="fc" id="L138">            addCertificateToTrustStore(certificate, clientTrustStorePath, clientTrustStorePassword);</span>
+<span class="fc" id="L139">            addCertificateAndKeyToKeyStore(certificate, keyPair, clientKeyStorePath, clientKeyStorePassword);</span>
 
-<span class="fc" id="L135">            initialized = true;</span>
-<span class="nc" id="L136">        } catch (Exception e) {</span>
-<span class="nc" id="L137">            throw new CertificateBootstrapException(&quot;Certificate bootstrap failed&quot;, e);</span>
-<span class="fc" id="L138">        }</span>
-<span class="fc" id="L139">    }</span>
+<span class="fc" id="L141">            initialized = true;</span>
+<span class="nc" id="L142">        } catch (Exception e) {</span>
+<span class="nc" id="L143">            throw new CertificateBootstrapException(&quot;Certificate bootstrap failed&quot;, e);</span>
+<span class="fc" id="L144">        }</span>
+<span class="fc" id="L145">    }</span>
 
     /**
      * Loads an existing keystore or creates a new one if it does not exist.
@@ -147,23 +153,23 @@ import java.util.Date;
      */
     private KeyStore loadOrCreateKeyStore(String keyStorePath, String password) throws CertificateBootstrapException {
         try {
-<span class="fc" id="L150">            File keyStoreFile = new File(keyStorePath);</span>
-<span class="fc" id="L151">            Files.createDirectories(keyStoreFile.toPath().getParent());</span>
+<span class="fc" id="L156">            File keyStoreFile = new File(keyStorePath);</span>
+<span class="fc" id="L157">            Files.createDirectories(keyStoreFile.toPath().getParent());</span>
 
-<span class="fc" id="L153">            KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE, PROVIDER);</span>
+<span class="fc" id="L159">            KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE, PROVIDER);</span>
 
-<span class="fc bfc" id="L155" title="All 2 branches covered.">            if (keyStoreFile.exists()) {</span>
-<span class="fc" id="L156">                try (FileInputStream fis = new FileInputStream(keyStoreFile)) {</span>
-<span class="fc" id="L157">                    keyStore.load(fis, password.toCharArray());</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">            if (keyStoreFile.exists()) {</span>
+<span class="fc" id="L162">                try (FileInputStream fis = new FileInputStream(keyStoreFile)) {</span>
+<span class="fc" id="L163">                    keyStore.load(fis, password.toCharArray());</span>
                 }
             } else {
-<span class="fc" id="L160">                keyStore.load(null, password.toCharArray());</span>
+<span class="fc" id="L166">                keyStore.load(null, password.toCharArray());</span>
             }
 
-<span class="fc" id="L163">            return keyStore;</span>
+<span class="fc" id="L169">            return keyStore;</span>
 
-<span class="nc" id="L165">        } catch (IOException | NoSuchProviderException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {</span>
-<span class="nc" id="L166">            throw new CertificateBootstrapException(&quot;Failed to load or create KeyStore&quot;, e);</span>
+<span class="nc" id="L171">        } catch (IOException | NoSuchProviderException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {</span>
+<span class="nc" id="L172">            throw new CertificateBootstrapException(&quot;Failed to load or create KeyStore&quot;, e);</span>
         }
     }
 
@@ -176,14 +182,14 @@ import java.util.Date;
      */
     private void saveKeyStore(KeyStore keyStore, String keyStorePath, String password) throws CertificateBootstrapException {
         try {
-<span class="fc" id="L179">            FileOutputStream fos = new FileOutputStream(keyStorePath);</span>
-<span class="fc" id="L180">            keyStore.store(fos, password.toCharArray());</span>
-<span class="fc" id="L181">            log.info(&quot;KeyStore saved to {}&quot;, keyStorePath);</span>
+<span class="fc" id="L185">            FileOutputStream fos = new FileOutputStream(keyStorePath);</span>
+<span class="fc" id="L186">            keyStore.store(fos, password.toCharArray());</span>
+<span class="fc" id="L187">            log.info(&quot;KeyStore saved to {}&quot;, keyStorePath);</span>
 
-<span class="nc" id="L183">        } catch(IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {</span>
-<span class="nc" id="L184">            throw new CertificateBootstrapException(&quot;Failed to save KeyStore&quot;, e);</span>
-<span class="fc" id="L185">        }</span>
-<span class="fc" id="L186">    }</span>
+<span class="nc" id="L189">        } catch(IOException | KeyStoreException | NoSuchAlgorithmException | CertificateException e) {</span>
+<span class="nc" id="L190">            throw new CertificateBootstrapException(&quot;Failed to save KeyStore&quot;, e);</span>
+<span class="fc" id="L191">        }</span>
+<span class="fc" id="L192">    }</span>
 
     /**
      * Adds the given certificate to the specified trust store.
@@ -194,24 +200,24 @@ import java.util.Date;
      */
     private void addCertificateToTrustStore(X509Certificate certificate, String trustStorePath, String password) throws CertificateBootstrapException {
         try {
-<span class="fc" id="L197">            KeyStore trustStore = loadOrCreateKeyStore(trustStorePath, password);</span>
+<span class="fc" id="L203">            KeyStore trustStore = loadOrCreateKeyStore(trustStorePath, password);</span>
 
-<span class="pc bpc" id="L199" title="1 of 2 branches missed.">            if (trustStore.containsAlias(CERTIFICATE_ALIAS)) {</span>
-<span class="nc" id="L200">                Certificate existingCert = trustStore.getCertificate(CERTIFICATE_ALIAS);</span>
-<span class="nc bnc" id="L201" title="All 2 branches missed.">                if (existingCert.equals(certificate)) {</span>
-<span class="nc" id="L202">                    return;</span>
+<span class="pc bpc" id="L205" title="1 of 2 branches missed.">            if (trustStore.containsAlias(CERTIFICATE_ALIAS)) {</span>
+<span class="nc" id="L206">                Certificate existingCert = trustStore.getCertificate(CERTIFICATE_ALIAS);</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">                if (existingCert.equals(certificate)) {</span>
+<span class="nc" id="L208">                    return;</span>
                 } else {
                     // Remove existing certificate if different
-<span class="nc" id="L205">                    trustStore.deleteEntry(CERTIFICATE_ALIAS);</span>
+<span class="nc" id="L211">                    trustStore.deleteEntry(CERTIFICATE_ALIAS);</span>
                 }
             }
 
-<span class="fc" id="L209">            trustStore.setCertificateEntry(CERTIFICATE_ALIAS, certificate);</span>
-<span class="fc" id="L210">            saveKeyStore(trustStore, trustStorePath, password);</span>
-<span class="nc" id="L211">        } catch (KeyStoreException e) {</span>
-<span class="nc" id="L212">            throw new CertificateBootstrapException(&quot;Failed to add certificate to trust store&quot;, e);</span>
-<span class="fc" id="L213">        }</span>
-<span class="fc" id="L214">    }</span>
+<span class="fc" id="L215">            trustStore.setCertificateEntry(CERTIFICATE_ALIAS, certificate);</span>
+<span class="fc" id="L216">            saveKeyStore(trustStore, trustStorePath, password);</span>
+<span class="nc" id="L217">        } catch (KeyStoreException e) {</span>
+<span class="nc" id="L218">            throw new CertificateBootstrapException(&quot;Failed to add certificate to trust store&quot;, e);</span>
+<span class="fc" id="L219">        }</span>
+<span class="fc" id="L220">    }</span>
 
     /**
      * Adds the given certificate and private key to the specified key store.
@@ -223,13 +229,13 @@ import java.util.Date;
      */
     private void addCertificateAndKeyToKeyStore(X509Certificate certificate, KeyPair keyPair, String keyStorePath, String password) throws CertificateBootstrapException {
         try {
-<span class="fc" id="L226">            KeyStore keyStore = loadOrCreateKeyStore(keyStorePath, password);</span>
-<span class="fc" id="L227">            keyStore.setKeyEntry(CERTIFICATE_ALIAS, keyPair.getPrivate(), password.toCharArray(), new Certificate[]{certificate});</span>
-<span class="fc" id="L228">            saveKeyStore(keyStore, keyStorePath, password);</span>
-<span class="nc" id="L229">        } catch (KeyStoreException e) {</span>
-<span class="nc" id="L230">            throw new CertificateBootstrapException(&quot;Failed to add cert and key to keystore&quot;, e);</span>
-<span class="fc" id="L231">        }</span>
-<span class="fc" id="L232">    }</span>
+<span class="fc" id="L232">            KeyStore keyStore = loadOrCreateKeyStore(keyStorePath, password);</span>
+<span class="fc" id="L233">            keyStore.setKeyEntry(CERTIFICATE_ALIAS, keyPair.getPrivate(), password.toCharArray(), new Certificate[]{certificate});</span>
+<span class="fc" id="L234">            saveKeyStore(keyStore, keyStorePath, password);</span>
+<span class="nc" id="L235">        } catch (KeyStoreException e) {</span>
+<span class="nc" id="L236">            throw new CertificateBootstrapException(&quot;Failed to add cert and key to keystore&quot;, e);</span>
+<span class="fc" id="L237">        }</span>
+<span class="fc" id="L238">    }</span>
 
     /**
      * Generates a new RSA key pair using the Bouncy Castle FIPS provider.
@@ -238,11 +244,11 @@ import java.util.Date;
      */
     private KeyPair generateKeyPair() throws CertificateBootstrapException {
         try {
-<span class="fc" id="L241">            KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_ALGORITHM, PROVIDER);</span>
-<span class="fc" id="L242">            keyGen.initialize(KEY_SIZE, new SecureRandom());</span>
-<span class="fc" id="L243">            return keyGen.generateKeyPair();</span>
-<span class="nc" id="L244">        } catch (NoSuchProviderException | NoSuchAlgorithmException e) {</span>
-<span class="nc" id="L245">            throw new CertificateBootstrapException(&quot;Failed to add Bouncy Castle FIPS provider&quot;, e);</span>
+<span class="fc" id="L247">            KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_ALGORITHM, PROVIDER);</span>
+<span class="fc" id="L248">            keyGen.initialize(KEY_SIZE, new SecureRandom());</span>
+<span class="fc" id="L249">            return keyGen.generateKeyPair();</span>
+<span class="nc" id="L250">        } catch (NoSuchProviderException | NoSuchAlgorithmException e) {</span>
+<span class="nc" id="L251">            throw new CertificateBootstrapException(&quot;Failed to add Bouncy Castle FIPS provider&quot;, e);</span>
         }
     }
 
@@ -254,31 +260,31 @@ import java.util.Date;
      */
     private X509Certificate generateSelfSignedCertificate(KeyPair keyPair) throws CertificateBootstrapException {
         try {
-<span class="fc" id="L257">            X500Name subject = new X500Name(&quot;CN=xform.local.testing.only, O=izgateway&quot;);</span>
-<span class="fc" id="L258">            X500Principal principal = new X500Principal(subject.getEncoded());</span>
+<span class="fc" id="L263">            X500Name subject = new X500Name(&quot;CN=xform.local.testing.only, O=izgateway&quot;);</span>
+<span class="fc" id="L264">            X500Principal principal = new X500Principal(subject.getEncoded());</span>
 
-<span class="fc" id="L260">            LocalDateTime notBefore = LocalDateTime.now();</span>
-<span class="fc" id="L261">            LocalDateTime notAfter = notBefore.plusYears(1);</span>
+<span class="fc" id="L266">            LocalDateTime notBefore = LocalDateTime.now();</span>
+<span class="fc" id="L267">            LocalDateTime notAfter = notBefore.plusYears(1);</span>
 
-<span class="fc" id="L263">            JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(</span>
+<span class="fc" id="L269">            JcaX509v3CertificateBuilder certBuilder = new JcaX509v3CertificateBuilder(</span>
                     principal,
-<span class="fc" id="L265">                    BigInteger.valueOf(System.currentTimeMillis()),</span>
-<span class="fc" id="L266">                    Date.from(notBefore.atZone(ZoneId.systemDefault()).toInstant()),</span>
-<span class="fc" id="L267">                    Date.from(notAfter.atZone(ZoneId.systemDefault()).toInstant()),</span>
+<span class="fc" id="L271">                    BigInteger.valueOf(System.currentTimeMillis()),</span>
+<span class="fc" id="L272">                    Date.from(notBefore.atZone(ZoneId.systemDefault()).toInstant()),</span>
+<span class="fc" id="L273">                    Date.from(notAfter.atZone(ZoneId.systemDefault()).toInstant()),</span>
                     principal,
-<span class="fc" id="L269">                    keyPair.getPublic()</span>
+<span class="fc" id="L275">                    keyPair.getPublic()</span>
             );
 
-<span class="fc" id="L272">            ContentSigner signer = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM)</span>
-<span class="fc" id="L273">                    .setProvider(PROVIDER)</span>
-<span class="fc" id="L274">                    .build(keyPair.getPrivate());</span>
+<span class="fc" id="L278">            ContentSigner signer = new JcaContentSignerBuilder(SIGNATURE_ALGORITHM)</span>
+<span class="fc" id="L279">                    .setProvider(PROVIDER)</span>
+<span class="fc" id="L280">                    .build(keyPair.getPrivate());</span>
 
-<span class="fc" id="L276">            X509CertificateHolder certHolder = certBuilder.build(signer);</span>
-<span class="fc" id="L277">            return new JcaX509CertificateConverter()</span>
-<span class="fc" id="L278">                    .setProvider(PROVIDER)</span>
-<span class="fc" id="L279">                    .getCertificate(certHolder);</span>
-<span class="nc" id="L280">        } catch (IOException | OperatorCreationException | CertificateException e) {</span>
-<span class="nc" id="L281">            throw new CertificateBootstrapException(&quot;Failed to generate self-signed certificate&quot;, e);</span>
+<span class="fc" id="L282">            X509CertificateHolder certHolder = certBuilder.build(signer);</span>
+<span class="fc" id="L283">            return new JcaX509CertificateConverter()</span>
+<span class="fc" id="L284">                    .setProvider(PROVIDER)</span>
+<span class="fc" id="L285">                    .getCertificate(certHolder);</span>
+<span class="nc" id="L286">        } catch (IOException | OperatorCreationException | CertificateException e) {</span>
+<span class="nc" id="L287">            throw new CertificateBootstrapException(&quot;Failed to generate self-signed certificate&quot;, e);</span>
         }
     }
 
@@ -290,18 +296,18 @@ import java.util.Date;
      */
     private void saveCertificate(X509Certificate certificate, Path path) throws CertificateBootstrapException {
         try {
-<span class="fc" id="L293">            Files.createDirectories(path.getParent());</span>
-<span class="fc" id="L294">            PrintWriter writer = new PrintWriter(new FileWriter(path.toFile()));</span>
-<span class="fc" id="L295">            writer.println(&quot;-----BEGIN CERTIFICATE-----&quot;);</span>
-<span class="fc" id="L296">            writer.println(Base64.getEncoder().encodeToString(certificate.getEncoded()));</span>
-<span class="fc" id="L297">            writer.println(&quot;-----END CERTIFICATE-----&quot;);</span>
-<span class="fc" id="L298">            writer.close();</span>
-<span class="fc" id="L299">            log.info(&quot;Certificate saved to {}&quot;, path);</span>
-<span class="nc" id="L300">        } catch (IOException | CertificateEncodingException e) {</span>
-<span class="nc" id="L301">            throw new CertificateBootstrapException(&quot;Failed to save certificate file&quot;, e);</span>
-<span class="fc" id="L302">        }</span>
+<span class="fc" id="L299">            Files.createDirectories(path.getParent());</span>
+<span class="fc" id="L300">            PrintWriter writer = new PrintWriter(new FileWriter(path.toFile()));</span>
+<span class="fc" id="L301">            writer.println(&quot;-----BEGIN CERTIFICATE-----&quot;);</span>
+<span class="fc" id="L302">            writer.println(Base64.getEncoder().encodeToString(certificate.getEncoded()));</span>
+<span class="fc" id="L303">            writer.println(&quot;-----END CERTIFICATE-----&quot;);</span>
+<span class="fc" id="L304">            writer.close();</span>
+<span class="fc" id="L305">            log.info(&quot;Certificate saved to {}&quot;, path);</span>
+<span class="nc" id="L306">        } catch (IOException | CertificateEncodingException e) {</span>
+<span class="nc" id="L307">            throw new CertificateBootstrapException(&quot;Failed to save certificate file&quot;, e);</span>
+<span class="fc" id="L308">        }</span>
 
-<span class="fc" id="L304">    }</span>
+<span class="fc" id="L310">    }</span>
 
     /**
      * Saves the given private key to a file in PEM format.
@@ -311,18 +317,18 @@ import java.util.Date;
      */
     private void savePrivateKey(PrivateKey privateKey, Path path) throws CertificateBootstrapException {
         try {
-<span class="fc" id="L314">            Files.createDirectories(path.getParent());</span>
-<span class="fc" id="L315">            PrintWriter writer = new PrintWriter(new FileWriter(path.toFile()));</span>
-<span class="fc" id="L316">            writer.println(&quot;-----BEGIN RSA PRIVATE KEY-----&quot;);</span>
-<span class="fc" id="L317">            writer.println(Base64.getEncoder().encodeToString(privateKey.getEncoded()));</span>
-<span class="fc" id="L318">            writer.println(&quot;-----END RSA PRIVATE KEY-----&quot;);</span>
-<span class="fc" id="L319">            writer.close();</span>
+<span class="fc" id="L320">            Files.createDirectories(path.getParent());</span>
+<span class="fc" id="L321">            PrintWriter writer = new PrintWriter(new FileWriter(path.toFile()));</span>
+<span class="fc" id="L322">            writer.println(&quot;-----BEGIN RSA PRIVATE KEY-----&quot;);</span>
+<span class="fc" id="L323">            writer.println(Base64.getEncoder().encodeToString(privateKey.getEncoded()));</span>
+<span class="fc" id="L324">            writer.println(&quot;-----END RSA PRIVATE KEY-----&quot;);</span>
+<span class="fc" id="L325">            writer.close();</span>
 
-<span class="fc" id="L321">            log.info(&quot;Private key saved to {}&quot;, path);</span>
-<span class="nc" id="L322">        } catch (IOException e) {</span>
-<span class="nc" id="L323">            throw new CertificateBootstrapException(&quot;Failed to create directories for private key file&quot;, e);</span>
-<span class="fc" id="L324">        }</span>
-<span class="fc" id="L325">    }</span>
+<span class="fc" id="L327">            log.info(&quot;Private key saved to {}&quot;, path);</span>
+<span class="nc" id="L328">        } catch (IOException e) {</span>
+<span class="nc" id="L329">            throw new CertificateBootstrapException(&quot;Failed to create directories for private key file&quot;, e);</span>
+<span class="fc" id="L330">        }</span>
+<span class="fc" id="L331">    }</span>
 
     /**
      * Get the value of an environment variable.
@@ -331,7 +337,7 @@ import java.util.Date;
      * @return The value of the environment variable, or null if not set.
      */
     private String getEnv(String variableName) {
-<span class="fc" id="L334">        return System.getenv(variableName);</span>
+<span class="fc" id="L340">        return System.getenv(variableName);</span>
     }
 
     /**
@@ -341,11 +347,11 @@ import java.util.Date;
      * @return The value of the environment variable, or null if not set.
      */
     private String getEnvStrict(String variableName) {
-<span class="fc" id="L344">        String value = getEnv(variableName);</span>
-<span class="pc bpc" id="L345" title="1 of 2 branches missed.">        if (StringUtils.isEmpty(value)) {</span>
-<span class="nc" id="L346">            throw new IllegalStateException(&quot;Environment variable &quot; + variableName + &quot; is not set&quot;);</span>
+<span class="fc" id="L350">        String value = getEnv(variableName);</span>
+<span class="pc bpc" id="L351" title="1 of 2 branches missed.">        if (StringUtils.isEmpty(value)) {</span>
+<span class="nc" id="L352">            throw new IllegalStateException(&quot;Environment variable &quot; + variableName + &quot; is not set&quot;);</span>
         }
-<span class="fc" id="L348">        return value;</span>
+<span class="fc" id="L354">        return value;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

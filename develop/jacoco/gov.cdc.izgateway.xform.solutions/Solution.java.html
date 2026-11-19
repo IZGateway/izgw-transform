@@ -12,55 +12,67 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Runtime form of a configured solution that runs its request or response operations on a message.
+ */
 public class Solution implements Advisable, Transformable {
 
     private final gov.cdc.izgateway.xform.model.Solution configuration;
     private final List&lt;SolutionOperation&gt; requestOperations;
     private final List&lt;SolutionOperation&gt; responseOperations;
-<span class="nc" id="L20">    private boolean hasTransformed = false;</span>
+<span class="nc" id="L23">    private boolean hasTransformed = false;</span>
 
-<span class="nc" id="L22">    public Solution(gov.cdc.izgateway.xform.model.Solution configuration) {</span>
-<span class="nc" id="L23">        this.configuration = configuration;</span>
-<span class="nc" id="L24">        requestOperations = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L25">        responseOperations = new ArrayList&lt;&gt;();</span>
+    /**
+     * Creates a runtime solution from its configuration.
+     * @param configuration the solution configuration
+     */
+<span class="nc" id="L29">    public Solution(gov.cdc.izgateway.xform.model.Solution configuration) {</span>
+<span class="nc" id="L30">        this.configuration = configuration;</span>
+<span class="nc" id="L31">        requestOperations = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L32">        responseOperations = new ArrayList&lt;&gt;();</span>
 
-<span class="nc" id="L27">        String solutionName = configuration.getSolutionName();</span>
+<span class="nc" id="L34">        String solutionName = configuration.getSolutionName();</span>
 
-<span class="nc bnc" id="L29" title="All 2 branches missed.">        for (gov.cdc.izgateway.xform.model.SolutionOperation so : configuration.getRequestOperations()) {</span>
-<span class="nc" id="L30">            requestOperations.add(new SolutionOperation(so, solutionName, DataFlowDirection.REQUEST));</span>
-<span class="nc" id="L31">        }</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        for (gov.cdc.izgateway.xform.model.SolutionOperation so : configuration.getRequestOperations()) {</span>
+<span class="nc" id="L37">            requestOperations.add(new SolutionOperation(so, solutionName, DataFlowDirection.REQUEST));</span>
+<span class="nc" id="L38">        }</span>
 
-<span class="nc bnc" id="L33" title="All 2 branches missed.">        for (gov.cdc.izgateway.xform.model.SolutionOperation so : configuration.getResponseOperations()) {</span>
-<span class="nc" id="L34">            responseOperations.add(new SolutionOperation(so, solutionName, DataFlowDirection.RESPONSE));</span>
-<span class="nc" id="L35">        }</span>
-<span class="nc" id="L36">    }</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        for (gov.cdc.izgateway.xform.model.SolutionOperation so : configuration.getResponseOperations()) {</span>
+<span class="nc" id="L41">            responseOperations.add(new SolutionOperation(so, solutionName, DataFlowDirection.RESPONSE));</span>
+<span class="nc" id="L42">        }</span>
+<span class="nc" id="L43">    }</span>
 
+    /**
+     * Runs the request or response operations, as selected by the current direction of the context.
+     * @param context the context of the message to transform
+     * @throws SolutionException if an operation fails
+     */
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws SolutionException {
-<span class="nc bnc" id="L40" title="All 2 branches missed.">    	List&lt;SolutionOperation&gt; source = context.getCurrentDirection().equals(DataFlowDirection.REQUEST) ? requestOperations : responseOperations;</span>
-<span class="nc bnc" id="L41" title="All 2 branches missed.">        for (SolutionOperation so : source) {</span>
-<span class="nc" id="L42">            hasTransformed = true;</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">    	List&lt;SolutionOperation&gt; source = context.getCurrentDirection().equals(DataFlowDirection.REQUEST) ? requestOperations : responseOperations;</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        for (SolutionOperation so : source) {</span>
+<span class="nc" id="L54">            hasTransformed = true;</span>
             try {
-<span class="nc" id="L44">                so.execute(context);</span>
-<span class="nc" id="L45">            } catch (SolutionOperationException e) {</span>
-<span class="nc" id="L46">                throw new SolutionException(String.format(&quot;Failed to execute solution: %s - %s&quot;, so.getClass().getSimpleName(), e.getMessage()), e.getCause());</span>
-<span class="nc" id="L47">            }</span>
-<span class="nc" id="L48">        }</span>
-<span class="nc" id="L49">    }</span>
+<span class="nc" id="L56">                so.execute(context);</span>
+<span class="nc" id="L57">            } catch (SolutionOperationException e) {</span>
+<span class="nc" id="L58">                throw new SolutionException(String.format(&quot;Failed to execute solution: %s - %s&quot;, so.getClass().getSimpleName(), e.getMessage()), e.getCause());</span>
+<span class="nc" id="L59">            }</span>
+<span class="nc" id="L60">        }</span>
+<span class="nc" id="L61">    }</span>
 
     @Override
     public String getName() {
-<span class="nc" id="L53">        return configuration.getSolutionName();</span>
+<span class="nc" id="L65">        return configuration.getSolutionName();</span>
     }
 
     @Override
     public UUID getId() {
-<span class="nc" id="L58">        return configuration.getId();</span>
+<span class="nc" id="L70">        return configuration.getId();</span>
     }
 
     @Override
     public boolean hasTransformed() {
-<span class="nc" id="L63">        return hasTransformed;</span>
+<span class="nc" id="L75">        return hasTransformed;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

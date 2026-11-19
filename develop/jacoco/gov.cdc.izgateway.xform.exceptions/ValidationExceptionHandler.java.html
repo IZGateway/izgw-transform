@@ -26,28 +26,42 @@ import java.util.stream.Collectors;
  * specified.
  */
 @ControllerAdvice
-<span class="fc" id="L29">public class ValidationExceptionHandler {</span>
+public class ValidationExceptionHandler {
+    /**
+     * Creates the handler.
+     */
+<span class="fc" id="L33">    public ValidationExceptionHandler() {</span>
+        // No initialization needed.
+<span class="fc" id="L35">    }</span>
+
+    /**
+     * Converts a validation failure into a bad request response that lists each field error.
+     *
+     * @param ex the validation exception
+     * @param request the HTTP request that failed validation
+     * @return a bad request response with the timestamp, status, error, path and field error message
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleValidationExceptions(
             MethodArgumentNotValidException ex,
             HttpServletRequest request) {
-<span class="nc" id="L34">        Map&lt;String, Object&gt; errors = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L48">        Map&lt;String, Object&gt; errors = new HashMap&lt;&gt;();</span>
 
-<span class="nc" id="L36">        errors.put(&quot;timestamp&quot;, System.currentTimeMillis());</span>
-<span class="nc" id="L37">        errors.put(&quot;status&quot;, HttpStatus.BAD_REQUEST.value());</span>
-<span class="nc" id="L38">        errors.put(&quot;error&quot;, &quot;Bad Request&quot;);</span>
-<span class="nc" id="L39">        errors.put(&quot;path&quot;, request.getRequestURI());</span>
+<span class="nc" id="L50">        errors.put(&quot;timestamp&quot;, System.currentTimeMillis());</span>
+<span class="nc" id="L51">        errors.put(&quot;status&quot;, HttpStatus.BAD_REQUEST.value());</span>
+<span class="nc" id="L52">        errors.put(&quot;error&quot;, &quot;Bad Request&quot;);</span>
+<span class="nc" id="L53">        errors.put(&quot;path&quot;, request.getRequestURI());</span>
 
         // Get all the field errors in the inbound data
-<span class="nc" id="L42">        List&lt;FieldError&gt; fieldErrors = ex.getBindingResult().getFieldErrors();</span>
-<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (!fieldErrors.isEmpty()) {</span>
-<span class="nc" id="L44">            String errorMessage = fieldErrors.stream()</span>
-<span class="nc" id="L45">                    .map(error -&gt; error.getField() + &quot;: &quot; + error.getDefaultMessage())</span>
-<span class="nc" id="L46">                    .collect(Collectors.joining(&quot;; &quot;));</span>
-<span class="nc" id="L47">            errors.put(&quot;message&quot;, errorMessage);</span>
+<span class="nc" id="L56">        List&lt;FieldError&gt; fieldErrors = ex.getBindingResult().getFieldErrors();</span>
+<span class="nc bnc" id="L57" title="All 2 branches missed.">        if (!fieldErrors.isEmpty()) {</span>
+<span class="nc" id="L58">            String errorMessage = fieldErrors.stream()</span>
+<span class="nc" id="L59">                    .map(error -&gt; error.getField() + &quot;: &quot; + error.getDefaultMessage())</span>
+<span class="nc" id="L60">                    .collect(Collectors.joining(&quot;; &quot;));</span>
+<span class="nc" id="L61">            errors.put(&quot;message&quot;, errorMessage);</span>
         }
 
-<span class="nc" id="L50">        return new ResponseEntity&lt;&gt;(errors, HttpStatus.BAD_REQUEST);</span>
+<span class="nc" id="L64">        return new ResponseEntity&lt;&gt;(errors, HttpStatus.BAD_REQUEST);</span>
     }
 }
 

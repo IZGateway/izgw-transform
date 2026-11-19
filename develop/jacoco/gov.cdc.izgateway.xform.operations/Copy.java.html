@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * An operation that copies the value of a source field to a destination field.
+ */
 @Getter
 @Setter
 public class Copy extends BaseOperation implements Operation {
@@ -16,29 +19,37 @@ public class Copy extends BaseOperation implements Operation {
     @NotBlank(message = &quot;required and cannot be empty&quot;)
     private String destinationField;
 
-<span class="fc" id="L19">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Copy.class);</span>
+<span class="fc" id="L22">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Copy.class);</span>
 
-<span class="fc" id="L21">    public Copy() {</span>
-<span class="fc" id="L22">    }</span>
-
-    protected Copy(Copy copy) {
-<span class="fc" id="L25">        super(copy.getId(), copy.getOrder());</span>
-<span class="fc" id="L26">        this.sourceField = copy.sourceField;</span>
-<span class="fc" id="L27">        this.destinationField = copy.destinationField;</span>
+    /**
+     * Creates an empty copy operation.
+     */
+<span class="fc" id="L27">    public Copy() {</span>
 <span class="fc" id="L28">    }</span>
+
+    /**
+     * Creates a copy operation with the same id, order and fields as another one.
+     *
+     * @param copy the operation to copy
+     */
+    protected Copy(Copy copy) {
+<span class="fc" id="L36">        super(copy.getId(), copy.getOrder());</span>
+<span class="fc" id="L37">        this.sourceField = copy.sourceField;</span>
+<span class="fc" id="L38">        this.destinationField = copy.destinationField;</span>
+<span class="fc" id="L39">    }</span>
 
     @Override
     public void execute(ServiceContext context) throws OperationException {
-<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
-<span class="nc" id="L33">            log.trace(&quot;Copy Operation: {} / Copy {} TO {}&quot;, this.getClass().getSimpleName(), this.sourceField, this.destinationField);</span>
+<span class="pc bpc" id="L43" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
+<span class="nc" id="L44">            log.trace(&quot;Copy Operation: {} / Copy {} TO {}&quot;, this.getClass().getSimpleName(), this.sourceField, this.destinationField);</span>
         }
 
-<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
-<span class="fc" id="L37">            Hl7v2Copy copy = new Hl7v2Copy(this);</span>
-<span class="fc" id="L38">            copy.execute(context);</span>
+<span class="pc bpc" id="L47" title="1 of 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
+<span class="fc" id="L48">            Hl7v2Copy copy = new Hl7v2Copy(this);</span>
+<span class="fc" id="L49">            copy.execute(context);</span>
         }
 
-<span class="fc" id="L41">    }</span>
+<span class="fc" id="L52">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

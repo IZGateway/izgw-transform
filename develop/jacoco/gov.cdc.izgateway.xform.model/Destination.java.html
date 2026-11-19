@@ -6,6 +6,9 @@ import gov.cdc.izgateway.security.IzgPrincipal;
 
 import java.util.Date;
 
+/**
+ * The outbound destination (IZ Gateway Hub or IIS) to which the Transformation Service sends a message.
+ */
 @lombok.Data
 public class Destination implements IDestination {
     private String facilityId;
@@ -29,7 +32,7 @@ public class Destination implements IDestination {
     private String maintenanceDetail;
     private boolean is2011;
     private boolean is2014;
-    private boolean isHub = true;
+<span class="nc" id="L35">    private boolean isHub = true;</span>
     private boolean isDex;
     private String destinationUri;
     private String destinationId;
@@ -38,69 +41,76 @@ public class Destination implements IDestination {
     private String jurisdictionName;
     private String jurisdictionDesc;
 
+    /**
+     * Creates an empty destination. Callers set the fields with the setters.
+     */
+<span class="nc" id="L47">    public Destination() {</span>
+        // Same as the constructor that Lombok @Data generates for a class without final fields.
+<span class="nc" id="L49">    }</span>
+
     @Override
     public IDestination safeCopy() {
-<span class="nc" id="L43">        return null;</span>
+<span class="nc" id="L53">        return null;</span>
     }
 
     @Override
     public Date getPassExpiry() {
-<span class="nc" id="L48">        return null;</span>
+<span class="nc" id="L58">        return null;</span>
     }
 
     @Override
     public void setPassExpiry(Date expiry) {
         // Not used for Xform Service
-<span class="nc" id="L54">    }</span>
+<span class="nc" id="L64">    }</span>
 
     @Override
     public String getCreatedBy() {
-<span class="nc" id="L58">        return null;</span>
+<span class="nc" id="L68">        return null;</span>
     }
 
     @Override
     public void setCreatedBy(String createdBy) {
         // Not used for Xform Service
-<span class="nc" id="L64">    }</span>
+<span class="nc" id="L74">    }</span>
 
     @Override
     public String getUpdatedBy() {
-<span class="nc" id="L68">        return null;</span>
+<span class="nc" id="L78">        return null;</span>
     }
 
     @Override
     public void setUpdatedBy(String updatedBy) {
         // Not used for Xform Service
-<span class="nc" id="L74">    }</span>
+<span class="nc" id="L84">    }</span>
 
     @Override
     public Date getCreatedOn() {
-<span class="nc" id="L78">        return null;</span>
+<span class="nc" id="L88">        return null;</span>
     }
 
     @Override
     public void setCreatedOn(Date createdAt) {
         // Not used for Xform Service
-<span class="nc" id="L84">    }</span>
+<span class="nc" id="L94">    }</span>
 
     @Override
     public Date getUpdatedOn() {
-<span class="nc" id="L88">        return null;</span>
+<span class="nc" id="L98">        return null;</span>
     }
 
     @Override
     public void setUpdatedOn(Date updatedAt) {
         // Not used for Xform Service
-<span class="nc" id="L94">    }</span>
+<span class="nc" id="L104">    }</span>
 
     @Override
     public void setCreated() {
         // Not used for Xform Service
-<span class="nc" id="L99">    }</span>
+<span class="nc" id="L109">    }</span>
 
     @Override
     public void setUpdated() {
         // Not used for Xform Service
-<span class="nc" id="L104">    }</span>
+<span class="nc" id="L114">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

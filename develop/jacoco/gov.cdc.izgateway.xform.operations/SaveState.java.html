@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Saves the value of a message field in the context state under a key.
+ */
 @Getter
 @Setter
 public class SaveState extends BaseOperation implements Operation {
@@ -16,26 +19,33 @@ public class SaveState extends BaseOperation implements Operation {
     @NotBlank(message = &quot;required and cannot be empty&quot;)
     private String key;
 
-<span class="fc" id="L19">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SaveState.class);</span>
+<span class="fc" id="L22">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SaveState.class);</span>
 
-<span class="fc" id="L21">    public SaveState() {}</span>
+    /**
+     * Creates an empty operation.
+     */
+<span class="fc" id="L27">    public SaveState() {}</span>
 
+    /**
+     * Creates an operation with the settings of another operation.
+     * @param saveState the operation to copy the settings from
+     */
     protected SaveState(SaveState saveState) {
-<span class="fc" id="L24">        super(saveState.getId(), saveState.getOrder());</span>
-<span class="fc" id="L25">        this.field = saveState.field;</span>
-<span class="fc" id="L26">        this.key = saveState.key;</span>
-<span class="fc" id="L27">    }</span>
+<span class="fc" id="L34">        super(saveState.getId(), saveState.getOrder());</span>
+<span class="fc" id="L35">        this.field = saveState.field;</span>
+<span class="fc" id="L36">        this.key = saveState.key;</span>
+<span class="fc" id="L37">    }</span>
 
     @Override
     public void execute(ServiceContext context) throws OperationException {
-<span class="nc bnc" id="L31" title="All 2 branches missed.">        if (log.isTraceEnabled()) {</span>
-<span class="nc" id="L32">            log.trace(&quot;Operation: {} / Save value from {} To key {}&quot;, this.getClass().getSimpleName(), this.field, this.key);</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        if (log.isTraceEnabled()) {</span>
+<span class="nc" id="L42">            log.trace(&quot;Operation: {} / Save value from {} To key {}&quot;, this.getClass().getSimpleName(), this.field, this.key);</span>
         }
 
-<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
-<span class="nc" id="L36">            Hl7v2SaveState saveState = new Hl7v2SaveState(this);</span>
-<span class="nc" id="L37">            saveState.execute(context);</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
+<span class="nc" id="L46">            Hl7v2SaveState saveState = new Hl7v2SaveState(this);</span>
+<span class="nc" id="L47">            saveState.execute(context);</span>
         }
-<span class="nc" id="L39">    }</span>
+<span class="nc" id="L49">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

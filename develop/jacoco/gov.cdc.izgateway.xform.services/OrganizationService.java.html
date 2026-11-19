@@ -5,19 +5,39 @@ import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service for the organizations.
+ */
 @Service
 public class OrganizationService  extends GenericService&lt;Organization&gt; {
+    /**
+     * Creates the service.
+     *
+     * @param repositoryFactory the factory that supplies the organization repository
+     */
     @Autowired
     public OrganizationService(RepositoryFactory repositoryFactory) {
-<span class="fc" id="L12">        super(repositoryFactory.organizationRepository());</span>
-<span class="fc" id="L13">    }</span>
+<span class="fc" id="L20">        super(repositoryFactory.organizationRepository());</span>
+<span class="fc" id="L21">    }</span>
 
+    /**
+     * Finds the active organization with a common name.
+     *
+     * @param commonName the common name
+     * @return the organization, or null if no active organization has the common name
+     */
     public Organization getOrganizationByCommonName(String commonName) {
-<span class="nc bnc" id="L16" title="All 4 branches missed.">        return repo.getEntitySet().stream().filter(o -&gt; o.getCommonName().equals(commonName) &amp;&amp; Boolean.TRUE.equals(o.getActive())).findFirst().orElse(null);</span>
+<span class="nc bnc" id="L30" title="All 4 branches missed.">        return repo.getEntitySet().stream().filter(o -&gt; o.getCommonName().equals(commonName) &amp;&amp; Boolean.TRUE.equals(o.getActive())).findFirst().orElse(null);</span>
     }
 
+    /**
+     * Checks if an active organization with a common name exists.
+     *
+     * @param commonName the common name
+     * @return true if an active organization has the common name
+     */
     public boolean organizationExists(String commonName) {
-<span class="nc bnc" id="L20" title="All 4 branches missed.">        return repo.getEntitySet().stream().anyMatch(o -&gt; o.getCommonName().equals(commonName) &amp;&amp; Boolean.TRUE.equals(o.getActive()));</span>
+<span class="nc bnc" id="L40" title="All 4 branches missed.">        return repo.getEntitySet().stream().anyMatch(o -&gt; o.getCommonName().equals(commonName) &amp;&amp; Boolean.TRUE.equals(o.getActive()));</span>
     }
 
     /**
@@ -28,10 +48,10 @@ public class OrganizationService  extends GenericService&lt;Organization&gt; {
      */
     @Override
     protected boolean isDuplicate(Organization organization) {
-<span class="nc" id="L31">        return repo.getEntitySet().stream()</span>
-<span class="nc" id="L32">                .anyMatch(o -&gt;</span>
-<span class="nc bnc" id="L33" title="All 2 branches missed.">                        o.getOrganizationName().equalsIgnoreCase(organization.getOrganizationName()) &amp;&amp;</span>
-<span class="nc bnc" id="L34" title="All 2 branches missed.">                                o.getCommonName().equalsIgnoreCase(organization.getCommonName())</span>
+<span class="nc" id="L51">        return repo.getEntitySet().stream()</span>
+<span class="nc" id="L52">                .anyMatch(o -&gt;</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">                        o.getOrganizationName().equalsIgnoreCase(organization.getOrganizationName()) &amp;&amp;</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">                                o.getCommonName().equalsIgnoreCase(organization.getCommonName())</span>
                 );
     }
 }

@@ -7,17 +7,32 @@ import org.springframework.stereotype.Repository;
 
 import java.util.LinkedHashSet;
 
+/**
+ * File-backed repository for {@link OperationPreconditionField} entities.
+ */
 @Repository
-<span class="fc" id="L11">public class OperationPreconditionFieldRepository extends GenericFileRepository&lt;OperationPreconditionField&gt; {</span>
+public class OperationPreconditionFieldRepository extends GenericFileRepository&lt;OperationPreconditionField&gt; {
 
+    /**
+     * Creates the file-backed repository.
+     */
+<span class="fc" id="L19">    public OperationPreconditionFieldRepository() {</span>
+        // The file path is set by setFilePath.
+<span class="fc" id="L21">    }</span>
+
+    /**
+     * Sets the path of the operation precondition field JSON file.
+     *
+     * @param filePath the path of the JSON file
+     */
     @Value(&quot;${xform.configurations.operation-precondition-fields}&quot;)
     protected void setFilePath(String filePath) {
-<span class="fc" id="L15">        this.filePath = filePath;</span>
-<span class="fc" id="L16">    }</span>
+<span class="fc" id="L30">        this.filePath = filePath;</span>
+<span class="fc" id="L31">    }</span>
 
     @Override
     protected TypeReference&lt;LinkedHashSet&lt;OperationPreconditionField&gt;&gt; getTypeReference() {
-<span class="nc" id="L20">        return new TypeReference&lt;&gt;() {};</span>
+<span class="nc" id="L35">        return new TypeReference&lt;&gt;() {};</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

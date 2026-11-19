@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Replaces the text that matches a regular expression in a message field.
+ */
 @Getter
 @Setter
 public class RegexReplace extends BaseOperation implements Operation {
@@ -18,29 +21,36 @@ public class RegexReplace extends BaseOperation implements Operation {
     @NotBlank(message = &quot;required and cannot be empty&quot;)
     private String replacement;
 
-<span class="fc" id="L21">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RegexReplace.class);</span>
+<span class="fc" id="L24">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(RegexReplace.class);</span>
 
-<span class="fc" id="L23">    public RegexReplace() {}</span>
+    /**
+     * Creates an empty operation.
+     */
+<span class="fc" id="L29">    public RegexReplace() {}</span>
 
+    /**
+     * Creates an operation with the settings of another operation.
+     * @param regexReplace the operation to copy the settings from
+     */
     protected RegexReplace(RegexReplace regexReplace) {
-<span class="fc" id="L26">        super(regexReplace.getId(), regexReplace.getOrder());</span>
-<span class="fc" id="L27">        this.field = regexReplace.field;</span>
-<span class="fc" id="L28">        this.regex = regexReplace.regex;</span>
-<span class="fc" id="L29">        this.replacement = regexReplace.replacement;</span>
-<span class="fc" id="L30">    }</span>
+<span class="fc" id="L36">        super(regexReplace.getId(), regexReplace.getOrder());</span>
+<span class="fc" id="L37">        this.field = regexReplace.field;</span>
+<span class="fc" id="L38">        this.regex = regexReplace.regex;</span>
+<span class="fc" id="L39">        this.replacement = regexReplace.replacement;</span>
+<span class="fc" id="L40">    }</span>
 
     @Override
     public void execute(ServiceContext context) throws OperationException {
 
-<span class="pc bpc" id="L35" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
-<span class="nc" id="L36">            log.trace(&quot;Operation: {} on '{}' with regex '{}' and replacement '{}'&quot;, this.getClass().getSimpleName(), this.field, this.regex, this.replacement);</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
+<span class="nc" id="L46">            log.trace(&quot;Operation: {} on '{}' with regex '{}' and replacement '{}'&quot;, this.getClass().getSimpleName(), this.field, this.regex, this.replacement);</span>
         }
 
-<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
-<span class="fc" id="L40">            Hl7v2RegexReplace regexReplace = new Hl7v2RegexReplace(this);</span>
-<span class="fc" id="L41">            regexReplace.execute(context);</span>
+<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
+<span class="fc" id="L50">            Hl7v2RegexReplace regexReplace = new Hl7v2RegexReplace(this);</span>
+<span class="fc" id="L51">            regexReplace.execute(context);</span>
         }
 
-<span class="fc" id="L44">    }</span>
+<span class="fc" id="L54">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -7,33 +7,40 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Validator for the {@link ValidSolution} annotation that checks that the solution and version of a pipe exist.
+ */
 public class SolutionValidator implements ConstraintValidator&lt;ValidSolution, Pipe&gt; {
     private final SolutionService solutionService;
 
+    /**
+     * Creates the validator.
+     * @param solutionService the service used to find solutions
+     */
     @Autowired
-<span class="nc" id="L14">    public SolutionValidator(SolutionService solutionService) {</span>
-<span class="nc" id="L15">        this.solutionService = solutionService;</span>
-<span class="nc" id="L16">    }</span>
+<span class="nc" id="L21">    public SolutionValidator(SolutionService solutionService) {</span>
+<span class="nc" id="L22">        this.solutionService = solutionService;</span>
+<span class="nc" id="L23">    }</span>
 
     @Override
     public boolean isValid(Pipe pipe, ConstraintValidatorContext context) {
-<span class="nc bnc" id="L20" title="All 4 branches missed.">        if (pipe.getSolutionId() == null || pipe.getSolutionVersion() == null) {</span>
-<span class="nc" id="L21">            return false;</span>
+<span class="nc bnc" id="L27" title="All 4 branches missed.">        if (pipe.getSolutionId() == null || pipe.getSolutionVersion() == null) {</span>
+<span class="nc" id="L28">            return false;</span>
         }
 
-<span class="nc" id="L24">        Solution solution = solutionService.getObject(pipe.getSolutionId());</span>
+<span class="nc" id="L31">        Solution solution = solutionService.getObject(pipe.getSolutionId());</span>
 
         // If a Solution is not found with the id then it is not valid
         // If the Solution exist, but not a Solution with the version then it is not valid
-<span class="nc bnc" id="L28" title="All 4 branches missed.">        if (solution == null || !solution.getVersion().equals(pipe.getSolutionVersion())) {</span>
-<span class="nc" id="L29">            context.disableDefaultConstraintViolation(); // we want to override the default validation message</span>
-<span class="nc" id="L30">            context.buildConstraintViolationWithTemplate(</span>
-<span class="nc" id="L31">                    &quot;Solution not found with ID &quot; + pipe.getSolutionId() + &quot; and version &quot; + pipe.getSolutionVersion())</span>
-<span class="nc" id="L32">                    .addConstraintViolation();</span>
-<span class="nc" id="L33">            return false;</span>
+<span class="nc bnc" id="L35" title="All 4 branches missed.">        if (solution == null || !solution.getVersion().equals(pipe.getSolutionVersion())) {</span>
+<span class="nc" id="L36">            context.disableDefaultConstraintViolation(); // we want to override the default validation message</span>
+<span class="nc" id="L37">            context.buildConstraintViolationWithTemplate(</span>
+<span class="nc" id="L38">                    &quot;Solution not found with ID &quot; + pipe.getSolutionId() + &quot; and version &quot; + pipe.getSolutionVersion())</span>
+<span class="nc" id="L39">                    .addConstraintViolation();</span>
+<span class="nc" id="L40">            return false;</span>
         }
 
-<span class="nc" id="L36">        return true;</span>
+<span class="nc" id="L43">        return true;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

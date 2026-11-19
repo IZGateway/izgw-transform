@@ -3,28 +3,44 @@
 import gov.cdc.izgateway.logging.RequestContext;
 import gov.cdc.izgateway.xform.logging.XformTransactionData;
 
+/**
+ * Holds the {@link XformTransactionData} of the current thread, to which the advice aspect adds advice.
+ */
 public class XformAdviceCollector {
 	private XformAdviceCollector() {}
-<span class="nc" id="L8">	private static final ThreadLocal&lt;XformTransactionData&gt; transactionDataVar = new ThreadLocal&lt;&gt;();</span>
+<span class="nc" id="L11">	private static final ThreadLocal&lt;XformTransactionData&gt; transactionDataVar = new ThreadLocal&lt;&gt;();</span>
 
     // TODO - See below simplify by casting to XformTransactionData from RequestContext.getTransactionData()
     // when I set this with the dervied, on read, it should still be the derived.
+	/**
+	 * Returns the transaction data of the current thread.
+	 *
+	 * @return the transaction data, or null if none is set
+	 */
 	public static XformTransactionData getTransactionData() {
-<span class="nc" id="L13">		return transactionDataVar.get();</span>
+<span class="nc" id="L21">		return transactionDataVar.get();</span>
 	}
 
+	/**
+	 * Sets the transaction data of the current thread and of the {@link RequestContext}. A null value clears both.
+	 *
+	 * @param transactionData the transaction data, or null to clear
+	 */
 	public static void setTransactionData(XformTransactionData transactionData) {
-<span class="nc" id="L17">        RequestContext.setTransactionData(transactionData);</span>
-<span class="nc bnc" id="L18" title="All 2 branches missed.">		if (transactionData == null) {</span>
-<span class="nc" id="L19">			clear();</span>
-<span class="nc" id="L20">			return;</span>
+<span class="nc" id="L30">        RequestContext.setTransactionData(transactionData);</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">		if (transactionData == null) {</span>
+<span class="nc" id="L32">			clear();</span>
+<span class="nc" id="L33">			return;</span>
 		}
-<span class="nc" id="L22">		transactionDataVar.set(transactionData);</span>
-<span class="nc" id="L23">	}</span>
+<span class="nc" id="L35">		transactionDataVar.set(transactionData);</span>
+<span class="nc" id="L36">	}</span>
 
+	/**
+	 * Removes the transaction data of the current thread and clears the {@link RequestContext}.
+	 */
 	public static void clear() {
-<span class="nc" id="L26">		transactionDataVar.remove();</span>
-<span class="nc" id="L27">        RequestContext.clear();</span>
-<span class="nc" id="L28">	}</span>
+<span class="nc" id="L42">		transactionDataVar.remove();</span>
+<span class="nc" id="L43">        RequestContext.clear();</span>
+<span class="nc" id="L44">	}</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

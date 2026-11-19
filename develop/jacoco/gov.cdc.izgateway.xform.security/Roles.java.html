@@ -4,21 +4,35 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Names of the roles that control access to the endpoints.
+ */
 public class Roles {
     // Supported roles
+    /** Role that has full access to all endpoints and organizations. */
     public static final String ADMIN = &quot;admin&quot;;
+    /** Role for systems that send messages to the transformation endpoints. */
     public static final String XFORM_SENDING_SYSTEM = &quot;xform-sender&quot;;
 
+    /** Role that allows reading pipelines through the API. */
     public static final String PIPELINE_READER = &quot;pipeline-reader&quot;;
+    /** Role that allows creating and updating pipelines through the API. */
     public static final String PIPELINE_WRITER = &quot;pipeline-writer&quot;;
+    /** Role that allows deleting pipelines through the API. */
     public static final String PIPELINE_DELETER = &quot;pipeline-deleter&quot;;
 
+    /** Role that allows reading organizations through the API. */
     public static final String ORGANIZATION_READER = &quot;organization-reader&quot;;
+    /** Role that allows creating and updating organizations through the API. */
     public static final String ORGANIZATION_WRITER = &quot;organization-writer&quot;;
+    /** Role that allows deleting organizations through the API. */
     public static final String ORGANIZATION_DELETER = &quot;organization-deleter&quot;;
 
+    /** Role that allows reading solutions through the API. */
     public static final String SOLUTION_READER = &quot;solution-reader&quot;;
+    /** Role that allows creating and updating solutions through the API. */
     public static final String SOLUTION_WRITER = &quot;solution-writer&quot;;
+    /** Role that allows deleting solutions through the API. */
     public static final String SOLUTION_DELETER = &quot;solution-deleter&quot;;
 
     /** Header to indicate that request from localhost should not be treated as an admin */
@@ -30,15 +44,15 @@ public class Roles {
      */
     public static final String REMOVE_ADMIN_ROLE_HEADER = &quot;X-Remove-Admin-Role&quot;;
 
-    // Special role for public access to an API endpoint.  Health check endpoints use this role.
+    /** Special role for public access to an API endpoint. Health check endpoints use this role. */
     public static final String PUBLIC_ACCESS = &quot;public-access&quot;;
 
     /**
      * A list of all roles to enable validation of role names
      * in model elements.
      */
-<span class="nc" id="L40">    public static final List&lt;String&gt; ALL_ROLES = Collections.unmodifiableList(</span>
-<span class="nc" id="L41">    	Arrays.asList(</span>
+<span class="nc" id="L54">    public static final List&lt;String&gt; ALL_ROLES = Collections.unmodifiableList(</span>
+<span class="nc" id="L55">    	Arrays.asList(</span>
     		ADMIN, XFORM_SENDING_SYSTEM, 
     		PIPELINE_READER, PIPELINE_WRITER, PIPELINE_DELETER,
     		ORGANIZATION_READER, ORGANIZATION_WRITER, ORGANIZATION_DELETER,

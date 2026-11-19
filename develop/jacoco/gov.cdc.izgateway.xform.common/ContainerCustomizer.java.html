@@ -8,24 +8,33 @@ import org.springframework.boot.tomcat.servlet.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.stereotype.Component;
 
+/**
+ * Adds the logging and access control valves to the embedded Tomcat server.
+ */
 @Component
-<span class="nc" id="L12">@Slf4j</span>
+<span class="nc" id="L15">@Slf4j</span>
 public class ContainerCustomizer implements WebServerFactoryCustomizer&lt;TomcatServletWebServerFactory&gt; {
 
 	private XformLoggingValve loggingValve;
 	private AccessControlValve accessControlValve;
 	
+	/**
+	 * Creates the customizer.
+	 *
+	 * @param loggingValve the valve that logs requests
+	 * @param accessControlValve the valve that does access control checks
+	 */
 	 @Autowired
-<span class="nc" id="L19">	 public ContainerCustomizer(XformLoggingValve loggingValve, AccessControlValve accessControlValve) {</span>
-<span class="nc" id="L20">		this.loggingValve = loggingValve;</span>
-<span class="nc" id="L21">		this.accessControlValve = accessControlValve;</span>
-<span class="nc" id="L22">	}</span>
+<span class="nc" id="L28">	 public ContainerCustomizer(XformLoggingValve loggingValve, AccessControlValve accessControlValve) {</span>
+<span class="nc" id="L29">		this.loggingValve = loggingValve;</span>
+<span class="nc" id="L30">		this.accessControlValve = accessControlValve;</span>
+<span class="nc" id="L31">	}</span>
 	
     @Override
     public void customize(TomcatServletWebServerFactory factory) {
 
-<span class="nc" id="L27">        log.info(&quot;Configuring embedded Tomcat&quot;);</span>
-<span class="nc" id="L28">        factory.addContextValves(loggingValve, accessControlValve);</span>
-<span class="nc" id="L29">    }</span>
+<span class="nc" id="L36">        log.info(&quot;Configuring embedded Tomcat&quot;);</span>
+<span class="nc" id="L37">        factory.addContextValves(loggingValve, accessControlValve);</span>
+<span class="nc" id="L38">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

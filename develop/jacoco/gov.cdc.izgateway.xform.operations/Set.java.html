@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Sets a message field to a fixed value.
+ */
 @Getter
 @Setter
 public class Set extends BaseOperation implements Operation {
@@ -16,27 +19,34 @@ public class Set extends BaseOperation implements Operation {
     @NotBlank(message = &quot;required and cannot be empty&quot;)
     private String setValue;
 
-<span class="fc" id="L19">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Set.class);</span>
+<span class="fc" id="L22">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Set.class);</span>
 
-<span class="fc" id="L21">    public Set() {}</span>
+    /**
+     * Creates an empty operation.
+     */
+<span class="fc" id="L27">    public Set() {}</span>
 
+    /**
+     * Creates an operation with the settings of another operation.
+     * @param set the operation to copy the settings from
+     */
     protected Set(Set set) {
-<span class="fc" id="L24">        super(set.getId(), set.getOrder());</span>
-<span class="fc" id="L25">        this.destinationField = set.destinationField;</span>
-<span class="fc" id="L26">        this.setValue = set.setValue;</span>
-<span class="fc" id="L27">    }</span>
+<span class="fc" id="L34">        super(set.getId(), set.getOrder());</span>
+<span class="fc" id="L35">        this.destinationField = set.destinationField;</span>
+<span class="fc" id="L36">        this.setValue = set.setValue;</span>
+<span class="fc" id="L37">    }</span>
 
 
     @Override
     public void execute(ServiceContext context) throws OperationException {
-<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
-<span class="nc" id="L33">            log.trace(&quot;SET Operation: {} / SET {} TO {}&quot;, this.getClass().getSimpleName(), this.destinationField, this.setValue);</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
+<span class="nc" id="L43">            log.trace(&quot;SET Operation: {} / SET {} TO {}&quot;, this.getClass().getSimpleName(), this.destinationField, this.setValue);</span>
         }
 
-<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
-<span class="fc" id="L37">            Hl7v2Set hl7Set = new Hl7v2Set(this);</span>
-<span class="fc" id="L38">            hl7Set.execute(context);</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
+<span class="fc" id="L47">            Hl7v2Set hl7Set = new Hl7v2Set(this);</span>
+<span class="fc" id="L48">            hl7Set.execute(context);</span>
         }
-<span class="fc" id="L40">    }</span>
+<span class="fc" id="L50">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

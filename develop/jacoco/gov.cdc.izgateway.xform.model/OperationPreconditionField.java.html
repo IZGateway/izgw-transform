@@ -8,10 +8,13 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
 import java.util.UUID;
 
+/**
+ * A named message data path that operations and preconditions can use as a field.
+ */
 @Getter
 @Setter
 @DynamoDbBean
-<span class="nc" id="L14">public class OperationPreconditionField extends BaseModel {</span>
+public class OperationPreconditionField extends BaseModel {
 
     private UUID id;
 
@@ -29,5 +32,12 @@ import java.util.UUID;
 
     @NotNull(message = &quot;Field active status is required&quot;)
     private Boolean active;
+
+    /**
+     * Creates an empty field.
+     */
+<span class="nc" id="L39">    public OperationPreconditionField() {</span>
+        // Jackson and the DynamoDB Enhanced Client set the fields.
+<span class="nc" id="L41">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

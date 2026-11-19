@@ -8,40 +8,58 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service for the field definitions that operations and preconditions use.
+ */
 @Service
 public class OperationPreconditionFieldService extends GenericService&lt;OperationPreconditionField&gt; {
+    /**
+     * Creates the service.
+     *
+     * @param repositoryFactory the factory that supplies the field repository
+     */
     @Autowired
     protected OperationPreconditionFieldService(RepositoryFactory repositoryFactory) {
-<span class="fc" id="L15">        super(repositoryFactory.operationPreconditionFieldRepository());</span>
-<span class="fc" id="L16">    }</span>
+<span class="fc" id="L23">        super(repositoryFactory.operationPreconditionFieldRepository());</span>
+<span class="fc" id="L24">    }</span>
 
+    /**
+     * Gets the accessible fields that are marked for use by operations.
+     *
+     * @return the operation fields
+     */
     public List&lt;OperationPreconditionField&gt; getOperationList() {
-<span class="nc" id="L19">        List&lt;OperationPreconditionField&gt; allFields = super.getList();</span>
-<span class="nc" id="L20">        List&lt;OperationPreconditionField&gt; operationFields = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L21" title="All 2 branches missed.">        for (OperationPreconditionField field : allFields) {</span>
-<span class="nc bnc" id="L22" title="All 2 branches missed.">            if (Boolean.TRUE.equals(field.getForOperation())) {</span>
-<span class="nc" id="L23">                operationFields.add(field);</span>
+<span class="nc" id="L32">        List&lt;OperationPreconditionField&gt; allFields = super.getList();</span>
+<span class="nc" id="L33">        List&lt;OperationPreconditionField&gt; operationFields = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">        for (OperationPreconditionField field : allFields) {</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">            if (Boolean.TRUE.equals(field.getForOperation())) {</span>
+<span class="nc" id="L36">                operationFields.add(field);</span>
             }
-<span class="nc" id="L25">        }</span>
-<span class="nc" id="L26">        return operationFields;</span>
+<span class="nc" id="L38">        }</span>
+<span class="nc" id="L39">        return operationFields;</span>
     }
 
+    /**
+     * Gets the accessible fields that are marked for use by preconditions.
+     *
+     * @return the precondition fields
+     */
     public List&lt;OperationPreconditionField&gt; getPreconditionList() {
-<span class="nc" id="L30">        List&lt;OperationPreconditionField&gt; allFields = super.getList();</span>
-<span class="nc" id="L31">        List&lt;OperationPreconditionField&gt; preconditionFields = new ArrayList&lt;&gt;();</span>
-<span class="nc bnc" id="L32" title="All 2 branches missed.">        for (OperationPreconditionField field : allFields) {</span>
-<span class="nc bnc" id="L33" title="All 2 branches missed.">            if (Boolean.TRUE.equals(field.getForPrecondition())) {</span>
-<span class="nc" id="L34">                preconditionFields.add(field);</span>
+<span class="nc" id="L48">        List&lt;OperationPreconditionField&gt; allFields = super.getList();</span>
+<span class="nc" id="L49">        List&lt;OperationPreconditionField&gt; preconditionFields = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        for (OperationPreconditionField field : allFields) {</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">            if (Boolean.TRUE.equals(field.getForPrecondition())) {</span>
+<span class="nc" id="L52">                preconditionFields.add(field);</span>
             }
-<span class="nc" id="L36">        }</span>
-<span class="nc" id="L37">        return preconditionFields;</span>
+<span class="nc" id="L54">        }</span>
+<span class="nc" id="L55">        return preconditionFields;</span>
     }
 
     @Override
     protected boolean isDuplicate(OperationPreconditionField operationPreconditionField) {
-<span class="nc" id="L42">        return repo.getEntitySet().stream().anyMatch(</span>
-<span class="nc bnc" id="L43" title="All 2 branches missed.">                opf -&gt; opf.getDataPath().equalsIgnoreCase(operationPreconditionField.getDataPath()) &amp;&amp;</span>
-<span class="nc bnc" id="L44" title="All 2 branches missed.">                        opf.getFieldName().equalsIgnoreCase(operationPreconditionField.getFieldName())</span>
+<span class="nc" id="L60">        return repo.getEntitySet().stream().anyMatch(</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">                opf -&gt; opf.getDataPath().equalsIgnoreCase(operationPreconditionField.getDataPath()) &amp;&amp;</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">                        opf.getFieldName().equalsIgnoreCase(operationPreconditionField.getFieldName())</span>
         );
     }
 

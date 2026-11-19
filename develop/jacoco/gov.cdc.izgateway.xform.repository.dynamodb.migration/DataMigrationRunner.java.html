@@ -24,49 +24,55 @@ public class DataMigrationRunner implements ApplicationRunner {
     private final DataMigrationService migrationService;
     private final MigrationLockService lockService;
 
+    /**
+     * Creates the runner.
+     *
+     * @param migrationService the service that migrates the entities
+     * @param lockService the service that makes sure that only one node runs the migration
+     */
     @Autowired
-<span class="nc" id="L28">    public DataMigrationRunner(DataMigrationService migrationService, MigrationLockService lockService) {</span>
-<span class="nc" id="L29">        this.migrationService = migrationService;</span>
-<span class="nc" id="L30">        this.lockService = lockService;</span>
-<span class="nc" id="L31">    }</span>
+<span class="nc" id="L34">    public DataMigrationRunner(DataMigrationService migrationService, MigrationLockService lockService) {</span>
+<span class="nc" id="L35">        this.migrationService = migrationService;</span>
+<span class="nc" id="L36">        this.lockService = lockService;</span>
+<span class="nc" id="L37">    }</span>
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-<span class="nc" id="L36">        log.info(&quot;Starting Data Migration from File Storage to DynamoDB&quot;);</span>
+<span class="nc" id="L42">        log.info(&quot;Starting Data Migration from File Storage to DynamoDB&quot;);</span>
 
-<span class="nc bnc" id="L38" title="All 2 branches missed.">        if ( !lockService.acquireLock() ) {</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if ( !lockService.acquireLock() ) {</span>
             // Wait until the migration is complete
-<span class="nc" id="L40">            log.info(&quot;Waiting for migration lock to be released by another node...&quot;);</span>
-<span class="nc bnc" id="L41" title="All 2 branches missed.">            while (lockService.isMigrationInProgress()) {</span>
+<span class="nc" id="L46">            log.info(&quot;Waiting for migration lock to be released by another node...&quot;);</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">            while (lockService.isMigrationInProgress()) {</span>
                 try {
-<span class="nc" id="L43">                    Thread.sleep(5000); // Check every 5 seconds</span>
-<span class="nc" id="L44">                } catch (InterruptedException e) {</span>
-<span class="nc" id="L45">                    Thread.currentThread().interrupt();</span>
-<span class="nc" id="L46">                    log.error(&quot;Migration wait interrupted&quot;, e);</span>
-<span class="nc" id="L47">                }</span>
+<span class="nc" id="L49">                    Thread.sleep(5000); // Check every 5 seconds</span>
+<span class="nc" id="L50">                } catch (InterruptedException e) {</span>
+<span class="nc" id="L51">                    Thread.currentThread().interrupt();</span>
+<span class="nc" id="L52">                    log.error(&quot;Migration wait interrupted&quot;, e);</span>
+<span class="nc" id="L53">                }</span>
             }
-<span class="nc" id="L49">            log.warn(&quot;Migration has been completed by another node. Exiting.&quot;);</span>
-<span class="nc" id="L50">            return;</span>
+<span class="nc" id="L55">            log.warn(&quot;Migration has been completed by another node. Exiting.&quot;);</span>
+<span class="nc" id="L56">            return;</span>
         }
 
         try {
-<span class="nc" id="L54">            boolean success = migrationService.migrateAll();</span>
+<span class="nc" id="L60">            boolean success = migrationService.migrateAll();</span>
 
-<span class="nc bnc" id="L56" title="All 2 branches missed.">            if (success) {</span>
-<span class="nc" id="L57">                log.info(&quot;Data Migration Completed Successfully&quot;);</span>
-<span class="nc" id="L58">                log.info(&quot;IMPORTANT: Set 'xform.repository.type=dynamodb' for future startups to use DynamoDB only&quot;);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">            if (success) {</span>
+<span class="nc" id="L63">                log.info(&quot;Data Migration Completed Successfully&quot;);</span>
+<span class="nc" id="L64">                log.info(&quot;IMPORTANT: Set 'xform.repository.type=dynamodb' for future startups to use DynamoDB only&quot;);</span>
             } else {
-<span class="nc" id="L60">                log.error(&quot;Data Migration Completed with Errors&quot;);</span>
-<span class="nc" id="L61">                log.error(&quot;Please review the errors above and fix any issues before retrying&quot;);</span>
+<span class="nc" id="L66">                log.error(&quot;Data Migration Completed with Errors&quot;);</span>
+<span class="nc" id="L67">                log.error(&quot;Please review the errors above and fix any issues before retrying&quot;);</span>
             }
 
-<span class="nc" id="L64">        } catch (Exception e) {</span>
-<span class="nc" id="L65">            log.error(&quot;Data Migration Failed&quot;, e);</span>
-<span class="nc" id="L66">            throw new RuntimeException(&quot;Migration failed: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L70">        } catch (Exception e) {</span>
+<span class="nc" id="L71">            log.error(&quot;Data Migration Failed&quot;, e);</span>
+<span class="nc" id="L72">            throw new RuntimeException(&quot;Migration failed: &quot; + e.getMessage(), e);</span>
         } finally {
-<span class="nc" id="L68">            lockService.releaseLock();</span>
+<span class="nc" id="L74">            lockService.releaseLock();</span>
         }
-<span class="nc" id="L70">    }</span>
+<span class="nc" id="L76">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

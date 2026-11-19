@@ -23,58 +23,66 @@ public class GenericEntityMigrator&lt;T extends BaseModel&gt; implements EntityM
     private final GenericDynamoDBRepository&lt;T&gt; dynamoDbRepository;
     private final Class&lt;T&gt; entityClass;
 
+    /**
+     * Creates a migrator that copies entities from a JSON file to a DynamoDB table.
+     *
+     * @param entityClass the entity class
+     * @param filePath the path of the JSON file to read
+     * @param dynamoDbClient the DynamoDB enhanced client
+     * @param tableName the name of the DynamoDB table
+     */
     public GenericEntityMigrator(Class&lt;T&gt; entityClass,
                                  String filePath,
                                  DynamoDbEnhancedClient dynamoDbClient,
-<span class="nc" id="L29">                                 String tableName) {</span>
-<span class="nc" id="L30">        this.entityClass = entityClass;</span>
-<span class="nc" id="L31">        this.fileRepository = new GenericFileRepositoryImpl&lt;&gt;(filePath, entityClass);</span>
-<span class="nc" id="L32">        this.dynamoDbRepository = new GenericDynamoDBRepositoryImpl&lt;&gt;(dynamoDbClient, tableName, entityClass);</span>
-<span class="nc" id="L33">    }</span>
+<span class="nc" id="L37">                                 String tableName) {</span>
+<span class="nc" id="L38">        this.entityClass = entityClass;</span>
+<span class="nc" id="L39">        this.fileRepository = new GenericFileRepositoryImpl&lt;&gt;(filePath, entityClass);</span>
+<span class="nc" id="L40">        this.dynamoDbRepository = new GenericDynamoDBRepositoryImpl&lt;&gt;(dynamoDbClient, tableName, entityClass);</span>
+<span class="nc" id="L41">    }</span>
 
     @Override
     public MigrationCounts migrate() {
-<span class="nc" id="L37">        Set&lt;T&gt; entities = fileRepository.getEntitySet();</span>
-<span class="nc" id="L38">        int totalCount = entities.size();</span>
-<span class="nc" id="L39">        int migratedCount = 0;</span>
-<span class="nc" id="L40">        int skippedCount = 0;</span>
+<span class="nc" id="L45">        Set&lt;T&gt; entities = fileRepository.getEntitySet();</span>
+<span class="nc" id="L46">        int totalCount = entities.size();</span>
+<span class="nc" id="L47">        int migratedCount = 0;</span>
+<span class="nc" id="L48">        int skippedCount = 0;</span>
 
-<span class="nc" id="L42">        log.info(&quot;Found {} {} entities in file storage&quot;, totalCount, getEntityName());</span>
+<span class="nc" id="L50">        log.info(&quot;Found {} {} entities in file storage&quot;, totalCount, getEntityName());</span>
 
-<span class="nc bnc" id="L44" title="All 2 branches missed.">        for (T entity : entities) {</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        for (T entity : entities) {</span>
             try {
-<span class="nc" id="L46">                T existing = dynamoDbRepository.getEntity(entity.getId());</span>
-<span class="nc bnc" id="L47" title="All 2 branches missed.">                if (existing != null) {</span>
-<span class="nc" id="L48">                    log.info(&quot;{} {} already exists in DynamoDB, skipping&quot;, getEntityName(), entity.getId());</span>
-<span class="nc" id="L49">                    skippedCount++;</span>
-<span class="nc" id="L50">                    continue;</span>
+<span class="nc" id="L54">                T existing = dynamoDbRepository.getEntity(entity.getId());</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                if (existing != null) {</span>
+<span class="nc" id="L56">                    log.info(&quot;{} {} already exists in DynamoDB, skipping&quot;, getEntityName(), entity.getId());</span>
+<span class="nc" id="L57">                    skippedCount++;</span>
+<span class="nc" id="L58">                    continue;</span>
                 }
 
-<span class="nc" id="L53">                dynamoDbRepository.createEntity(entity);</span>
-<span class="nc" id="L54">                migratedCount++;</span>
-<span class="nc" id="L55">                log.info(&quot;Migrated {}: {}&quot;, getEntityName(), entity.getId());</span>
+<span class="nc" id="L61">                dynamoDbRepository.createEntity(entity);</span>
+<span class="nc" id="L62">                migratedCount++;</span>
+<span class="nc" id="L63">                log.info(&quot;Migrated {}: {}&quot;, getEntityName(), entity.getId());</span>
 
-<span class="nc" id="L57">            } catch (Exception e) {</span>
-<span class="nc" id="L58">                log.warn(&quot;Failed to migrate {} {}: {}&quot;,</span>
-<span class="nc" id="L59">                        getEntityName(), entity.getId(), e.getMessage());</span>
+<span class="nc" id="L65">            } catch (Exception e) {</span>
+<span class="nc" id="L66">                log.warn(&quot;Failed to migrate {} {}: {}&quot;,</span>
+<span class="nc" id="L67">                        getEntityName(), entity.getId(), e.getMessage());</span>
                 // Keep going with other entities
-<span class="nc" id="L61">            }</span>
-<span class="nc" id="L62">        }</span>
+<span class="nc" id="L69">            }</span>
+<span class="nc" id="L70">        }</span>
 
-<span class="nc" id="L64">        log.info(&quot;Successfully migrated {}/{} {} ({} skipped)&quot;,</span>
-<span class="nc" id="L65">                migratedCount, totalCount, getEntityName(), skippedCount);</span>
+<span class="nc" id="L72">        log.info(&quot;Successfully migrated {}/{} {} ({} skipped)&quot;,</span>
+<span class="nc" id="L73">                migratedCount, totalCount, getEntityName(), skippedCount);</span>
 
-<span class="nc" id="L67">        return new MigrationCounts(totalCount, migratedCount, skippedCount);</span>
+<span class="nc" id="L75">        return new MigrationCounts(totalCount, migratedCount, skippedCount);</span>
     }
 
     @Override
     public Class&lt;T&gt; getEntityType() {
-<span class="nc" id="L72">        return entityClass;</span>
+<span class="nc" id="L80">        return entityClass;</span>
     }
 
     @Override
     public String getEntityName() {
-<span class="nc" id="L77">        return entityClass.getSimpleName();</span>
+<span class="nc" id="L85">        return entityClass.getSimpleName();</span>
     }
 
     /**
@@ -83,19 +91,19 @@ public class GenericEntityMigrator&lt;T extends BaseModel&gt; implements EntityM
     private static class GenericFileRepositoryImpl&lt;T extends BaseModel&gt; extends GenericFileRepository&lt;T&gt; {
         private final Class&lt;T&gt; entityClass;
 
-<span class="nc" id="L86">        public GenericFileRepositoryImpl(String filePath, Class&lt;T&gt; entityClass) {</span>
-<span class="nc" id="L87">            this.filePath = filePath;</span>
-<span class="nc" id="L88">            this.entityClass = entityClass;</span>
-<span class="nc" id="L89">        }</span>
+<span class="nc" id="L94">        public GenericFileRepositoryImpl(String filePath, Class&lt;T&gt; entityClass) {</span>
+<span class="nc" id="L95">            this.filePath = filePath;</span>
+<span class="nc" id="L96">            this.entityClass = entityClass;</span>
+<span class="nc" id="L97">        }</span>
 
         @Override
         protected TypeReference&lt;LinkedHashSet&lt;T&gt;&gt; getTypeReference() {
             // Create a TypeReference that uses the concrete entity class
-<span class="nc" id="L94">            return new TypeReference&lt;LinkedHashSet&lt;T&gt;&gt;() {</span>
+<span class="nc" id="L102">            return new TypeReference&lt;LinkedHashSet&lt;T&gt;&gt;() {</span>
                 @Override
                 public java.lang.reflect.Type getType() {
-<span class="nc" id="L97">                    return com.fasterxml.jackson.databind.type.TypeFactory.defaultInstance()</span>
-<span class="nc" id="L98">                            .constructCollectionType(LinkedHashSet.class, entityClass);</span>
+<span class="nc" id="L105">                    return com.fasterxml.jackson.databind.type.TypeFactory.defaultInstance()</span>
+<span class="nc" id="L106">                            .constructCollectionType(LinkedHashSet.class, entityClass);</span>
                 }
             };
         }
@@ -110,13 +118,13 @@ public class GenericEntityMigrator&lt;T extends BaseModel&gt; implements EntityM
         public GenericDynamoDBRepositoryImpl(DynamoDbEnhancedClient dynamoDbClient,
                                              String tableName,
                                              Class&lt;T&gt; entityClass) {
-<span class="nc" id="L113">            super(dynamoDbClient, tableName, entityClass, TableSchema.fromBean(entityClass));</span>
-<span class="nc" id="L114">            this.entityClass = entityClass;</span>
-<span class="nc" id="L115">        }</span>
+<span class="nc" id="L121">            super(dynamoDbClient, tableName, entityClass, TableSchema.fromBean(entityClass));</span>
+<span class="nc" id="L122">            this.entityClass = entityClass;</span>
+<span class="nc" id="L123">        }</span>
 
         @Override
         protected String getEntityName() {
-<span class="nc" id="L119">            return entityClass.getSimpleName();</span>
+<span class="nc" id="L127">            return entityClass.getSimpleName();</span>
         }
     }
 }

@@ -17,48 +17,73 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.UUID;
 
+/**
+ * Camel type converters between {@link IZGXformContext}, HL7 v2 message content, and files.
+ */
 @Component
-<span class="fc" id="L21">@Slf4j</span>
-<span class="fc" id="L22">public class HubConverters implements TypeConverters {</span>
+<span class="fc" id="L24">@Slf4j</span>
+public class HubConverters implements TypeConverters {
+    /**
+     * Creates the converters.
+     */
+<span class="fc" id="L29">    public HubConverters() {</span>
+        // No initialization needed.
+<span class="fc" id="L31">    }</span>
+
+    /**
+     * Converts a context to a stream of its response HL7 v2 message.
+     * @param context the transformation context
+     * @return the response HL7 v2 message as an input stream
+     */
     @Converter
     public InputStream contextToStream(IZGXformContext context) {
-<span class="nc" id="L25">        String hl7Message = context.getSubmitSingleMessageResponse().getHl7Message();</span>
-<span class="nc" id="L26">        return new ByteArrayInputStream(hl7Message.getBytes());</span>
+<span class="nc" id="L40">        String hl7Message = context.getSubmitSingleMessageResponse().getHl7Message();</span>
+<span class="nc" id="L41">        return new ByteArrayInputStream(hl7Message.getBytes());</span>
     }
 
+    /**
+     * Converts a context to its response HL7 v2 message.
+     * @param context the transformation context
+     * @return the response HL7 v2 message
+     */
     @Converter
     public String contextToString(IZGXformContext context) {
-<span class="nc" id="L31">        return context.getSubmitSingleMessageResponse().getHl7Message();</span>
+<span class="nc" id="L51">        return context.getSubmitSingleMessageResponse().getHl7Message();</span>
     }
 
+    /**
+     * Creates a hub-to-hub HL7 v2 context from a file that contains an HL7 v2 message.
+     * @param file the file that contains the HL7 v2 request message
+     * @return a new context for the message
+     */
     @Converter
     public IZGXformContext fileToContext(GenericFile&lt;File&gt; file) {
-<span class="nc" id="L36">        File thebody = (File) file.getBody();</span>
+<span class="nc" id="L61">        File thebody = (File) file.getBody();</span>
 
-<span class="nc" id="L38">        UUID organization = UUID.fromString(&quot;0d15449b-fb08-4013-8985-20c148b353fe&quot;);</span>
-<span class="nc" id="L39">        ServiceContext serviceContext = null;</span>
+<span class="nc" id="L63">        UUID organization = UUID.fromString(&quot;0d15449b-fb08-4013-8985-20c148b353fe&quot;);</span>
+<span class="nc" id="L64">        ServiceContext serviceContext = null;</span>
         String body;
         try {
-<span class="nc" id="L42">            body = new String(Files.readAllBytes(thebody.toPath()));</span>
-<span class="nc" id="L43">            serviceContext = new ServiceContext(organization,</span>
+<span class="nc" id="L67">            body = new String(Files.readAllBytes(thebody.toPath()));</span>
+<span class="nc" id="L68">            serviceContext = new ServiceContext(organization,</span>
                     &quot;izgts:IISHubService&quot;,
                     &quot;izghub:IISHubService&quot;,
                     DataType.HL7V2,
                     &quot;&quot;, // This isn't used so blanking FacilityID for now
                     body);
-<span class="nc" id="L49">        } catch (Exception e) {</span>
-<span class="nc" id="L50">            log.error(&quot;Error creating ServiceContext: &quot; + e.getMessage());</span>
-<span class="nc" id="L51">            throw new RuntimeException(&quot;Error creating ServiceContext: &quot; + e.getMessage());</span>
-<span class="nc" id="L52">        }</span>
+<span class="nc" id="L74">        } catch (Exception e) {</span>
+<span class="nc" id="L75">            log.error(&quot;Error creating ServiceContext: &quot; + e.getMessage());</span>
+<span class="nc" id="L76">            throw new RuntimeException(&quot;Error creating ServiceContext: &quot; + e.getMessage());</span>
+<span class="nc" id="L77">        }</span>
 
-<span class="nc" id="L54">        SubmitSingleMessageRequest request = new SubmitSingleMessageRequest();</span>
-<span class="nc" id="L55">        request.getHubHeader().setDestinationId(&quot;dev&quot;);</span>
+<span class="nc" id="L79">        SubmitSingleMessageRequest request = new SubmitSingleMessageRequest();</span>
+<span class="nc" id="L80">        request.getHubHeader().setDestinationId(&quot;dev&quot;);</span>
 
         // TODO this needs to be addressed
-<span class="nc" id="L58">        TransactionData t = new TransactionData(&quot;TODO: A Real EVENTID&quot;);</span>
-<span class="nc" id="L59">        RequestContext.setTransactionData(t);</span>
+<span class="nc" id="L83">        TransactionData t = new TransactionData(&quot;TODO: A Real EVENTID&quot;);</span>
+<span class="nc" id="L84">        RequestContext.setTransactionData(t);</span>
 
-<span class="nc" id="L61">        return new IZGXformContext(serviceContext, request, null);</span>
+<span class="nc" id="L86">        return new IZGXformContext(serviceContext, request, null);</span>
 
     }
 

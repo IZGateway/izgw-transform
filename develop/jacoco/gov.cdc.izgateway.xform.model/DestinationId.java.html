@@ -2,41 +2,50 @@
 
 import gov.cdc.izgateway.model.IDestinationId;
 
-<span class="nc" id="L5">public class DestinationId implements IDestinationId {</span>
+/**
+ * The identifier of a destination: a destination id and a destination type.
+ */
+public class DestinationId implements IDestinationId {
     private String destId;
     private int destType;
 
+    /**
+     * Creates an empty destination identifier.
+     */
+<span class="nc" id="L15">    public DestinationId() {</span>
+<span class="nc" id="L16">    }</span>
+
     @Override
     public String getDestId() {
-<span class="nc" id="L11">        return destId;</span>
+<span class="nc" id="L20">        return destId;</span>
     }
 
     @Override
     public int getDestType() {
-<span class="nc" id="L16">        return destType;</span>
+<span class="nc" id="L25">        return destType;</span>
     }
 
     @Override
     public void setDestId(String destId) {
-<span class="nc" id="L21">        this.destId = destId;</span>
-<span class="nc" id="L22">    }</span>
+<span class="nc" id="L30">        this.destId = destId;</span>
+<span class="nc" id="L31">    }</span>
 
     @Override
     public IDestinationId copy() {
-<span class="nc" id="L26">        DestinationId copy = new DestinationId();</span>
-<span class="nc" id="L27">        copy.setDestId(this.destId);</span>
-<span class="nc" id="L28">        copy.setDestType(this.destType);</span>
-<span class="nc" id="L29">        return copy;</span>
+<span class="nc" id="L35">        DestinationId copy = new DestinationId();</span>
+<span class="nc" id="L36">        copy.setDestId(this.destId);</span>
+<span class="nc" id="L37">        copy.setDestType(this.destType);</span>
+<span class="nc" id="L38">        return copy;</span>
     }
 
     @Override
     public void setDestType(String destType) {
-<span class="nc" id="L34">        this.destType = Integer.parseInt(destType);</span>
-<span class="nc" id="L35">    }</span>
+<span class="nc" id="L43">        this.destType = Integer.parseInt(destType);</span>
+<span class="nc" id="L44">    }</span>
 
     @Override
     public void setDestType(int destType) {
-<span class="nc" id="L39">        this.destType = destType;</span>
-<span class="nc" id="L40">    }</span>
+<span class="nc" id="L48">        this.destType = destType;</span>
+<span class="nc" id="L49">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

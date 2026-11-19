@@ -14,14 +14,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 
-<span class="nc" id="L17">@Slf4j</span>
+/**
+ * HL7 v2 implementation of the {@link Mapper} operation.
+ */
+<span class="nc" id="L20">@Slf4j</span>
 public class Hl7v2Mapper extends Mapper implements Operation {
 
     private final MappingService mappingService;
+    /**
+     * Creates an HL7 v2 mapper operation with the settings of another operation.
+     * @param mapper the operation to copy the settings from
+     */
     public Hl7v2Mapper(Mapper mapper) {
-<span class="nc" id="L22">        super(mapper);</span>
-<span class="nc" id="L23">        this.mappingService = SpringContext.getBean(MappingService.class);</span>
-<span class="nc" id="L24">    }</span>
+<span class="nc" id="L29">        super(mapper);</span>
+<span class="nc" id="L30">        this.mappingService = SpringContext.getBean(MappingService.class);</span>
+<span class="nc" id="L31">    }</span>
 
     @Override
     @CaptureXformAdvice
@@ -29,30 +36,30 @@ public class Hl7v2Mapper extends Mapper implements Operation {
 
         try {
 
-<span class="nc" id="L32">            Message message = context.getCurrentMessage();</span>
-<span class="nc" id="L33">            Terser terser = new Terser(message);</span>
-<span class="nc" id="L34">            Code codeToMap = getCode(terser);</span>
-<span class="nc" id="L35">            Mapping mapping = mappingService.getMapping(context.getOrganizationId(), codeToMap);</span>
+<span class="nc" id="L39">            Message message = context.getCurrentMessage();</span>
+<span class="nc" id="L40">            Terser terser = new Terser(message);</span>
+<span class="nc" id="L41">            Code codeToMap = getCode(terser);</span>
+<span class="nc" id="L42">            Mapping mapping = mappingService.getMapping(context.getOrganizationId(), codeToMap);</span>
 
-<span class="nc bnc" id="L37" title="All 2 branches missed.">            if (mapping == null) {</span>
-<span class="nc" id="L38">                log.debug(String.format(&quot;Mapping not found for %s / %s&quot;, codeToMap.codeSystem(), codeToMap.code()));</span>
-<span class="nc" id="L39">                return;</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">            if (mapping == null) {</span>
+<span class="nc" id="L45">                log.debug(String.format(&quot;Mapping not found for %s / %s&quot;, codeToMap.codeSystem(), codeToMap.code()));</span>
+<span class="nc" id="L46">                return;</span>
             }
 
-<span class="nc" id="L42">            terser.set(this.getCodeField(), mapping.getTargetCode());</span>
-<span class="nc" id="L43">            terser.set(this.getCodeSystemField(), mapping.getTargetCodeSystem());</span>
-<span class="nc" id="L44">            context.setCurrentMessage(message);</span>
-<span class="nc" id="L45">        } catch (HL7Exception ex) {</span>
-<span class="nc" id="L46">            throw new OperationException(ex.getMessage(), ex.getCause());</span>
-<span class="nc" id="L47">        }</span>
-<span class="nc" id="L48">    }</span>
+<span class="nc" id="L49">            terser.set(this.getCodeField(), mapping.getTargetCode());</span>
+<span class="nc" id="L50">            terser.set(this.getCodeSystemField(), mapping.getTargetCodeSystem());</span>
+<span class="nc" id="L51">            context.setCurrentMessage(message);</span>
+<span class="nc" id="L52">        } catch (HL7Exception ex) {</span>
+<span class="nc" id="L53">            throw new OperationException(ex.getMessage(), ex.getCause());</span>
+<span class="nc" id="L54">        }</span>
+<span class="nc" id="L55">    }</span>
 
     private Code getCode(Terser terser) throws HL7Exception {
-<span class="nc" id="L51">        String code = terser.get(this.getCodeField());</span>
-<span class="nc bnc" id="L52" title="All 2 branches missed.">        String codeSystem = StringUtils.isEmpty(terser.get(this.getCodeSystemField())) ?</span>
-<span class="nc" id="L53">                this.getCodeSystemDefault() : terser.get(this.getCodeSystemField());</span>
+<span class="nc" id="L58">        String code = terser.get(this.getCodeField());</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        String codeSystem = StringUtils.isEmpty(terser.get(this.getCodeSystemField())) ?</span>
+<span class="nc" id="L60">                this.getCodeSystemDefault() : terser.get(this.getCodeSystemField());</span>
 
-<span class="nc" id="L55">        return new Code(code, codeSystem);</span>
+<span class="nc" id="L62">        return new Code(code, codeSystem);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

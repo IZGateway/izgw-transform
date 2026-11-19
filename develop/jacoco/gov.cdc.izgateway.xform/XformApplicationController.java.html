@@ -13,34 +13,57 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-<span class="fc" id="L16">@Log</span>
+/**
+ * REST endpoints for the health and build information of the application.
+ */
+<span class="fc" id="L19">@Log</span>
 @RestController
 @Lazy(false)
 public class XformApplicationController {
 
+    /**
+     * Creates the controller and registers it for access control.
+     *
+     * @param registry the access control registry
+     */
     @Autowired
     public XformApplicationController(
             AccessControlRegistry registry
-<span class="fc" id="L24">    ) {</span>
-<span class="fc" id="L25">        registry.register(this);</span>
-<span class="fc" id="L26">    }</span>
+<span class="fc" id="L32">    ) {</span>
+<span class="fc" id="L33">        registry.register(this);</span>
+<span class="fc" id="L34">    }</span>
 
+    /**
+     * Returns the health status of the application.
+     *
+     * @return true with status 200 if healthy, false with status 503 if not
+     */
     @RolesAllowed({Roles.PUBLIC_ACCESS})
     @GetMapping(&quot;/healthy&quot;)
     public ResponseEntity&lt;Boolean&gt; isHealthy() {
-<span class="nc" id="L31">        boolean healthy = HealthService.getHealth().isHealthy();</span>
-<span class="nc bnc" id="L32" title="All 2 branches missed.">        if (!healthy) {</span>
-<span class="nc" id="L33">            return ResponseEntity.status(503).body(false);</span>
+<span class="nc" id="L44">        boolean healthy = HealthService.getHealth().isHealthy();</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        if (!healthy) {</span>
+<span class="nc" id="L46">            return ResponseEntity.status(503).body(false);</span>
         }
-<span class="nc" id="L35">        return ResponseEntity.ok(true);</span>
+<span class="nc" id="L48">        return ResponseEntity.ok(true);</span>
     }
 
+    /**
+     * Returns the health details of the application.
+     *
+     * @return the health details
+     */
     @RolesAllowed({Roles.ADMIN})
     @GetMapping(&quot;/health&quot;)
     public gov.cdc.izgateway.logging.event.Health getHealth() {
-<span class="nc" id="L41">        return HealthService.getHealth();</span>
+<span class="nc" id="L59">        return HealthService.getHealth();</span>
     }
 
+    /**
+     * Returns the build information of the application.
+     *
+     * @return the build number, build machine and build date as text
+     */
     @Operation(summary = &quot;Get build information about the application&quot;,
             description = &quot;Returns the build number, build machine and build date.&quot;)
     @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Success&quot;,
@@ -49,7 +72,7 @@ public class XformApplicationController {
     @RolesAllowed({Roles.ADMIN})
     @GetMapping({&quot;/build&quot;, &quot;/build.txt&quot;})
     public String getBuild() {
-<span class="nc" id="L52">        return Application.getPage(Application.BUILD);</span>
+<span class="nc" id="L75">        return Application.getPage(Application.BUILD);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -8,19 +8,26 @@ import org.springframework.stereotype.Component;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Validator for the {@link ValidOrganization} annotation that checks that an organization identifier exists and is active.
+ */
 @Component
 public class OrganizationValidator implements ConstraintValidator&lt;ValidOrganization, UUID&gt; {
 
     private final OrganizationValidationService validationService;
 
+    /**
+     * Creates the validator.
+     * @param validationService the service that validates organizations
+     */
     @Autowired
-<span class="nc" id="L17">    public OrganizationValidator(OrganizationValidationService validationService) {</span>
-<span class="nc" id="L18">        this.validationService = validationService;</span>
-<span class="nc" id="L19">    }</span>
+<span class="nc" id="L24">    public OrganizationValidator(OrganizationValidationService validationService) {</span>
+<span class="nc" id="L25">        this.validationService = validationService;</span>
+<span class="nc" id="L26">    }</span>
 
     @Override
     public boolean isValid(UUID organizationId, ConstraintValidatorContext context) {
-<span class="nc" id="L23">        return validationService.validateOrganization(organizationId, context);</span>
+<span class="nc" id="L30">        return validationService.validateOrganization(organizationId, context);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

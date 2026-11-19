@@ -5,17 +5,30 @@ import lombok.Data;
 
 import java.util.UUID;
 
+/**
+ * Base class for the advice that the advice aspect records about an advised object.
+ */
 @Data
 public class XformAdviceDTO {
 
-<span class="nc" id="L11">    public XformAdviceDTO() {</span>
-<span class="nc" id="L12">    }</span>
-
-<span class="nc" id="L14">    public XformAdviceDTO(UUID id, String className, String name) {</span>
-<span class="nc" id="L15">        this.className = className;</span>
-<span class="nc" id="L16">        this.name = name;</span>
-<span class="nc" id="L17">        this.id = id;</span>
+    /**
+     * Creates empty advice.
+     */
+<span class="nc" id="L17">    public XformAdviceDTO() {</span>
 <span class="nc" id="L18">    }</span>
+
+    /**
+     * Creates advice for the identified advised object.
+     *
+     * @param id the identifier of the advised object
+     * @param className the simple class name of the advised object
+     * @param name the name of the advised object
+     */
+<span class="nc" id="L27">    public XformAdviceDTO(UUID id, String className, String name) {</span>
+<span class="nc" id="L28">        this.className = className;</span>
+<span class="nc" id="L29">        this.name = name;</span>
+<span class="nc" id="L30">        this.id = id;</span>
+<span class="nc" id="L31">    }</span>
 
     private UUID id;
     private boolean processError;

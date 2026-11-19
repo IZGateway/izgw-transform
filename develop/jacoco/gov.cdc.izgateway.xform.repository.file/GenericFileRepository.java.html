@@ -19,11 +19,21 @@ import java.util.UUID;
  *
  * @param &lt;T&gt; Model type stored in the repository
  */
-<span class="fc" id="L22">public abstract class GenericFileRepository&lt;T extends BaseModel&gt; implements XformRepository&lt;T&gt; {</span>
+public abstract class GenericFileRepository&lt;T extends BaseModel&gt; implements XformRepository&lt;T&gt; {
 
 
+    /** The entities read from the file, or null if the file has not been read. */
     protected LinkedHashSet&lt;T&gt; entities;
+    /** The path of the JSON file. */
     protected String filePath;
+
+    /**
+     * Creates the repository.
+     */
+<span class="fc" id="L33">    public GenericFileRepository() {</span>
+        // The file path is set by the subclass.
+<span class="fc" id="L35">    }</span>
+
     /**
      * Provide the type reference used to deserialize the stored entities.
      *
@@ -33,48 +43,48 @@ import java.util.UUID;
 
     @Override
     public T getEntity(UUID id) {
-<span class="nc" id="L36">        return getEntitySet().stream().filter(p -&gt; p.getId().equals(id)).findFirst().orElse(null);</span>
+<span class="nc" id="L46">        return getEntitySet().stream().filter(p -&gt; p.getId().equals(id)).findFirst().orElse(null);</span>
     }
 
     @Override
     public Set&lt;T&gt; getEntitySet() {
-<span class="nc bnc" id="L41" title="All 2 branches missed.">        if (entities == null) {</span>
-<span class="nc" id="L42">            ObjectMapper mapper = new ObjectMapper();</span>
-<span class="nc" id="L43">            try (InputStream inputStream = Files.newInputStream(Paths.get(filePath))) {</span>
-<span class="nc" id="L44">                entities = mapper.readValue(inputStream, getTypeReference());</span>
-<span class="nc" id="L45">            } catch (IOException e) {</span>
-<span class="nc" id="L46">                throw new RepositoryRuntimeException(String.format(&quot;Error reading file: %s&quot;, e.getMessage()), e);</span>
-<span class="nc" id="L47">            }</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (entities == null) {</span>
+<span class="nc" id="L52">            ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L53">            try (InputStream inputStream = Files.newInputStream(Paths.get(filePath))) {</span>
+<span class="nc" id="L54">                entities = mapper.readValue(inputStream, getTypeReference());</span>
+<span class="nc" id="L55">            } catch (IOException e) {</span>
+<span class="nc" id="L56">                throw new RepositoryRuntimeException(String.format(&quot;Error reading file: %s&quot;, e.getMessage()), e);</span>
+<span class="nc" id="L57">            }</span>
         }
-<span class="nc" id="L49">        return entities;</span>
+<span class="nc" id="L59">        return entities;</span>
     }
 
     @Override
     public void createEntity(T obj) {
-<span class="nc" id="L54">        getEntitySet().add(obj);</span>
-<span class="nc" id="L55">        writeEntitiesToFile();</span>
-<span class="nc" id="L56">    }</span>
+<span class="nc" id="L64">        getEntitySet().add(obj);</span>
+<span class="nc" id="L65">        writeEntitiesToFile();</span>
+<span class="nc" id="L66">    }</span>
 
     @Override
     public void updateEntity(T obj) {
-<span class="nc" id="L60">        entities.removeIf(p -&gt; p.getId().equals(obj.getId()));</span>
-<span class="nc" id="L61">        createEntity(obj);</span>
-<span class="nc" id="L62">    }</span>
+<span class="nc" id="L70">        entities.removeIf(p -&gt; p.getId().equals(obj.getId()));</span>
+<span class="nc" id="L71">        createEntity(obj);</span>
+<span class="nc" id="L72">    }</span>
 
     @Override
     public void deleteEntity(UUID id) {
-<span class="nc" id="L66">        entities.removeIf(p -&gt; p.getId().equals(id));</span>
-<span class="nc" id="L67">        writeEntitiesToFile();</span>
-<span class="nc" id="L68">    }</span>
+<span class="nc" id="L76">        entities.removeIf(p -&gt; p.getId().equals(id));</span>
+<span class="nc" id="L77">        writeEntitiesToFile();</span>
+<span class="nc" id="L78">    }</span>
 
     private void writeEntitiesToFile() {
-<span class="nc" id="L71">        ObjectMapper mapper = new ObjectMapper();</span>
+<span class="nc" id="L81">        ObjectMapper mapper = new ObjectMapper();</span>
         try {
-<span class="nc" id="L73">            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(entities);</span>
-<span class="nc" id="L74">            Files.write(Paths.get(filePath), json.getBytes());</span>
-<span class="nc" id="L75">        } catch (IOException e) {</span>
-<span class="nc" id="L76">            throw new RepositoryRuntimeException(&quot;Error writing file.&quot;, e);</span>
-<span class="nc" id="L77">        }</span>
-<span class="nc" id="L78">    }</span>
+<span class="nc" id="L83">            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(entities);</span>
+<span class="nc" id="L84">            Files.write(Paths.get(filePath), json.getBytes());</span>
+<span class="nc" id="L85">        } catch (IOException e) {</span>
+<span class="nc" id="L86">            throw new RepositoryRuntimeException(&quot;Error writing file.&quot;, e);</span>
+<span class="nc" id="L87">        }</span>
+<span class="nc" id="L88">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

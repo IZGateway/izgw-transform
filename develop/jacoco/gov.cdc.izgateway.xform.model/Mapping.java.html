@@ -8,10 +8,13 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 
 import java.util.UUID;
 
+/**
+ * Maps a code in a code system to a target code in a target code system for an organization.
+ */
 @Getter
 @Setter
 @DynamoDbBean
-<span class="fc" id="L14">public class Mapping extends BaseModel implements OrganizationAware {</span>
+public class Mapping extends BaseModel implements OrganizationAware {
     private UUID id;
     @NotNull(message = &quot;Mapping active status is required&quot;)
     private Boolean active;
@@ -27,5 +30,12 @@ import java.util.UUID;
     private String targetCode;
     @Size(max = 2000, message = &quot;Notes must not exceed 2000 characters&quot;)
     private String notes;
+
+    /**
+     * Creates an empty mapping.
+     */
+<span class="fc" id="L37">    public Mapping() {</span>
+        // Jackson and the DynamoDB Enhanced Client set the fields.
+<span class="fc" id="L39">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -15,39 +15,46 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
 
-<span class="fc" id="L18">@Slf4j</span>
+/**
+ * Camel producer that sends the transformed request to the IZ Gateway Hub destination and stores the response in the context.
+ */
+<span class="fc" id="L21">@Slf4j</span>
 public class IZGHubProducer extends ProducerBase {
 
+    /**
+     * Creates the producer.
+     * @param endpoint the endpoint that owns the producer
+     */
     public IZGHubProducer(Endpoint endpoint) {
-<span class="fc" id="L22">        super(endpoint);</span>
-<span class="fc" id="L23">    }</span>
+<span class="fc" id="L29">        super(endpoint);</span>
+<span class="fc" id="L30">    }</span>
 
     @Override
     public void process(Exchange exchange) throws Exception {
-<span class="nc" id="L27">        HubMessageSender messageSender = getHubComponent().getMessageSender();</span>
+<span class="nc" id="L34">        HubMessageSender messageSender = getHubComponent().getMessageSender();</span>
 
-<span class="nc" id="L29">        IZGXformContext context = exchange.getIn().getBody(IZGXformContext.class);</span>
+<span class="nc" id="L36">        IZGXformContext context = exchange.getIn().getBody(IZGXformContext.class);</span>
 
-<span class="nc" id="L31">        IDestination destination = createDestination(getHubComponent());</span>
-<span class="nc" id="L32">        destination.setUsername(context.getSubmitSingleMessageRequest().getUsername());</span>
-<span class="nc" id="L33">        destination.setPassword(context.getSubmitSingleMessageRequest().getPassword());</span>
-<span class="nc" id="L34">        setDestinationInfoFromDestination(RequestContext.getDestinationInfo(), destination);</span>
+<span class="nc" id="L38">        IDestination destination = createDestination(getHubComponent());</span>
+<span class="nc" id="L39">        destination.setUsername(context.getSubmitSingleMessageRequest().getUsername());</span>
+<span class="nc" id="L40">        destination.setPassword(context.getSubmitSingleMessageRequest().getPassword());</span>
+<span class="nc" id="L41">        setDestinationInfoFromDestination(RequestContext.getDestinationInfo(), destination);</span>
 
         try {
-<span class="nc" id="L37">            context.getSubmitSingleMessageRequest().setHl7Message(context.getServiceContext().getRequestMessage().encode());</span>
-<span class="nc" id="L38">        } catch (HL7Exception e) {</span>
-<span class="nc" id="L39">            throw new HubControllerFault(e);</span>
-<span class="nc" id="L40">        }</span>
+<span class="nc" id="L44">            context.getSubmitSingleMessageRequest().setHl7Message(context.getServiceContext().getRequestMessage().encode());</span>
+<span class="nc" id="L45">        } catch (HL7Exception e) {</span>
+<span class="nc" id="L46">            throw new HubControllerFault(e);</span>
+<span class="nc" id="L47">        }</span>
 
-<span class="nc" id="L42">        SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(destination,</span>
-<span class="nc" id="L43">                context.getSubmitSingleMessageRequest());</span>
-<span class="nc" id="L44">        context.getServiceContext().setCurrentDirection(DataFlowDirection.RESPONSE);</span>
-<span class="nc" id="L45">        context.getServiceContext().setResponseMessage(Hl7Utils.parseHl7v2Message(response.getHl7Message()));</span>
-<span class="nc" id="L46">        context.setSubmitSingleMessageResponse(response);</span>
-<span class="nc" id="L47">    }</span>
+<span class="nc" id="L49">        SubmitSingleMessageResponse response = messageSender.sendSubmitSingleMessage(destination,</span>
+<span class="nc" id="L50">                context.getSubmitSingleMessageRequest());</span>
+<span class="nc" id="L51">        context.getServiceContext().setCurrentDirection(DataFlowDirection.RESPONSE);</span>
+<span class="nc" id="L52">        context.getServiceContext().setResponseMessage(Hl7Utils.parseHl7v2Message(response.getHl7Message()));</span>
+<span class="nc" id="L53">        context.setSubmitSingleMessageResponse(response);</span>
+<span class="nc" id="L54">    }</span>
 
     private IZGHubComponent getHubComponent() {
-<span class="nc" id="L50">        return (IZGHubComponent) getEndpoint().getComponent();</span>
+<span class="nc" id="L57">        return (IZGHubComponent) getEndpoint().getComponent();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

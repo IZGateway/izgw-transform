@@ -2,20 +2,30 @@
 
 import gov.cdc.izgateway.xform.context.ServiceContext;
 
+/**
+ * HL7 v2 implementation of the {@link NotExists} precondition.
+ */
 public class Hl7v2NotExists extends NotExists implements Precondition {
 
+    /**
+     * Creates an empty precondition.
+     */
     public Hl7v2NotExists() {
-<span class="fc" id="L8">        super();</span>
-<span class="fc" id="L9">    }</span>
+<span class="fc" id="L14">        super();</span>
+<span class="fc" id="L15">    }</span>
 
+    /**
+     * Creates an HL7 v2 precondition with the settings of another precondition.
+     * @param notExists the precondition to copy the settings from
+     */
     public Hl7v2NotExists(NotExists notExists) {
-<span class="fc" id="L12">        super(notExists);</span>
-<span class="fc" id="L13">    }</span>
+<span class="fc" id="L22">        super(notExists);</span>
+<span class="fc" id="L23">    }</span>
 
     @Override
     public boolean evaluate(ServiceContext context) {
-<span class="fc" id="L17">        Hl7v2Exists exists = new Hl7v2Exists(this);</span>
-<span class="fc bfc" id="L18" title="All 2 branches covered.">        return !exists.evaluate(context);</span>
+<span class="fc" id="L27">        Hl7v2Exists exists = new Hl7v2Exists(this);</span>
+<span class="fc bfc" id="L28" title="All 2 branches covered.">        return !exists.evaluate(context);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

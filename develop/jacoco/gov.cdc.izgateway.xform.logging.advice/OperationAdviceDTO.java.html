@@ -5,14 +5,27 @@ import lombok.EqualsAndHashCode;
 
 import java.util.UUID;
 
+/**
+ * Advice recorded for an operation by the advice aspect.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class OperationAdviceDTO extends XformAdviceDTO {
-<span class="nc" id="L11">    public OperationAdviceDTO() {</span>
-<span class="nc" id="L12">    }</span>
+    /**
+     * Creates empty advice.
+     */
+<span class="nc" id="L17">    public OperationAdviceDTO() {</span>
+<span class="nc" id="L18">    }</span>
 
+    /**
+     * Creates advice for the identified advised object.
+     *
+     * @param id the identifier of the advised object
+     * @param className the simple class name of the advised object
+     * @param name the name of the advised object
+     */
     public OperationAdviceDTO(UUID id, String className, String name) {
-<span class="nc" id="L15">        super(id, className, name);</span>
-<span class="nc" id="L16">    }</span>
+<span class="nc" id="L28">        super(id, className, name);</span>
+<span class="nc" id="L29">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

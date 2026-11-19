@@ -12,33 +12,67 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+/**
+ * Facade over the organization, pipeline and solution services that the transformation runtime uses to look up its configuration.
+ */
 @Component
 public class XformConfig {
     private final OrganizationService organizationService;
     private final PipelineService pipelineService;
     private final SolutionService solutionService;
 
+    /**
+     * Creates the facade.
+     *
+     * @param organizationService the service for organizations
+     * @param pipelineService the service for pipelines
+     * @param solutionService the service for solutions
+     */
     @Autowired
-<span class="fc" id="L22">    public XformConfig(OrganizationService organizationService, PipelineService pipelineService, SolutionService solutionService) {</span>
-<span class="fc" id="L23">        this.pipelineService = pipelineService;</span>
-<span class="fc" id="L24">        this.solutionService = solutionService;</span>
-<span class="fc" id="L25">        this.organizationService = organizationService;</span>
-<span class="fc" id="L26">    }</span>
+<span class="fc" id="L32">    public XformConfig(OrganizationService organizationService, PipelineService pipelineService, SolutionService solutionService) {</span>
+<span class="fc" id="L33">        this.pipelineService = pipelineService;</span>
+<span class="fc" id="L34">        this.solutionService = solutionService;</span>
+<span class="fc" id="L35">        this.organizationService = organizationService;</span>
+<span class="fc" id="L36">    }</span>
 
+    /**
+     * Gets an organization by its identifier.
+     *
+     * @param organizationId the organization identifier
+     * @return the organization
+     */
     public Organization getOrganization(UUID organizationId) {
-<span class="nc" id="L29">        return organizationService.getObject(organizationId);</span>
+<span class="nc" id="L45">        return organizationService.getObject(organizationId);</span>
     }
 
+    /**
+     * Gets a pipeline by its identifier.
+     *
+     * @param pipelineId the pipeline identifier
+     * @return the pipeline
+     */
     public Pipeline getPipeline(UUID pipelineId) {
-<span class="nc" id="L33">        return pipelineService.getObject(pipelineId);</span>
+<span class="nc" id="L55">        return pipelineService.getObject(pipelineId);</span>
     }
 
+    /**
+     * Finds the pipeline for the organization, inbound endpoint and outbound endpoint of a service context.
+     *
+     * @param context the service context of the message
+     * @return the matching pipeline
+     */
     public Pipeline findPipelineByContext(ServiceContext context) {
-<span class="nc" id="L37">        return pipelineService.getPipelineByOrganizationAndEndpoints(context.getOrganizationId(), context.getInboundEndpoint(), context.getOutboundEndpoint());</span>
+<span class="nc" id="L65">        return pipelineService.getPipelineByOrganizationAndEndpoints(context.getOrganizationId(), context.getInboundEndpoint(), context.getOutboundEndpoint());</span>
     }
 
+    /**
+     * Gets a solution by its identifier.
+     *
+     * @param solutionId the solution identifier
+     * @return the solution
+     */
     public Solution getSolution(UUID solutionId) {
-<span class="nc" id="L41">        return solutionService.getObject(solutionId);</span>
+<span class="nc" id="L75">        return solutionService.getObject(solutionId);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

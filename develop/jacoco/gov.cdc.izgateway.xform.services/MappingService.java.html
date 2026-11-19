@@ -8,29 +8,44 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+/**
+ * Service for the code mappings.
+ */
 @Service
 public class MappingService extends GenericService&lt;Mapping&gt; {
+    /**
+     * Creates the service.
+     *
+     * @param repositoryFactory the factory that supplies the mapping repository
+     */
     @Autowired
     public MappingService(RepositoryFactory repositoryFactory) {
-<span class="fc" id="L15">        super(repositoryFactory.mappingRepository());</span>
-<span class="fc" id="L16">    }</span>
+<span class="fc" id="L23">        super(repositoryFactory.mappingRepository());</span>
+<span class="fc" id="L24">    }</span>
 
+    /**
+     * Finds the mapping for a code in an organization.
+     *
+     * @param organizationId the id of the organization
+     * @param code the code and code system to map
+     * @return the mapping, or null if no mapping exists
+     */
     public Mapping getMapping(UUID organizationId, Code code) {
-<span class="fc" id="L19">        return repo.getEntitySet().stream()</span>
-<span class="pc bpc" id="L20" title="3 of 6 branches missed.">                .filter(m -&gt; m.getOrganizationId().equals(organizationId) &amp;&amp; m.getCodeSystem().equals(code.codeSystem()) &amp;&amp; m.getCode().equals(code.code()))</span>
-<span class="fc" id="L21">                .findFirst()</span>
-<span class="fc" id="L22">                .orElse(null);</span>
+<span class="fc" id="L34">        return repo.getEntitySet().stream()</span>
+<span class="pc bpc" id="L35" title="3 of 6 branches missed.">                .filter(m -&gt; m.getOrganizationId().equals(organizationId) &amp;&amp; m.getCodeSystem().equals(code.codeSystem()) &amp;&amp; m.getCode().equals(code.code()))</span>
+<span class="fc" id="L36">                .findFirst()</span>
+<span class="fc" id="L37">                .orElse(null);</span>
     }
 
     @Override
     protected boolean isDuplicate(Mapping mapping) {
-<span class="nc" id="L27">        return repo.getEntitySet().stream()</span>
-<span class="nc" id="L28">                .anyMatch(m -&gt;</span>
-<span class="nc bnc" id="L29" title="All 2 branches missed.">                        m.getOrganizationId().equals(mapping.getOrganizationId()) &amp;&amp;</span>
-<span class="nc bnc" id="L30" title="All 2 branches missed.">                                m.getCodeSystem().equalsIgnoreCase(mapping.getCodeSystem()) &amp;&amp;</span>
-<span class="nc bnc" id="L31" title="All 2 branches missed.">                                m.getCode().equalsIgnoreCase(mapping.getCode()) &amp;&amp;</span>
-<span class="nc bnc" id="L32" title="All 2 branches missed.">                                m.getTargetCodeSystem().equalsIgnoreCase(mapping.getTargetCodeSystem()) &amp;&amp;</span>
-<span class="nc bnc" id="L33" title="All 2 branches missed.">                                m.getTargetCode().equalsIgnoreCase(mapping.getTargetCode())</span>
+<span class="nc" id="L42">        return repo.getEntitySet().stream()</span>
+<span class="nc" id="L43">                .anyMatch(m -&gt;</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">                        m.getOrganizationId().equals(mapping.getOrganizationId()) &amp;&amp;</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">                                m.getCodeSystem().equalsIgnoreCase(mapping.getCodeSystem()) &amp;&amp;</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">                                m.getCode().equalsIgnoreCase(mapping.getCode()) &amp;&amp;</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">                                m.getTargetCodeSystem().equalsIgnoreCase(mapping.getTargetCodeSystem()) &amp;&amp;</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">                                m.getTargetCode().equalsIgnoreCase(mapping.getTargetCode())</span>
                 );
     }
 
