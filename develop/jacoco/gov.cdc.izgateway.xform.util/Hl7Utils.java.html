@@ -8,41 +8,18 @@ import ca.uhn.hl7v2.validation.impl.NoValidation;
 
 import java.io.IOException;
 
-/**
- * Utility methods for HL7 v2 messages.
- */
-public class Hl7Utils {
-    /**
-     * Creates an instance. All methods are static.
-     */
-<span class="nc" id="L18">    public Hl7Utils() {</span>
-        // No state to initialize.
-<span class="nc" id="L20">    }</span>
-
-    /**
-     * Appends &quot; - HL7&quot; to a message.
-     *
-     * @param message the message
-     * @return the message with &quot; - HL7&quot; at the end
-     */
+<span class="nc" id="L11">public class Hl7Utils {</span>
     public static String getHl7Message(String message) {
-<span class="nc" id="L29">        return message + &quot; - HL7&quot;;</span>
+<span class="nc" id="L13">        return message + &quot; - HL7&quot;;</span>
     }
 
-    /**
-     * Parses an HL7 v2 message without validation. Line feeds are changed to carriage returns before parsing.
-     *
-     * @param rawHl7Message the message in pipe-delimited format
-     * @return the parsed message
-     * @throws HL7Exception if the message cannot be parsed
-     */
     public static Message parseHl7v2Message(String rawHl7Message) throws HL7Exception {
         PipeParser parser;
-<span class="fc" id="L41">        DefaultHapiContext context = new DefaultHapiContext();</span>
-<span class="fc" id="L42">        rawHl7Message = rawHl7Message.replace(&quot;\n&quot;, &quot;\r&quot;);</span>
-<span class="fc" id="L43">        context.setValidationContext(new NoValidation());</span>
-<span class="fc" id="L44">        parser = context.getPipeParser();</span>
-<span class="fc" id="L45">        return parser.parse(rawHl7Message);</span>
+<span class="fc" id="L18">        DefaultHapiContext context = new DefaultHapiContext();</span>
+<span class="fc" id="L19">        rawHl7Message = rawHl7Message.replace(&quot;\n&quot;, &quot;\r&quot;);</span>
+<span class="fc" id="L20">        context.setValidationContext(new NoValidation());</span>
+<span class="fc" id="L21">        parser = context.getPipeParser();</span>
+<span class="fc" id="L22">        return parser.parse(rawHl7Message);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

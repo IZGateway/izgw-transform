@@ -7,9 +7,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Maps a code and code system in a message to a different code with the organization's mappings.
- */
 @Getter
 @Setter
 public class Mapper extends BaseOperation implements Operation {
@@ -21,34 +18,27 @@ public class Mapper extends BaseOperation implements Operation {
     @NotBlank(message = &quot;required and cannot be empty&quot;)
     private String codeSystemDefault;
 
-<span class="nc" id="L24">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Mapper.class);</span>
+<span class="nc" id="L21">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Mapper.class);</span>
 
-    /**
-     * Creates an empty operation.
-     */
-<span class="nc" id="L29">    protected Mapper() {}</span>
+<span class="nc" id="L23">    protected Mapper() {}</span>
 
-    /**
-     * Creates an operation with the settings of another operation.
-     * @param mapper the operation to copy the settings from
-     */
     protected Mapper(Mapper mapper) {
-<span class="nc" id="L36">        super(mapper.getId(), mapper.getOrder());</span>
-<span class="nc" id="L37">        this.codeField = mapper.getCodeField();</span>
-<span class="nc" id="L38">        this.codeSystemField = mapper.getCodeSystemField();</span>
-<span class="nc" id="L39">        this.codeSystemDefault = mapper.getCodeSystemDefault();</span>
-<span class="nc" id="L40">    }</span>
+<span class="nc" id="L26">        super(mapper.getId(), mapper.getOrder());</span>
+<span class="nc" id="L27">        this.codeField = mapper.getCodeField();</span>
+<span class="nc" id="L28">        this.codeSystemField = mapper.getCodeSystemField();</span>
+<span class="nc" id="L29">        this.codeSystemDefault = mapper.getCodeSystemDefault();</span>
+<span class="nc" id="L30">    }</span>
 
     @Override
     public void execute(ServiceContext context) throws OperationException {
-<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (log.isTraceEnabled()) {</span>
-<span class="nc" id="L45">            log.trace(&quot;MAP Operation: {} / CODE FIELD {} CODE SYSTEM FIELD {}&quot;, this.getClass().getSimpleName(), this.getCodeField(), this.getCodeSystemField());</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">        if (log.isTraceEnabled()) {</span>
+<span class="nc" id="L35">            log.trace(&quot;MAP Operation: {} / CODE FIELD {} CODE SYSTEM FIELD {}&quot;, this.getClass().getSimpleName(), this.getCodeField(), this.getCodeSystemField());</span>
         }
 
-<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
-<span class="nc" id="L49">            Hl7v2Mapper copy = new Hl7v2Mapper(this);</span>
-<span class="nc" id="L50">            copy.execute(context);</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (context.getDataType().equals(DataType.HL7V2)) {</span>
+<span class="nc" id="L39">            Hl7v2Mapper copy = new Hl7v2Mapper(this);</span>
+<span class="nc" id="L40">            copy.execute(context);</span>
         }
-<span class="nc" id="L52">    }</span>
+<span class="nc" id="L42">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

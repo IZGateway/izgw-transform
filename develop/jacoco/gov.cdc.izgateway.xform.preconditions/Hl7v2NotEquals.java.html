@@ -2,27 +2,17 @@
 
 import gov.cdc.izgateway.xform.context.ServiceContext;
 
-/**
- * HL7 v2 implementation of the {@link NotEquals} precondition.
- */
 public class Hl7v2NotEquals extends NotEquals implements Precondition {
-    /**
-     * Creates an empty precondition.
-     */
-<span class="fc" id="L12">    public Hl7v2NotEquals() {}</span>
+<span class="fc" id="L6">    public Hl7v2NotEquals() {}</span>
 
-    /**
-     * Creates an HL7 v2 precondition with the settings of another precondition.
-     * @param notEquals the precondition to copy the settings from
-     */
     public Hl7v2NotEquals(NotEquals notEquals) {
-<span class="nc" id="L19">        super(notEquals);</span>
-<span class="nc" id="L20">    }</span>
+<span class="nc" id="L9">        super(notEquals);</span>
+<span class="nc" id="L10">    }</span>
 
     @Override
     public boolean evaluate(ServiceContext context) {
-<span class="fc" id="L24">        Hl7v2Equals hl7v2Equals = new Hl7v2Equals(this.getDataPath(), this.getComparisonValue());</span>
-<span class="fc bfc" id="L25" title="All 2 branches covered.">        return !hl7v2Equals.evaluate(context);</span>
+<span class="fc" id="L14">        Hl7v2Equals hl7v2Equals = new Hl7v2Equals(this.getDataPath(), this.getComparisonValue());</span>
+<span class="fc bfc" id="L15" title="All 2 branches covered.">        return !hl7v2Equals.evaluate(context);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

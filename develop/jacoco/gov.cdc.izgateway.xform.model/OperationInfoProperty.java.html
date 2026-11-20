@@ -4,22 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Describes one configuration property of an operation type.
- */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Getter
 @Setter
-public class OperationInfoProperty {
+<span class="nc" id="L10">public class OperationInfoProperty {</span>
     private String type;
     private String description;
     private boolean required;
-
-    /**
-     * Creates an empty property description.
-     */
-<span class="nc" id="L21">    public OperationInfoProperty() {</span>
-        // The service sets the fields.
-<span class="nc" id="L23">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

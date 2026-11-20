@@ -8,13 +8,10 @@ import lombok.Setter;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import java.util.UUID;
 
-/**
- * An organization that sends messages through the Xform Service, identified by its certificate common name.
- */
 @Getter
 @Setter
 @DynamoDbBean
-public class Organization extends BaseModel implements OrganizationAware {
+<span class="nc" id="L14">public class Organization extends BaseModel implements OrganizationAware {</span>
     @NotBlank(message = &quot;Organization name is required&quot;)
     private String organizationName;
 
@@ -26,16 +23,9 @@ public class Organization extends BaseModel implements OrganizationAware {
     @NotNull(message = &quot;Organization common name is required&quot;)
     private String commonName;
 
-    /**
-     * Creates an empty organization.
-     */
-<span class="nc" id="L32">    public Organization() {</span>
-        // Jackson and the DynamoDB Enhanced Client set the fields.
-<span class="nc" id="L34">    }</span>
-
     @JsonIgnore
     public UUID getOrganizationId() {
-<span class="nc" id="L38">        return id;</span>
+<span class="nc" id="L28">        return id;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

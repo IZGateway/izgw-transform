@@ -18,39 +18,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
-/**
- * REST API for the mappings from user groups to roles.
- */
-<span class="fc" id="L24">@Log</span>
+<span class="fc" id="L21">@Log</span>
 @Lazy(false)
 @RestController
 public class GroupRoleMappingApiController extends BaseApiController {
     private final GroupRoleMappingService groupRoleMappingService;
 
-    /**
-     * Creates the controller and registers it with the access control registry.
-     *
-     * @param groupRoleMappingService the service for the group to role mappings
-     * @param registry the access control registry
-     */
     @Autowired
     public GroupRoleMappingApiController(
             GroupRoleMappingService groupRoleMappingService,
             AccessControlRegistry registry
-<span class="fc" id="L40">    ) {</span>
-<span class="fc" id="L41">        this.groupRoleMappingService = groupRoleMappingService;</span>
-<span class="fc" id="L42">        registry.register(this);</span>
-<span class="fc" id="L43">    }</span>
+<span class="fc" id="L31">    ) {</span>
+<span class="fc" id="L32">        this.groupRoleMappingService = groupRoleMappingService;</span>
+<span class="fc" id="L33">        registry.register(this);</span>
+<span class="fc" id="L34">    }</span>
 
-    /**
-     * Gets one page of group to role mappings.
-     *
-     * @param nextCursor the id of the mapping after which the page starts, or null
-     * @param prevCursor the id of the mapping before which the page ends, or null
-     * @param includeInactive if true, inactive mappings are included
-     * @param limit the maximum number of mappings in the page
-     * @return the page as JSON, or status 500 if the page cannot be serialized
-     */
     @RolesAllowed({Roles.ADMIN})
     @GetMapping(&quot;/api/v1/group-role-mappings&quot;)
     public ResponseEntity&lt;String&gt; getGroupRoleMappingList(
@@ -60,75 +42,50 @@ public class GroupRoleMappingApiController extends BaseApiController {
             @RequestParam(defaultValue = &quot;10&quot;) int limit
     ) {
         try {
-<span class="nc" id="L63">            return processList(groupRoleMappingService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
-<span class="nc" id="L64">        } catch (JsonProcessingException e) {</span>
-<span class="nc" id="L65">            log.log(Level.SEVERE, e.getMessage(), e);</span>
-<span class="nc" id="L66">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="nc" id="L45">            return processList(groupRoleMappingService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
+<span class="nc" id="L46">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L47">            log.log(Level.SEVERE, e.getMessage(), e);</span>
+<span class="nc" id="L48">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
         }
     }
 
-    /**
-     * Gets one group to role mapping.
-     *
-     * @param uuid the id of the mapping
-     * @return the mapping, or status 404 if it is not found
-     */
     @RolesAllowed({Roles.ADMIN})
     @GetMapping(&quot;/api/v1/group-role-mappings/{uuid}&quot;)
     public ResponseEntity&lt;GroupRoleMapping&gt; getGroupRoleMappingByUUID(@PathVariable UUID uuid) {
-<span class="nc" id="L79">        GroupRoleMapping entity = groupRoleMappingService.getObject(uuid);</span>
-<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (entity == null) {</span>
-<span class="nc" id="L81">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+<span class="nc" id="L55">        GroupRoleMapping entity = groupRoleMappingService.getObject(uuid);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if (entity == null) {</span>
+<span class="nc" id="L57">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
         }
-<span class="nc" id="L83">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
+<span class="nc" id="L59">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
     }
 
-    /**
-     * Replaces a group to role mapping.
-     *
-     * @param uuid the id of the mapping
-     * @param updatedGroupRoleMapping the new mapping
-     * @return the updated mapping
-     */
     @RolesAllowed({Roles.ADMIN})
     @PutMapping(&quot;/api/v1/group-role-mappings/{uuid}&quot;)
     public ResponseEntity&lt;GroupRoleMapping&gt; updateGroupRoleMapping(
             @PathVariable UUID uuid,
             @RequestBody @Valid GroupRoleMapping updatedGroupRoleMapping
     ) {
-<span class="nc" id="L99">        updatedGroupRoleMapping.setId(uuid);</span>
-<span class="nc" id="L100">        groupRoleMappingService.update(updatedGroupRoleMapping);</span>
-<span class="nc" id="L101">        return new ResponseEntity&lt;&gt;(updatedGroupRoleMapping, HttpStatus.OK);</span>
+<span class="nc" id="L68">        updatedGroupRoleMapping.setId(uuid);</span>
+<span class="nc" id="L69">        groupRoleMappingService.update(updatedGroupRoleMapping);</span>
+<span class="nc" id="L70">        return new ResponseEntity&lt;&gt;(updatedGroupRoleMapping, HttpStatus.OK);</span>
     }
 
-    /**
-     * Creates a group to role mapping with a new id.
-     *
-     * @param groupRoleMapping the mapping to create
-     * @return the created mapping
-     */
     @RolesAllowed({Roles.ADMIN})
     @PostMapping(&quot;/api/v1/group-role-mappings&quot;)
     public ResponseEntity&lt;GroupRoleMapping&gt; createGroupRoleMapping(
             @Valid @RequestBody() GroupRoleMapping groupRoleMapping
     ) {
-<span class="nc" id="L115">        groupRoleMappingService.create(groupRoleMapping);</span>
-<span class="nc" id="L116">        return new ResponseEntity&lt;&gt;(groupRoleMapping, HttpStatus.OK);</span>
+<span class="nc" id="L78">        groupRoleMappingService.create(groupRoleMapping);</span>
+<span class="nc" id="L79">        return new ResponseEntity&lt;&gt;(groupRoleMapping, HttpStatus.OK);</span>
     }
 
-    /**
-     * Deletes a group to role mapping.
-     *
-     * @param uuid the id of the mapping
-     * @return status 204
-     */
     @RolesAllowed({Roles.ADMIN})
     @DeleteMapping(&quot;/api/v1/group-role-mappings/{uuid}&quot;)
     public ResponseEntity&lt;GroupRoleMapping&gt; deleteGroupRoleMapping(
             @PathVariable UUID uuid
     ) {
-<span class="nc" id="L130">        groupRoleMappingService.delete(uuid);</span>
-<span class="nc" id="L131">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+<span class="nc" id="L87">        groupRoleMappingService.delete(uuid);</span>
+<span class="nc" id="L88">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

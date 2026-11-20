@@ -19,73 +19,41 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
-/**
- * REST API for the solutions.
- */
-<span class="fc" id="L25">@Log</span>
+<span class="fc" id="L22">@Log</span>
 @Lazy(false)
 @RestController
 public class SolutionApiController extends BaseApiController {
     private final SolutionService solutionService;
     private final PipelineService pipelineService;
-    /**
-     * Creates the controller and registers it with the access control registry.
-     *
-     * @param solutionService the service for the solutions
-     * @param pipelineService the service for the pipelines, used to find solutions that are in use
-     * @param registry the access control registry
-     */
     @Autowired
     public SolutionApiController(
             SolutionService solutionService,
             PipelineService pipelineService,
             AccessControlRegistry registry
-<span class="fc" id="L43">    ) {</span>
-<span class="fc" id="L44">        this.solutionService = solutionService;</span>
-<span class="fc" id="L45">        this.pipelineService = pipelineService;</span>
-<span class="fc" id="L46">        registry.register(this);</span>
-<span class="fc" id="L47">    }</span>
+<span class="fc" id="L33">    ) {</span>
+<span class="fc" id="L34">        this.solutionService = solutionService;</span>
+<span class="fc" id="L35">        this.pipelineService = pipelineService;</span>
+<span class="fc" id="L36">        registry.register(this);</span>
+<span class="fc" id="L37">    }</span>
 
-    /**
-     * Gets one solution.
-     *
-     * @param uuid the id of the solution
-     * @return the solution, or status 404 if it is not found
-     */
     @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping(&quot;/api/v1/solutions/{uuid}&quot;)
     public ResponseEntity&lt;Solution&gt; getSolutionByUUID(@PathVariable UUID uuid) {
-<span class="nc" id="L58">        Solution entity = solutionService.getObject(uuid);</span>
-<span class="nc bnc" id="L59" title="All 2 branches missed.">        if (entity == null) {</span>
-<span class="nc" id="L60">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+<span class="nc" id="L42">        Solution entity = solutionService.getObject(uuid);</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (entity == null) {</span>
+<span class="nc" id="L44">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
         }
-<span class="nc" id="L62">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
+<span class="nc" id="L46">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
     }
 
-    /**
-     * Replaces a solution.
-     *
-     * @param uuid the id of the solution
-     * @param updatedSolution the new solution
-     * @return the updated solution
-     */
     @RolesAllowed({Roles.SOLUTION_WRITER})
     @PutMapping(&quot;/api/v1/solutions/{uuid}&quot;)
     public ResponseEntity&lt;Solution&gt; updateSolution(@PathVariable UUID uuid, @Valid @RequestBody Solution updatedSolution) {
-<span class="nc" id="L75">        updatedSolution.setId(uuid);</span>
-<span class="nc" id="L76">        solutionService.update(updatedSolution);</span>
-<span class="nc" id="L77">        return new ResponseEntity&lt;&gt;(updatedSolution, HttpStatus.OK);</span>
+<span class="nc" id="L52">        updatedSolution.setId(uuid);</span>
+<span class="nc" id="L53">        solutionService.update(updatedSolution);</span>
+<span class="nc" id="L54">        return new ResponseEntity&lt;&gt;(updatedSolution, HttpStatus.OK);</span>
     }
 
-    /**
-     * Gets one page of solutions.
-     *
-     * @param nextCursor the id of the solution after which the page starts, or null
-     * @param prevCursor the id of the solution before which the page ends, or null
-     * @param includeInactive if true, inactive solutions are included
-     * @param limit the maximum number of solutions in the page
-     * @return the page as JSON, or status 500 if the page cannot be serialized
-     */
     @RolesAllowed({Roles.SOLUTION_READER})
     @GetMapping(&quot;/api/v1/solutions&quot;)
     public ResponseEntity&lt;String&gt; getSolutionsList(
@@ -95,46 +63,34 @@ public class SolutionApiController extends BaseApiController {
             @RequestParam(defaultValue = &quot;10&quot;) int limit
     ) {
         try {
-<span class="nc" id="L98">            return processList(solutionService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
-<span class="nc" id="L99">        } catch (JsonProcessingException e) {</span>
-<span class="nc" id="L100">            log.log(Level.SEVERE, e.getMessage(), e);</span>
-<span class="nc" id="L101">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="nc" id="L66">            return processList(solutionService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
+<span class="nc" id="L67">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L68">            log.log(Level.SEVERE, e.getMessage(), e);</span>
+<span class="nc" id="L69">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
         }
     }
 
-    /**
-     * Creates a solution with a new id.
-     *
-     * @param solution the solution to create
-     * @return the created solution
-     */
     @RolesAllowed({Roles.SOLUTION_WRITER})
     @PostMapping(&quot;/api/v1/solutions&quot;)
     public ResponseEntity&lt;Solution&gt; createSolution(
             @Valid @RequestBody() Solution solution
     ) {
-<span class="nc" id="L116">        solutionService.create(solution);</span>
-<span class="nc" id="L117">        return new ResponseEntity&lt;&gt;(solution, HttpStatus.OK);</span>
+<span class="nc" id="L78">        solutionService.create(solution);</span>
+<span class="nc" id="L79">        return new ResponseEntity&lt;&gt;(solution, HttpStatus.OK);</span>
     }
 
-    /**
-     * Deletes a solution if no pipeline uses it.
-     *
-     * @param uuid the id of the solution
-     * @return status 204, or status 409 if a pipeline uses the solution
-     */
     @RolesAllowed({Roles.SOLUTION_DELETER})
     @DeleteMapping(&quot;/api/v1/solutions/{uuid}&quot;)
     public ResponseEntity&lt;Solution&gt; deleteSolution(
             @PathVariable UUID uuid
     ) {
 
-<span class="nc bnc" id="L132" title="All 2 branches missed.">        if (pipelineService.isSolutionInUse(uuid)) {</span>
-<span class="nc" id="L133">            return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (pipelineService.isSolutionInUse(uuid)) {</span>
+<span class="nc" id="L89">            return new ResponseEntity&lt;&gt;(HttpStatus.CONFLICT);</span>
         }
 
-<span class="nc" id="L136">        solutionService.delete(uuid);</span>
-<span class="nc" id="L137">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+<span class="nc" id="L92">        solutionService.delete(uuid);</span>
+<span class="nc" id="L93">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

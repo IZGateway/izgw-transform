@@ -26,29 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Base class for the SOAP controllers. It sends inbound messages through a Camel pipeline route.
- */
-<span class="fc" id="L32">@Slf4j</span>
+<span class="fc" id="L29">@Slf4j</span>
 public abstract class BaseController extends SoapControllerBase {
-    /** Sends the message context to the Camel pipeline route. */
     protected final ProducerTemplate producerTemplate;
-    /** Finds the organization of the sender. */
     protected final OrganizationService organizationService;
-    /** The service that checks access to request paths. */
     protected final AccessControlService accessControlService;
 
-    /**
-     * Creates the controller.
-     *
-     * @param mshService the message header service
-     * @param namespace the SOAP namespace of the service
-     * @param wsdl the WSDL of the service
-     * @param additionalNamespaces other namespaces that the service accepts
-     * @param producerTemplate sends the message context to the Camel pipeline route
-     * @param organizationService finds the organization of the sender
-     * @param accessControlService the service that checks access to request paths
-     */
     protected BaseController(
             IMessageHeaderService mshService,
             String namespace,
@@ -58,107 +41,75 @@ public abstract class BaseController extends SoapControllerBase {
             OrganizationService organizationService,
             AccessControlService accessControlService
     ) {
-<span class="fc" id="L61">        super(mshService, namespace, wsdl, additionalNamespaces);</span>
-<span class="fc" id="L62">        this.producerTemplate = producerTemplate;</span>
-<span class="fc" id="L63">        this.organizationService = organizationService;</span>
-<span class="fc" id="L64">        this.accessControlService = accessControlService;</span>
-<span class="fc" id="L65">    }</span>
+<span class="fc" id="L44">        super(mshService, namespace, wsdl, additionalNamespaces);</span>
+<span class="fc" id="L45">        this.producerTemplate = producerTemplate;</span>
+<span class="fc" id="L46">        this.organizationService = organizationService;</span>
+<span class="fc" id="L47">        this.accessControlService = accessControlService;</span>
+<span class="fc" id="L48">    }</span>
 
     protected ResponseEntity&lt;?&gt; submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String pipeline) throws Fault {
 
-<span class="nc" id="L69">        UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();</span>
-<span class="nc" id="L70">        IZGXformContext context = createXformContext(organization, submitSingleMessage);</span>
+<span class="nc" id="L52">        UUID organization = getOrganization(RequestContext.getSourceInfo().getCommonName()).getId();</span>
+<span class="nc" id="L53">        IZGXformContext context = createXformContext(organization, submitSingleMessage);</span>
 
         try {
-<span class="nc" id="L73">            producerTemplate.sendBody(pipeline, context);</span>
+<span class="nc" id="L56">            producerTemplate.sendBody(pipeline, context);</span>
 
-<span class="nc bnc" id="L75" title="All 2 branches missed.">            if (XformAdviceCollector.getTransactionData().getPipelineAdvice() != null) {</span>
-<span class="nc bnc" id="L76" title="All 2 branches missed.">                if (XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed())</span>
-<span class="nc" id="L77">                    context.getSubmitSingleMessageResponse().getXformHeader().setTransformedRequest(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());</span>
-<span class="nc bnc" id="L78" title="All 2 branches missed.">                if (XformAdviceCollector.getTransactionData().getPipelineAdvice().isResponseTransformed())</span>
-<span class="nc" id="L79">                    context.getSubmitSingleMessageResponse().getXformHeader().setOriginalResponse(XformAdviceCollector.getTransactionData().getPipelineAdvice().getResponse());</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">            if (XformAdviceCollector.getTransactionData().getPipelineAdvice() != null) {</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">                if (XformAdviceCollector.getTransactionData().getPipelineAdvice().isRequestTransformed())</span>
+<span class="nc" id="L60">                    context.getSubmitSingleMessageResponse().getXformHeader().setTransformedRequest(XformAdviceCollector.getTransactionData().getPipelineAdvice().getTransformedRequest());</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">                if (XformAdviceCollector.getTransactionData().getPipelineAdvice().isResponseTransformed())</span>
+<span class="nc" id="L62">                    context.getSubmitSingleMessageResponse().getXformHeader().setOriginalResponse(XformAdviceCollector.getTransactionData().getPipelineAdvice().getResponse());</span>
             }
 
-<span class="nc" id="L82">            context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());</span>
-<span class="nc" id="L83">            context.getSubmitSingleMessageResponse().updateAction(isHubWsdl());</span>
+<span class="nc" id="L65">            context.getSubmitSingleMessageResponse().setHl7Message(context.getServiceContext().getResponseMessage().encode());</span>
+<span class="nc" id="L66">            context.getSubmitSingleMessageResponse().updateAction(isHubWsdl());</span>
 
-<span class="nc" id="L85">        } catch (CamelExecutionException | HL7Exception e) {</span>
-<span class="nc" id="L86">            throw new HubControllerFault(e.getCause());</span>
-<span class="nc" id="L87">        }</span>
+<span class="nc" id="L68">        } catch (CamelExecutionException | HL7Exception e) {</span>
+<span class="nc" id="L69">            throw new HubControllerFault(e.getCause());</span>
+<span class="nc" id="L70">        }</span>
 
-<span class="nc" id="L89">        return checkResponseEntitySize(new ResponseEntity&lt;&gt;(context.getSubmitSingleMessageResponse(), HttpStatus.OK));</span>
+<span class="nc" id="L72">        return checkResponseEntitySize(new ResponseEntity&lt;&gt;(context.getSubmitSingleMessageResponse(), HttpStatus.OK));</span>
     }
 
-    /**
-     * Returns the organization for a certificate common name, or the override organization from the
-     * x-xform-organization header if the user is an administrator.
-     *
-     * @param commonName the common name of the client certificate
-     * @return the organization
-     * @throws Fault if no organization is found
-     */
     protected Organization getOrganization(String commonName) throws Fault {
-<span class="nc" id="L101">        Organization organization = checkOrganizationOverride(organizationService.getOrganizationByCommonName(commonName));</span>
-<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (organization == null) {</span>
-<span class="nc" id="L103">            throw new HubControllerFault(&quot;Organization not found for &quot; + commonName);</span>
+<span class="nc" id="L76">        Organization organization = checkOrganizationOverride(organizationService.getOrganizationByCommonName(commonName));</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (organization == null) {</span>
+<span class="nc" id="L78">            throw new HubControllerFault(&quot;Organization not found for &quot; + commonName);</span>
         }
-<span class="nc" id="L105">        log.debug(&quot;{} found for {}&quot;, organization.getOrganizationName(), commonName);</span>
-<span class="nc" id="L106">        return organization;</span>
+<span class="nc" id="L80">        log.debug(&quot;{} found for {}&quot;, organization.getOrganizationName(), commonName);</span>
+<span class="nc" id="L81">        return organization;</span>
     }
 
-    /**
-     * Returns the organization from the x-xform-organization header if the user has the ADMIN role
-     * and the header is present; otherwise returns the given organization.
-     *
-     * @param organization the organization found for the sender
-     * @return the organization to use
-     * @throws Fault if the organization in the header is not found
-     */
     protected Organization checkOrganizationOverride(Organization organization) throws Fault {
-<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (RequestContext.getHttpHeaders() != null</span>
-<span class="nc bnc" id="L119" title="All 2 branches missed.">                &amp;&amp; RequestContext.getPrincipal().getRoles().contains(Roles.ADMIN)</span>
-<span class="nc bnc" id="L120" title="All 2 branches missed.">                &amp;&amp; RequestContext.getHttpHeaders().containsKey(&quot;x-xform-organization&quot;)) {</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        if (RequestContext.getHttpHeaders() != null</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">                &amp;&amp; RequestContext.getPrincipal().getRoles().contains(Roles.ADMIN)</span>
+<span class="nc bnc" id="L87" title="All 2 branches missed.">                &amp;&amp; RequestContext.getHttpHeaders().containsKey(&quot;x-xform-organization&quot;)) {</span>
 
-<span class="nc" id="L122">            Map&lt;String, List&lt;String&gt;&gt; headers = RequestContext.getHttpHeaders();</span>
-<span class="nc" id="L123">            String orgId = headers.get(&quot;x-xform-organization&quot;).get(0);</span>
-<span class="nc" id="L124">            Organization organizationOverride = organizationService.getObject(UUID.fromString(orgId));</span>
-<span class="nc bnc" id="L125" title="All 2 branches missed.">            if (organizationOverride == null) {</span>
-<span class="nc" id="L126">                throw new HubControllerFault(&quot;Organization not found for organizationId: &quot; + orgId);</span>
+<span class="nc" id="L89">            Map&lt;String, List&lt;String&gt;&gt; headers = RequestContext.getHttpHeaders();</span>
+<span class="nc" id="L90">            String orgId = headers.get(&quot;x-xform-organization&quot;).get(0);</span>
+<span class="nc" id="L91">            Organization organizationOverride = organizationService.getObject(UUID.fromString(orgId));</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">            if (organizationOverride == null) {</span>
+<span class="nc" id="L93">                throw new HubControllerFault(&quot;Organization not found for organizationId: &quot; + orgId);</span>
             }
-<span class="nc" id="L128">            return organizationOverride;</span>
+<span class="nc" id="L95">            return organizationOverride;</span>
         }
 
-<span class="nc" id="L131">        return organization;</span>
+<span class="nc" id="L98">        return organization;</span>
     }
 
-    /**
-     * Creates the transformation context for a request, with the direction set to REQUEST.
-     *
-     * @param organization the organization identifier
-     * @param submitSingleMessage the inbound request
-     * @return the transformation context
-     * @throws Fault if the service context cannot be created
-     */
     protected IZGXformContext createXformContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
-<span class="nc" id="L143">        ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage);</span>
-<span class="nc" id="L144">        serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);</span>
+<span class="nc" id="L102">        ServiceContext serviceContext = createServiceContext(organization, submitSingleMessage);</span>
+<span class="nc" id="L103">        serviceContext.setCurrentDirection(DataFlowDirection.REQUEST);</span>
 
-<span class="nc" id="L146">        return new IZGXformContext(serviceContext, submitSingleMessage);</span>
+<span class="nc" id="L105">        return new IZGXformContext(serviceContext, submitSingleMessage);</span>
     }
 
-    /**
-     * Creates the service context for a request.
-     *
-     * @param organization the organization identifier
-     * @param submitSingleMessage the inbound request
-     * @return the service context
-     * @throws Fault if the service context cannot be created
-     */
     abstract protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault;
 
     @Override
     protected void checkCredentials(HasCredentials s) throws SecurityFault {
         // This is not used for Xform Service yet
-<span class="nc" id="L162">    }</span>
+<span class="nc" id="L113">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

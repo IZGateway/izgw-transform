@@ -4,40 +4,27 @@ import lombok.Data;
 
 import java.util.UUID;
 
-/**
- * Advice recorded for a precondition by the advice aspect. Two instances are equal if they have the same identifier.
- */
 @Data
 public class PreconditionAdviceDTO extends XformAdviceDTO {
-    /**
-     * Creates empty advice.
-     */
-<span class="nc" id="L15">    public PreconditionAdviceDTO() {</span>
-<span class="nc" id="L16">    }</span>
+<span class="nc" id="L9">    public PreconditionAdviceDTO() {</span>
+<span class="nc" id="L10">    }</span>
 
-    /**
-     * Creates advice for the identified advised object.
-     *
-     * @param id the identifier of the advised object
-     * @param className the simple class name of the advised object
-     * @param name the name of the advised object
-     */
     public PreconditionAdviceDTO(UUID id, String className, String name) {
-<span class="nc" id="L26">        super(id, className, name);</span>
-<span class="nc" id="L27">    }</span>
+<span class="nc" id="L13">        super(id, className, name);</span>
+<span class="nc" id="L14">    }</span>
 
     @Override
     public boolean equals(Object obj) {
-<span class="nc bnc" id="L31" title="All 2 branches missed.">        if (obj instanceof PreconditionAdviceDTO other) {</span>
-<span class="nc" id="L32">            return this.getId().equals(other.getId());</span>
+<span class="nc bnc" id="L18" title="All 2 branches missed.">        if (obj instanceof PreconditionAdviceDTO other) {</span>
+<span class="nc" id="L19">            return this.getId().equals(other.getId());</span>
         }
 
-<span class="nc" id="L35">        return false;</span>
+<span class="nc" id="L22">        return false;</span>
     }
 
     @Override
     public int hashCode() {
-<span class="nc" id="L40">        return this.getId().hashCode();</span>
+<span class="nc" id="L27">        return this.getId().hashCode();</span>
     }
 
 }

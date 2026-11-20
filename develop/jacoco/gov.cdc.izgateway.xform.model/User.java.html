@@ -12,9 +12,6 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * A user of the Xform Service and the organizations that the user can access.
- */
 @Getter
 @Setter
 @DynamoDbBean
@@ -31,19 +28,11 @@ public class User extends BaseModel {
     @NotNull(message = &quot;User - Active status is required&quot;)
     private Boolean active;
 
-    /**
-     * Creates an empty user.
-     */
-<span class="nc" id="L37">    public User() {</span>
-<span class="nc" id="L38">    }</span>
+<span class="nc" id="L31">    public User() {</span>
+<span class="nc" id="L32">    }</span>
 
-    /**
-     * Creates a user with the user name.
-     *
-     * @param userName the user name
-     */
-<span class="fc" id="L45">    public User(String userName) {</span>
-<span class="fc" id="L46">        this.userName = userName;</span>
-<span class="fc" id="L47">    }</span>
+<span class="fc" id="L34">    public User(String userName) {</span>
+<span class="fc" id="L35">        this.userName = userName;</span>
+<span class="fc" id="L36">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

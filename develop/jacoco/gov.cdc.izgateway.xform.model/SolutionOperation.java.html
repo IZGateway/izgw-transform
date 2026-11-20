@@ -9,24 +9,14 @@ import lombok.Setter;
 
 import java.util.List;
 
-/**
- * A list of operations of a solution that runs when its preconditions are met.
- */
 @Getter
 @Setter
-public class SolutionOperation {
+<span class="fc" id="L14">public class SolutionOperation {</span>
     @NotNull(message = &quot;Preconditions List is required (can be empty)&quot;)
     @Valid
     private List&lt;Precondition&gt; preconditions;
     @NotNull(message = &quot;Operation List is required (can be empty)&quot;)
     @Valid
     private List&lt;Operation&gt; operationList;
-
-    /**
-     * Creates an empty solution operation.
-     */
-<span class="fc" id="L28">    public SolutionOperation() {</span>
-        // Jackson sets the fields.
-<span class="fc" id="L30">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

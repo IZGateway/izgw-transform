@@ -5,81 +5,51 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.UUID;
 
-/**
- * Collected advice for one solution, with the advice of its request and response operations and preconditions.
- */
 @Data
 public class SolutionAdvice extends SolutionAdviceDTO {
-<span class="nc" id="L13">    private final ArrayList&lt;PreconditionAdviceDTO&gt; requestPreconditionAdviceList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L14">    private final ArrayList&lt;PreconditionAdviceDTO&gt; responsePreconditionAdviceList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L15">    private final ArrayList&lt;OperationAdviceDTO&gt; requestOperationAdviceList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L16">    private final ArrayList&lt;OperationAdviceDTO&gt; responseOperationAdviceList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L10">    private final ArrayList&lt;PreconditionAdviceDTO&gt; requestPreconditionAdviceList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L11">    private final ArrayList&lt;PreconditionAdviceDTO&gt; responsePreconditionAdviceList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L12">    private final ArrayList&lt;OperationAdviceDTO&gt; requestOperationAdviceList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L13">    private final ArrayList&lt;OperationAdviceDTO&gt; responseOperationAdviceList = new ArrayList&lt;&gt;();</span>
 
-    /**
-     * Creates collected advice for the identified solution.
-     *
-     * @param id the identifier of the solution
-     * @param className the simple class name of the advised object
-     * @param name the name of the solution
-     */
     public SolutionAdvice(UUID id, String className, String name) {
-<span class="nc" id="L26">        super(id, className, name);</span>
-<span class="nc" id="L27">    }</span>
+<span class="nc" id="L16">        super(id, className, name);</span>
+<span class="nc" id="L17">    }</span>
 
-    /**
-     * Adds advice for an operation that transformed the request.
-     *
-     * @param operationAdvice the operation advice to add
-     */
     public void addRequestOperationAdvice(OperationAdviceDTO operationAdvice) {
-<span class="nc" id="L35">        requestOperationAdviceList.add(operationAdvice);</span>
-<span class="nc" id="L36">    }</span>
+<span class="nc" id="L20">        requestOperationAdviceList.add(operationAdvice);</span>
+<span class="nc" id="L21">    }</span>
 
-    /**
-     * Adds advice for an operation that transformed the response.
-     *
-     * @param operationAdvice the operation advice to add
-     */
     public void addResponseOperationAdvice(OperationAdviceDTO operationAdvice) {
-<span class="nc" id="L44">        responseOperationAdviceList.add(operationAdvice);</span>
-<span class="nc" id="L45">    }</span>
+<span class="nc" id="L24">        responseOperationAdviceList.add(operationAdvice);</span>
+<span class="nc" id="L25">    }</span>
 
-    /**
-     * Adds request precondition advice if it is not in the list.
-     *
-     * @param advice the precondition advice to add
-     */
     public void addRequestPreconditionAdvice(PreconditionAdviceDTO advice) {
-<span class="nc" id="L53">        int adviceIndex = requestPreconditionAdviceList.indexOf(advice);</span>
-<span class="nc bnc" id="L54" title="All 2 branches missed.">        if ( adviceIndex &lt; 0 ) {</span>
-<span class="nc" id="L55">            requestPreconditionAdviceList.add(advice);</span>
+<span class="nc" id="L28">        int adviceIndex = requestPreconditionAdviceList.indexOf(advice);</span>
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        if ( adviceIndex &lt; 0 ) {</span>
+<span class="nc" id="L30">            requestPreconditionAdviceList.add(advice);</span>
         }
-<span class="nc" id="L57">    }</span>
+<span class="nc" id="L32">    }</span>
 
-    /**
-     * Adds response precondition advice if it is not in the list.
-     *
-     * @param advice the precondition advice to add
-     */
     public void addResponsePreconditionAdvice(PreconditionAdviceDTO advice) {
-<span class="nc" id="L65">        int adviceIndex = responsePreconditionAdviceList.indexOf(advice);</span>
-<span class="nc bnc" id="L66" title="All 2 branches missed.">        if ( adviceIndex &lt; 0 ) {</span>
-<span class="nc" id="L67">            responsePreconditionAdviceList.add(advice);</span>
+<span class="nc" id="L35">        int adviceIndex = responsePreconditionAdviceList.indexOf(advice);</span>
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        if ( adviceIndex &lt; 0 ) {</span>
+<span class="nc" id="L37">            responsePreconditionAdviceList.add(advice);</span>
         }
-<span class="nc" id="L69">    }</span>
+<span class="nc" id="L39">    }</span>
 
     @Override
     public boolean equals(Object obj) {
-<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (obj instanceof SolutionAdviceDTO other) {</span>
-<span class="nc" id="L74">            return this.getId().equals(other.getId());</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (obj instanceof SolutionAdviceDTO other) {</span>
+<span class="nc" id="L44">            return this.getId().equals(other.getId());</span>
         }
 
-<span class="nc" id="L77">        return false;</span>
+<span class="nc" id="L47">        return false;</span>
     }
 
     @Override
     public int hashCode() {
-<span class="nc" id="L82">        return this.getId().hashCode();</span>
+<span class="nc" id="L52">        return this.getId().hashCode();</span>
     }
 
 }

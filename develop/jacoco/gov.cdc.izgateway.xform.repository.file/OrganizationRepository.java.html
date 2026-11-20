@@ -7,33 +7,18 @@ import org.springframework.stereotype.Repository;
 
 import java.util.LinkedHashSet;
 
-/**
- * File-backed repository for {@link Organization} entities.
- */
 @Repository
-public class OrganizationRepository extends GenericFileRepository&lt;Organization&gt; {
+<span class="fc" id="L11">public class OrganizationRepository extends GenericFileRepository&lt;Organization&gt; {</span>
 
-    /**
-     * Creates the file-backed repository.
-     */
-<span class="fc" id="L19">    public OrganizationRepository() {</span>
-        // The file path is set by setFilePath.
-<span class="fc" id="L21">    }</span>
-
-    /**
-     * Sets the path of the organization JSON file.
-     *
-     * @param filePath the path of the JSON file
-     */
     @Value(&quot;${xform.configurations.organizations}&quot;)
     protected void setFilePath(String filePath) {
-<span class="fc" id="L30">        this.filePath = filePath;</span>
-<span class="fc" id="L31">    }</span>
+<span class="fc" id="L15">        this.filePath = filePath;</span>
+<span class="fc" id="L16">    }</span>
 
 
     @Override
     protected TypeReference&lt;LinkedHashSet&lt;Organization&gt;&gt; getTypeReference() {
-<span class="nc" id="L36">        return new TypeReference&lt;&gt;() {};</span>
+<span class="nc" id="L21">        return new TypeReference&lt;&gt;() {};</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

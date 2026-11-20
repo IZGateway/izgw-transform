@@ -4,23 +4,14 @@ import gov.cdc.izgateway.xform.model.GroupRoleMapping;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
-/**
- * DynamoDB repository for {@link GroupRoleMapping} entities.
- */
 public class GroupRoleMappingRepository extends GenericDynamoDBRepository&lt;GroupRoleMapping&gt; {
 
-    /**
-     * Creates the repository.
-     *
-     * @param dynamoDbClient the DynamoDB enhanced client
-     * @param tableName the name of the DynamoDB table
-     */
     public GroupRoleMappingRepository(
             DynamoDbEnhancedClient dynamoDbClient,
             String tableName
     ) {
-<span class="nc" id="L22">        super(dynamoDbClient, tableName, GroupRoleMapping.class, TableSchema.fromBean(GroupRoleMapping.class));</span>
-<span class="nc" id="L23">    }</span>
+<span class="nc" id="L13">        super(dynamoDbClient, tableName, GroupRoleMapping.class, TableSchema.fromBean(GroupRoleMapping.class));</span>
+<span class="nc" id="L14">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

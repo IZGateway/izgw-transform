@@ -24,53 +24,40 @@ import java.io.IOException;
 public class AccessControlValve extends ValveBase {
     private final AccessControlService accessControlService;
 
-    /**
-     * Creates the valve.
-     *
-     * @param accessControlService the service that checks access to request paths
-     */
     @Autowired
-<span class="nc" id="L33">    public AccessControlValve(AccessControlService accessControlService) {</span>
-<span class="nc" id="L34">        this.accessControlService = accessControlService;</span>
-<span class="nc" id="L35">    }</span>
+<span class="nc" id="L28">    public AccessControlValve(AccessControlService accessControlService) {</span>
+<span class="nc" id="L29">        this.accessControlService = accessControlService;</span>
+<span class="nc" id="L30">    }</span>
 
     @Override
     public void invoke(Request req, Response resp) throws IOException, ServletException {
-<span class="nc bnc" id="L39" title="All 2 branches missed.">        if (accessAllowed(req, resp)) {</span>
-<span class="nc" id="L40">            this.getNext().invoke(req, resp);</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">        if (accessAllowed(req, resp)) {</span>
+<span class="nc" id="L35">            this.getNext().invoke(req, resp);</span>
         }
-<span class="nc" id="L42">    }</span>
+<span class="nc" id="L37">    }</span>
 
-    /**
-     * Checks access to the request path. If access is not allowed, sets the response status to
-     * 404 (path does not exist) or 401 (access denied).
-     *
-     * @param req the request
-     * @param resp the response
-     * @return true if access is allowed
-     */
     public boolean accessAllowed(HttpServletRequest req, HttpServletResponse resp) {
-<span class="nc" id="L53">        String path = req.getRequestURI();</span>
-<span class="nc" id="L54">        Boolean accessAllowed = accessControlService.checkAccess(req.getMethod(), path);</span>
-<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (accessAllowed == null) {</span>
-<span class="nc" id="L56">            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);</span>
-<span class="nc" id="L57">            log.trace(&quot;Path does not exist: {}&quot;, path);</span>
-<span class="nc" id="L58">            return false;</span>
-<span class="nc bnc" id="L59" title="All 2 branches missed.">        } else if ( Boolean.FALSE.equals(accessAllowed) ) {</span>
-<span class="nc" id="L60">            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span>
-<span class="nc" id="L61">            log.trace(&quot;Access denied to protected URL {} address by {} at {}&quot;, </span>
+<span class="nc" id="L40">        String path = req.getRequestURI();</span>
+<span class="nc" id="L41">        Boolean accessAllowed = accessControlService.checkAccess(req.getMethod(), path);</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if (accessAllowed == null) {</span>
+<span class="nc" id="L43">            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);</span>
+<span class="nc" id="L44">            log.trace(&quot;Path does not exist: {}&quot;, path);</span>
+<span class="nc" id="L45">            return false;</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        } else if ( Boolean.FALSE.equals(accessAllowed) ) {</span>
+<span class="nc" id="L47">            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span>
+<span class="nc" id="L48">            log.trace(&quot;Access denied to protected URL {} address by {} at {}&quot;, </span>
         		path, 
-<span class="nc" id="L63">        		RequestContext.getPrincipal().getName(), </span>
-<span class="nc" id="L64">        		RequestContext.getTransactionData().getSource().getIpAddress()</span>
+<span class="nc" id="L50">        		RequestContext.getPrincipal().getName(), </span>
+<span class="nc" id="L51">        		RequestContext.getTransactionData().getSource().getIpAddress()</span>
             );
-<span class="nc" id="L66">            return false;</span>
+<span class="nc" id="L53">            return false;</span>
         } else {
-<span class="nc" id="L68">            log.trace(&quot;Access granted to protected URL {} address by {} at {}&quot;, </span>
+<span class="nc" id="L55">            log.trace(&quot;Access granted to protected URL {} address by {} at {}&quot;, </span>
         		path, 
-<span class="nc" id="L70">        		RequestContext.getPrincipal().getName(), </span>
-<span class="nc" id="L71">        		RequestContext.getTransactionData().getSource().getIpAddress()</span>
+<span class="nc" id="L57">        		RequestContext.getPrincipal().getName(), </span>
+<span class="nc" id="L58">        		RequestContext.getTransactionData().getSource().getIpAddress()</span>
         	);
-<span class="nc" id="L73">            return true;</span>
+<span class="nc" id="L60">            return true;</span>
         }
     }
 }

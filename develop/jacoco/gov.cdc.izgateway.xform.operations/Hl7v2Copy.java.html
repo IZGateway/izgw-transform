@@ -8,35 +8,28 @@ import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.exceptions.OperationException;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * HL7 v2 implementation of the {@link Copy} operation.
- */
-<span class="fc" id="L14">@Slf4j</span>
+<span class="fc" id="L11">@Slf4j</span>
 public class Hl7v2Copy extends Copy implements Operation {
-    /**
-     * Creates an HL7 v2 copy operation with the settings of another operation.
-     * @param copy the operation to copy the settings from
-     */
     public Hl7v2Copy(Copy copy) {
-<span class="fc" id="L21">        super(copy);</span>
-<span class="fc" id="L22">    }</span>
+<span class="fc" id="L14">        super(copy);</span>
+<span class="fc" id="L15">    }</span>
 
     @Override
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws OperationException {
-<span class="fc" id="L27">        Message message = context.getCurrentMessage();</span>
+<span class="fc" id="L20">        Message message = context.getCurrentMessage();</span>
 
-<span class="fc" id="L29">        Terser terser = new Terser(message);</span>
+<span class="fc" id="L22">        Terser terser = new Terser(message);</span>
 
         try {
-<span class="fc" id="L32">            String sourceValue = terser.get(this.getSourceField());</span>
-<span class="fc" id="L33">            terser.set(this.getDestinationField(), sourceValue);</span>
-<span class="nc" id="L34">        } catch (HL7Exception hl7Exception) {</span>
-<span class="nc" id="L35">            log.error(&quot;Error while copying HL7v2 field: {} to {}&quot;, this.getSourceField(), this.getDestinationField(), hl7Exception);</span>
-<span class="nc" id="L36">            throw new OperationException(hl7Exception.getMessage(), hl7Exception.getCause());</span>
-<span class="fc" id="L37">        }</span>
+<span class="fc" id="L25">            String sourceValue = terser.get(this.getSourceField());</span>
+<span class="fc" id="L26">            terser.set(this.getDestinationField(), sourceValue);</span>
+<span class="nc" id="L27">        } catch (HL7Exception hl7Exception) {</span>
+<span class="nc" id="L28">            log.error(&quot;Error while copying HL7v2 field: {} to {}&quot;, this.getSourceField(), this.getDestinationField(), hl7Exception);</span>
+<span class="nc" id="L29">            throw new OperationException(hl7Exception.getMessage(), hl7Exception.getCause());</span>
+<span class="fc" id="L30">        }</span>
 
-<span class="fc" id="L39">        context.setCurrentMessage(message);</span>
-<span class="fc" id="L40">    }</span>
+<span class="fc" id="L32">        context.setCurrentMessage(message);</span>
+<span class="fc" id="L33">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

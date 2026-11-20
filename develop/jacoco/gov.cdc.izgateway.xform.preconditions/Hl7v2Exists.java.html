@@ -6,52 +6,38 @@ import ca.uhn.hl7v2.util.Terser;
 import gov.cdc.izgateway.xform.context.ServiceContext;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * HL7 v2 implementation of the {@link Exists} precondition.
- */
-<span class="fc" id="L12">@Slf4j</span>
+<span class="fc" id="L9">@Slf4j</span>
 public class Hl7v2Exists extends Exists implements Precondition {
 
-    /**
-     * Creates an empty precondition.
-     */
     public Hl7v2Exists() {
-<span class="fc" id="L19">        super();</span>
-<span class="fc" id="L20">    }</span>
+<span class="fc" id="L13">        super();</span>
+<span class="fc" id="L14">    }</span>
 
-    /**
-     * Creates an HL7 v2 precondition with the settings of another precondition.
-     * @param exists the precondition to copy the settings from
-     */
     public Hl7v2Exists(Exists exists) {
-<span class="fc" id="L27">        super(exists);</span>
-<span class="fc" id="L28">    }</span>
+<span class="fc" id="L17">        super(exists);</span>
+<span class="fc" id="L18">    }</span>
 
-    /**
-     * Creates a precondition that checks if a message field has a value.
-     * @param fieldName the HL7 v2 Terser path of the field
-     */
     public Hl7v2Exists(String fieldName) {
-<span class="nc" id="L35">        super(fieldName);</span>
-<span class="nc" id="L36">    }</span>
+<span class="nc" id="L21">        super(fieldName);</span>
+<span class="nc" id="L22">    }</span>
 
     @Override
     public boolean evaluate(ServiceContext context) {
 
-<span class="fc" id="L41">        Message message = context.getCurrentMessage();</span>
-<span class="fc" id="L42">        Terser terser = new Terser(message);</span>
+<span class="fc" id="L27">        Message message = context.getCurrentMessage();</span>
+<span class="fc" id="L28">        Terser terser = new Terser(message);</span>
 
         String pathValue;
         try {
-<span class="fc" id="L46">            pathValue = terser.get(this.getDataPath());</span>
-<span class="fc" id="L47">        } catch (HL7Exception e) {</span>
+<span class="fc" id="L32">            pathValue = terser.get(this.getDataPath());</span>
+<span class="fc" id="L33">        } catch (HL7Exception e) {</span>
             // HL7Exception will happen if Terser.get references Segment that does not exist in the message
             // In this case just returning false.  Entirely possible that Analyst/Engineer has a precondition
             // set for a segment that just simply won't exist in every message submitted.
-<span class="fc" id="L51">            return false;</span>
-<span class="fc" id="L52">        }</span>
+<span class="fc" id="L37">            return false;</span>
+<span class="fc" id="L38">        }</span>
 
-<span class="fc bfc" id="L54" title="All 2 branches covered.">        return pathValue != null;</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">        return pathValue != null;</span>
 
     }
 }

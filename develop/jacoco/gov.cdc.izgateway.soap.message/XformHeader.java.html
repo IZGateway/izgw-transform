@@ -15,70 +15,41 @@ import java.util.function.Function;
 
 // TODO: Refactor this with IZG Core
 
-/**
- * The transformation service header in a SOAP message.
- */
 @Data 
 @Schema(description=&quot;The Hub Request header in the SOAP message&quot;)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class XformHeader implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-    /** The request after transformation. */
     @Schema(description=&quot;The transformed request.&quot;)
     private String transformedRequest;
-    /** The response before transformation. */
     @Schema(description=&quot;The original response prior to xform.&quot;)
     private String originalResponse;
 
-<span class="fc" id="L34">	private static List&lt;Pair&lt;String, Function&lt;SoapMessage, String&gt;&gt;&gt; pairs = Arrays.asList(</span>
-<span class="pc" id="L35">            Pair.of(&quot;TransformedRequest&quot;, (Function&lt;SoapMessage, String&gt;)(m -&gt; m.getXformHeader().getTransformedRequest())),</span>
-<span class="pc" id="L36">            Pair.of(&quot;OriginalResponse&quot;, (Function&lt;SoapMessage, String&gt;)(m -&gt; m.getXformHeader().getOriginalResponse()))</span>
+<span class="fc" id="L29">	private static List&lt;Pair&lt;String, Function&lt;SoapMessage, String&gt;&gt;&gt; pairs = Arrays.asList(</span>
+<span class="pc" id="L30">            Pair.of(&quot;TransformedRequest&quot;, (Function&lt;SoapMessage, String&gt;)(m -&gt; m.getXformHeader().getTransformedRequest())),</span>
+<span class="pc" id="L31">            Pair.of(&quot;OriginalResponse&quot;, (Function&lt;SoapMessage, String&gt;)(m -&gt; m.getXformHeader().getOriginalResponse()))</span>
 		);
 		
-	/**
-	 * Create an empty header.
-	 */
-<span class="fc" id="L42">	public XformHeader() {</span>
-		// All fields start as null.
-<span class="fc" id="L44">	}</span>
-
-	/**
-	 * Get the element names and value getters for the header elements.
-	 * @return The pairs of element name and function that gets the value from a message.
-	 */
 	@JsonIgnore
 	public static List&lt;Pair&lt;String, Function&lt;SoapMessage, String&gt;&gt;&gt; getKeyValueSuppliers() {
-<span class="nc" id="L52">		return pairs;</span>
+<span class="nc" id="L36">		return pairs;</span>
 	}
 
-	/**
-	 * Check whether the header has no values.
-	 * @return true if all values are empty.
-	 */
 	@JsonIgnore
 	public boolean isEmpty() {
-<span class="nc" id="L61">		return StringUtils.isAllEmpty(transformedRequest, originalResponse);</span>
+<span class="nc" id="L41">		return StringUtils.isAllEmpty(transformedRequest, originalResponse);</span>
 	}
 	
-	/**
-	 * Remove all values from the header.
-	 * @return This header.
-	 */
 	public XformHeader clear() {
-<span class="nc" id="L69">		transformedRequest = originalResponse = null;</span>
-<span class="nc" id="L70">		return this;</span>
+<span class="nc" id="L45">		transformedRequest = originalResponse = null;</span>
+<span class="nc" id="L46">		return this;</span>
 	}
 
-	/**
-	 * Copy all values from another header.
-	 * @param that The header to copy from.
-	 * @return This header.
-	 */
 	public XformHeader copyFrom(XformHeader that) {
-<span class="nc" id="L79">        this.transformedRequest = that.transformedRequest;</span>
-<span class="nc" id="L80">        this.originalResponse = that.originalResponse;</span>
-<span class="nc" id="L81">		return this;</span>
+<span class="nc" id="L50">        this.transformedRequest = that.transformedRequest;</span>
+<span class="nc" id="L51">        this.originalResponse = that.originalResponse;</span>
+<span class="nc" id="L52">		return this;</span>
 	}
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

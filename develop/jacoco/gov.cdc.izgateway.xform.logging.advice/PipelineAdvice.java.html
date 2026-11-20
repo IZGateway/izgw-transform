@@ -6,71 +6,46 @@ import lombok.EqualsAndHashCode;
 import java.util.ArrayList;
 import java.util.UUID;
 
-/**
- * Collected advice for one pipeline run, with the advice of its solutions and pipeline-level preconditions.
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class PipelineAdvice extends PipelineAdviceDTO {
-<span class="nc" id="L15">    private ArrayList&lt;SolutionAdvice&gt; solutionAdviceList = new ArrayList&lt;&gt;();</span>
-<span class="nc" id="L16">    private ArrayList&lt;PreconditionAdviceDTO&gt; preconditionAdviceList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L12">    private ArrayList&lt;SolutionAdvice&gt; solutionAdviceList = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L13">    private ArrayList&lt;PreconditionAdviceDTO&gt; preconditionAdviceList = new ArrayList&lt;&gt;();</span>
     private UUID id;
-<span class="nc" id="L18">    private boolean requestTransformed = false;</span>
-<span class="nc" id="L19">    private boolean responseTransformed = false;</span>
+<span class="nc" id="L15">    private boolean requestTransformed = false;</span>
+<span class="nc" id="L16">    private boolean responseTransformed = false;</span>
 
-    /**
-     * Creates the collected pipeline advice from the first advice recorded for the pipeline.
-     *
-     * @param advice the pipeline advice to copy
-     */
-<span class="nc" id="L26">    public PipelineAdvice(PipelineAdviceDTO advice) {</span>
-<span class="nc" id="L27">        this.setClassName(advice.getClassName());</span>
-<span class="nc" id="L28">        this.setName(advice.getName());</span>
-<span class="nc" id="L29">        this.setRequest(advice.getRequest());</span>
-<span class="nc" id="L30">        this.setTransformedRequest(advice.getTransformedRequest());</span>
-<span class="nc" id="L31">        this.setResponse(advice.getResponse());</span>
-<span class="nc" id="L32">        this.setTransformedResponse(advice.getTransformedResponse());</span>
-<span class="nc" id="L33">        this.setId(advice.getId());</span>
-<span class="nc" id="L34">    }</span>
+<span class="nc" id="L18">    public PipelineAdvice(PipelineAdviceDTO advice) {</span>
+<span class="nc" id="L19">        this.setClassName(advice.getClassName());</span>
+<span class="nc" id="L20">        this.setName(advice.getName());</span>
+<span class="nc" id="L21">        this.setRequest(advice.getRequest());</span>
+<span class="nc" id="L22">        this.setTransformedRequest(advice.getTransformedRequest());</span>
+<span class="nc" id="L23">        this.setResponse(advice.getResponse());</span>
+<span class="nc" id="L24">        this.setTransformedResponse(advice.getTransformedResponse());</span>
+<span class="nc" id="L25">        this.setId(advice.getId());</span>
+<span class="nc" id="L26">    }</span>
 
-    /**
-     * Returns the collected advice for the solution with the identifier of the given advice, and adds it if it is not in the list.
-     *
-     * @param advice the solution advice to find
-     * @return the collected solution advice
-     */
     public SolutionAdvice getSolutionAdvice(SolutionAdviceDTO advice) {
-<span class="nc" id="L43">        SolutionAdvice solutionAdvice = new SolutionAdvice(advice.getId(), advice.getClassName(), advice.getName());</span>
-<span class="nc" id="L44">        int adviceIndex = solutionAdviceList.indexOf(solutionAdvice);</span>
-<span class="nc bnc" id="L45" title="All 2 branches missed.">        if ( adviceIndex &gt;= 0 ) {</span>
-<span class="nc" id="L46">            return solutionAdviceList.get(adviceIndex);</span>
+<span class="nc" id="L29">        SolutionAdvice solutionAdvice = new SolutionAdvice(advice.getId(), advice.getClassName(), advice.getName());</span>
+<span class="nc" id="L30">        int adviceIndex = solutionAdviceList.indexOf(solutionAdvice);</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        if ( adviceIndex &gt;= 0 ) {</span>
+<span class="nc" id="L32">            return solutionAdviceList.get(adviceIndex);</span>
         }
 
-<span class="nc" id="L49">        solutionAdviceList.add(solutionAdvice);</span>
+<span class="nc" id="L35">        solutionAdviceList.add(solutionAdvice);</span>
 
-<span class="nc" id="L51">        return solutionAdvice;</span>
+<span class="nc" id="L37">        return solutionAdvice;</span>
     }
 
-    /**
-     * Adds the pipeline-level precondition advice if it is not in the list.
-     *
-     * @param advice the precondition advice to add
-     */
     public void addPreconditionAdvice(PreconditionAdviceDTO advice) {
-<span class="nc" id="L60">        int adviceIndex = preconditionAdviceList.indexOf(advice);</span>
-<span class="nc bnc" id="L61" title="All 2 branches missed.">        if ( adviceIndex &lt; 0 ) {</span>
-<span class="nc" id="L62">            preconditionAdviceList.add(advice);</span>
+<span class="nc" id="L41">        int adviceIndex = preconditionAdviceList.indexOf(advice);</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        if ( adviceIndex &lt; 0 ) {</span>
+<span class="nc" id="L43">            preconditionAdviceList.add(advice);</span>
         }
-<span class="nc" id="L64">    }</span>
+<span class="nc" id="L45">    }</span>
 
-    /**
-     * Returns true if the precondition advice is in the pipeline-level list.
-     *
-     * @param precondition the precondition advice to find
-     * @return true if the list contains advice with the same identifier
-     */
     public boolean preconditionExists(PreconditionAdviceDTO precondition) {
-<span class="nc" id="L73">        return (preconditionAdviceList.contains(precondition));</span>
+<span class="nc" id="L48">        return (preconditionAdviceList.contains(precondition));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -11,53 +11,35 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.Endpoint;
 import org.apache.camel.support.DefaultProducer;
 
-/**
- * Base class for Camel producers that send messages to a destination from an {@link IZGComponent}.
- */
-<span class="fc" id="L17">@Slf4j</span>
+<span class="fc" id="L14">@Slf4j</span>
 public abstract class ProducerBase extends DefaultProducer {
 
-    /**
-     * Creates the producer.
-     * @param endpoint the endpoint that owns the producer
-     */
     protected ProducerBase(Endpoint endpoint) {
-<span class="fc" id="L25">        super(endpoint);</span>
-<span class="fc" id="L26">    }</span>
+<span class="fc" id="L18">        super(endpoint);</span>
+<span class="fc" id="L19">    }</span>
 
-    /**
-     * Copies the URL and identifier of a destination into the logging destination information.
-     * @param info the logging destination information to update
-     * @param route the destination, or null to clear the URL and identifier
-     */
     public void setDestinationInfoFromDestination(DestinationInfo info, IDestination route) {
-<span class="nc bnc" id="L34" title="All 2 branches missed.">        if (route == null) {</span>
-<span class="nc" id="L35">            info.setUrl(null);</span>
-<span class="nc" id="L36">            info.setId(null);</span>
-<span class="nc" id="L37">            return;</span>
+<span class="nc bnc" id="L22" title="All 2 branches missed.">        if (route == null) {</span>
+<span class="nc" id="L23">            info.setUrl(null);</span>
+<span class="nc" id="L24">            info.setId(null);</span>
+<span class="nc" id="L25">            return;</span>
         }
-<span class="nc" id="L39">        info.setUrl(route.getDestUri());</span>
-<span class="nc" id="L40">        info.setId(route.getDestId());</span>
-<span class="nc" id="L41">    }</span>
+<span class="nc" id="L27">        info.setUrl(route.getDestUri());</span>
+<span class="nc" id="L28">        info.setId(route.getDestId());</span>
+<span class="nc" id="L29">    }</span>
 
-    /**
-     * Creates a destination from the settings of a component.
-     * @param component the component that holds the destination settings
-     * @return the new destination
-     * @throws UnknownDestinationFault if the destination cannot be created
-     */
     protected IDestination createDestination(IZGComponent component) throws UnknownDestinationFault {
-<span class="nc" id="L50">        IDestinationId destinationIdObject = new DestinationId();</span>
-<span class="nc" id="L51">        destinationIdObject.setDestId(component.getDestinationId());</span>
-<span class="nc" id="L52">        destinationIdObject.setDestType(component.getDestinationType());</span>
+<span class="nc" id="L32">        IDestinationId destinationIdObject = new DestinationId();</span>
+<span class="nc" id="L33">        destinationIdObject.setDestId(component.getDestinationId());</span>
+<span class="nc" id="L34">        destinationIdObject.setDestType(component.getDestinationType());</span>
 
-<span class="nc" id="L54">        Destination destination = new Destination();</span>
-<span class="nc" id="L55">        destination.setDestUri(component.getDestinationUri());</span>
-<span class="nc" id="L56">        destination.setDestId(component.getDestinationId());</span>
-<span class="nc" id="L57">        destination.setDestTypeId(SystemUtils.getDestType());</span>
-<span class="nc" id="L58">        destination.setId(destinationIdObject);</span>
+<span class="nc" id="L36">        Destination destination = new Destination();</span>
+<span class="nc" id="L37">        destination.setDestUri(component.getDestinationUri());</span>
+<span class="nc" id="L38">        destination.setDestId(component.getDestinationId());</span>
+<span class="nc" id="L39">        destination.setDestTypeId(SystemUtils.getDestType());</span>
+<span class="nc" id="L40">        destination.setId(destinationIdObject);</span>
 
-<span class="nc" id="L60">        return destination;</span>
+<span class="nc" id="L42">        return destination;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

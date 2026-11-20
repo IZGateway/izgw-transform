@@ -11,9 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
-/**
- * Camel component that sends messages to the IZ Gateway Hub destination configured in {@code xform.destination.hub.*}.
- */
 @Component(&quot;izghub&quot;)
 @Getter
 public class IZGHubComponent extends DefaultComponent implements IZGComponent {
@@ -29,18 +26,14 @@ public class IZGHubComponent extends DefaultComponent implements IZGComponent {
 
     private final HubMessageSender messageSender;
 
-    /**
-     * Creates the component.
-     * @param messageSender the sender used to send SOAP messages to the destination
-     */
     @Autowired
-<span class="fc" id="L37">    public IZGHubComponent(HubMessageSender messageSender) {</span>
-<span class="fc" id="L38">        this.messageSender = messageSender;</span>
-<span class="fc" id="L39">    }</span>
+<span class="fc" id="L30">    public IZGHubComponent(HubMessageSender messageSender) {</span>
+<span class="fc" id="L31">        this.messageSender = messageSender;</span>
+<span class="fc" id="L32">    }</span>
 
     @Override
     protected Endpoint createEndpoint(String uri, String remaining, Map&lt;String, Object&gt; parameters) throws Exception {
-<span class="fc" id="L43">        return new IZGHubEndpoint(uri, this);</span>
+<span class="fc" id="L36">        return new IZGHubEndpoint(uri, this);</span>
     }
 
 }

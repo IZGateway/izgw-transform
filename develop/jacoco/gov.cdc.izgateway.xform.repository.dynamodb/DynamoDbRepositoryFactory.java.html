@@ -8,9 +8,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 
-/**
- * Creates the DynamoDB repositories when spring.database is dynamodb or migrate.
- */
 @Component
 @ConditionalOnExpression(&quot;'${spring.database:}'.equalsIgnoreCase('dynamodb') || '${spring.database:}'.equalsIgnoreCase('migrate')&quot;)
 public class DynamoDbRepositoryFactory implements RepositoryFactory {
@@ -29,89 +26,83 @@ public class DynamoDbRepositoryFactory implements RepositoryFactory {
     private UserRepository ur;
     private EventRepository er;
 
-    /**
-     * Creates the factory.
-     *
-     * @param dynamoDbClient the DynamoDB enhanced client
-     * @param dynamoDbConfig the DynamoDB configuration that contains the table name
-     */
     public DynamoDbRepositoryFactory(
             DynamoDbEnhancedClient dynamoDbClient,
-<span class="nc" id="L40">            DynamoDbConfig dynamoDbConfig) {</span>
-<span class="nc" id="L41">        this.dynamoDbClient = dynamoDbClient;</span>
-<span class="nc" id="L42">        this.tableName = dynamoDbConfig.getDynamodbTable();</span>
-<span class="nc" id="L43">    }</span>
+<span class="nc" id="L31">            DynamoDbConfig dynamoDbConfig) {</span>
+<span class="nc" id="L32">        this.dynamoDbClient = dynamoDbClient;</span>
+<span class="nc" id="L33">        this.tableName = dynamoDbConfig.getDynamodbTable();</span>
+<span class="nc" id="L34">    }</span>
 
     @Override
     public XformRepository&lt;AccessControl&gt; accessControlRepository() {
-<span class="nc bnc" id="L47" title="All 2 branches missed.">        if (acr == null) {</span>
-<span class="nc" id="L48">            acr = new AccessControlRepository(dynamoDbClient, tableName);</span>
+<span class="nc bnc" id="L38" title="All 2 branches missed.">        if (acr == null) {</span>
+<span class="nc" id="L39">            acr = new AccessControlRepository(dynamoDbClient, tableName);</span>
         }
-<span class="nc" id="L50">        return acr;</span>
+<span class="nc" id="L41">        return acr;</span>
     }
 
     @Override
     public XformRepository&lt;GroupRoleMapping&gt; groupRoleMappingRepository() {
-<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (grmr == null) {</span>
-<span class="nc" id="L56">            grmr = new GroupRoleMappingRepository(dynamoDbClient, tableName);</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (grmr == null) {</span>
+<span class="nc" id="L47">            grmr = new GroupRoleMappingRepository(dynamoDbClient, tableName);</span>
         }
-<span class="nc" id="L58">        return grmr;</span>
+<span class="nc" id="L49">        return grmr;</span>
     }
 
     @Override
     public XformRepository&lt;Mapping&gt; mappingRepository() {
-<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (mr == null) {</span>
-<span class="nc" id="L64">            mr = new MappingRepository(dynamoDbClient, tableName);</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (mr == null) {</span>
+<span class="nc" id="L55">            mr = new MappingRepository(dynamoDbClient, tableName);</span>
         }
-<span class="nc" id="L66">        return mr;</span>
+<span class="nc" id="L57">        return mr;</span>
     }
 
     @Override
     public XformRepository&lt;OperationPreconditionField&gt; operationPreconditionFieldRepository() {
-<span class="nc bnc" id="L71" title="All 2 branches missed.">        if (opfr == null) {</span>
-<span class="nc" id="L72">            opfr = new OperationPreconditionFieldRepository(dynamoDbClient, tableName);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (opfr == null) {</span>
+<span class="nc" id="L63">            opfr = new OperationPreconditionFieldRepository(dynamoDbClient, tableName);</span>
         }
-<span class="nc" id="L74">        return opfr;</span>
+<span class="nc" id="L65">        return opfr;</span>
     }
 
     @Override
     public XformRepository&lt;Organization&gt; organizationRepository() {
-<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (or == null) {</span>
-<span class="nc" id="L80">            or = new OrganizationRepository(dynamoDbClient, tableName);</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        if (or == null) {</span>
+<span class="nc" id="L71">            or = new OrganizationRepository(dynamoDbClient, tableName);</span>
         }
-<span class="nc" id="L82">        return or;</span>
+<span class="nc" id="L73">        return or;</span>
     }
 
     @Override
     public XformRepository&lt;Pipeline&gt; pipelineRepository() {
-<span class="nc bnc" id="L87" title="All 2 branches missed.">        if (pr == null) {</span>
-<span class="nc" id="L88">            pr = new PipelineRepository(dynamoDbClient, tableName);</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (pr == null) {</span>
+<span class="nc" id="L79">            pr = new PipelineRepository(dynamoDbClient, tableName);</span>
         }
-<span class="nc" id="L90">        return pr;</span>
+<span class="nc" id="L81">        return pr;</span>
     }
 
     @Override
     public XformRepository&lt;Solution&gt; solutionRepository() {
-<span class="nc bnc" id="L95" title="All 2 branches missed.">        if (sr == null) {</span>
-<span class="nc" id="L96">            sr = new SolutionRepository(dynamoDbClient, tableName);</span>
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        if (sr == null) {</span>
+<span class="nc" id="L87">            sr = new SolutionRepository(dynamoDbClient, tableName);</span>
         }
-<span class="nc" id="L98">        return sr;</span>
+<span class="nc" id="L89">        return sr;</span>
     }
 
     @Override
     public XformRepository&lt;User&gt; userRepository() {
-<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (ur == null) {</span>
-<span class="nc" id="L104">            ur = new UserRepository(dynamoDbClient, tableName);</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (ur == null) {</span>
+<span class="nc" id="L95">            ur = new UserRepository(dynamoDbClient, tableName);</span>
         }
-<span class="nc" id="L106">        return ur;</span>
+<span class="nc" id="L97">        return ur;</span>
     }
 
     @Override
     public XformRepository&lt;Event&gt; eventRepository() {
-<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (er == null) {</span>
-<span class="nc" id="L112">            er = new EventRepository(dynamoDbClient, tableName);</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (er == null) {</span>
+<span class="nc" id="L103">            er = new EventRepository(dynamoDbClient, tableName);</span>
         }
-<span class="nc" id="L114">        return er;</span>
+<span class="nc" id="L105">        return er;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

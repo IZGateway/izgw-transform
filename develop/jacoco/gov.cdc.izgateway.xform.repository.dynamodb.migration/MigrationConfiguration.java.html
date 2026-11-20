@@ -16,7 +16,7 @@ import java.util.Map;
 @ConfigurationProperties(prefix = &quot;xform.configurations&quot;)
 @Getter
 @Setter
-public class MigrationConfiguration {
+<span class="nc" id="L19">public class MigrationConfiguration {</span>
 
     private String organizations;
     private String pipelines;
@@ -28,19 +28,11 @@ public class MigrationConfiguration {
     private String groupRoleMapping;
 
     /**
-     * Creates the configuration.
-     */
-<span class="nc" id="L33">    public MigrationConfiguration() {</span>
-        // Spring binds the properties.
-<span class="nc" id="L35">    }</span>
-
-    /**
      * Gets a map of entity classes to their configuration file paths.
      * Add new entity types here as they get DynamoDB support.
-     * @return a map of entity classes to their configuration file paths
      */
     public Map&lt;Class&lt;? extends BaseModel&gt;, String&gt; getEntityConfigurations() {
-<span class="nc" id="L43">        return Map.of(</span>
+<span class="nc" id="L35">        return Map.of(</span>
                 Organization.class, organizations,
                 AccessControl.class, accessControl,
                 Pipeline.class, pipelines,

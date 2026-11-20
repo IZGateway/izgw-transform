@@ -19,37 +19,24 @@ public class IZGXformContext {
     private SubmitSingleMessageResponse submitSingleMessageResponse;
     private FaultMessage faultMessage;
     
-    /**
-     * Creates a context for a request that has no response yet.
-     *
-     * @param serviceContext the service context of the message
-     * @param submitSingleMessageRequest the inbound SOAP request
-     */
-<span class="nc" id="L28">    public IZGXformContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest) {</span>
+<span class="nc" id="L22">    public IZGXformContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest) {</span>
+<span class="nc" id="L23">        this.serviceContext = serviceContext;</span>
+<span class="nc" id="L24">        this.submitSingleMessageRequest = submitSingleMessageRequest;</span>
+<span class="nc" id="L25">        this.submitSingleMessageResponse = null;</span>
+<span class="nc" id="L26">    }</span>
+
+<span class="nc" id="L28">    public IZGXformContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest, SubmitSingleMessageResponse submitSingleMessageResponse) {</span>
 <span class="nc" id="L29">        this.serviceContext = serviceContext;</span>
 <span class="nc" id="L30">        this.submitSingleMessageRequest = submitSingleMessageRequest;</span>
-<span class="nc" id="L31">        this.submitSingleMessageResponse = null;</span>
+<span class="nc" id="L31">        this.submitSingleMessageResponse = submitSingleMessageResponse;</span>
 <span class="nc" id="L32">    }</span>
-
-    /**
-     * Creates a context for a request and its response.
-     *
-     * @param serviceContext the service context of the message
-     * @param submitSingleMessageRequest the inbound SOAP request
-     * @param submitSingleMessageResponse the SOAP response
-     */
-<span class="nc" id="L41">    public IZGXformContext(ServiceContext serviceContext, SubmitSingleMessageRequest submitSingleMessageRequest, SubmitSingleMessageResponse submitSingleMessageResponse) {</span>
-<span class="nc" id="L42">        this.serviceContext = serviceContext;</span>
-<span class="nc" id="L43">        this.submitSingleMessageRequest = submitSingleMessageRequest;</span>
-<span class="nc" id="L44">        this.submitSingleMessageResponse = submitSingleMessageResponse;</span>
-<span class="nc" id="L45">    }</span>
     
     /**
      * Get the fault status.
      * @return true if the context reflects that a fault occured.
      */
     public boolean hasFault() {
-<span class="nc bnc" id="L52" title="All 2 branches missed.">    	return faultMessage != null;</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">    	return faultMessage != null;</span>
     }
     
     /**
@@ -57,7 +44,7 @@ public class IZGXformContext {
      * @return	true if there is a response.
      */
     public boolean hasResponse() {
-<span class="nc bnc" id="L60" title="All 2 branches missed.">    	return submitSingleMessageResponse != null;</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">    	return submitSingleMessageResponse != null;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

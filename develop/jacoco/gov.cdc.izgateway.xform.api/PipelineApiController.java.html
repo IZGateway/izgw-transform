@@ -18,71 +18,40 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import java.util.logging.Level;
 
-/**
- * REST API for the pipelines.
- */
-<span class="fc" id="L24">@Log</span>
+<span class="fc" id="L21">@Log</span>
 @Lazy(false)
 @RestController
 public class PipelineApiController extends BaseApiController {
     private final PipelineService pipelineService;
 
-    /**
-     * Creates the controller and registers it with the access control registry.
-     *
-     * @param pipelineService the service for the pipelines
-     * @param registry the access control registry
-     */
     @Autowired
     public PipelineApiController(
             PipelineService pipelineService,
             AccessControlRegistry registry
-<span class="fc" id="L40">    ) {</span>
-<span class="fc" id="L41">        this.pipelineService = pipelineService;</span>
-<span class="fc" id="L42">        registry.register(this);</span>
-<span class="fc" id="L43">    }</span>
+<span class="fc" id="L31">    ) {</span>
+<span class="fc" id="L32">        this.pipelineService = pipelineService;</span>
+<span class="fc" id="L33">        registry.register(this);</span>
+<span class="fc" id="L34">    }</span>
 
-    /**
-     * Gets one pipeline.
-     *
-     * @param uuid the id of the pipeline
-     * @return the pipeline, or status 404 if it is not found
-     */
     @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping(&quot;/api/v1/pipelines/{uuid}&quot;)
     public ResponseEntity&lt;Pipeline&gt; getPipelineByUUID(@PathVariable UUID uuid) {
-<span class="nc" id="L54">        Pipeline entity = pipelineService.getObject(uuid);</span>
-<span class="nc bnc" id="L55" title="All 2 branches missed.">        if (entity == null) {</span>
-<span class="nc" id="L56">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
+<span class="nc" id="L39">        Pipeline entity = pipelineService.getObject(uuid);</span>
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (entity == null) {</span>
+<span class="nc" id="L41">            return new ResponseEntity&lt;&gt;(HttpStatus.NOT_FOUND);</span>
         }
-<span class="nc" id="L58">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
+<span class="nc" id="L43">        return new ResponseEntity&lt;&gt;(entity, HttpStatus.OK);</span>
     }
 
-    /**
-     * Replaces a pipeline.
-     *
-     * @param uuid the id of the pipeline
-     * @param updatedPipeline the new pipeline
-     * @return the updated pipeline
-     */
     @RolesAllowed({Roles.PIPELINE_WRITER})
     @PutMapping(&quot;/api/v1/pipelines/{uuid}&quot;)
     public ResponseEntity&lt;Pipeline&gt; updatePipeline(@PathVariable UUID uuid, @Valid @RequestBody Pipeline updatedPipeline) {
-<span class="nc" id="L71">        updatedPipeline.setId(uuid);</span>
-<span class="nc" id="L72">        pipelineService.update(updatedPipeline);</span>
-<span class="nc" id="L73">        return new ResponseEntity&lt;&gt;(updatedPipeline, HttpStatus.OK);</span>
+<span class="nc" id="L49">        updatedPipeline.setId(uuid);</span>
+<span class="nc" id="L50">        pipelineService.update(updatedPipeline);</span>
+<span class="nc" id="L51">        return new ResponseEntity&lt;&gt;(updatedPipeline, HttpStatus.OK);</span>
     }
 
     // TODO - Paul to look at AccessControl as it works with groups too.
-    /**
-     * Gets one page of pipelines.
-     *
-     * @param nextCursor the id of the pipeline after which the page starts, or null
-     * @param prevCursor the id of the pipeline before which the page ends, or null
-     * @param includeInactive if true, inactive pipelines are included
-     * @param limit the maximum number of pipelines in the page
-     * @return the page as JSON, or status 500 if the page cannot be serialized
-     */
     @RolesAllowed({Roles.PIPELINE_READER})
     @GetMapping(&quot;/api/v1/pipelines&quot;)
     public ResponseEntity&lt;String&gt; getPipelinesList(
@@ -92,42 +61,30 @@ public class PipelineApiController extends BaseApiController {
             @RequestParam(defaultValue = &quot;10&quot;) int limit
     ) {
         try {
-<span class="nc" id="L95">            return processList(pipelineService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
-<span class="nc" id="L96">        } catch (JsonProcessingException e) {</span>
-<span class="nc" id="L97">            log.log(Level.SEVERE, e.getMessage(), e);</span>
-<span class="nc" id="L98">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="nc" id="L64">            return processList(pipelineService.getList(), nextCursor, prevCursor, includeInactive, limit);</span>
+<span class="nc" id="L65">        } catch (JsonProcessingException e) {</span>
+<span class="nc" id="L66">            log.log(Level.SEVERE, e.getMessage(), e);</span>
+<span class="nc" id="L67">            return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);</span>
         }
     }
 
-    /**
-     * Creates a pipeline with a new id.
-     *
-     * @param pipeline the pipeline to create
-     * @return the created pipeline
-     */
     @RolesAllowed({Roles.PIPELINE_WRITER})
     @PostMapping(&quot;/api/v1/pipelines&quot;)
     public ResponseEntity&lt;Pipeline&gt; createPipeline(
             @Valid @RequestBody() Pipeline pipeline
     ) {
-<span class="nc" id="L113">        pipelineService.create(pipeline);</span>
-<span class="nc" id="L114">        return new ResponseEntity&lt;&gt;(pipeline, HttpStatus.OK);</span>
+<span class="nc" id="L76">        pipelineService.create(pipeline);</span>
+<span class="nc" id="L77">        return new ResponseEntity&lt;&gt;(pipeline, HttpStatus.OK);</span>
     }
 
-    /**
-     * Deletes a pipeline.
-     *
-     * @param uuid the id of the pipeline
-     * @return status 204
-     */
     @RolesAllowed({Roles.PIPELINE_DELETER})
     @DeleteMapping(&quot;/api/v1/pipelines/{uuid}&quot;)
     public ResponseEntity&lt;Pipeline&gt; deletePipeline(
             @PathVariable UUID uuid
     ) {
 
-<span class="nc" id="L129">        pipelineService.delete(uuid);</span>
-<span class="nc" id="L130">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
+<span class="nc" id="L86">        pipelineService.delete(uuid);</span>
+<span class="nc" id="L87">        return new ResponseEntity&lt;&gt;(HttpStatus.NO_CONTENT);</span>
     }
 
 }

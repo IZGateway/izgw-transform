@@ -10,9 +10,6 @@ import lombok.Data;
 import java.util.HashMap;
 import java.util.UUID;
 
-/**
- * Mutable per-message state that is passed through a pipeline, including the request and response messages and the current data flow direction.
- */
 @Data
 public class ServiceContext {
     private UUID organizationId;
@@ -23,61 +20,39 @@ public class ServiceContext {
     private DataFlowDirection currentDirection;
     private DataType dataType;
     private HashMap&lt;String, String&gt; state;
-    /** The facility identifier of the message, compared by the facility preconditions. */
     public String facilityId;
 
-    /**
-     * Creates a context in the request direction and parses the raw message if the data type is HL7 v2.
-     *
-     * @param organizationId the organization identifier
-     * @param inboundEndpoint the inbound endpoint
-     * @param outboundEndpoint the outbound endpoint
-     * @param dataType the data type of the message
-     * @param facilityId the facility identifier
-     * @param rawMessage the raw message text
-     * @throws HL7Exception if the HL7 v2 message cannot be parsed
-     */
-<span class="fc" id="L40">    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, DataType dataType, String facilityId, String rawMessage) throws HL7Exception {</span>
-<span class="fc" id="L41">        this.organizationId = organizationId;</span>
-<span class="fc" id="L42">        this.inboundEndpoint = inboundEndpoint;</span>
-<span class="fc" id="L43">        this.outboundEndpoint = outboundEndpoint;</span>
-<span class="fc" id="L44">        this.dataType = dataType;</span>
-<span class="fc" id="L45">        this.facilityId = facilityId;</span>
+<span class="fc" id="L25">    public ServiceContext(UUID organizationId, String inboundEndpoint, String outboundEndpoint, DataType dataType, String facilityId, String rawMessage) throws HL7Exception {</span>
+<span class="fc" id="L26">        this.organizationId = organizationId;</span>
+<span class="fc" id="L27">        this.inboundEndpoint = inboundEndpoint;</span>
+<span class="fc" id="L28">        this.outboundEndpoint = outboundEndpoint;</span>
+<span class="fc" id="L29">        this.dataType = dataType;</span>
+<span class="fc" id="L30">        this.facilityId = facilityId;</span>
 
-<span class="pc bpc" id="L47" title="1 of 2 branches missed.">        if (dataType.equals(DataType.HL7V2)) {</span>
-<span class="fc" id="L48">            this.requestMessage = Hl7Utils.parseHl7v2Message(rawMessage);</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if (dataType.equals(DataType.HL7V2)) {</span>
+<span class="fc" id="L33">            this.requestMessage = Hl7Utils.parseHl7v2Message(rawMessage);</span>
         }
-<span class="fc" id="L50">        this.currentDirection = DataFlowDirection.REQUEST;</span>
+<span class="fc" id="L35">        this.currentDirection = DataFlowDirection.REQUEST;</span>
 
-<span class="fc" id="L52">        this.state = new HashMap&lt;&gt;();</span>
-<span class="fc" id="L53">    }</span>
+<span class="fc" id="L37">        this.state = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L38">    }</span>
 
-    /**
-     * Gets the message for the current direction.
-     *
-     * @return the request message in the request direction, otherwise the response message
-     */
     public Message getCurrentMessage() {
         // TODO - need to generalize &quot;message&quot; here so it can be HL7 or FHIR or whatever
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        if (this.currentDirection == DataFlowDirection.REQUEST) {</span>
-<span class="fc" id="L63">            return this.requestMessage;</span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        if (this.currentDirection == DataFlowDirection.REQUEST) {</span>
+<span class="fc" id="L43">            return this.requestMessage;</span>
         }
 
-<span class="nc" id="L66">        return this.responseMessage;</span>
+<span class="nc" id="L46">        return this.responseMessage;</span>
     }
 
-    /**
-     * Sets the message for the current direction.
-     *
-     * @param message the message to set as the request or response message
-     */
     public void setCurrentMessage(Message message) {
-<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        if (this.currentDirection == DataFlowDirection.REQUEST) {</span>
-<span class="fc" id="L76">            this.requestMessage = message;</span>
-<span class="nc bnc" id="L77" title="All 2 branches missed.">        } else if (this.currentDirection == DataFlowDirection.RESPONSE) {</span>
-<span class="nc" id="L78">            this.responseMessage = message;</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (this.currentDirection == DataFlowDirection.REQUEST) {</span>
+<span class="fc" id="L51">            this.requestMessage = message;</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        } else if (this.currentDirection == DataFlowDirection.RESPONSE) {</span>
+<span class="nc" id="L53">            this.responseMessage = message;</span>
         }
-<span class="fc" id="L80">    }</span>
+<span class="fc" id="L55">    }</span>
 
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

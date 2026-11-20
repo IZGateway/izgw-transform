@@ -28,23 +28,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 import java.util.UUID;
 
-/**
- * SOAP endpoint for {@code /IISService} that transforms messages and sends them to the IIS destination.
- */
 @RestController
 @RolesAllowed({Roles.XFORM_SENDING_SYSTEM, Roles.ADMIN})
 @RequestMapping(&quot;/IISService&quot;)
 @Lazy(false)
-<span class="fc" id="L38">@Slf4j</span>
+<span class="fc" id="L35">@Slf4j</span>
 public class IISController extends BaseController {
-    /**
-     * Creates the controller and registers it with the access control registry.
-     * @param mshService the service that processes MSH segments
-     * @param registry the access control registry
-     * @param producerTemplate the template used to send messages to Camel routes
-     * @param organizationService the service used to find the sending organization
-     * @param accessControlService the access control service
-     */
     public IISController(
             IMessageHeaderService mshService,
             AccessControlRegistry registry,
@@ -52,20 +41,20 @@ public class IISController extends BaseController {
             OrganizationService organizationService,
             AccessControlService accessControlService
     ) {
-<span class="fc" id="L55">        super(mshService, SoapMessage.IIS2014_NS, &quot;cdc-iis.wsdl&quot;, Arrays.asList(SoapMessage.IIS2014_NS), producerTemplate, organizationService, accessControlService);</span>
-<span class="fc" id="L56">        registry.register(this);</span>
-<span class="fc" id="L57">    }</span>
+<span class="fc" id="L44">        super(mshService, SoapMessage.IIS2014_NS, &quot;cdc-iis.wsdl&quot;, Arrays.asList(SoapMessage.IIS2014_NS), producerTemplate, organizationService, accessControlService);</span>
+<span class="fc" id="L45">        registry.register(this);</span>
+<span class="fc" id="L46">    }</span>
 
     @Override
     protected ResponseEntity&lt;?&gt; submitSingleMessage(SubmitSingleMessageRequest submitSingleMessage, String destinationId) throws Fault {
 
-<span class="nc" id="L62">        return super.submitSingleMessage(submitSingleMessage, EndpointUris.DIRECT_IIS_PIPELINE);</span>
+<span class="nc" id="L51">        return super.submitSingleMessage(submitSingleMessage, EndpointUris.DIRECT_IIS_PIPELINE);</span>
     }
 
     @Override
     protected boolean isHubWsdl() {
         // IIS Controller is never to be considered Hub
-<span class="nc" id="L68">        return false;</span>
+<span class="nc" id="L57">        return false;</span>
     }
 
     @Operation(
@@ -89,19 +78,19 @@ public class IISController extends BaseController {
     )
     @Override
     public ResponseEntity&lt;?&gt; submitSoapRequest(@RequestBody SoapMessage soapMessage, @Schema(description = &quot;Throws the fault specified in the header parameter&quot;) @RequestHeader(value = &quot;X-IIS-Hub-Dev-Action&quot;,required = false) String devAction) throws SecurityFault {
-<span class="nc" id="L92">        return super.submitSoapRequest(soapMessage, devAction);</span>
+<span class="nc" id="L81">        return super.submitSoapRequest(soapMessage, devAction);</span>
     }
 
     protected ServiceContext createServiceContext(UUID organization, SubmitSingleMessageRequest submitSingleMessage) throws Fault {
         try {
-<span class="nc" id="L97">            return new ServiceContext(organization,</span>
+<span class="nc" id="L86">            return new ServiceContext(organization,</span>
                     EndpointUris.IZGTS_IISService,
                     EndpointUris.IIS_IISService,
                     DataType.HL7V2,
-<span class="nc" id="L101">                    submitSingleMessage.getFacilityID(),</span>
-<span class="nc" id="L102">                    submitSingleMessage.getHl7Message());</span>
-<span class="nc" id="L103">        } catch (HL7Exception e) {</span>
-<span class="nc" id="L104">            throw new HubControllerFault(e);</span>
+<span class="nc" id="L90">                    submitSingleMessage.getFacilityID(),</span>
+<span class="nc" id="L91">                    submitSingleMessage.getHl7Message());</span>
+<span class="nc" id="L92">        } catch (HL7Exception e) {</span>
+<span class="nc" id="L93">            throw new HubControllerFault(e);</span>
         }
     }
 

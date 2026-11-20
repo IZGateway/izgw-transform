@@ -9,34 +9,27 @@ import gov.cdc.izgateway.xform.exceptions.OperationException;
 import lombok.extern.slf4j.Slf4j;
 
 
-/**
- * HL7 v2 implementation of the {@link Set} operation.
- */
-<span class="fc" id="L15">@Slf4j</span>
+<span class="fc" id="L12">@Slf4j</span>
 public class Hl7v2Set extends Set implements Operation {
 
-    /**
-     * Creates an HL7 v2 set operation with the settings of another operation.
-     * @param set the operation to copy the settings from
-     */
     public Hl7v2Set(Set set) {
-<span class="fc" id="L23">        super(set);</span>
-<span class="fc" id="L24">    }</span>
+<span class="fc" id="L16">        super(set);</span>
+<span class="fc" id="L17">    }</span>
 
     @Override
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws OperationException {
 
         try {
-<span class="fc" id="L31">            Message message = context.getCurrentMessage();</span>
+<span class="fc" id="L24">            Message message = context.getCurrentMessage();</span>
 
-<span class="fc" id="L33">            Terser terser = new Terser(message);</span>
-<span class="fc" id="L34">            terser.set(this.getDestinationField(), this.getSetValue());</span>
+<span class="fc" id="L26">            Terser terser = new Terser(message);</span>
+<span class="fc" id="L27">            terser.set(this.getDestinationField(), this.getSetValue());</span>
 
-<span class="fc" id="L36">            context.setCurrentMessage(message);</span>
-<span class="nc" id="L37">        } catch (HL7Exception e) {</span>
-<span class="nc" id="L38">            throw new OperationException(e.getMessage(), e.getCause());</span>
-<span class="fc" id="L39">        }</span>
-<span class="fc" id="L40">    }</span>
+<span class="fc" id="L29">            context.setCurrentMessage(message);</span>
+<span class="nc" id="L30">        } catch (HL7Exception e) {</span>
+<span class="nc" id="L31">            throw new OperationException(e.getMessage(), e.getCause());</span>
+<span class="fc" id="L32">        }</span>
+<span class="fc" id="L33">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

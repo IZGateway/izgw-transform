@@ -4,20 +4,11 @@ import gov.cdc.izgateway.xform.model.Mapping;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 
-/**
- * DynamoDB repository for {@link Mapping} entities.
- */
 public class MappingRepository extends GenericDynamoDBRepository&lt;Mapping&gt; {
-    /**
-     * Creates the repository.
-     *
-     * @param dynamoDbClient the DynamoDB enhanced client
-     * @param tableName the name of the DynamoDB table
-     */
     public MappingRepository(
             DynamoDbEnhancedClient dynamoDbClient,
             String tableName) {
-<span class="nc" id="L20">        super(dynamoDbClient, tableName, Mapping.class, TableSchema.fromBean(Mapping.class));</span>
-<span class="nc" id="L21">    }</span>
+<span class="nc" id="L11">        super(dynamoDbClient, tableName, Mapping.class, TableSchema.fromBean(Mapping.class));</span>
+<span class="nc" id="L12">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

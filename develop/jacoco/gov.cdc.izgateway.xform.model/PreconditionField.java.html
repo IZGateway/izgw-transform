@@ -7,12 +7,9 @@ import lombok.Setter;
 
 import java.util.UUID;
 
-/**
- * A named message data path that preconditions can use as a field.
- */
 @Getter
 @Setter
-public class PreconditionField extends BaseModel {
+<span class="nc" id="L12">public class PreconditionField extends BaseModel {</span>
 
     @NotNull(message = &quot;Precondition Field ID is required&quot;)
     private UUID id;
@@ -25,12 +22,5 @@ public class PreconditionField extends BaseModel {
 
     @NotNull(message = &quot;Precondition Field active status is required&quot;)
     private Boolean active;
-
-    /**
-     * Creates an empty precondition field.
-     */
-<span class="nc" id="L32">    public PreconditionField() {</span>
-        // Jackson sets the fields.
-<span class="nc" id="L34">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

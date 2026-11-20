@@ -9,50 +9,40 @@ import gov.cdc.izgateway.xform.constants.XformConstants;
 
 import java.util.Objects;
 
-/**
- * Precondition that passes when the value at the data path is not equal to the comparison value.
- */
 @Getter
 @Setter
 public class NotEquals extends Equals implements Precondition {
 
-<span class="fc" id="L19">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotEquals.class);</span>
+<span class="fc" id="L16">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotEquals.class);</span>
 
-    /**
-     * Creates an empty precondition.
-     */
     protected NotEquals() {
-<span class="fc" id="L25">        super();</span>
-<span class="fc" id="L26">    }</span>
+<span class="fc" id="L19">        super();</span>
+<span class="fc" id="L20">    }</span>
 
-    /**
-     * Creates a precondition with the settings of another precondition.
-     * @param notEquals the precondition to copy the settings from
-     */
     protected NotEquals(NotEquals notEquals) {
-<span class="nc" id="L33">        super(notEquals);</span>
-<span class="nc" id="L34">    }</span>
+<span class="nc" id="L23">        super(notEquals);</span>
+<span class="nc" id="L24">    }</span>
 
     @Override
     @CaptureXformAdvice
     public boolean evaluate(ServiceContext context) {
-<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
-<span class="nc" id="L40">            log.trace(&quot;Precondition: {} / dataPath: '{}' / comparisonValue: '{}'&quot;,</span>
-<span class="nc" id="L41">                    this.getClass().getSimpleName(),</span>
-<span class="nc" id="L42">                    this.getDataPath(),</span>
-<span class="nc" id="L43">                    this.getComparisonValue());</span>
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
+<span class="nc" id="L30">            log.trace(&quot;Precondition: {} / dataPath: '{}' / comparisonValue: '{}'&quot;,</span>
+<span class="nc" id="L31">                    this.getClass().getSimpleName(),</span>
+<span class="nc" id="L32">                    this.getDataPath(),</span>
+<span class="nc" id="L33">                    this.getComparisonValue());</span>
         }
 
-<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (this.getDataPath().startsWith(&quot;state.&quot;)) {</span>
-<span class="fc" id="L47">            String stateKey = this.getDataPath().split(&quot;\\.&quot;)[1];</span>
-<span class="fc bfc" id="L48" title="All 2 branches covered.">            return !Objects.equals(this.getComparisonValue(), context.getState().get(stateKey));</span>
-<span class="pc bpc" id="L49" title="1 of 2 branches missed.">        } else if (getDataPath().equals(XformConstants.CONTEXT_FACILITY_ID_PATH)) {</span>
-<span class="fc bfc" id="L50" title="All 2 branches covered.">            return !context.getFacilityId().equals(getComparisonValue());</span>
-<span class="nc bnc" id="L51" title="All 2 branches missed.">        } else if (context.getDataType().equals(DataType.HL7V2)) {</span>
-<span class="nc" id="L52">            return new Hl7v2NotEquals(this).evaluate(context);</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (this.getDataPath().startsWith(&quot;state.&quot;)) {</span>
+<span class="fc" id="L37">            String stateKey = this.getDataPath().split(&quot;\\.&quot;)[1];</span>
+<span class="fc bfc" id="L38" title="All 2 branches covered.">            return !Objects.equals(this.getComparisonValue(), context.getState().get(stateKey));</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        } else if (getDataPath().equals(XformConstants.CONTEXT_FACILITY_ID_PATH)) {</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">            return !context.getFacilityId().equals(getComparisonValue());</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        } else if (context.getDataType().equals(DataType.HL7V2)) {</span>
+<span class="nc" id="L42">            return new Hl7v2NotEquals(this).evaluate(context);</span>
         }
 
-<span class="nc" id="L55">        return false;</span>
+<span class="nc" id="L45">        return false;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

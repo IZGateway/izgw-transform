@@ -8,44 +8,37 @@ import gov.cdc.izgateway.xform.context.ServiceContext;
 import gov.cdc.izgateway.xform.exceptions.OperationException;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * HL7 v2 implementation of the {@link RegexReplace} operation.
- */
-<span class="fc" id="L14">@Slf4j</span>
+<span class="fc" id="L11">@Slf4j</span>
 public class Hl7v2RegexReplace extends RegexReplace implements Operation {
 
-    /**
-     * Creates an HL7 v2 regex replace operation with the settings of another operation.
-     * @param regexReplace the operation to copy the settings from
-     */
     public Hl7v2RegexReplace(RegexReplace regexReplace) {
-<span class="fc" id="L22">        super(regexReplace);</span>
-<span class="fc" id="L23">    }</span>
+<span class="fc" id="L15">        super(regexReplace);</span>
+<span class="fc" id="L16">    }</span>
 
     @Override
     @CaptureXformAdvice
     public void execute(ServiceContext context) throws OperationException {
 
         try {
-<span class="fc" id="L30">            Message message = context.getCurrentMessage();</span>
-<span class="fc" id="L31">            Terser terser = new Terser(message);</span>
-<span class="fc" id="L32">            String sourceValue = getField(terser);</span>
-<span class="fc bfc" id="L33" title="All 2 branches covered.">            if (sourceValue != null) {</span>
-<span class="fc" id="L34">                String cleanedValue = sourceValue.replaceAll(this.getRegex(), this.getReplacement());</span>
-<span class="fc" id="L35">                terser.set(this.getField(), cleanedValue);</span>
-<span class="fc" id="L36">                context.setCurrentMessage(message);</span>
+<span class="fc" id="L23">            Message message = context.getCurrentMessage();</span>
+<span class="fc" id="L24">            Terser terser = new Terser(message);</span>
+<span class="fc" id="L25">            String sourceValue = getField(terser);</span>
+<span class="fc bfc" id="L26" title="All 2 branches covered.">            if (sourceValue != null) {</span>
+<span class="fc" id="L27">                String cleanedValue = sourceValue.replaceAll(this.getRegex(), this.getReplacement());</span>
+<span class="fc" id="L28">                terser.set(this.getField(), cleanedValue);</span>
+<span class="fc" id="L29">                context.setCurrentMessage(message);</span>
             }
-<span class="nc" id="L38">        } catch (HL7Exception ex) {</span>
-<span class="nc" id="L39">            throw new OperationException(ex.getMessage(), ex.getCause());</span>
-<span class="fc" id="L40">        }</span>
-<span class="fc" id="L41">    }</span>
+<span class="nc" id="L31">        } catch (HL7Exception ex) {</span>
+<span class="nc" id="L32">            throw new OperationException(ex.getMessage(), ex.getCause());</span>
+<span class="fc" id="L33">        }</span>
+<span class="fc" id="L34">    }</span>
     
     private String getField(Terser terser) {
         try {
-<span class="fc" id="L45">			return terser.get(this.getField());</span>
-<span class="nc" id="L46">		} catch (HL7Exception e) {</span>
+<span class="fc" id="L38">			return terser.get(this.getField());</span>
+<span class="nc" id="L39">		} catch (HL7Exception e) {</span>
 			// The field does not exist, simply return null.
-<span class="nc" id="L48">			return null;</span>
+<span class="nc" id="L41">			return null;</span>
 		}
     }
 }

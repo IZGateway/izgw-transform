@@ -8,52 +8,39 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-/**
- * Checks that an organization exists and is active, and adds a constraint violation if not.
- */
 @Service
 public class OrganizationValidationService {
 
     private final OrganizationService organizationService;
 
-    /**
-     * Creates the service.
-     * @param organizationService the service used to find organizations
-     */
     @Autowired
-<span class="nc" id="L24">    public OrganizationValidationService(OrganizationService organizationService) {</span>
-<span class="nc" id="L25">        this.organizationService = organizationService;</span>
-<span class="nc" id="L26">    }</span>
+<span class="nc" id="L17">    public OrganizationValidationService(OrganizationService organizationService) {</span>
+<span class="nc" id="L18">        this.organizationService = organizationService;</span>
+<span class="nc" id="L19">    }</span>
 
-    /**
-     * Checks that an organization exists and is active.
-     * @param organizationId the identifier of the organization
-     * @param context the validator context, used to add a constraint violation message
-     * @return true if the organization exists and is active, false otherwise
-     */
     public boolean validateOrganization(UUID organizationId, ConstraintValidatorContext context) {
-<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (organizationId == null) {</span>
-<span class="nc" id="L36">            return false;</span>
+<span class="nc bnc" id="L22" title="All 2 branches missed.">        if (organizationId == null) {</span>
+<span class="nc" id="L23">            return false;</span>
         }
 
-<span class="nc" id="L39">        Organization organization = organizationService.getObject(organizationId);</span>
+<span class="nc" id="L26">        Organization organization = organizationService.getObject(organizationId);</span>
 
-<span class="nc bnc" id="L41" title="All 2 branches missed.">        if (organization == null) {</span>
-<span class="nc" id="L42">            addConstraintViolation(context, &quot;Organization not found with ID &quot; + organizationId);</span>
-<span class="nc" id="L43">            return false;</span>
+<span class="nc bnc" id="L28" title="All 2 branches missed.">        if (organization == null) {</span>
+<span class="nc" id="L29">            addConstraintViolation(context, &quot;Organization not found with ID &quot; + organizationId);</span>
+<span class="nc" id="L30">            return false;</span>
         }
 
-<span class="nc bnc" id="L46" title="All 2 branches missed.">        if (Boolean.FALSE.equals(organization.getActive())) {</span>
-<span class="nc" id="L47">            addConstraintViolation(context, &quot;Organization with ID &quot; + organizationId + &quot; is NOT active&quot;);</span>
-<span class="nc" id="L48">            return false;</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        if (Boolean.FALSE.equals(organization.getActive())) {</span>
+<span class="nc" id="L34">            addConstraintViolation(context, &quot;Organization with ID &quot; + organizationId + &quot; is NOT active&quot;);</span>
+<span class="nc" id="L35">            return false;</span>
         }
 
-<span class="nc" id="L51">        return true;</span>
+<span class="nc" id="L38">        return true;</span>
     }
 
     private void addConstraintViolation(ConstraintValidatorContext context, String message) {
-<span class="nc" id="L55">        context.disableDefaultConstraintViolation();</span>
-<span class="nc" id="L56">        context.buildConstraintViolationWithTemplate(message).addConstraintViolation();</span>
-<span class="nc" id="L57">    }</span>
+<span class="nc" id="L42">        context.disableDefaultConstraintViolation();</span>
+<span class="nc" id="L43">        context.buildConstraintViolationWithTemplate(message).addConstraintViolation();</span>
+<span class="nc" id="L44">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

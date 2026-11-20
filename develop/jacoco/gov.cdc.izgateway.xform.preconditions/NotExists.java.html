@@ -6,46 +6,36 @@ import gov.cdc.izgateway.xform.enums.DataType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Precondition that passes when the data path has no value.
- */
 @Getter
 @Setter
 public class NotExists extends Exists implements Precondition {
 
-<span class="fc" id="L16">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotExists.class);</span>
+<span class="fc" id="L13">    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotExists.class);</span>
 
-    /**
-     * Creates an empty precondition.
-     */
-<span class="fc" id="L21">    protected NotExists() {</span>
-<span class="fc" id="L22">    }</span>
+<span class="fc" id="L15">    protected NotExists() {</span>
+<span class="fc" id="L16">    }</span>
 
-    /**
-     * Creates a precondition with the settings of another precondition.
-     * @param notExists the precondition to copy the settings from
-     */
     protected NotExists(NotExists notExists) {
-<span class="fc" id="L29">        super(notExists);</span>
-<span class="fc" id="L30">    }</span>
+<span class="fc" id="L19">        super(notExists);</span>
+<span class="fc" id="L20">    }</span>
 
     @Override
     @CaptureXformAdvice
     public boolean evaluate(ServiceContext context) {
-<span class="pc bpc" id="L35" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
-<span class="nc" id="L36">            log.trace(&quot;Precondition: {} / dataPath: '{}'&quot;,</span>
-<span class="nc" id="L37">                    this.getClass().getSimpleName(),</span>
-<span class="nc" id="L38">                    this.getDataPath());</span>
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">        if (log.isTraceEnabled()) {</span>
+<span class="nc" id="L26">            log.trace(&quot;Precondition: {} / dataPath: '{}'&quot;,</span>
+<span class="nc" id="L27">                    this.getClass().getSimpleName(),</span>
+<span class="nc" id="L28">                    this.getDataPath());</span>
         }
 
-<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (this.getDataPath().startsWith(&quot;state.&quot;)) {</span>
-<span class="fc" id="L42">            String stateKey = this.getDataPath().split(&quot;\\.&quot;)[1];</span>
-<span class="pc bpc" id="L43" title="1 of 2 branches missed.">            return !context.getState().containsKey(stateKey);</span>
-<span class="pc bpc" id="L44" title="1 of 2 branches missed.">        } else if (context.getDataType().equals(DataType.HL7V2)) {</span>
-<span class="fc" id="L45">            return new Hl7v2NotExists(this).evaluate(context);</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">        if (this.getDataPath().startsWith(&quot;state.&quot;)) {</span>
+<span class="fc" id="L32">            String stateKey = this.getDataPath().split(&quot;\\.&quot;)[1];</span>
+<span class="pc bpc" id="L33" title="1 of 2 branches missed.">            return !context.getState().containsKey(stateKey);</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">        } else if (context.getDataType().equals(DataType.HL7V2)) {</span>
+<span class="fc" id="L35">            return new Hl7v2NotExists(this).evaluate(context);</span>
         }
 
-<span class="nc" id="L48">        return false;</span>
+<span class="nc" id="L38">        return false;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

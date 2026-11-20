@@ -5,26 +5,18 @@ import gov.cdc.izgateway.xform.repository.RepositoryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Service for the solutions.
- */
 @Service
 public class SolutionService extends GenericService&lt;Solution&gt; {
-    /**
-     * Creates the service.
-     *
-     * @param repositoryFactory the factory that supplies the solution repository
-     */
     @Autowired
     public SolutionService(RepositoryFactory repositoryFactory) {
-<span class="fc" id="L20">        super(repositoryFactory.solutionRepository());</span>
-<span class="fc" id="L21">    }</span>
+<span class="fc" id="L12">        super(repositoryFactory.solutionRepository());</span>
+<span class="fc" id="L13">    }</span>
 
     @Override
     protected boolean isDuplicate(Solution solution) {
-<span class="nc" id="L25">        return repo.getEntitySet().stream().anyMatch(s -&gt;</span>
-<span class="nc bnc" id="L26" title="All 2 branches missed.">                s.getSolutionName().equalsIgnoreCase(solution.getSolutionName()) &amp;&amp;</span>
-<span class="nc bnc" id="L27" title="All 2 branches missed.">                        s.getVersion().equalsIgnoreCase(solution.getVersion())</span>
+<span class="nc" id="L17">        return repo.getEntitySet().stream().anyMatch(s -&gt;</span>
+<span class="nc bnc" id="L18" title="All 2 branches missed.">                s.getSolutionName().equalsIgnoreCase(solution.getSolutionName()) &amp;&amp;</span>
+<span class="nc bnc" id="L19" title="All 2 branches missed.">                        s.getVersion().equalsIgnoreCase(solution.getVersion())</span>
         );
     }
 

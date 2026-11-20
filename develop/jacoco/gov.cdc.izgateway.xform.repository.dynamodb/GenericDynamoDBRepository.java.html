@@ -16,22 +16,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Generic DynamoDB-backed repository that stores entities with the entity name as the partition key and the identifier as the sort key.
- *
- * @param &lt;T&gt; the entity type
- */
 public abstract class GenericDynamoDBRepository&lt;T extends BaseModel&gt; implements XformRepository&lt;T&gt; {
 
-    /** The DynamoDB enhanced client. */
     protected final DynamoDbEnhancedClient dynamoDbClient;
-    /** The name of the DynamoDB table. */
     protected final String tableName;
-    /** The entity class. */
     protected final Class&lt;T&gt; entityClass;
-    /** The table schema of the entity class. */
     protected final TableSchema&lt;T&gt; tableSchema;
-    /** The DynamoDB table for the entity class. */
     protected DynamoDbTable&lt;T&gt; table;
 
     /**
@@ -40,35 +30,27 @@ public abstract class GenericDynamoDBRepository&lt;T extends BaseModel&gt; imple
      * @return the entity name
      */
     protected String getEntityName() {
-<span class="nc" id="L43">        return entityClass.getSimpleName();</span>
+<span class="nc" id="L33">        return entityClass.getSimpleName();</span>
     }
 
-    /**
-     * Creates the repository and opens the table.
-     *
-     * @param dynamoDbClient the DynamoDB enhanced client
-     * @param tableName the name of the DynamoDB table
-     * @param entityClass the entity class
-     * @param tableSchema the table schema of the entity class
-     */
-<span class="nc" id="L54">    protected GenericDynamoDBRepository(DynamoDbEnhancedClient dynamoDbClient, String tableName, Class&lt;T&gt; entityClass, TableSchema&lt;T&gt; tableSchema) {</span>
-<span class="nc" id="L55">        this.dynamoDbClient = dynamoDbClient;</span>
-<span class="nc" id="L56">        this.tableName = tableName;</span>
-<span class="nc" id="L57">        this.entityClass = entityClass;</span>
-<span class="nc" id="L58">        this.tableSchema = tableSchema;</span>
-<span class="nc" id="L59">        this.table = dynamoDbClient.table(tableName, tableSchema);</span>
-<span class="nc" id="L60">    }</span>
+<span class="nc" id="L36">    protected GenericDynamoDBRepository(DynamoDbEnhancedClient dynamoDbClient, String tableName, Class&lt;T&gt; entityClass, TableSchema&lt;T&gt; tableSchema) {</span>
+<span class="nc" id="L37">        this.dynamoDbClient = dynamoDbClient;</span>
+<span class="nc" id="L38">        this.tableName = tableName;</span>
+<span class="nc" id="L39">        this.entityClass = entityClass;</span>
+<span class="nc" id="L40">        this.tableSchema = tableSchema;</span>
+<span class="nc" id="L41">        this.table = dynamoDbClient.table(tableName, tableSchema);</span>
+<span class="nc" id="L42">    }</span>
 
     @Override
     public T getEntity(UUID id) {
         try {
-<span class="nc" id="L65">            Key key = Key.builder()</span>
-<span class="nc" id="L66">                    .partitionValue(getEntityName())</span>
-<span class="nc" id="L67">                    .sortValue(id.toString())</span>
-<span class="nc" id="L68">                    .build();</span>
-<span class="nc" id="L69">            return table.getItem(key);</span>
-<span class="nc" id="L70">        } catch (DynamoDbException e) {</span>
-<span class="nc" id="L71">            throw new RepositoryRuntimeException(String.format(&quot;Error retrieving entity with ID %s: %s&quot;, id, e.getMessage()), e);</span>
+<span class="nc" id="L47">            Key key = Key.builder()</span>
+<span class="nc" id="L48">                    .partitionValue(getEntityName())</span>
+<span class="nc" id="L49">                    .sortValue(id.toString())</span>
+<span class="nc" id="L50">                    .build();</span>
+<span class="nc" id="L51">            return table.getItem(key);</span>
+<span class="nc" id="L52">        } catch (DynamoDbException e) {</span>
+<span class="nc" id="L53">            throw new RepositoryRuntimeException(String.format(&quot;Error retrieving entity with ID %s: %s&quot;, id, e.getMessage()), e);</span>
         }
     }
 
@@ -77,56 +59,56 @@ public abstract class GenericDynamoDBRepository&lt;T extends BaseModel&gt; imple
         try {
             // Create a filter expression to only return items with the matching entity type
             // The entity type is stored as the partition key
-<span class="nc" id="L80">            ScanEnhancedRequest scanRequest = ScanEnhancedRequest.builder()</span>
-<span class="nc" id="L81">                    .filterExpression(</span>
-<span class="nc" id="L82">                            software.amazon.awssdk.enhanced.dynamodb.Expression.builder()</span>
-<span class="nc" id="L83">                                    .expression(String.format(&quot;%s = :entityType&quot;, BaseModel.ENTITY_TYPE))</span>
-<span class="nc" id="L84">                                    .putExpressionValue(&quot;:entityType&quot;,</span>
-<span class="nc" id="L85">                                            software.amazon.awssdk.services.dynamodb.model.AttributeValue.builder()</span>
-<span class="nc" id="L86">                                                    .s(getEntityName())</span>
-<span class="nc" id="L87">                                                    .build())</span>
-<span class="nc" id="L88">                                    .build())</span>
-<span class="nc" id="L89">                    .build();</span>
+<span class="nc" id="L62">            ScanEnhancedRequest scanRequest = ScanEnhancedRequest.builder()</span>
+<span class="nc" id="L63">                    .filterExpression(</span>
+<span class="nc" id="L64">                            software.amazon.awssdk.enhanced.dynamodb.Expression.builder()</span>
+<span class="nc" id="L65">                                    .expression(String.format(&quot;%s = :entityType&quot;, BaseModel.ENTITY_TYPE))</span>
+<span class="nc" id="L66">                                    .putExpressionValue(&quot;:entityType&quot;,</span>
+<span class="nc" id="L67">                                            software.amazon.awssdk.services.dynamodb.model.AttributeValue.builder()</span>
+<span class="nc" id="L68">                                                    .s(getEntityName())</span>
+<span class="nc" id="L69">                                                    .build())</span>
+<span class="nc" id="L70">                                    .build())</span>
+<span class="nc" id="L71">                    .build();</span>
 
-<span class="nc" id="L91">            PageIterable&lt;T&gt; results = table.scan(scanRequest);</span>
+<span class="nc" id="L73">            PageIterable&lt;T&gt; results = table.scan(scanRequest);</span>
 
             // Convert the results to a LinkedHashSet
-<span class="nc" id="L94">            return results.items().stream()</span>
-<span class="nc" id="L95">                    .collect(Collectors.toCollection(LinkedHashSet::new));</span>
-<span class="nc" id="L96">        } catch (DynamoDbException e) {</span>
-<span class="nc" id="L97">            throw new RepositoryRuntimeException(String.format(&quot;Error retrieving entities: %s&quot;, e.getMessage()), e);</span>
+<span class="nc" id="L76">            return results.items().stream()</span>
+<span class="nc" id="L77">                    .collect(Collectors.toCollection(LinkedHashSet::new));</span>
+<span class="nc" id="L78">        } catch (DynamoDbException e) {</span>
+<span class="nc" id="L79">            throw new RepositoryRuntimeException(String.format(&quot;Error retrieving entities: %s&quot;, e.getMessage()), e);</span>
         }
     }
 
     @Override
     public void createEntity(T obj) {
         try {
-<span class="nc" id="L104">            table.putItem(obj);</span>
-<span class="nc" id="L105">        } catch (DynamoDbException e) {</span>
-<span class="nc" id="L106">            throw new RepositoryRuntimeException(String.format(&quot;Error creating entity: %s&quot;, e.getMessage()), e);</span>
-<span class="nc" id="L107">        }</span>
-<span class="nc" id="L108">    }</span>
+<span class="nc" id="L86">            table.putItem(obj);</span>
+<span class="nc" id="L87">        } catch (DynamoDbException e) {</span>
+<span class="nc" id="L88">            throw new RepositoryRuntimeException(String.format(&quot;Error creating entity: %s&quot;, e.getMessage()), e);</span>
+<span class="nc" id="L89">        }</span>
+<span class="nc" id="L90">    }</span>
 
     @Override
     public void updateEntity(T obj) {
         try {
-<span class="nc" id="L113">            table.updateItem(obj);</span>
-<span class="nc" id="L114">        } catch (DynamoDbException e) {</span>
-<span class="nc" id="L115">            throw new RepositoryRuntimeException(String.format(&quot;Error updating entity with ID %s: %s&quot;, obj.getId(), e.getMessage()), e);</span>
-<span class="nc" id="L116">        }</span>
-<span class="nc" id="L117">    }</span>
+<span class="nc" id="L95">            table.updateItem(obj);</span>
+<span class="nc" id="L96">        } catch (DynamoDbException e) {</span>
+<span class="nc" id="L97">            throw new RepositoryRuntimeException(String.format(&quot;Error updating entity with ID %s: %s&quot;, obj.getId(), e.getMessage()), e);</span>
+<span class="nc" id="L98">        }</span>
+<span class="nc" id="L99">    }</span>
 
     @Override
     public void deleteEntity(UUID id) {
         try {
-<span class="nc" id="L122">            Key key = Key.builder()</span>
-<span class="nc" id="L123">                    .partitionValue(getEntityName())</span>
-<span class="nc" id="L124">                    .sortValue(id.toString())</span>
-<span class="nc" id="L125">                    .build();</span>
-<span class="nc" id="L126">            table.deleteItem(key);</span>
-<span class="nc" id="L127">        } catch (DynamoDbException e) {</span>
-<span class="nc" id="L128">            throw new RepositoryRuntimeException(String.format(&quot;Error deleting entity with ID %s: %s&quot;, id, e.getMessage()), e);</span>
-<span class="nc" id="L129">        }</span>
-<span class="nc" id="L130">    }</span>
+<span class="nc" id="L104">            Key key = Key.builder()</span>
+<span class="nc" id="L105">                    .partitionValue(getEntityName())</span>
+<span class="nc" id="L106">                    .sortValue(id.toString())</span>
+<span class="nc" id="L107">                    .build();</span>
+<span class="nc" id="L108">            table.deleteItem(key);</span>
+<span class="nc" id="L109">        } catch (DynamoDbException e) {</span>
+<span class="nc" id="L110">            throw new RepositoryRuntimeException(String.format(&quot;Error deleting entity with ID %s: %s&quot;, id, e.getMessage()), e);</span>
+<span class="nc" id="L111">        }</span>
+<span class="nc" id="L112">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

@@ -25,33 +25,25 @@ public class MigratorFactory {
     private final String tableName;
     private final MigrationConfiguration migrationConfig;
 
-    /**
-     * Creates the factory.
-     *
-     * @param dynamoDbClient the DynamoDB enhanced client
-     * @param dynamoDbConfig the DynamoDB configuration that supplies the table name
-     * @param migrationConfig the configuration of the entity file paths
-     */
     public MigratorFactory(DynamoDbEnhancedClient dynamoDbClient,
                            DynamoDbConfig dynamoDbConfig,
-<span class="nc" id="L37">                           MigrationConfiguration migrationConfig) {</span>
-<span class="nc" id="L38">        this.dynamoDbClient = dynamoDbClient;</span>
-<span class="nc" id="L39">        this.tableName = dynamoDbConfig.getDynamodbTable();</span>
-<span class="nc" id="L40">        this.migrationConfig = migrationConfig;</span>
-<span class="nc" id="L41">    }</span>
+<span class="nc" id="L30">                           MigrationConfiguration migrationConfig) {</span>
+<span class="nc" id="L31">        this.dynamoDbClient = dynamoDbClient;</span>
+<span class="nc" id="L32">        this.tableName = dynamoDbConfig.getDynamodbTable();</span>
+<span class="nc" id="L33">        this.migrationConfig = migrationConfig;</span>
+<span class="nc" id="L34">    }</span>
 
     /**
      * Creates EntityMigrator instances for all configured entity types.
      * Spring will automatically inject this list into DataMigrationService.
-     * @return the migrators for all configured entity types
      */
     @Bean
     public List&lt;EntityMigrator&lt;?&gt;&gt; entityMigrators() {
-<span class="nc" id="L50">        return migrationConfig.getEntityConfigurations()</span>
-<span class="nc" id="L51">                .entrySet()</span>
-<span class="nc" id="L52">                .stream()</span>
-<span class="nc" id="L53">                .map(entry -&gt; createMigrator(entry.getKey(), entry.getValue()))</span>
-<span class="nc" id="L54">                .collect(Collectors.toList());</span>
+<span class="nc" id="L42">        return migrationConfig.getEntityConfigurations()</span>
+<span class="nc" id="L43">                .entrySet()</span>
+<span class="nc" id="L44">                .stream()</span>
+<span class="nc" id="L45">                .map(entry -&gt; createMigrator(entry.getKey(), entry.getValue()))</span>
+<span class="nc" id="L46">                .collect(Collectors.toList());</span>
     }
 
     /**
@@ -59,8 +51,8 @@ public class MigratorFactory {
      */
     @SuppressWarnings(&quot;unchecked&quot;)
     private &lt;T extends BaseModel&gt; EntityMigrator&lt;T&gt; createMigrator(Class&lt;T&gt; entityClass, String filePath) {
-<span class="nc" id="L62">        log.info(&quot;Creating migrator for {} with file path: {}&quot;, entityClass.getSimpleName(), filePath);</span>
-<span class="nc" id="L63">        return new GenericEntityMigrator&lt;&gt;(entityClass, filePath, dynamoDbClient, tableName);</span>
+<span class="nc" id="L54">        log.info(&quot;Creating migrator for {} with file path: {}&quot;, entityClass.getSimpleName(), filePath);</span>
+<span class="nc" id="L55">        return new GenericEntityMigrator&lt;&gt;(entityClass, filePath, dynamoDbClient, tableName);</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
