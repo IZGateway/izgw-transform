@@ -329,7 +329,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    uses: IZGateway/izg-dependency-scripts/.github/workflows/auto-merge-security-update.yml@IGDD-2766
+    uses: IZGateway/izg-dependency-scripts/.github/workflows/auto-merge-security-update.yml@v1
     secrets:
       dependency-bot-app-id: ${{ secrets.DEPENDENCY_BOT_APP_ID }}
       dependency-bot-app-key: ${{ secrets.DEPENDENCY_BOT_APP_KEY }}

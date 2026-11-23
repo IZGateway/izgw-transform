@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   security-updates:
-    uses: IZGateway/izg-dependency-scripts/.github/workflows/maven-security-updates.yml@IGDD-2766
+    uses: IZGateway/izg-dependency-scripts/.github/workflows/maven-security-updates.yml@v1
     with:
       auto-merge: ${{ github.event_name == 'schedule' || inputs.auto_merge == true }}
       maven-servers: github-bom github-core v2tofhir
