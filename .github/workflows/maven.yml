@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - develop
-      - IGDD-2766   # TEMP-TEST: revert before merge
 
   push:
     branches:
@@ -330,8 +329,6 @@ jobs:
       contents: read
       pull-requests: write
     uses: IZGateway/izg-dependency-scripts/.github/workflows/auto-merge-security-update.yml@IGDD-2766
-    with:
-      base-branch: IGDD-2766   # TEMP-TEST: revert before merge (normally develop, the default)
     secrets:
       dependency-bot-app-id: ${{ secrets.DEPENDENCY_BOT_APP_ID }}
       dependency-bot-app-key: ${{ secrets.DEPENDENCY_BOT_APP_KEY }}

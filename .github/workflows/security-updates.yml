@@ -16,8 +16,6 @@ name: Security Updates
 #   - pom.xml versions-maven-plugin config (allowMinorUpdates=false => patch releases only)
 
 on:
-  push:
-    branches: [IGDD-2766]   # TEMP-TEST: revert before merge
   schedule:
     # Mon-Fri 08:00 UTC: after izgw-bom's nightly update (07:00 UTC) and the
     # develop build (06:00 UTC), so upstream changes land first.
@@ -43,8 +41,7 @@ jobs:
   security-updates:
     uses: IZGateway/izg-dependency-scripts/.github/workflows/maven-security-updates.yml@IGDD-2766
     with:
-      auto-merge: ${{ github.event_name == 'schedule' || github.event_name == 'push' || inputs.auto_merge == true }}   # TEMP-TEST: push
-      base-branch: IGDD-2766   # TEMP-TEST: revert before merge (normally develop)
+      auto-merge: ${{ github.event_name == 'schedule' || inputs.auto_merge == true }}
       maven-servers: github-bom github-core v2tofhir
       ci-description: the build, OWASP dependency-check, dev deploy and integration tests
     secrets:
