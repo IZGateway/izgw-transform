@@ -45,7 +45,8 @@ jobs:
         shell: bash
         run: |
           echo COMPUTERNAME=`hostname` >> $GITHUB_ENV
-          npm install -g newman-reporter-junitfull
+          # TEMP-TEST: from PR #298 (IGDD-2974). ubuntu-latest no longer includes newman. Revert before merge.
+          npm install -g newman newman-reporter-junitfull
           npm install -g xunit-viewer
           mkdir -p ~/.m2
           cat << EOF > ~/.m2/settings.xml
