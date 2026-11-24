@@ -1,6 +1,6 @@
 name: Security Updates
 
-# Nightly patch updates for the dependencies and plugins this project owns (everything
+# Nightly patch and minor updates for the dependencies and plugins this project owns (everything
 # outside izgw-bom / izgw-core / v2tofhir, which are bumped by their own release process).
 # The work is done by the shared workflow in IZGateway/izg-dependency-scripts; see its
 # README section "maven-security-updates".
@@ -13,7 +13,7 @@ name: Security Updates
 # Scope is controlled by:
 #   - automation-exclusions.txt   artifacts never bumped (upstream IZG projects, FIPS jars)
 #   - versions-rules.xml          pre-release / flavour filters
-#   - pom.xml versions-maven-plugin config (allowMinorUpdates=false => patch releases only)
+#   - versions-maven-plugin config inherited from izgw-bom (patch and minor, never major)
 
 on:
   schedule:

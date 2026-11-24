@@ -5,8 +5,8 @@
   (.github/workflows/security-updates.yml). izgw-bom configures the plugin's rulesUri
   to point at this file in the project root, so it must exist here.
 
-  Only stable releases are considered. Combined with allowMinorUpdates=false (set in
-  pom.xml), only patch releases are applied.
+  Only stable releases are considered. izgw-bom's plugin configuration
+  (allowMajorUpdates=false, allowMinorUpdates=true) limits updates to patch and minor releases.
 
   See: https://www.mojohaus.org/versions/versions-maven-plugin/version-rules.html
 -->

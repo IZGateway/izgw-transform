@@ -28,7 +28,9 @@
 		<jacoco.version>0.8.13</jacoco.version>
 
 		<!-- Versions owned by this project (not managed by izgw-bom). Kept as properties so the
-		     Security Updates workflow (versions:update-properties) can apply patch releases. -->
+		     Security Updates workflow (versions:update-properties) can update them. Which updates
+		     are allowed (patch and minor, never major) comes from the versions-maven-plugin
+		     configuration inherited from izgw-bom. -->
 		<guava.version>33.7.2-jre</guava.version>
 		<maven-site-plugin.version>3.21.0</maven-site-plugin.version>
 		<maven-checkstyle-plugin.version>3.4.0</maven-checkstyle-plugin.version>
@@ -166,21 +168,6 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!-- Used by .github/workflows/security-updates.yml. izgw-bom configures this plugin
-				     with allowMinorUpdates=true; POM configuration wins over -D flags, so it is
-				     overridden here to apply patch releases only. -->
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>versions-maven-plugin</artifactId>
-					<configuration>
-						<allowMajorUpdates>false</allowMajorUpdates>
-						<allowMinorUpdates>false</allowMinorUpdates>
-						<allowIncrementalUpdates>true</allowIncrementalUpdates>
-						<allowSnapshots>false</allowSnapshots>
-						<generateBackupPoms>false</generateBackupPoms>
-						<rulesUri>${project.baseUri}versions-rules.xml</rulesUri>
-					</configuration>
-				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
